@@ -1,0 +1,14 @@
+.join {color: #5AA05A; font-style: italic}
+.leave {color: #A0A05A; font-style: italic}
+.kick {color: #646464; font-style: italic}
+.ban {color: #646464; font-style: italic}
+.nick {color: #5A5AA0; font-style: italic}
+.timestamp a {color: #5A5A5A; text-decoration: none}
+.system {color: #5A5AA0}
+.emote {color: #A05AA0}
+.self {color: #000080}
+.owner {color: #800000}
+.admin {color: #008000}
+.normal {color: #000080}
+h1 {color: #369; font-family: monospace; margin-left: 20pt; border-bottom: #246 solid 2pt}
+a.h1 {text-decoration: none; color: #369}

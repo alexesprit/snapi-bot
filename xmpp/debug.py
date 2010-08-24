@@ -1,0 +1,249 @@
+# debug.py 
+
+# Copyright (c) 2003 Jacob Lundqvist
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+
+_version_ = '1.4.0'
+
+'''
+Generic debug class
+
+Other modules can always define extra debug flags for local usage, as long as
+they make sure they append them to debug_flags
+
+Also its always a good thing to prefix local flags with something, to reduce risk
+of coliding flags. Nothing breaks if two flags would be identical, but it might 
+activate unintended debugging.
+
+flags can be numeric, but that makes analysing harder, on creation its
+not obvious what is activated, and when flag_show is given, output isnt
+really meaningfull.
+
+This Debug class can either be initialized and used on app level, or used independantly
+by the individual classes.
+
+For samples of usage, see samples subdir in distro source, and selftest
+in this code
+'''
+
+import os, sys, time, traceback, types;
+
+useColors = ('TERM' in os.environ);
+
+colorNone			= chr(27) + "[0m"
+colorBlack			= chr(27) + "[30m"
+colorRed			= chr(27) + "[31m"
+colorGreen			= chr(27) + "[32m"
+colorBrown			= chr(27) + "[33m"
+colorBlue			= chr(27) + "[34m"
+colorMagenta		= chr(27) + "[35m"
+colorCyan			= chr(27) + "[36m"
+colorLightGray		= chr(27) + "[37m"
+colorDarkGray		= chr(27) + "[30;1m"
+colorBrightRed		= chr(27) + "[31;1m"
+colorBrightGreen	= chr(27) + "[32;1m"
+colorYellow			= chr(27) + "[33;1m"
+colorBrightBlue		= chr(27) + "[34;1m"
+colorPurple			= chr(27) + "[35;1m"
+colorBrightCyan		= chr(27) + "[36;1m"
+colorWhite			= chr(27) + "[37;1m"
+
+'''
+Define your flags in yor modules like this:
+
+from debug import *
+
+DBG_INIT = 'init'                ; debug_flags.append( DBG_INIT )
+DBG_CONNECTION = 'connection'    ; debug_flags.append( DBG_CONNECTION )
+
+The reason for having a double statement wis so we can validate params
+and catch all undefined debug flags
+
+This gives us control over all used flags, and makes it easier to allow
+global debugging in your code, just do something like
+
+foo = Debug( debug_flags )
+
+group flags, that is a flag in it self containing multiple flags should be
+defined without the debug_flags.append() sequence, since the parts are already
+in the list, also they must of course be defined after the flags they depend on ;)
+example:
+
+DBG_MULTI = [ DBG_INIT, DBG_CONNECTION ]
+
+NoDebug
+-------
+To speed code up, typically for product releases or such
+use this class instead if you globaly want to disable debugging
+'''
+
+DBG_ALWAYS = 'always';
+
+class NoDebug:
+	colors = {};
+
+	def __init__(self, *args, **kwargs ):
+		self.debugFlags = [];
+
+	def show(self,  *args, **kwargs):
+		pass;
+
+	def is_active(self, flag):
+		pass;
+
+	def setActiveFlags(self, activeFlags = []):
+		return(0);
+
+class Debug:  
+	colors = {};
+    
+	def __init__( self,
+				activeFlags = [],
+				logFile = sys.stderr,
+				#
+				# prefix and sufix can either be set globaly or per call.
+				# personally I use this to color code debug statements
+				# with prefix = chr(27) + '[34m'
+				#      sufix = chr(27) + '[37;1m\n'
+				#
+				prefix = 'DEBUG: ',
+				suffix = '\n',
+				#
+				# If you want unix style timestamps, 
+				#  0 disables timestamps
+				#  1 before prefix, good when prefix is a string
+				#  2 after prefix, good when prefix is a color
+				#
+				timeStamp = 0,
+				#
+				# flag_show should normaly be of, but can be turned on to get a
+				# good view of what flags are actually used for calls,
+				# if it is not None, it should be a string
+				# flags for current call will be displayed 
+				# with flag_show as separator                  
+				# recomended values vould be '-' or ':', but any string goes
+				#
+				showFlags = True,
+				validateFlags = True,
+				welcomeMsg = True):
+		
+		self.debugFlags = activeFlags;
+		if(welcomeMsg):
+			welcomeMsg = activeFlags and 1 or 0;
+
+		self._removeDuplicates();
+		if(logFile):
+			if(type(logFile) == type('')):
+				try:
+					self._fh = open(logFile, 'w');
+				except:
+					print('ERROR: can open %s for writing');
+					sys.exit(0)
+			else:
+				self._fh = logFile;
+		else:
+			self._fh = sys.stdout;
+		
+		if(timeStamp not in (0, 1, 2)):
+			raise 'Invalid timeStamp param', timeStamp;
+		self.prefix = prefix;
+		self.suffix = suffix;
+		self.timeStamp = timeStamp;
+		self.validateFlags = validateFlags;
+		self.showFlags = showFlags;
+
+		self.setActiveFlags(activeFlags);
+		if(welcomeMsg):
+			caller = sys._getframe(1);
+			try:
+				modName = ':%s' % (caller.f_locals['__name__']);
+			except:
+				modName = '';
+			self.show('Debug created for %s%s' % (caller.f_code.co_filename, modName));
+			self.show('Flags defined: %s' % ', '.join(self.activeFlags));
+
+	def setActiveFlags(self, activeFlags = None):
+		validFlags = [];
+		if(not activeFlags):
+			self.activeFlags = [];
+		elif(type(activeFlags) in (types.TupleType, types.ListType)):
+			for flag in activeFlags:
+				if(flag not in self.debugFlags):
+					sys.stderr.write('Invalid debugflag given: %s\n' % flag);
+				validFlags.append(flag);
+			self.activeFlags = validFlags;
+		else:
+			try:
+				flags = activeFlags.split(',');
+			except:
+				self.show( 'Invalid debug param given: %s' % activeFlags);
+				self.activeFlags = self.debugFlags;
+			for flag in flags:
+				validFlags.append(flag.strip());
+			self.activeFlags = validFlags;
+		self._removeDuplicates();
+	
+	def getActiveFlags(self):
+		return self.active;
+
+	def _validateFlag(self, flags):
+		if(flags):
+			for f in flags:
+				if(not f in self.debugFlags):
+					raise Exception('Invalid debugflag given: %s' % f);
+
+	def _removeDuplicates(self):
+		uniqueFlags = [];
+		for f in self.debugFlags:
+			if(f not in uniqueFlags):
+				uniqueFlags.append(f);
+		self.debugFlags = uniqueFlags;
+
+	def show(self, msg, flag = None, prefix = ''):
+		if(flag and self.validateFlags):
+			self._validateFlags(flag);
+		if(not flag or self.isActive(flag)):
+			if(not(isinstance(msg, unicode) or isinstance(msg, str))):
+				msg = unicode(msg);
+			prefixcolor = '';
+			if(useColors and prefix in self.colors):
+				msg = self.colors[prefix] + msg + colorNone;
+				if(flag):
+					prefixcolor = self.colors[flag];
+			if(prefix == 'error'):
+				_exception = sys.exc_info();
+				if(_exception[0]):
+					msg += '\n' + ''.join(traceback.format_exception(_exception[0], _exception[1], _exception[2])).rstrip();
+			prefix = self.prefix + prefixcolor;
+			if(flag and self.showFlags):
+				prefix += '[' + flag + '] ';
+			if(self.timeStamp == 2):
+				output = '%s%s ' % (prefix, time.strftime('[%H:%M:%S]', time.localtime(time.time())));
+			elif(self.timeStamp == 1):
+				output = '%s %s' % (time.strftime('[%H:%M:%S]', time.localtime(time.time())), prefix);
+			else:
+				output = prefix;
+			output = '%s%s%s' % (output, msg, self.suffix);
+			try:
+				self._fh.write(output);
+			except:
+				if(os.name == 'posix'):
+					self._fh.write(output.encode('utf-8'));
+				elif(os.name == 'nt'):
+					self._fh.write(output.encode('cp866'));
+			self._fh.flush();
+
+	def isActive(self, flag):
+		if(self.activeFlags): 
+			if(not flag or flag in self.activeFlags or DBG_ALWAYS in self.activeFlags):
+				return(1);
+		return(0);

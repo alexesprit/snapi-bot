@@ -1,0 +1,28 @@
+# coding: utf-8;
+
+# servers.py
+# Initial Copyright (c) 2007 dimichxp <dimichxp@gmail.com>
+# Modification Copyright (c) 2007-2008 Als <Als@exploit.in>>
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+def playRoulette(type, conference, nick, param):
+	if(not getNickKey(conference, nick, NICK_MODER)):
+		if(not random.randrange(0, 6)):
+			sendMsg(type, conference, nick, u'ЩЁЛК!');
+		else:
+			sendToConference(conference, u'/me выстрелила в %s' % (nick));
+			time.sleep(0.5);
+			setRole(conference, nick, 'none', u'ПЫЩЩЬ-ПТЫДЫЩЬ!');
+	else:
+		sendMsg(type, conference, nick, u'не могу я в модера стрелять :(');
+
+registerCommandHandler(playRoulette, u'рр', 10, u'Старая добрая русская рулетка', u'рр', (u'рр', ), CHAT | NONPARAM);
