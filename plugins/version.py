@@ -22,7 +22,7 @@ def showVersion(type, conference, nick, param):
 	else:
 		if(param):
 			if(chatInList(conference) and nickOnlineInChat(conference, param)):
-				jid = groupChat + '/' + param;
+				jid = conference + '/' + param;
 			else:
 				return;
 		else:

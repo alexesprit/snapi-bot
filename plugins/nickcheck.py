@@ -14,11 +14,11 @@
 # GNU General Public License for more details.
 
 def checkNick(stanza, conference, nick, trueJid):
-	if(chatInList(conference)):
-		code = stanza.getStatusCode();
-		nick = ('303' != code) and nick or stanza.getNick();
+	code = stanza.getStatusCode();
+	nick = ('303' != code) and nick or stanza.getNick();
+	if(nick):
 		command = nick.split()[0].strip().lower();
 		if(isCommand(command) or gMacros.hasMacros(command, conference) or gMacros.hasMacros(command)):
-			setRole(conference, nick, 'none', u'меняй ник!!!');
+			setRole(conference, nick, ROLE_NONE, u'меняй ник!!!');
 
 registerPresenceHandler(checkNick, CHAT);

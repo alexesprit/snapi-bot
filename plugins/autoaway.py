@@ -40,5 +40,6 @@ registerCommandHandler(autoAwayControl, u'автостатус', 30, u'Откл�
 def setAutoawayState(conference):
 	if(getConfigKey(conference, CFG_AUTOAWAY) is None):
 		setConfigKey(conference, CFG_AUTOAWAY, 1);
-
+	if(getConfigKey(conference, CFG_AUTOAWAY)):
+		createAwayTimer(conference);
 registerPluginHandler(setAutoawayState, ADD_CHAT);

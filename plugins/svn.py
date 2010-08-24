@@ -30,7 +30,7 @@ def showSvnLog(type, conference, nick, param):
 					count = 10;
 				url = param[0];
 				pipe = os.popen('svn log %s --limit %d' % (url, count));
-				sendMsg(type, conference, nick, unicode(pipe.read(), 'utf-8'));
+				sendMsg(type, conference, nick, pipe.read().decode('utf-8'));
 				break;
 
 registerCommandHandler(showSvnLog, u'svn', 10, u'Показывает лог с svn', u'svn <адрес> [кол-во]', (u'svn http://jimm-fork.googlecode.com/svn/trunk 5', ), ANY);

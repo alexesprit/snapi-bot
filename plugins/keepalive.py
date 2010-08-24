@@ -30,6 +30,9 @@ def sendKeepAlivePacket():
 		iq.addChild('ping', {}, [], xmpp.NS_PING);
 		iq.setTo(conference + '/' + getBotNick(conference));
 		gClient.SendAndCallForResponse(iq, _sendKeepAlivePacket, (keepID, conference, ));
+	startKeepAliveTimer();
+
+def startKeepAliveTimer():
 	startTimer(KEEPALIVE_TIMEOUT, sendKeepAlivePacket);
 
 registerPluginHandler(sendKeepAlivePacket, INIT_2);

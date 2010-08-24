@@ -35,13 +35,13 @@ def giveBomb(type, conference, nick, param):
 		return;
 	userNick = param or random.choice(getOnlineNicks(conference));
 	if(nickOnlineInChat(conference, userNick)): 
-		truejid = getTrueJid(conference, userNick);
-		if(bombMarked(conference, truejid)):
+		trueJid = getTrueJid(conference, userNick);
+		if(bombMarked(conference, trueJid)):
 			sendMsg(type, conference, nick, u'в него уже кинули, ему хватит :-D');
 		else:
 			colors = getRandomColors();
-			gBombAnswer[conference][truejid] = random.choice(colors);
-			gBombColors[conference][truejid] = colors;
+			gBombAnswer[conference][trueJid] = random.choice(colors);
+			gBombColors[conference][trueJid] = colors;
 			timeout = random.randrange(40, 71);
 			if(colors):
 				message = u'вам вручена бомба, на ней %d цветов: %s, ' % (len(colors), ', '.join(colors));
@@ -50,15 +50,14 @@ def giveBomb(type, conference, nick, param):
 				# это не баг, это фича :)
 				message = u'хаха, тебе не повезло, у тебя бомба БЕЗ проводов! она взорвётся через %s' % (time2str(timeout));
 			sendMsg(type, conference, userNick, message);
-			gBombTimers[conference][truejid] = startTimer(timeout, bombExec, (type, conference, nick)); 
+			gBombTimers[conference][trueJid] = startTimer(timeout, bombExec, (type, conference, nick, trueJid)); 
 
-def bombExec(type, conference, nick):
-	trueJid = getTrueJid(conference, nick);
+def bombExec(type, conference, nick, trueJid):
 	if(nickOnlineInChat(conference, nick)):
-		sendMsg(type, conference, userNick, u'надо было резать %s, чего тормозишь? :)' % (gBombAnswer[groupChat][trueJid]));
+		sendMsg(type, conference, nick, u'надо было резать %s, чего тормозишь? :)' % (gBombAnswer[conference][trueJid]));
 		detonate(type, conference, nick);
 	else:
-		sendMsg(type, conference, userNick, u'трус :/');
+		sendMsg(type, conference, nick, u'трус :/');
 
 def bombColorsListener(stanza, type, conference, nick, trueJid, param):
 	if(bombMarked(conference, trueJid)):
@@ -76,7 +75,6 @@ def bombColorsListener(stanza, type, conference, nick, trueJid, param):
 
 def detonate(type, conference, nick):
 	num = random.randrange(0, 10);
-	printf('detonate');
 	if(num < 1 or getNickKey(conference, nick, NICK_MODER)):
 		sendMsg(type, conference, nick, u'бомба глюкнула...');
 	elif(num < 7):

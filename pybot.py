@@ -54,7 +54,7 @@ PARAM = 1 << 5;
 ANY = CHAT | ROSTER;
 
 PRIVATE = 'chat';
-PUBLIC = 'conference';
+PUBLIC = 'groupchat';
 ERROR = 'error';
 HEADLINE = 'headline';
 RESULT = 'result';
@@ -69,7 +69,6 @@ NICK_JOINED = 'joined';
 
 IDLE_TIMEOUT = 600;
 JOIN_TIMEOUT = 5;
-CONFLOAD_TIMEOUT = 5;
 REJOIN_TIMEOUT = 120;
 RETRY_TIMEOUT = 15;
 RECONNECT_DELAY = 5;
@@ -293,21 +292,27 @@ def getConfigKey(conference, key):
 def setConfigKey(conference, key, value):
 	gConfig[conference][key] = value;
 
+def joinConferences(conferences):
+	for conference in conferences:
+		addConference(conference);
+		joinConference(conference, getBotNick(conference), getConfigKey(conference, 'password'));
+		saveChatConfig(conference);
+		time.sleep(JOIN_TIMEOUT);
+	printf('Entered in %d rooms' % (len(conferences)), FLAG_SUCCESS);
+
 def addConference(conference):
 	gChats[conference] = {};
 	gIsJoined[conference] = False;
 	writeFile(CHATLIST_FILE, str(gChats.keys()));
 	loadChatConfig(conference);
 	for process in gPluginHandlers[ADD_CHAT]:
-		startThread(process, (conference, ));
-	if(getConfigKey(conference, CFG_AUTOAWAY)):
-		createAwayTimer(conference);
+		process(conference);
 
 def delConference(conference):
 	if(getConfigKey(conference, CFG_AUTOAWAY)):
 		stopAwayTimer(conference);
 	for instance in gPluginHandlers[DEL_CHAT]:
-		startThread(instance, (conference, ));
+		instance(conference);
 	del(gIsJoined[conference]);
 	del(gConfig[conference]);
 	del(gChats[conference]);
@@ -771,16 +776,12 @@ def start():
 	setRosterStatus(None, None, gPriority);
 	gRoster = gClient.getRoster();
 
+	printf('Now I am ready to work :)');
+
 	createFile(CHATLIST_FILE, '[]');
 	conferences = eval(readFile(CHATLIST_FILE));
 	if(conferences):
-		for conference in conferences:
-			addConference(conference);
-			time.sleep(JOIN_TIMEOUT);
-			joinConference(conference, getBotNick(conference), getConfigKey(conference, 'password'));
-			saveChatConfig(conference);
-		printf('Entered in %d rooms' % (len(conferences)), FLAG_SUCCESS);
-	printf('Now I am ready to work :)');
+		startThread(joinConferences, (conferences, ));
 
 	for process in gPluginHandlers[INIT_2]:
 		startThread(process);

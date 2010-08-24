@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def joinConference(type, conference, nick, param):
+def joinToConference(type, conference, nick, param):
 	param = param.split();
 	if(param and param[0].count('@')):
 		conf = param[0];
@@ -21,20 +21,20 @@ def joinConference(type, conference, nick, param):
 			sendMsg(type, conference, nick, u'я уже там!');
 		else:
 			password = (len(param) == 2) and param[1] or None;
-			addGroupChat(conf);
+			addConference(conf);
 			time.sleep(1);
-			joinGroupChat(conf, gBotNick, getConfigKey(conf, 'password'));
+			joinConference(conf, gBotNick, getConfigKey(conf, 'password'));
 			saveChatConfig(conf);
 			sendMsg(type, conference, nick, u'зашла');
 
-def leaveConference(type, conference, nick, param):
+def leaveAConference(type, conference, nick, param):
 	conf = param or conference;
 	if(chatInList(conf)):
 		if(not chatInList(conference)):
 			sendMsg(type, conference, nick, u'ушла');
-		leaveGroupChat(conf, u'меня уводит %s' % (nick));
+		leaveConference(conf, u'меня уводит %s' % (nick));
 	else:
 		sendMsg(type, conference, nick, u'а меня там нету');
 
-registerCommandHandler(joinConference, u'зайти', 100, u'Зайти в определённую конференцию', u'зайти <конференция> [пароль]', (u'зайти test@conference.jabber.aq', u'зайти test@conference.jabber.ru 1234'));
-registerCommandHandler(leaveConference, u'свали', 30, u'Заставляет выйти из текущей или определённой конференции', u'свали [конференция]', (u'свали test@conference.jabber.ru', u'свали'));
+registerCommandHandler(joinToConference, u'зайти', 100, u'Зайти в определённую конференцию', u'зайти <конференция> [пароль]', (u'зайти test@conference.jabber.aq', u'зайти test@conference.jabber.ru 1234'));
+registerCommandHandler(leaveAConference, u'свали', 30, u'Заставляет выйти из текущей или определённой конференции', u'свали [конференция]', (u'свали test@conference.jabber.ru', u'свали'));
