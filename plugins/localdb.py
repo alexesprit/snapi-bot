@@ -38,6 +38,8 @@ def getKeyToPrivate(type, conference, nick, param):
 		key = param[0].lower();
 	if(confJid):
 		if(key in gLocalBase[conference]):
+			if(PUBLIC == type):
+				sendMsg(type, conference, nick, u'ушло');
 			sendTo(PRIVATE, confJid, u'про %s я знаю следующее:\n%s' % (key, gLocalBase[conference][key]))
 		else:
 			sendMsg(type, conference, nick, u'я хз что такое %s :(' % key);

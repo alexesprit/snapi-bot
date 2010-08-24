@@ -34,9 +34,9 @@ def showTopTalkers(type, conference, nick):
 			words = statistic['words'];
 			messages = statistic['messages'];
 			meMessages = statistic['mes'];
-			nick = statistic['nick'];
+			userNick = statistic['nick'];
 			wordsPerMsg = (float(words)) / (messages + meMessages);
-			topList.append([messages, meMessages, words, wordsPerMsg, nick]);
+			topList.append([messages, meMessages, words, wordsPerMsg, userNick]);
 			if(i == count - 1):
 				break;
 		topList.sort();

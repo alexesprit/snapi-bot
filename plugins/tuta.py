@@ -40,10 +40,9 @@ registerCommandHandler(showHereStatistic, u'тута', 10, u'Показывае�
 def updateJoinStatistic(groupChat, nick, trueJid, aff, role):
 	base = gHereTimeCache[groupChat];
 	info = base.getKey(trueJid);
-	if(info):
-		info['count'] += 1;
-	else:
+	if(not info):
 		info = {'record': 0, 'count': 0, 'here': 0};
+	info['count'] += 1;
 	base.setKey(trueJid, info);
 	base.save();
 

@@ -33,11 +33,12 @@ def writeHeader(fp, jid, (year, month, day)):
 
 def getLogFile(type, jid, (year, month, day)):
 	fileName = u'%s/%s/%d/%02d/%02d.html' % (gLogDir, jid, year, month, day);
+	fileName = fileName.encode('utf-8');
 	if(os.path.exists(fileName)):
 		fp = file(fileName, 'a');
 	else:
 		createFile(fileName, '');
-		fp = file(fileName, 'w')
+		fp = file(fileName, 'w');
 		writeHeader(fp, jid, (year, month, day));
 	return(fp);
 
@@ -74,19 +75,19 @@ def writeLog(type, jid, nick, body, aff = 0):
 	fp.close();
 
 def writeMessage(stanza, type, conference, nick, trueJid, text):
-	if(getConfigKey(conference, CFG_LOG) == 1):
+	if(PUBLIC == type and getConfigKey(conference, CFG_LOG)):
 		aff = 0;
-		if(nick and getNickKey(conference, nick, 'ismoder')):
+		if(nick and getNickKey(conference, nick, NICK_MODER)):
 			level = getAccess(conference, trueJid);
 			aff = (level >= 30) and 2 or 1;
 		writeLog(type, conference, nick, text, aff);
 
 def writeUserJoin(groupChat, nick, trueJid, aff, role):
-	if(getConfigKey(groupChat, CFG_LOG) == 1):
+	if(getConfigKey(groupChat, CFG_LOG)):
 		writeLog(PUBLIC, groupChat, '@$$join$$@', u'%s зашёл в комнату как %s и %s' % (nick, role, aff));
 
 def writeUserLeave(groupChat, nick, trueJid, reason, code):
-	if(getConfigKey(groupChat, CFG_LOG) == 1):
+	if(getConfigKey(groupChat, CFG_LOG)):
 		if(code == '307'):
 			if(reason):
 				writeLog(PUBLIC, groupChat, '@$$kick$$@', u'%s выгнали из комнаты (%s)' % (nick, reason));
@@ -104,7 +105,7 @@ def writeUserLeave(groupChat, nick, trueJid, reason, code):
 				writeLog(PUBLIC, groupChat, '@$$leave$$@', u'%s вышел из комнаты' % (nick));
 
 def writePresence(stanza, conference, nick, trueJid):
-	if(getConfigKey(conference, CFG_LOG) == 1):
+	if(getConfigKey(conference, CFG_LOG)):
 		code = stanza.getStatusCode();
 		type = stanza.getType();
 		if(code == '303'):

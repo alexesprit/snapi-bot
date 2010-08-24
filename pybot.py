@@ -25,7 +25,7 @@ import database, macros, simplejson, xmpp;
 PLUGIN_DIR = 'plugins';
 PID_FILE = 'pid.txt';
 CONFIG_FILE = 'config.py';
-CHATLIST_FILE = 'config/conrerences.txt';
+CHATLIST_FILE = 'config/conferences.txt';
 GLOBACCESS_FILE = 'config/access.txt';
 PERMACCESS_FILE = 'config/%s/access.txt';
 CHATCONFIG_FILE = 'config/%s/config.txt';
@@ -249,6 +249,7 @@ def decode(text):
 	return(XMLUnescape(text));
 
 def createFile(path, data):
+	path = path.encode('utf-8');
 	if(not os.access(path, os.F_OK)):
 		dir = os.path.dirname(path);
 		if(not os.path.exists(dir)):
@@ -259,6 +260,7 @@ def createFile(path, data):
 		f.close();
 
 def readFile(path, encoding = None):
+	path = path.encode('utf-8');
 	printf('Read: %s' % (path), FLAG_READ);
 	f = file(path);
 	data = f.read();
@@ -268,6 +270,7 @@ def readFile(path, encoding = None):
 	return(data);
 
 def writeFile(path, data, mode = 'w'):
+	path = path.encode('utf-8');
 	printf('Write: %s' % (path), FLAG_WRITE);
 	f = file(path, mode);
 	f.write(data);
@@ -577,6 +580,10 @@ def messageHandler(session, stanza):
 		botNick = getBotNick(conference);
 		if(botNick == nick):
 			return;
+		if(message.startswith(botNick)):
+			for x in [botNick + x for x in (':', ',')]:
+				if(message.startswith(x)):
+					message = message.replace(x, '').strip();
 		prefix = getConfigKey(conference, 'prefix');
 		if(prefix):
 			if(message.startswith(prefix)):
@@ -697,17 +704,21 @@ def errorHandler(funcName):
 def loadPlugins():
 	printf('Loading plugins...');
 	validPlugins = 0;
+	invalidPlugins = 0;
 	plugins = os.listdir(PLUGIN_DIR);
 	for plugin in plugins:
 		try:
-			exec(file(os.path.join(PLUGIN_DIR, plugin))) in globals();
-			validPlugins += 1;
+			path = os.path.join(PLUGIN_DIR, plugin);
+			if(os.path.isfile(path)):
+				exec(file(path)) in globals();
+				validPlugins += 1;
 		except(SyntaxError, NameError):
 			errorHandler('loadPlugins');
-	if(validPlugins == len(plugins)):
+			invalidPlugins += 1;
+	if(not invalidPlugins):
 		printf('Loaded %d plugins' % (validPlugins), FLAG_SUCCESS);
 	else:
-		printf('Loaded %d plugins (%d with errors)' % (validPlugins, len(plugins) - validPlugins), FLAG_WARNING);
+		printf('Loaded %d plugins (%d with errors)' % (validPlugins, invalidPlugins), FLAG_WARNING);
 
 def detectMultiLaunch():
 	if(os.name == 'posix'):
@@ -766,13 +777,12 @@ def start():
 	if(chatList):
 		for groupChat in chatList:
 			addGroupChat(groupChat);
-			time.sleep(1);
+			time.sleep(JOIN_TIMEOUT);
 			joinGroupChat(groupChat, getBotNick(groupChat), getConfigKey(groupChat, 'password'));
 			saveChatConfig(groupChat);
 		printf('Entered in %d rooms' % (len(chatList)), FLAG_SUCCESS);
 	printf('Now I am ready to work :)');
 
-	gInfo['start'] = time.time();
 	for process in gPluginHandlers[INIT_2]:
 		startThread(process);
 	while(1):
@@ -782,6 +792,7 @@ if(__name__ == '__main__'):
 	try:
 		pid = detectMultiLaunch();
 		if(not pid):
+			gInfo['start'] = time.time();
 			start();
 		else:
 			printf('Another instance is running (pid: %s)' % (pid), FLAG_ERROR);
