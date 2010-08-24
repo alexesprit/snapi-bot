@@ -64,5 +64,5 @@ def showCommands(type, conference, nick, param):
 		sendMsg(type, conference, nick, u'ушли');
 	sendMsg(PRIVATE, conference, nick, message);	
 
-registerCommandHandler(showHelp, u'помощь', 0, u'Даёт справку об определённой команде или выводит общую справку', u'помощь [команда]', (u'помощь пинг'), ANY | FROZEN);
-registerCommandHandler(showCommands, u'команды', 0, u'Показывает список всех команд', u'команды', (u'команды', u'команды все'), ANY | FROZEN | NONPARAM);
+registerCommandHandler(showHelp, u'помощь', 0, u'Даёт справку об определённой команде или выводит общую справку', u'помощь [команда]', (u'помощь', u'помощь пинг'), ANY | FROZEN);
+registerCommandHandler(showCommands, u'команды', 0, u'Показывает список всех команд', None, (u'команды', ), ANY | FROZEN | NONPARAM);

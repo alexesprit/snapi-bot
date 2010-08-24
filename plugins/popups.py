@@ -32,7 +32,7 @@ def popupsControl(type, conference, nick, param):
 		else:
 			sendMsg(type, conference, nick, u'прочитай помощь по команде');
 	else:
-		sendMsg(type, conference, nick, u'текущее значение: %s' % (getConfigKey(conference, 'popups')));
+		sendMsg(type, conference, nick, u'текущее значение: %s' % (getConfigKey(conference, CFG_POPUPS)));
 	
 def setPopupsState(conference):
 	if(getConfigKey(conference, CFG_POPUPS) is None):

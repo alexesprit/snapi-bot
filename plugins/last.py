@@ -33,4 +33,4 @@ def _showOnlineTime(stanza, lastID, type, conference, nick):
 		else:
 			sendMsg(type, conference, nick, u'не получается :(');
 
-registerCommandHandler(showOnlineTime, u'всети', 10, u'Показывает ваше время в сети', None, (u'всети'), ROSTER | NONPARAM);
+registerCommandHandler(showOnlineTime, u'всети', 10, u'Показывает ваше время в сети', None, (u'всети', ), ROSTER | NONPARAM);

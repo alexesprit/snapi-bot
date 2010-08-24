@@ -74,4 +74,4 @@ registerPresenceHandler(presenceUpdate, CHAT);
 registerMessageHandler(messageUpdate, CHAT);
 registerBotMessageHandler(botMessageUpdate);
 registerPluginHandler(createStatistic, ADD_CHAT);
-registerCommandHandler(showStatistic, u'статистика', 10, u'Статистика текущей конференции', u'статистика', (u'статистика', ), CHAT | NONPARAM);
+registerCommandHandler(showStatistic, u'статистика', 10, u'Статистика текущей конференции', None, (u'статистика', ), CHAT | NONPARAM);

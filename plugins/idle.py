@@ -18,4 +18,4 @@ def showUserIdleTime(type, conference, nick, param):
 		idleTime = int(time.time() - getNickKey(conference, param, NICK_IDLE));
 		sendMsg(type, conference, nick, u'%s заснул %s назад' % (param, time2str(idleTime)));
 
-registerCommandHandler(showUserIdleTime, u'жив', 10, u'Показывает время неактивности пользователя', u'жив <ник>', (u'жив Nick'), CHAT | PARAM);
+registerCommandHandler(showUserIdleTime, u'жив', 10, u'Показывает время неактивности пользователя', u'жив <ник>', (u'жив Nick', ), CHAT | PARAM);

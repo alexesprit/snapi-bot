@@ -14,6 +14,7 @@
 # GNU General Public License for more details.
 
 def botRestart(type, conference, nick, param):
+	nick = (chatInList(conference)) and nick or conference.split('@')[0];
 	if(param):
 		message = u'меня перезагружает %s (%s)' % (nick, param);
 	else:
@@ -29,6 +30,7 @@ def botRestart(type, conference, nick, param):
 registerCommandHandler(botRestart, u'рестарт', 100, u'Перезапускает бота', u'рестарт [причина]', (u'рестарт', u'рестарт ы!'), ANY | FROZEN);
 
 def botShutdown(type, conference, nick, param):
+	nick = (chatInList(conference)) and nick or conference.split('@')[0];
 	if(param):
 		message = u'меня выключает %s (%s)' % (nick, param);
 	else:

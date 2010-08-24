@@ -48,4 +48,4 @@ def loadGreetings(conference):
 
 registerJoinHandler(sendGreeting);
 registerPluginHandler(loadGreetings, ADD_CHAT);
-registerCommandHandler(setGreet, u'приветствие', 30, u'Добавляет приветствие для определённого ника/жида', u'приветствие <ник/жид> = [текст]', (u'приветствие Nick = something'), CHAT | PARAM);
+registerCommandHandler(setGreet, u'приветствие', 30, u'Добавляет приветствие для определённого ника/жида', u'приветствие <ник/жид> = [текст]', (u'приветствие Nick = something', ), CHAT | PARAM);

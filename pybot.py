@@ -54,10 +54,11 @@ PARAM = 1 << 5;
 ANY = CHAT | ROSTER;
 
 PRIVATE = 'chat';
-PUBLIC = 'groupchat';
+PUBLIC = 'conference';
 ERROR = 'error';
 HEADLINE = 'headline';
 RESULT = 'result';
+UNAVAILABLE = 'unavailable';
 
 NICK_JID = 'jid';
 NICK_IDLE = 'idle';
@@ -68,6 +69,7 @@ NICK_JOINED = 'joined';
 
 IDLE_TIMEOUT = 600;
 JOIN_TIMEOUT = 5;
+CONFLOAD_TIMEOUT = 5;
 REJOIN_TIMEOUT = 120;
 RETRY_TIMEOUT = 15;
 RECONNECT_DELAY = 5;
@@ -276,47 +278,47 @@ def writeFile(path, data, mode = 'w'):
 	f.write(data);
 	f.close();
 
-def loadChatConfig(groupChat):
-	fileName = CHATCONFIG_FILE % (groupChat);
+def loadChatConfig(conference):
+	fileName = CHATCONFIG_FILE % (conference);
 	createFile(fileName, '{}');
-	gConfig[groupChat] = eval(readFile(fileName));
+	gConfig[conference] = eval(readFile(fileName));
 
-def saveChatConfig(groupChat):
-	fileName = CHATCONFIG_FILE % (groupChat);
-	writeFile(fileName, str(gConfig[groupChat]));
+def saveChatConfig(conference):
+	fileName = CHATCONFIG_FILE % (conference);
+	writeFile(fileName, str(gConfig[conference]));
 
-def getConfigKey(groupChat, key):
-	return(gConfig[groupChat].get(key));
+def getConfigKey(conference, key):
+	return(gConfig[conference].get(key));
 
-def setConfigKey(groupChat, key, value):
-	gConfig[groupChat][key] = value;
+def setConfigKey(conference, key, value):
+	gConfig[conference][key] = value;
 
-def addGroupChat(groupChat):
-	gChats[groupChat] = {};
-	gIsJoined[groupChat] = False;
+def addConference(conference):
+	gChats[conference] = {};
+	gIsJoined[conference] = False;
 	writeFile(CHATLIST_FILE, str(gChats.keys()));
-	loadChatConfig(groupChat);
+	loadChatConfig(conference);
 	for process in gPluginHandlers[ADD_CHAT]:
-		startThread(process, (groupChat, ));
-	if(getConfigKey(groupChat, 'autoaway')):
-		createAwayTimer(groupChat);
+		startThread(process, (conference, ));
+	if(getConfigKey(conference, CFG_AUTOAWAY)):
+		createAwayTimer(conference);
 
-def delGroupChat(groupChat):
-	if(getConfigKey(groupChat, 'autoaway')):
-		stopAwayTimer(groupChat);
+def delConference(conference):
+	if(getConfigKey(conference, CFG_AUTOAWAY)):
+		stopAwayTimer(conference);
 	for instance in gPluginHandlers[DEL_CHAT]:
-		startThread(instance, (groupChat, ));
-	del(gIsJoined[groupChat]);
-	del(gConfig[groupChat]);
-	del(gChats[groupChat]);
+		startThread(instance, (conference, ));
+	del(gIsJoined[conference]);
+	del(gConfig[conference]);
+	del(gChats[conference]);
 	writeFile(CHATLIST_FILE, str(gChats.keys()));
 
-def joinGroupChat(groupChat, nick, password):
-	setConfigKey(groupChat, 'nick', nick);
-	setConfigKey(groupChat, 'password', password);
-	prs = xmpp.Presence(groupChat + '/' + nick, priority = gPriority);
-	status = getConfigKey(groupChat, 'status');
-	show = getConfigKey(groupChat, 'show');
+def joinConference(conference, nick, password):
+	setConfigKey(conference, 'nick', nick);
+	setConfigKey(conference, 'password', password);
+	prs = xmpp.Presence(conference + '/' + nick, priority = gPriority);
+	status = getConfigKey(conference, 'status');
+	show = getConfigKey(conference, 'show');
 	if(status):
 		prs.setStatus(status);
 	if(show):
@@ -328,16 +330,16 @@ def joinGroupChat(groupChat, nick, password):
 		mucTag.setTagData('password', password);
 	gClient.send(prs);
 
-def leaveGroupChat(groupChat, status = None):
-	prs = xmpp.Presence(groupChat, 'unavailable');
+def leaveconference(conference, status = None):
+	prs = xmpp.Presence(conference, UNAVAILABLE);
 	if(status):
 		prs.setStatus(status);
 	gClient.send(prs);
-	delGroupChat(groupChat);
+	delConference(conference);
 
-def getBotNick(groupChat):
-	if(groupChat in gChats):
-		return(getConfigKey(groupChat, 'nick') or gBotNick);
+def getBotNick(conference):
+	if(conference in gChats):
+		return(getConfigKey(conference, 'nick') or gBotNick);
 	return(gBotNick);
 	
 def getCapsNode():
@@ -362,36 +364,36 @@ def setRosterStatus(status, show, priority):
 	prs.addChild(node = getCapsNode());
 	gClient.send(prs);
 
-def setBotStatus(groupChat, status, show, away = 0):
-	prs = xmpp.Presence(groupChat, priority = gPriority);
+def setBotStatus(conference, status, show, away = 0):
+	prs = xmpp.Presence(conference, priority = gPriority);
 	if(status):
 		prs.setStatus(status);
 	if(show):
 		prs.setShow(show);
 	prs.addChild(node = getCapsNode());
 	gClient.send(prs);
-	if(getConfigKey(groupChat, 'autoaway')):
-		gAutoAway[groupChat]['away'] = away;
+	if(getConfigKey(conference, CFG_AUTOAWAY)):
+		gAutoAway[conference]['away'] = away;
 		
-def hasAwayTimer(groupChat):
-	return(groupChat in gAutoAway);
+def hasAwayTimer(conference):
+	return(conference in gAutoAway);
 		
-def createAwayTimer(groupChat):
-	gAutoAway[groupChat] = {'away': 0, 'thr': None};
-	resetAwayTimer(groupChat, False);
+def createAwayTimer(conference):
+	gAutoAway[conference] = {'away': 0, 'thr': None};
+	resetAwayTimer(conference, False);
 		
-def resetAwayTimer(groupChat, cancel = True):
+def resetAwayTimer(conference, cancel = True):
 	if(cancel):
-		gAutoAway[groupChat]['thr'].cancel();
-	gAutoAway[groupChat]['thr'] = startTimer(IDLE_TIMEOUT, setBotStatus, (groupChat, time.strftime(u'I\'ve been away since %H:%M'), 'away', 1));
+		gAutoAway[conference]['thr'].cancel();
+	gAutoAway[conference]['thr'] = startTimer(IDLE_TIMEOUT, setBotStatus, (conference, time.strftime(u'I\'ve been away since %H:%M'), 'away', 1));
 	
-def stopAwayTimer(groupChat):
-	gAutoAway[groupChat]['thr'].cancel();
-	del(gAutoAway[groupChat]);	
+def stopAwayTimer(conference):
+	gAutoAway[conference]['thr'].cancel();
+	del(gAutoAway[conference]);	
 
-def setRole(groupChat, nick, role, reason):
+def setRole(conference, nick, role, reason):
 	iq = xmpp.Iq('set');
-	iq.setTo(groupChat);
+	iq.setTo(conference);
 	query = xmpp.Node('query', {'xmlns': xmpp.NS_MUC_ADMIN});
 	if(nick.count('@')):
 		role = query.addChild('item', {'jid': nick, 'role': role});
@@ -401,9 +403,9 @@ def setRole(groupChat, nick, role, reason):
 	iq.addChild(node = query);
 	gClient.send(iq);
 
-def setAffiliation(groupChat, nick, aff, reason):
+def setAffiliation(conference, nick, aff, reason):
 	iq = xmpp.Iq('set');
-	iq.setTo(groupChat);
+	iq.setTo(conference);
 	query = xmpp.Node('query', {'xmlns': xmpp.NS_MUC_ADMIN});
 	if(nick.count('@')):
 		aff = query.addChild('item', {'jid': nick, 'affiliation': aff});
@@ -422,18 +424,18 @@ def isCommand(command):
 def isCommandType(command, type):
 	return(gCommands[command]['type'] & type);
 
-def isAvailableCommand(groupChat, command):
-	return(not(groupChat in gCmdOff and command in gCmdOff[groupChat]));
+def isAvailableCommand(conference, command):
+	return(not(conference in gCmdOff and command in gCmdOff[conference]));
 
-def getNicks(groupChat):
-	return(gChats[groupChat].keys());
+def getNicks(conference):
+	return(gChats[conference].keys());
 
-def getOnlineNicks(groupChat):
-	return([x for x in gChats[groupChat] if(getNickKey(groupChat, x, NICK_HERE))]);
+def getOnlineNicks(conference):
+	return([x for x in gChats[conference] if(getNickKey(conference, x, NICK_HERE))]);
 
-def getJidList(groupChat, offline = False):
-	nicks = offline and getNicks(groupChat) or getOnlineNicks(groupChat);
-	jidList = tuple(set([getTrueJid(groupChat,  nick) for nick in nicks]));
+def getJidList(conference, offline = False):
+	nicks = offline and getNicks(conference) or getOnlineNicks(conference);
+	jidList = tuple(set([getTrueJid(conference,  nick) for nick in nicks]));
 	return(jidList);
 	
 def getTrueJid(jid, resource = None):
@@ -450,35 +452,35 @@ def getTrueJid(jid, resource = None):
 def getChatList():
 	return(gChats.keys());
 
-def getNickKey(groupChat, nick, key):
-	return(gChats[groupChat][nick].get(key));
+def getNickKey(conference, nick, key):
+	return(gChats[conference][nick].get(key));
 
-def setNickKey(groupChat, nick, key, value):
-	gChats[groupChat][nick][key] = value;
+def setNickKey(conference, nick, key, value):
+	gChats[conference][nick][key] = value;
 
-def chatInList(groupChat):
-	return(groupChat in gChats);
+def chatInList(conference):
+	return(conference in gChats);
 
-def nickInChat(groupChat, nick):
-	return(nick in gChats[groupChat]);
+def nickInChat(conference, nick):
+	return(nick in gChats[conference]);
 
-def nickOnlineInChat(groupChat, nick):
-	return(nickInChat(groupChat, nick) and getNickKey(groupChat, nick, NICK_HERE));
+def nickOnlineInChat(conference, nick):
+	return(nickInChat(conference, nick) and getNickKey(conference, nick, NICK_HERE));
 
-def setTempAccess(groupChat, jid, level = 0):
-	gTempAccess[groupChat][jid] = None;	
+def setTempAccess(conference, jid, level = 0):
+	gTempAccess[conference][jid] = None;	
 	if(level):
-		gTempAccess[groupChat][jid] = level;
+		gTempAccess[conference][jid] = level;
 	else:
-		del(gTempAccess[groupChat][jid]);
+		del(gTempAccess[conference][jid]);
 
-def setPermAccess(groupChat, jid, level = 0):
-	gPermAccess[groupChat][jid] = None;
+def setPermAccess(conference, jid, level = 0):
+	gPermAccess[conference][jid] = None;
 	if(level):
-		gPermAccess[groupChat][jid] = level;
+		gPermAccess[conference][jid] = level;
 	else:
-		del(gPermAccess[groupChat][jid]);
-	writeFile(PERMACCESS_FILE % groupChat, str(gPermAccess[groupChat]));
+		del(gPermAccess[conference][jid]);
+	writeFile(PERMACCESS_FILE % conference, str(gPermAccess[conference]));
 
 def setPermGlobalAccess(jid, level = 0):
 	tempAccess = eval(readFile(GLOBACCESS_FILE));
@@ -499,14 +501,14 @@ def setTempGlobalAccess(jid, level = 0):
 	else:
 		del(gGlobalAccess[jid]);
 
-def getAccess(groupChat, jid):
+def getAccess(conference, jid):
 	if(jid in gGlobalAccess):
 		return(gGlobalAccess[jid]);
-	if(groupChat in gChats):
-		if(jid in gPermAccess[groupChat]):
-			return(gPermAccess[groupChat][jid]);
-		if(jid in gTempAccess[groupChat]):
-			return(gTempAccess[groupChat][jid]);	
+	if(conference in gChats):
+		if(jid in gPermAccess[conference]):
+			return(gPermAccess[conference][jid]);
+		if(jid in gTempAccess[conference]):
+			return(gTempAccess[conference][jid]);	
 	else:
 		return(11);
 	return(0);
@@ -565,7 +567,7 @@ def messageHandler(session, stanza):
 			time.sleep(0.5);
 			gClient.send(xmpp.Message(fullJid, message, PUBLIC));
 		elif(errorCode == '406'):
-			joinGroupChat(conference, gBotNick, getConfigKey(conference, 'password'));
+			joinConference(conference, gBotNick, getConfigKey(conference, 'password'));
 			time.sleep(0.5);
 			gClient.send(xmpp.Message(fullJid, message, PUBLIC));
 		return;
@@ -640,7 +642,7 @@ def presenceHandler(session, stanza):
 		if(not prsType):
 			if(not trueJid):
 				sendToConference(conference, u'Без прав модератора работа невозможна!');
-				leaveGroupChat(conference);
+				leaveconference(conference);
 				return;
 			if(not nickOnlineInChat(conference, nick)):
 				aff = stanza.getAffiliation();
@@ -675,13 +677,13 @@ def presenceHandler(session, stanza):
 		elif(prsType == ERROR):
 			errorCode = stanza.getErrorCode();
 			if(errorCode == '409'):
-				joinGroupChat(groupChat, getBotNick(conference) + '.', getConfigKey(conference, 'password'));
+				joinConference(conference, getBotNick(conference) + '.', getConfigKey(conference, 'password'));
 			elif(errorCode == '404'):
-				delGroupChat(conference);
+				delConference(conference);
 			elif(errorCode == '503'):
-				startTimer(REJOIN_TIMEOUT, conference, (groupChat, getBotNick(conference), getConfigKey(conference, 'password')));
+				startTimer(REJOIN_TIMEOUT, conference, (conference, getBotNick(conference), getConfigKey(conference, 'password')));
 			elif(errorCode in ('401', '403', '405')):
-				leaveGroupChat(conference, u'got %s error code' % errorCode);
+				leaveconference(conference, u'got %s error code' % errorCode);
 		callPresenceHandlers(stanza, CHAT, conference, nick, trueJid);
 	else:
 		callPresenceHandlers(stanza, ROSTER, conference, nick, trueJid);
@@ -737,9 +739,6 @@ def restart():
 		os.remove(PID_FILE);
 	os.execl(sys.executable, sys.executable, sys.argv[0]);
 
-def test():
-	printf(getUniqueID('t'));
-
 def start():
 	global gRoster;
 	loadPlugins();
@@ -773,14 +772,14 @@ def start():
 	gRoster = gClient.getRoster();
 
 	createFile(CHATLIST_FILE, '[]');
-	chatList = eval(readFile(CHATLIST_FILE));
-	if(chatList):
-		for groupChat in chatList:
-			addGroupChat(groupChat);
+	conferences = eval(readFile(CHATLIST_FILE));
+	if(conferences):
+		for conference in conferences:
+			addConference(conference);
 			time.sleep(JOIN_TIMEOUT);
-			joinGroupChat(groupChat, getBotNick(groupChat), getConfigKey(groupChat, 'password'));
-			saveChatConfig(groupChat);
-		printf('Entered in %d rooms' % (len(chatList)), FLAG_SUCCESS);
+			joinConference(conference, getBotNick(conference), getConfigKey(conference, 'password'));
+			saveChatConfig(conference);
+		printf('Entered in %d rooms' % (len(conferences)), FLAG_SUCCESS);
 	printf('Now I am ready to work :)');
 
 	for process in gPluginHandlers[INIT_2]:
@@ -798,7 +797,7 @@ if(__name__ == '__main__'):
 			printf('Another instance is running (pid: %s)' % (pid), FLAG_ERROR);
 	except(KeyboardInterrupt):
 		if(gClient.isConnected()):
-			prs = xmpp.Presence(typ = 'unavailable');
+			prs = xmpp.Presence(typ = UNAVAILABLE);
 			prs.setStatus(u'выключаюсь (CTRL+C)');
 			gClient.send(prs);
 	except(SystemExit):
@@ -810,7 +809,7 @@ if(__name__ == '__main__'):
 		writeFile(fileName, traceback.format_exc() + '\n', 'a');		
 		if(gRestart):
 			if(gClient.isConnected()):
-				prs = xmpp.Presence(typ = 'unavailable');
+				prs = xmpp.Presence(typ = UNAVAILABLE);
 				prs.setStatus(u'что-то сломалось...');
 				gClient.send(prs);
 			restart();

@@ -92,5 +92,5 @@ registerPluginHandler(loadLocalBase, ADD_CHAT);
 registerCommandHandler(getKeyToPublic, u'???', 10, u'Ищет ответ на вопрос в локальной базе', u'??? <запрос>', (u'??? что-то', u'??? что-то ещё'), CHAT | PARAM);
 registerCommandHandler(getKeyToPrivate, u'!??', 10, u'Ищет ответ на вопрос в локальной базе и посылает его в приват', u'!?? <ник> <запрос>', (u'!?? что-то', u'!?? guy что-то'), CHAT | PARAM);
 registerCommandHandler(setBaseKey, u'!!!', 11, u'Устанавливает ответ на вопрос в локальной базе', u'!!! <запрос> = <ответ>', (u'!!! что-то = the best!', u'!!! что-то ещё ='), CHAT | PARAM);
-registerCommandHandler(searchKey, u'???поиск', 10, u'Поиск по базе', '???поиск <запрос>', (u'???поиск что-то'), CHAT | PARAM);
-registerCommandHandler(showAllKeys, u'???все', 10, u'Показывает все ключи базы', u'???все', (u'???все'), CHAT | NONPARAM);
+registerCommandHandler(searchKey, u'???поиск', 10, u'Поиск по базе', '???поиск <запрос>', (u'???поиск что-то', ), CHAT | PARAM);
+registerCommandHandler(showAllKeys, u'???все', 10, u'Показывает все ключи базы', None, (u'???все', ), CHAT | NONPARAM);

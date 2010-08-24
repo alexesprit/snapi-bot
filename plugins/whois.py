@@ -26,4 +26,4 @@ def showWhoIs(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'не могу :(');
 
-registerCommandHandler(showWhoIs, u'хтоэто', 10, u'Показывает информацию о домене', u'хтоэто <адрес>', (u'хтоэто jabber.ru'), ANY | PARAM);
+registerCommandHandler(showWhoIs, u'хтоэто', 10, u'Показывает информацию о домене', u'хтоэто <адрес>', (u'хтоэто jabber.ru', ), ANY | PARAM);
