@@ -36,7 +36,7 @@ def showTvProgramm(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'нету на сегодня программы');
 
-registerCommandHandler(showTvProgramm, u'тв', 10, u'Показать телепрограму для определённого канала', u'тв <название>', (u'тв первый'), ANY | PARAM);
+registerCommand(showTvProgramm, u'тв', 10, u'Показать телепрограму для определённого канала', u'тв <название>', (u'тв первый'), ANY | PARAM);
 
 def showTvList(type, conference, nick, parameters):
 	if(PUBLIC == type):
@@ -45,10 +45,10 @@ def showTvList(type, conference, nick, parameters):
 	tvList.sort();
 	sendMsg(PRIVATE, conference, nick, u'список каналов:\n' + '\n'.join(tvList));
 	
-registerCommandHandler(showTvList, u'твлист', 10, u'Просмотреть список каналов, доступных для просмотра программы', None, (u'твлист'), ANY | NONPARAM);
+registerCommand(showTvList, u'твлист', 10, u'Просмотреть список каналов, доступных для просмотра программы', None, (u'твлист'), ANY | NONPARAM);
 
 def loadChannels():
 	global gChannels;
 	gChannels = eval(readFile('resource/channels.txt', 'utf-8'));
 
-registerPluginHandler(loadChannels, STARTUP);
+registerEvent(loadChannels, STARTUP);

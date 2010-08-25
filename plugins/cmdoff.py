@@ -53,7 +53,7 @@ def cmdSwitchOff(type, conference, nick, param):
 			message = u'в этой конференции включены все команды';
 	sendMsg(type, conference, nick, message);
 
-registerCommandHandler(cmdSwitchOff, u'комвыкл', 30, u'Отключает определённые команды для текущей конференции. Без параметров показывает список отключенных команд', u'комвыкл [команды]', (u'комвыкл', u'комвыкл тык диско версия пинг', ), CHAT | FROZEN);
+registerCommand(cmdSwitchOff, u'комвыкл', 30, u'Отключает определённые команды для текущей конференции. Без параметров показывает список отключенных команд', u'комвыкл [команды]', (u'комвыкл', u'комвыкл тык диско версия пинг', ), CHAT | FROZEN);
 
 def cmdSwitchOn(type, conference, nick, param):
 	validCmd, invalidCmd, alreadySwitched = [], [], [];
@@ -80,7 +80,7 @@ def cmdSwitchOn(type, conference, nick, param):
 	saveCommands(conference);
 	sendMsg(type, conference, nick, message);
 
-registerCommandHandler(cmdSwitchOn, u'комвкл', 30, u'Включает определённые команды для текущей конференции', u'комвкл <команды>', (u'комвкл тык диско версия пинг', ), CHAT | FROZEN | PARAM);
+registerCommand(cmdSwitchOn, u'комвкл', 30, u'Включает определённые команды для текущей конференции', u'комвкл <команды>', (u'комвкл тык диско версия пинг', ), CHAT | FROZEN | PARAM);
 
 def saveCommands(conference):
 	fileName = CMDOFF_FILENAME % (conference);
@@ -91,9 +91,9 @@ def loadCommands(conference):
 	createFile(fileName, '[]');
 	gCmdOff[conference] = eval(readFile(fileName));
 
-registerPluginHandler(loadCommands, ADD_CHAT);
+registerEvent(loadCommands, ADDCONF);
 
 def unloadCommands(conference):
 	del(gCmdOff[conference]);
 	
-registerPluginHandler(unloadCommands, DEL_CHAT);
+registerEvent(unloadCommands, DELCONF);

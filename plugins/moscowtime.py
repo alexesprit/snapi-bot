@@ -26,4 +26,4 @@ def showMoscowTime(type, conference, nick, param):
 		else:
 			sendMsg(type, conference, nick, u'не получается');
 
-registerCommandHandler(showMoscowTime, u'время', 10, u'Показывает точное московское время', None, (u'время', ), ANY | NONPARAM);
+registerCommand(showMoscowTime, u'время', 10, u'Показывает точное московское время', None, (u'время', ), ANY | NONPARAM);

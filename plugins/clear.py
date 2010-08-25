@@ -21,4 +21,4 @@ def clearConference(type, conference, nick, param):
 		sendToConference(conference, '');
 		time.sleep(2);
 
-registerCommandHandler(clearConference, u'чисть', 15, u'Очищает конференцию', None, (u'чисть', ), CHAT | NONPARAM);
+registerCommand(clearConference, u'чисть', 15, u'Очищает конференцию', None, (u'чисть', ), CHAT | NONPARAM);

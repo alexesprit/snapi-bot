@@ -32,18 +32,19 @@ ACCESS_DESC = {-100: u'(игнор)', 0: u'(никто)', 10: u'(юзер)', 11:
 
 def changeAccess(stanza, conference, nick, trueJid):
 	type = stanza.getType();
-	if(not(trueJid in gGlobalAccess or trueJid in gPermAccess[conference])):
-		if(type != 'unavailable'):
-			role = stanza.getRole();
-			aff = stanza.getAffiliation();
-			roleAccess = ROLES[role];
-			affAccess = AFFILIATIONS[aff];
-			setTempAccess(conference, trueJid, roleAccess + affAccess);
-		else:
-			for item in getOnlineNicks(conference):
-				if(getTrueJid(conference, item) == trueJid):
-					return;
-			setTempAccess(conference, trueJid);
+	if(ERROR != type):
+		if(not(trueJid in gGlobalAccess or trueJid in gPermAccess[conference])):
+			if(type != UNAVAILABLE):
+				role = stanza.getRole();
+				aff = stanza.getAffiliation();
+				roleAccess = ROLES[role];
+				affAccess = AFFILIATIONS[aff];
+				setTempAccess(conference, trueJid, roleAccess + affAccess);
+			else:
+				for item in getOnlineNicks(conference):
+					if(getTrueJid(conference, item) == trueJid):
+						return;
+				setTempAccess(conference, trueJid);
 
 registerPresenceHandler(changeAccess, CHAT);
 
@@ -53,15 +54,14 @@ def login(type, conference, nick, param):
 		setTempGlobalAccess(trueJid, 100);
 		sendMsg(PRIVATE, conference, nick, u'пароль принят, полный доступ выдан');
 
-registerCommandHandler(login, u'логин', 0, u'Авторизоваться как админиcтратор бота', u'логин <пароль>', (u'логин мой_пароль', ), ANY | FROZEN | PARAM);
-
+registerCommand(login, u'логин', 0, u'Авторизоваться как админиcтратор бота', u'логин <пароль>', (u'логин мой_пароль', ), ANY | FROZEN | PARAM);
 
 def logout(type, conference, nick, parameters):
 	trueJid = getTrueJid(conference, nick);
 	setTempGlobalAccess(trueJid);
 	sendMsg(type, conference, nick, u'доступ снят');
 
-registerCommandHandler(logout, u'логаут', 0, u'Разлогиниться', u'логаут', (u'логаут', ), ANY | FROZEN | NONPARAM);
+registerCommand(logout, u'логаут', 0, u'Разлогиниться', u'логаут', (u'логаут', ), ANY | FROZEN | NONPARAM);
 
 def showUserAccess(type, conference, nick, param):
 	levelDesc = '';
@@ -69,7 +69,7 @@ def showUserAccess(type, conference, nick, param):
 		trueJid = getTrueJid(conference, nick);
 		level = getAccess(conference, trueJid);	
 	else:
-		if(chatInList(conference) and nickInChat(conference, param)):
+		if(conferenceInList(conference) and nickInConference(conference, param)):
 			trueJid = getTrueJid(conference, param);
 		else:
 			return;
@@ -78,7 +78,7 @@ def showUserAccess(type, conference, nick, param):
 		levelDesc = ACCESS_DESC[level];
 	sendMsg(type, conference, nick, u'%d %s' % (level, levelDesc));
 
-registerCommandHandler(showUserAccess, u'доступ', 0, u'Показывает уровень доступа определённого пользователя', u'доступ [ник]', (u'доступ', u'доступ Nick'), ANY | FROZEN);
+registerCommand(showUserAccess, u'доступ', 0, u'Показывает уровень доступа определённого пользователя', u'доступ [ник]', (u'доступ', u'доступ Nick'), ANY | FROZEN);
 
 def setLocalAccess(type, conference, nick, param):
 	param = param.split();
@@ -91,7 +91,7 @@ def setLocalAccess(type, conference, nick, param):
 			sendMsg(type, conference, nick, u'ошибочный запрос');
 			return;
 	userNick = param[0].strip();
-	if(nickOnlineInChat(conference, userNick)):
+	if(nickIsOnline(conference, userNick)):
 		myJid = getTrueJid(conference, nick);
 		myAccess = getAccess(conference, myJid);
 		userJid = getTrueJid(conference, userNick);
@@ -109,7 +109,7 @@ def setLocalAccess(type, conference, nick, param):
 			setPermAccess(conference, userJid, access)
 			sendMsg(type, conference, nick, u'выдан постоянный доступ');
 
-registerCommandHandler(setLocalAccess, u'дать_доступ', 20, u'Устанавливает или снимает (если не писать уровень) уровень доступа для определённого пользователя на определённый уровень. Если указываеться третий параметр, то изменение происходит навсегда', u'дать_доступ <ник> [уровень] [навсегда]', (u'дать_доступ Nick 100', u'дать_доступ Nick 100 1'), CHAT | PARAM);
+registerCommand(setLocalAccess, u'дать_доступ', 20, u'Устанавливает или снимает (если не писать уровень) уровень доступа для определённого пользователя на определённый уровень. Если указываеться третий параметр, то изменение происходит навсегда', u'дать_доступ <ник> [уровень] [навсегда]', (u'дать_доступ Nick 100', u'дать_доступ Nick 100 1'), CHAT | PARAM);
 
 def setGlobalAccess(type, conference, nick, param):
 	param = param.split();
@@ -117,8 +117,8 @@ def setGlobalAccess(type, conference, nick, param):
 		sendMsg(type, conference, nick, u'ошибочный запрос');
 		return;
 	userNick = param[0].strip();
-	if(chatInList(conference)):
-		if(nickInChat(conference, userNick)):
+	if(conferenceInList(conference)):
+		if(nickInConference(conference, userNick)):
 			trueJid = getTrueJid(conference, userNick);
 		else:
 			return;
@@ -138,7 +138,7 @@ def setGlobalAccess(type, conference, nick, param):
 		setPermGlobalAccess(trueJid);
 		sendMsg(type, conference, nick, u'сняла');
 
-registerCommandHandler(setGlobalAccess, u'глобдоступ', 100, u'Устанавливает или снимает (если не писать уровень) уровень доступа для определённого пользователя на определённый уровень глобально', u'глобдоступ <ник> [уровень]', (u'глобдоступ guy', u'глобдоступ Nick 100'), CHAT | FROZEN | PARAM);
+registerCommand(setGlobalAccess, u'глобдоступ', 100, u'Устанавливает или снимает (если не писать уровень) уровень доступа для определённого пользователя на определённый уровень глобально', u'глобдоступ <ник> [уровень]', (u'глобдоступ guy', u'глобдоступ Nick 100'), CHAT | FROZEN | PARAM);
 
 def showGlobalAccesses(type, conference, nick, param):
 	if(not gGlobalAccess):
@@ -147,7 +147,7 @@ def showGlobalAccesses(type, conference, nick, param):
 		items = [u'%s [%d]' % (jid, gGlobalAccess[jid]) for jid in gGlobalAccess];
 		sendMsg(type, conference, nick, u'вот, что я нашла\n' + '\n'.join(items));
 
-registerCommandHandler(showGlobalAccesses, u'доступы', 100, u'Показывает все глобальные доступы', None, (u'доступы', ), ANY | NONPARAM);
+registerCommand(showGlobalAccesses, u'доступы', 100, u'Показывает все глобальные доступы', None, (u'доступы', ), ANY | NONPARAM);
 
 def showLocalAccesses(type, conference, nick, param):
 	if(not gPermAccess[conference]):
@@ -156,7 +156,7 @@ def showLocalAccesses(type, conference, nick, param):
 		items = [u'\n%s [%d]' % (jid, gPermAccess[conference][jid]) for jid in gPermAccess[conference]];
 		sendMsg(type, conference, nick, u'вот, что я нашла\n' + '\n'.join(items));
 
-registerCommandHandler(showLocalAccesses, u'локалдоступы', 20, u'Показывает все локальные доступы', None, (u'локалдоступы', ), CHAT | NONPARAM);
+registerCommand(showLocalAccesses, u'локалдоступы', 20, u'Показывает все локальные доступы', None, (u'локалдоступы', ), CHAT | NONPARAM);
 
 def loadGlobalAccesses():
 	global gGlobalAccess;
@@ -165,7 +165,7 @@ def loadGlobalAccesses():
 	for jid in gAdmins:
 		gGlobalAccess[jid] = 100;
 
-registerPluginHandler(loadGlobalAccesses, STARTUP);
+registerEvent(loadGlobalAccesses, STARTUP);
 
 def loadLocalAccesses(conference):
 	fileName = PERMACCESS_FILE % (conference);
@@ -173,10 +173,10 @@ def loadLocalAccesses(conference):
 	gPermAccess[conference] = eval(readFile(fileName));
 	gTempAccess[conference] = {};
 
-registerPluginHandler(loadLocalAccesses, ADD_CHAT);
+registerEvent(loadLocalAccesses, ADDCONF);
 
 def unloadLocalAccesses(conference):
 	del(gPermAccess[conference]);
 	del(gTempAccess[conference]);
 
-registerPluginHandler(unloadLocalAccesses, DEL_CHAT);
+registerEvent(unloadLocalAccesses, DELCONF);

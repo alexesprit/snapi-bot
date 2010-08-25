@@ -24,11 +24,11 @@ def setBotVersion(type, conference, nick, param):
 		writeFile(VER_FILENAME, str(gVersion));
 		sendMsg(type, conference, nick, u'поняла, сейчас поставлю');
 
-registerCommandHandler(setBotVersion, u'ботверсия', 100, u'Выставляет версию клиента у бота. Без параметра покажет текущее значение', u'ботверсия [клиент|версия|ось]', (u'ботверсия', u'ботверсия Jimm|0.6.4|Nokia 3310'), ROSTER);
+registerCommand(setBotVersion, u'ботверсия', 100, u'Выставляет версию клиента у бота. Без параметра покажет текущее значение', u'ботверсия [клиент|версия|ось]', (u'ботверсия', u'ботверсия Jimm|0.6.4|Nokia 3310'), ROSTER);
 
 def loadBotVersion():
 	global gVersion;
 	createFile(VER_FILE, str(gVersion));
 	gVersion = eval(readFile(VER_FILE));
 
-registerPluginHandler(loadBotVersion, STARTUP);
+registerEvent(loadBotVersion, STARTUP);

@@ -22,4 +22,4 @@ def showDreamInfo(type, conference, nick, param):
 		sendMsg(type, conference, nick, u'ушло в приват');
 	sendMsg(PRIVATE, conference, nick, text);
 
-registerCommandHandler(showDreamInfo, u'сонник', 10, u'Толкователь снов', u'сонник <что-то>', (u'сонник деньги', ), ANY | PARAM);
+registerCommand(showDreamInfo, u'сонник', 10, u'Толкователь снов', u'сонник <что-то>', (u'сонник деньги', ), ANY | PARAM);

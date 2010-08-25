@@ -24,4 +24,4 @@ def showDates(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'ничего не нашла :(');
 
-registerCommandHandler(showDates, u'праздники', 10, u'Показывает праздники на сегодня и завтра', None, (u'праздники', ));
+registerCommand(showDates, u'праздники', 10, u'Показывает праздники на сегодня и завтра', None, (u'праздники', ));

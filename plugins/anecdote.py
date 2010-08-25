@@ -24,4 +24,4 @@ def showAnecdote(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'не получается');
 
-registerCommandHandler(showAnecdote, u'анекдот', 10, u'Показывает случайный анекдот', None, (u'анекдот', ), ANY | NONPARAM);
+registerCommand(showAnecdote, u'анекдот', 10, u'Показывает случайный анекдот', None, (u'анекдот', ), ANY | NONPARAM);

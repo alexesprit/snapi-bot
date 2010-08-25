@@ -51,7 +51,7 @@ def deletePath(type, conference, nick, param):
 		
 def deleteFromConfig(type, conference, nick, param):
 	files, dirs = 0, 0;
-	for conf in getChatList():
+	for conf in getConferences():
 		path = 'config/%s/%s' % (conf, param);
 		answer = deleteFile(path);
 		if(answer == DIR):
@@ -71,6 +71,6 @@ def deleteFile(path):
 	else:
 		return(-1);
 
-registerCommandHandler(deleteFromConfig, u'rmcfg', 100, u'Удаляет файл или папку из /config', u'rmcfg <имя>', (u'rmcfg test.txt', ), ROSTER | PARAM);	 
-registerCommandHandler(deletePath, u'rm', 100, u'Удаляет файл или папку', u'rm <имя>', (u'rm test.txt', ), ROSTER | PARAM);
-registerCommandHandler(showDirectory, u'ls', 100, u'Показывает список указанного каталога', u'ls <путь>', (u'ls dynamic', ), ROSTER | PARAM);
+registerCommand(deleteFromConfig, u'rmcfg', 100, u'Удаляет файл или папку из /config', u'rmcfg <имя>', (u'rmcfg test.txt', ), ROSTER | PARAM);	 
+registerCommand(deletePath, u'rm', 100, u'Удаляет файл или папку', u'rm <имя>', (u'rm test.txt', ), ROSTER | PARAM);
+registerCommand(showDirectory, u'ls', 100, u'Показывает список указанного каталога', u'ls <путь>', (u'ls dynamic', ), ROSTER | PARAM);

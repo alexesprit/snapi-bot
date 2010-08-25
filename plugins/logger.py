@@ -82,27 +82,27 @@ def writeMessage(stanza, type, conference, nick, trueJid, text):
 			aff = (level >= 30) and 2 or 1;
 		writeLog(type, conference, nick, text, aff);
 
-def writeUserJoin(groupChat, nick, trueJid, aff, role):
-	if(getConfigKey(groupChat, CFG_LOG)):
-		writeLog(PUBLIC, groupChat, '@$$join$$@', u'%s зашёл в комнату как %s и %s' % (nick, role, aff));
+def writeUserJoin(conference, nick, trueJid, aff, role):
+	if(getConfigKey(conference, CFG_LOG)):
+		writeLog(PUBLIC, conference, '@$$join$$@', u'%s зашёл в комнату как %s и %s' % (nick, role, aff));
 
-def writeUserLeave(groupChat, nick, trueJid, reason, code):
-	if(getConfigKey(groupChat, CFG_LOG)):
+def writeUserLeave(conference, nick, trueJid, reason, code):
+	if(getConfigKey(conference, CFG_LOG)):
 		if(code == '307'):
 			if(reason):
-				writeLog(PUBLIC, groupChat, '@$$kick$$@', u'%s выгнали из комнаты (%s)' % (nick, reason));
+				writeLog(PUBLIC, conference, '@$$kick$$@', u'%s выгнали из комнаты (%s)' % (nick, reason));
 			else:
-				writeLog(PUBLIC, groupChat, '@$$kick$$@', u'%s выгнали из комнаты' % (nick));		
+				writeLog(PUBLIC, conference, '@$$kick$$@', u'%s выгнали из комнаты' % (nick));		
 		elif(code == '301'):
 			if(reason):
-				writeLog(PUBLIC, groupChat, '@$$ban$$@', u'%s забанили (%s)' % (nick, reason));
+				writeLog(PUBLIC, conference, '@$$ban$$@', u'%s забанили (%s)' % (nick, reason));
 			else:
-				writeLog(PUBLIC, groupChat, '@$$ban$$@', '@$$userban$$@');	
+				writeLog(PUBLIC, conference, '@$$ban$$@', '@$$userban$$@');	
 		else:
 			if(reason):
-				writeLog(PUBLIC, groupChat, '@$$leave$$@', u'%s вышел из комнаты (%s)' % (nick, reason));
+				writeLog(PUBLIC, conference, '@$$leave$$@', u'%s вышел из комнаты (%s)' % (nick, reason));
 			else:
-				writeLog(PUBLIC, groupChat, '@$$leave$$@', u'%s вышел из комнаты' % (nick));
+				writeLog(PUBLIC, conference, '@$$leave$$@', u'%s вышел из комнаты' % (nick));
 
 def writePresence(stanza, conference, nick, trueJid):
 	if(getConfigKey(conference, CFG_LOG)):
@@ -122,7 +122,7 @@ def loggingControl(type, conference, nick, param):
 			else:
 				setConfigKey(conference, CFG_LOG, 0);
 				sendMsg(type, conference, nick, u'логирование отключено');
-			saveChatConfig(groupChat);
+			saveChatConfig(conference);
 		else:
 			sendMsg(type, conference, nick, u'прочитай помощь по команде');
 	else:
@@ -137,5 +137,5 @@ if(gLogDir):
 	registerLeaveHandler(writeUserLeave);
 	registerPresenceHandler(writePresence, CHAT);
 	registerMessageHandler(writeMessage, CHAT);
-registerPluginHandler(setLoggingState, ADD_CHAT);		
-registerCommandHandler(loggingControl, u'логирование', 30, 'Отключает (0) или включает (1) ведение логов. Без параметра покажет текущее значение','логирование [0/1]', ('логирование', 'логирование 0'), CHAT);
+registerEvent(setLoggingState, ADDCONF);		
+registerCommand(loggingControl, u'логирование', 30, 'Отключает (0) или включает (1) ведение логов. Без параметра покажет текущее значение','логирование [0/1]', ('логирование', 'логирование 0'), CHAT);

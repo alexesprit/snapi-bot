@@ -38,5 +38,5 @@ def setPopupsState(conference):
 	if(getConfigKey(conference, CFG_POPUPS) is None):
 		setConfigKey(conference, CFG_POPUPS, 1);
 
-registerPluginHandler(setPopupsState, ADD_CHAT);
-registerCommandHandler(popupsControl, u'оповещения', 30, u'Отключает (0) или включает (1) сообщения о рестартах/выключениях, а также глобальные новости. Без параметра покажет текущее значение', u'попапы [0/1]', (u'оповещения', u'оповещения 0'), CHAT);
+registerEvent(setPopupsState, ADDCONF);
+registerCommand(popupsControl, u'оповещения', 30, u'Отключает (0) или включает (1) сообщения о рестартах/выключениях, а также глобальные новости. Без параметра покажет текущее значение', u'попапы [0/1]', (u'оповещения', u'оповещения 0'), CHAT);

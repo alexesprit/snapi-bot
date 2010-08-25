@@ -17,7 +17,7 @@ def sendInvite(type, conference, nick, param):
 	reason = '';
 	if(not param.count('@')):
 		userNick = param.split()[0];
-		if(nickInChat(conference, userNick)):
+		if(nickInConference(conference, userNick)):
 			trueJid = getTrueJid(conference, userNick);
 			reason = ' '.join(param.split()[1:]);
 		else:
@@ -37,4 +37,4 @@ def sendInvite(type, conference, nick, param):
 	printf(msg, FLAG_WARNING);
 	sendMsg(type, conference, nick, u'кинула инвайт');
 			
-registerCommandHandler(sendInvite, u'призвать', 10, u'Приглашет заданного пользователя в конференцию', u'призвать <ник/жид> [причина]', (u'призвать guy', u'призвать guy@jabber.aq есть дело'), CHAT | PARAM);
+registerCommand(sendInvite, u'призвать', 10, u'Приглашет заданного пользователя в конференцию', u'призвать <ник/жид> [причина]', (u'призвать guy', u'призвать guy@jabber.aq есть дело'), CHAT | PARAM);

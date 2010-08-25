@@ -42,4 +42,4 @@ def showWeather(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'не могу :(');
 
-registerCommandHandler(showWeather, u'погода', 10, u'Показывает погоду', u'погода <город>', (u'погода Москва', ), ANY | PARAM);
+registerCommand(showWeather, u'погода', 10, u'Показывает погоду', u'погода <город>', (u'погода Москва', ), ANY | PARAM);

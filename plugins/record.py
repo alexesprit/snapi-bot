@@ -35,6 +35,6 @@ def loadRecordCache(conference):
 	createFile(fileName, '{}');
 	gRecordsCache[conference] = eval(readFile(fileName));
 
-registerPluginHandler(loadRecordCache, ADD_CHAT);
+registerEvent(loadRecordCache, ADDCONF);
 registerJoinHandler(calculateRecord);
-registerCommandHandler(showRecord, u'рекорд', 10, u'Показывает рекорд посещаемости конференции', u'рекорд', (u'рекорд'), CHAT | NONPARAM);
+registerCommand(showRecord, u'рекорд', 10, u'Показывает рекорд посещаемости конференции', u'рекорд', (u'рекорд'), CHAT | NONPARAM);

@@ -27,11 +27,11 @@ def changeStatus(type, conference, nick, param):
 	setConfigKey(conference, 'show', show);
 	saveChatConfig(conference);
 
-registerCommandHandler(changeStatus, u'ботстатус', 30, u'Меняет статус бота', u'ботстатус <[статус] [сообщение]>', (u'ботстатус away', u'ботстатус away сплю'), CHAT | PARAM);
+registerCommand(changeStatus, u'ботстатус', 30, u'Меняет статус бота', u'ботстатус <[статус] [сообщение]>', (u'ботстатус away', u'ботстатус away сплю'), CHAT | PARAM);
 
 def setDefaultStatus(conference):
 	if(not getConfigKey(conference, 'show')):
 		setConfigKey(conference, 'show', u'online');
 		setConfigKey(conference, 'status', None);
 
-registerPluginHandler(setDefaultStatus, ADD_CHAT);
+registerEvent(setDefaultStatus, ADDCONF);

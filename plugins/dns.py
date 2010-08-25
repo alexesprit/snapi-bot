@@ -34,4 +34,4 @@ def showServerDns(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'не могу');
 
-registerCommandHandler(showServerDns, u'днс', 10, u'Показывает ответ от DNS для определённого хоста или IP адреса', u'днс <хост/IP>', (u'днс jabber.aq', u'днс 127.0.0.1'), ANY | PARAM);
+registerCommand(showServerDns, u'днс', 10, u'Показывает ответ от DNS для определённого хоста или IP адреса', u'днс <хост/IP>', (u'днс jabber.aq', u'днс 127.0.0.1'), ANY | PARAM);

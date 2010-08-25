@@ -19,7 +19,7 @@ def sendToAdmins(type, conference, nick, param):
 	sendMsg(type, conference, nick, u'ваше сообщение отправлено');
 
 def sendToConferences(type, conference, nick, param):
-	conferences = getChatList();
+	conferences = getConferences();
 	count = 0;
 	for conf in conferences:
 		if(isPopupEnabled(conf)):
@@ -30,6 +30,6 @@ def sendToConferences(type, conference, nick, param):
 def messageToChat(type, conference, nick, param):
 	sendToConference(conference, param);
 
-registerCommandHandler(sendToConferences, u'мессага_конфам', 100, u'Отправляет сообщение по всем конференциям, в которых сидит бот', u'мессага_конфам [сообщение]', (u'мессага_конфам привет!11'), ANY | PARAM);
-registerCommandHandler(sendToAdmins, u'мессага_админу', 10, u'Отправляет сообщение всем администраторам бота', u'мессага_админу <сообщение>', (u'мессага_админу привет!11'), ANY | PARAM);
-registerCommandHandler(messageToChat, u'сказать', 20, u'Говорить через бота в конференции', u'сказать <сообщение>', (u'сказать салют пиплы', ), CHAT | PARAM);
+registerCommand(sendToConferences, u'мессага_конфам', 100, u'Отправляет сообщение по всем конференциям, в которых сидит бот', u'мессага_конфам [сообщение]', (u'мессага_конфам привет!11'), ANY | PARAM);
+registerCommand(sendToAdmins, u'мессага_админу', 10, u'Отправляет сообщение всем администраторам бота', u'мессага_админу <сообщение>', (u'мессага_админу привет!11'), ANY | PARAM);
+registerCommand(messageToChat, u'сказать', 20, u'Говорить через бота в конференции', u'сказать <сообщение>', (u'сказать салют пиплы', ), CHAT | PARAM);

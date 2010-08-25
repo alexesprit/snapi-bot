@@ -29,7 +29,7 @@ def showTopTalkers(type, conference, nick):
 		replic = u'Статистика топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n';
 		topListLine = u'%d) %s, %d, %d, %d, %0.1f';
 		count = 10;
-		for i, jid in enumerate(base.items()):
+		for jid in base.items():
 			statistic = base.getKey(jid);
 			words = statistic['words'];
 			messages = statistic['messages'];
@@ -37,15 +37,14 @@ def showTopTalkers(type, conference, nick):
 			userNick = statistic['nick'];
 			wordsPerMsg = (float(words)) / (messages + meMessages);
 			topList.append([messages, meMessages, words, wordsPerMsg, userNick]);
-			if(i == count - 1):
-				break;
 		topList.sort();
 		topList.reverse();
+		topList = topList[:10];
 		items = [topListLine % (i + 1, x[4], x[0], x[1], x[2], x[3]) for i, x in enumerate(topList)];
 		sendMsg(type, conference, nick, replic + '\n'.join(items));
 
 def clearStatistic(type, conference, nick):
-	groupChat = source[1];
+	conference = source[1];
 	trueJid = getTrueJid(conference, nick);
 	if(getAccess(conference, trueJid) >= 20):
 		base = gTalkCache[conference];
@@ -63,7 +62,7 @@ def showTalkerInfo(type, conference, nick, param):
 	else:
 		if(not param):
 			trueJid = getTrueJid(conference, nick);
-		elif(nickInChat(conference, param)):
+		elif(nickInConference(conference, param)):
 			trueJid = getTrueJid(conference, param);
 		else:
 			return;
@@ -106,6 +105,6 @@ def loadTalkCache(conference):
 	gTalkCache[conference] = database.DataBase(fileName);
 	gMsgCount[conference] = 0;
 
-registerPluginHandler(loadTalkCache, ADD_CHAT);
+registerEvent(loadTalkCache, ADDCONF);
 registerMessageHandler(updateStatistic, CHAT);
-registerCommandHandler(showTalkerInfo, u'болтун', 10, u'Показывает статистику болтливости указанного пользователя', u'болтун [ник]', (u'болтун Nick', u'болтун топ'), CHAT);
+registerCommand(showTalkerInfo, u'болтун', 10, u'Показывает статистику болтливости указанного пользователя', u'болтун [ник]', (u'болтун Nick', u'болтун топ'), CHAT);

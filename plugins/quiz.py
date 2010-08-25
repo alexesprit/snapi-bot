@@ -49,7 +49,9 @@ def isTimerEnabled(conference):
 def resetQuizTimer(conference):
 	if(isTimerEnabled(conference)):
 		gQuizTimer[conference].cancel();
+	gInfo['tmr'] += 1;
 	gQuizTimer[conference] = startTimer(QUIZ_TIME_LIMIT, idleCheck, (conference, ));
+	#gQuizTimer[conference].start();		
 
 def getNewQuestion():
 	questionNum = random.randrange(0, QUIZ_TOTAL_LINES);
@@ -85,7 +87,7 @@ def quizStop(conference):
 		gQuizTimer[conference].cancel();
 		del(gQuizTimer[conference]);
 	time.sleep(1);
-	if(chatInList(conference)):
+	if(conferenceInList(conference)):
 		gQuizScores[conference].save();
 		showScoreList(conference);
 
@@ -105,17 +107,16 @@ def checkAnswer(conference, nick, trueJid, answer):
 			sendToConference(conference, u'(!) %s, поздравляю! +%d в банк! Верный ответ: %s' % (nick, points, rightAnswer));
 		else:
 			sendToConference(conference, u'(!) %s, поздравляю! Верный ответ: %s' % (nick, rightAnswer));
-		if(isConference):
-			base = gQuizScores[conference];
-			scores = base.getKey(trueJid);
-			if(scores):
-				scores[0] = nick;
-				scores[1] += points;
-				scores[2] += 1;
-			else:
-				scores = [nick, points, 1];
-			base.setKey(trueJid, scores);
-		askNewQuestion(type, conference);
+		base = gQuizScores[conference];
+		scores = base.getKey(trueJid);
+		if(scores):
+			scores[0] = nick;
+			scores[1] += points;
+			scores[2] += 1;
+		else:
+			scores = [nick, points, 1];
+		base.setKey(trueJid, scores);
+		askNewQuestion(conference);
 
 def answerListener(stanza, type, conference, nick, trueJid, text):
 	if(conference in gQuizAnswer):
@@ -123,18 +124,15 @@ def answerListener(stanza, type, conference, nick, trueJid, text):
 
 def showScoreList(conference):
 	base = gQuizScores[conference];
-	items = base.items()
-	if(items):
+	if(not base.isEmpty()):
 		result = u'(*) Cчет:\nНик, счет, ответов\n';
 		scores = [];
-		count = 10;
-		for i, jid in enumerate(items):
+		for jid in base.items():
 			item = base.getKey(jid);
 			scores.append([item[1], item[2], item[0]]);
-			if(i == count - 1):
-				break;
 		scores.sort();
 		scores.reverse();
+		scores = scores[:10];
 		items = [u'%s) %s, %s, %s' % (i + 1, x[2], x[0], x[1]) for i, x in enumerate(scores)];
 		sendToConference(conference, result + '\n'.join(items));
 	else:
@@ -186,11 +184,11 @@ def loadQuizScores(conference):
 	fileName = QUIZ_SCORES_FILE % (conference);
 	gQuizScores[conference] = database.DataBase(fileName);
 
-registerPluginHandler(loadQuizScores, ADD_CHAT);
+registerEvent(loadQuizScores, ADDCONF);
 registerMessageHandler(answerListener, CHAT);
-registerCommandHandler(startQuiz, u'старт', 10, u'Запуск игры', None, (u'старт', ), CHAT | NONPARAM);
-registerCommandHandler(stopQuiz, u'стоп', 10, u'Остановка игры', None, (u'стоп', ), CHAT | NONPARAM);
-registerCommandHandler(showScores, u'счет', 10, u'Показывает счёт игры', None, (u'счет', ), CHAT | NONPARAM);
-registerCommandHandler(showHint, u'х', 10, u'Показать подсказку', None, (u'х', ), CHAT | NONPARAM);
-registerCommandHandler(showQuestion, u'повтор', 10, u'Повтор текущего вопроса', None, (u'повтор', ), CHAT | NONPARAM);
-registerCommandHandler(askQuestion, u'сл', 10, u'Следущий вопрос', None, (u'сл', ), CHAT | NONPARAM);
+registerCommand(startQuiz, u'старт', 10, u'Запуск игры', None, (u'старт', ), CHAT | NONPARAM);
+registerCommand(stopQuiz, u'стоп', 10, u'Остановка игры', None, (u'стоп', ), CHAT | NONPARAM);
+registerCommand(showScores, u'счет', 10, u'Показывает счёт игры', None, (u'счет', ), CHAT | NONPARAM);
+registerCommand(showHint, u'х', 10, u'Показать подсказку', None, (u'х', ), CHAT | NONPARAM);
+registerCommand(showQuestion, u'повтор', 10, u'Повтор текущего вопроса', None, (u'повтор', ), CHAT | NONPARAM);
+registerCommand(askQuestion, u'сл', 10, u'Следущий вопрос', None, (u'сл', ), CHAT | NONPARAM);

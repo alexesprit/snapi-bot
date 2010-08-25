@@ -69,4 +69,4 @@ def detectLanguage(text):
 	except(KeyError):
 		return(None);
 
-registerCommandHandler(translateText, u'перевод', 10, u'Перевод текста с одного языка на другой', u'перевод <исходный_язык> <нужный_язык> <фраза>', (u'перевод en ru hello', u'перевод ru en привет'));
+registerCommand(translateText, u'перевод', 10, u'Перевод текста с одного языка на другой', u'перевод <исходный_язык> <нужный_язык> <фраза>', (u'перевод en ru hello', u'перевод ru en привет'));

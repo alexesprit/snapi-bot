@@ -48,7 +48,7 @@ def pythonCalc(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'ты глюк');
 
-registerCommandHandler(pythonEval, u'eval', 100, u'Расчитывает и показывает заданное выражение питона', u'eval <выражение>', (u'eval str(1)'), ANY | FROZEN | PARAM);
-registerCommandHandler(pythonExec, u'exec', 100, u'Выполняет выражение питона', u'exec <выражение>', (u'exec del(GROUPCHATS)', ), ANY | FROZEN | PARAM);
-registerCommandHandler(pythonShell, u'sh', 100, u'Выполняет шелл-команду', u'sh <команда>', (u'sh ls'), ANY | FROZEN | PARAM);
-registerCommandHandler(pythonCalc, u'кальк', 10, u'Калькулятор', u'калк <выражение>', (u'калк 1 + 2'), ANY | PARAM);
+registerCommand(pythonEval, u'eval', 100, u'Расчитывает и показывает заданное выражение питона', u'eval <выражение>', (u'eval str(1)'), ANY | FROZEN | PARAM);
+registerCommand(pythonExec, u'exec', 100, u'Выполняет выражение питона', u'exec <выражение>', (u'exec del(GROUPCHATS)', ), ANY | FROZEN | PARAM);
+registerCommand(pythonShell, u'sh', 100, u'Выполняет шелл-команду', u'sh <команда>', (u'sh ls'), ANY | FROZEN | PARAM);
+registerCommand(pythonCalc, u'кальк', 10, u'Калькулятор', u'калк <выражение>', (u'калк 1 + 2'), ANY | PARAM);

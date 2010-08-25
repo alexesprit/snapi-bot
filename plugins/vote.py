@@ -61,7 +61,7 @@ def vote(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
 
-registerCommandHandler(vote, u'мнение', 10, u'Для подачи мнения в текущем голосовании', u'мнение <номер>', (u'мнение 1', ), CHAT | PARAM);
+registerCommand(vote, u'мнение', 10, u'Для подачи мнения в текущем голосовании', u'мнение <номер>', (u'мнение 1', ), CHAT | PARAM);
 
 def newVote(type, conference, nick, param):
 	if(gVoteCache[conference]):
@@ -75,7 +75,7 @@ def newVote(type, conference, nick, param):
 		saveVotes(conference);
 		sendMsg(type, conference, nick, u'Голосование создано! Чтобы добавить пункты напиши "пункт+ твой_пункт", удалить - "пункт- номер пункта". Начать голосование - команда "голосование+". Посмотреть текущие результаты - команда "мнения". Окончить голосование - команда "итоги"', True);
 
-registerCommandHandler(newVote, u'голосование', 11, u'Создает новое голосование или показывает текущее (если имеется)', u'голосование [текст]', (u'голосование винды - сакс!', u'голосование'), CHAT);
+registerCommand(newVote, u'голосование', 11, u'Создает новое голосование или показывает текущее (если имеется)', u'голосование [текст]', (u'голосование винды - сакс!', u'голосование'), CHAT);
 
 def startVote(type, conference, nick, parameters):
 	if(gVoteCache[conference]):
@@ -97,7 +97,7 @@ def startVote(type, conference, nick, parameters):
 	else:
 		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
 
-registerCommandHandler(startVote, u'голосование+', 11, u'Возобновляет голосование', None, (u'голосование+', ), CHAT | NONPARAM);
+registerCommand(startVote, u'голосование+', 11, u'Возобновляет голосование', None, (u'голосование+', ), CHAT | NONPARAM);
 
 def stopVote(type, conference, nick, param):
 	if(gVoteCache[conference]):
@@ -117,7 +117,7 @@ def stopVote(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
 
-registerCommandHandler(stopVote, u'голосование-', 11, u'Останавливает голосование, все данные сохраняются до продолжения голосования', u'голосование-', (u'голосование-'), CHAT | NONPARAM);
+registerCommand(stopVote, u'голосование-', 11, u'Останавливает голосование, все данные сохраняются до продолжения голосования', u'голосование-', (u'голосование-'), CHAT | NONPARAM);
 
 def addOpinion(type, conference, nick, param):
 	if(gVoteCache[conference]):
@@ -140,7 +140,7 @@ def addOpinion(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
 
-registerCommandHandler(addOpinion, u'пункт+', 11, u'Добавляет пункт к текущему голосованию', u'пункт+ <пункт>', (u'пункт+ да', ), CHAT | PARAM);
+registerCommand(addOpinion, u'пункт+', 11, u'Добавляет пункт к текущему голосованию', u'пункт+ <пункт>', (u'пункт+ да', ), CHAT | PARAM);
 	
 def delOpinion(type, conference, nick, param):
 	if(gVoteCache[conference]):
@@ -164,7 +164,7 @@ def delOpinion(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
 
-registerCommandHandler(delOpinion , u'пункт-', 11, u'Удаляет пункт из голосования. Пункт указывается его номером', u'пункт- <номер_пункта>', (u'пункт- 5', ), CHAT | PARAM);
+registerCommand(delOpinion , u'пункт-', 11, u'Удаляет пункт из голосования. Пункт указывается его номером', u'пункт- <номер_пункта>', (u'пункт- 5', ), CHAT | PARAM);
 	
 def showOpinions(type, conference, nick, param):
 	if(gVoteCache[conference]):
@@ -181,7 +181,7 @@ def showOpinions(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
 
-registerCommandHandler(showOpinions, u'мнения', 11, u'Отдаёт текущие результаты голосования в приват, не завершая голосования при этом', None, (u'мнения', ), CHAT | NONPARAM);
+registerCommand(showOpinions, u'мнения', 11, u'Отдаёт текущие результаты голосования в приват, не завершая голосования при этом', None, (u'мнения', ), CHAT | NONPARAM);
 
 def endVote(type, conference, nick, param):
 	if(gVoteCache[conference]):
@@ -201,7 +201,7 @@ def endVote(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
 
-registerCommandHandler(endVote, u'итоги', 11, u'Завершает голование и показывает его результаты', None, (u'итоги', ), CHAT | NONPARAM);
+registerCommand(endVote, u'итоги', 11, u'Завершает голование и показывает его результаты', None, (u'итоги', ), CHAT | NONPARAM);
 
 def showVote(conference, nick, trueJid, aff, role):
 	if(gVoteCache[conference]):
@@ -218,4 +218,4 @@ def loadVotes(conference):
 	createFile(fileName, '{}');
 	gVoteCache[conference] = eval(readFile(fileName));
 
-registerPluginHandler(loadVotes, ADD_CHAT);
+registerEvent(loadVotes, ADDCONF);

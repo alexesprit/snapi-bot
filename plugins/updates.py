@@ -22,4 +22,4 @@ def showUpdates(type, conference, nick, param):
 		sendMsg(type, conference, nick, u'скинула в приват');
 	sendMsg(PRIVATE, conference, nick, u'что изменено:\n' + '\n'.join(changeList));
 
-registerCommandHandler(showUpdates, u'изменения', 10, u'Даты изменений файлов в папке plugins', None, (u'изменения', ), ANY | NONPARAM);
+registerCommand(showUpdates, u'изменения', 10, u'Даты изменений файлов в папке plugins', None, (u'изменения', ), ANY | NONPARAM);

@@ -25,7 +25,7 @@ def pokeUser(type, conference, nick, param):
 						if(userNick != botNick and userNick != nick):
 							message = random.choice(gPokes);
 							sendToConference(conference, u'/me ' + message % (userNick));
-				elif(nickOnlineInChat(conference, param)):
+				elif(nickIsOnline(conference, param)):
 					message = random.choice(gPokes);
 					sendToConference(conference, u'/me ' + message % (param));
 			else:
@@ -35,10 +35,10 @@ def pokeUser(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u':-P');
 
-registerCommandHandler(pokeUser, u'тык', 10, u'Тыкает пользователя. Заставляет его обратить внимание на вас', u'тык <ник>', (u'тык Nick', ), CHAT);
+registerCommand(pokeUser, u'тык', 10, u'Тыкает пользователя. Заставляет его обратить внимание на вас', u'тык <ник>', (u'тык Nick', ), CHAT);
 
 def loadPokes():
 	global gPokes;
 	gPokes = eval(readFile('resource/pokes.txt', 'utf-8'));
 
-registerPluginHandler(loadPokes, STARTUP);
+registerEvent(loadPokes, STARTUP);

@@ -52,7 +52,7 @@ def leaveUpdate(conference, nick, trueJid, reason, code):
 		gBanned[conference].append(trueJid);
 
 def presenceUpdate(stanza, conference, nick, trueJid):
-	if(chatInList(conference)):
+	if(conferenceInList(conference)):
 		code = stanza.getStatusCode();
 		if(code == '303'):
 			gStats[conference]['nick'] += 1;
@@ -73,5 +73,5 @@ registerLeaveHandler(leaveUpdate);
 registerPresenceHandler(presenceUpdate, CHAT);
 registerMessageHandler(messageUpdate, CHAT);
 registerBotMessageHandler(botMessageUpdate);
-registerPluginHandler(createStatistic, ADD_CHAT);
-registerCommandHandler(showStatistic, u'статистика', 10, u'Статистика текущей конференции', None, (u'статистика', ), CHAT | NONPARAM);
+registerEvent(createStatistic, ADDCONF);
+registerCommand(showStatistic, u'статистика', 10, u'Статистика текущей конференции', None, (u'статистика', ), CHAT | NONPARAM);

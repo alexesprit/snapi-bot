@@ -30,7 +30,7 @@ def getKeyToPrivate(type, conference, nick, param):
 	confJid = '';
 	if(len(param) == 2):
 		userNick = param[0].strip();
-		if(nickOnlineInChat(conference, userNick)):
+		if(nickIsOnline(conference, userNick)):
 			confJid = conference + '/' + userNick;
 			key = param[1].lower();
 	elif(len(param) == 1):
@@ -79,18 +79,18 @@ def showAllKeys(type, conference, nick, parameters):
 	else:
 		sendMsg(type, conference, nick, 'база пуста!');
 
-def loadLocalBase(groupChat):
-	fileName = LOCALDB_FILE % (groupChat);
+def loadLocalBase(conference):
+	fileName = LOCALDB_FILE % (conference);
 	createFile(fileName, '{}');
-	gLocalBase[groupChat] = eval(readFile(fileName));
+	gLocalBase[conference] = eval(readFile(fileName));
 	
-def saveLocalBase(groupChat):
-	fileName = LOCALDB_FILE % (groupChat);
-	writeFile(fileName, str(gLocalBase[groupChat]));
+def saveLocalBase(conference):
+	fileName = LOCALDB_FILE % (conference);
+	writeFile(fileName, str(gLocalBase[conference]));
 
-registerPluginHandler(loadLocalBase, ADD_CHAT);
-registerCommandHandler(getKeyToPublic, u'???', 10, u'Ищет ответ на вопрос в локальной базе', u'??? <запрос>', (u'??? что-то', u'??? что-то ещё'), CHAT | PARAM);
-registerCommandHandler(getKeyToPrivate, u'!??', 10, u'Ищет ответ на вопрос в локальной базе и посылает его в приват', u'!?? <ник> <запрос>', (u'!?? что-то', u'!?? guy что-то'), CHAT | PARAM);
-registerCommandHandler(setBaseKey, u'!!!', 11, u'Устанавливает ответ на вопрос в локальной базе', u'!!! <запрос> = <ответ>', (u'!!! что-то = the best!', u'!!! что-то ещё ='), CHAT | PARAM);
-registerCommandHandler(searchKey, u'???поиск', 10, u'Поиск по базе', '???поиск <запрос>', (u'???поиск что-то', ), CHAT | PARAM);
-registerCommandHandler(showAllKeys, u'???все', 10, u'Показывает все ключи базы', None, (u'???все', ), CHAT | NONPARAM);
+registerEvent(loadLocalBase, ADDCONF);
+registerCommand(getKeyToPublic, u'???', 10, u'Ищет ответ на вопрос в локальной базе', u'??? <запрос>', (u'??? что-то', u'??? что-то ещё'), CHAT | PARAM);
+registerCommand(getKeyToPrivate, u'!??', 10, u'Ищет ответ на вопрос в локальной базе и посылает его в приват', u'!?? <ник> <запрос>', (u'!?? что-то', u'!?? guy что-то'), CHAT | PARAM);
+registerCommand(setBaseKey, u'!!!', 11, u'Устанавливает ответ на вопрос в локальной базе', u'!!! <запрос> = <ответ>', (u'!!! что-то = the best!', u'!!! что-то ещё ='), CHAT | PARAM);
+registerCommand(searchKey, u'???поиск', 10, u'Поиск по базе', '???поиск <запрос>', (u'???поиск что-то', ), CHAT | PARAM);
+registerCommand(showAllKeys, u'???все', 10, u'Показывает все ключи базы', None, (u'???все', ), CHAT | NONPARAM);

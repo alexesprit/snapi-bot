@@ -31,16 +31,16 @@ def jokesControl(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_JOKES)));
 
-registerCommandHandler(jokesControl, u'шуточки', 30, u'Отключает (0) или включает (1) шуточки, которыми бот порою подменяет ответ. Без параметра покажет текущее значение', u'шуточки [0/1]', (u'шуточки', u'шуточки 0'), CHAT);
+registerCommand(jokesControl, u'шуточки', 30, u'Отключает (0) или включает (1) шуточки, которыми бот порою подменяет ответ. Без параметра покажет текущее значение', u'шуточки [0/1]', (u'шуточки', u'шуточки 0'), CHAT);
 
 def setJokesState(conference):
 	if(getConfigKey(conference, CFG_JOKES) is None):
 		setConfigKey(conference, CFG_JOKES, 1);
 
-registerPluginHandler(setJokesState, ADD_CHAT);
+registerEvent(setJokesState, ADDCONF);
 
 def loadJokes():
 	global gJokes;
 	gJokes = eval(readFile('resource/jokes.txt', 'utf-8'));
 
-registerPluginHandler(loadJokes, STARTUP);
+registerEvent(loadJokes, STARTUP);

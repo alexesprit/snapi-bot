@@ -39,19 +39,19 @@ def showSomeList(type, conference, nick, aff):
 def showBanList(type, conference, nick, param):
 	showSomeList(type, conference, nick, AFF_OUTCAST);
 
-registerCommandHandler(showBanList, u'банлист', 20, u'Показывает список забаненных', None, (u'банлист', ), CHAT | NONPARAM);
+registerCommand(showBanList, u'банлист', 20, u'Показывает список забаненных', None, (u'банлист', ), CHAT | NONPARAM);
 
 def showMemberList(type, conference, nick, param):
 	showSomeList(type, conference, nick, AFF_MEMBER);
 
-registerCommandHandler(showMemberList, u'мемберлист', 20, u'Показывает список мемберов', None, (u'мемберлист', ), CHAT | NONPARAM);
+registerCommand(showMemberList, u'мемберлист', 20, u'Показывает список мемберов', None, (u'мемберлист', ), CHAT | NONPARAM);
 
 def showAdminList(type, conference, nick, param):
 	showSomeList(type, conference, nick, AFF_ADMIN);
 
-registerCommandHandler(showAdminList, u'админлист', 20, u'Показывает список админов', None, (u'админлист', ), CHAT | NONPARAM);
+registerCommand(showAdminList, u'админлист', 20, u'Показывает список админов', None, (u'админлист', ), CHAT | NONPARAM);
 
 def showOwnerList(type, conference, nick, param):
 	showSomeList(type, conference, nick, AFF_OWNER);
 
-registerCommandHandler(showOwnerList, u'овнерлист', 20, u'Показывает список овнеров', None, (u'овнерлист', ), CHAT | NONPARAM);
+registerCommand(showOwnerList, u'овнерлист', 20, u'Показывает список овнеров', None, (u'овнерлист', ), CHAT | NONPARAM);

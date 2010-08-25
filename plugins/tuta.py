@@ -19,7 +19,7 @@ gHereTimeCache = {};
 
 def showHereStatistic(type, conference, nick, param):
 	userNick = param or nick;
-	if(nickOnlineInChat(conference, userNick)):
+	if(nickIsOnline(conference, userNick)):
 		base = gHereTimeCache[conference];
 		trueJid = getTrueJid(conference, userNick);
 		info = base.getKey(trueJid);
@@ -35,10 +35,10 @@ def showHereStatistic(type, conference, nick, param):
 		else:
 			sendMsg(type, conference, nick, u'нет статистики');
 
-registerCommandHandler(showHereStatistic, u'тута', 10, u'Показывает кол-во часов, проведённое в чатике, максимальное и среднее', u'тута [ник]', (u'тута', ), CHAT);
+registerCommand(showHereStatistic, u'тута', 10, u'Показывает кол-во часов, проведённое в чатике, максимальное и среднее', u'тута [ник]', (u'тута', ), CHAT);
 	
-def updateJoinStatistic(groupChat, nick, trueJid, aff, role):
-	base = gHereTimeCache[groupChat];
+def updateJoinStatistic(conference, nick, trueJid, aff, role):
+	base = gHereTimeCache[conference];
 	info = base.getKey(trueJid);
 	if(not info):
 		info = {'record': 0, 'count': 0, 'here': 0};
@@ -46,22 +46,22 @@ def updateJoinStatistic(groupChat, nick, trueJid, aff, role):
 	base.setKey(trueJid, info);
 	base.save();
 
-def updateLeaveStatistic(groupChat, nick, trueJid, reason, code):
-	base = gHereTimeCache[groupChat];
-	joinTime = getNickKey(groupChat, nick, 'joined');
+def updateLeaveStatistic(conference, nick, trueJid, reason, code):
+	base = gHereTimeCache[conference];
+	joinTime = getNickKey(conference, nick, 'joined');
 	if(joinTime):
 		info = base.getKey(trueJid);
 		if(info):
-			hereTime = time.time() - getNickKey(groupChat, nick, NICK_JOINED);
+			hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED);
 			info['here'] += hereTime;
 			info['record'] = max(info['record'], hereTime);
 			base.setKey(trueJid, info);
 			base.save();
 
-def loadHereCache(groupChat):
-	fileName = HERE_FILE % (groupChat);
-	gHereTimeCache[groupChat] = database.DataBase(fileName);
+def loadHereCache(conference):
+	fileName = HERE_FILE % (conference);
+	gHereTimeCache[conference] = database.DataBase(fileName);
 
-registerPluginHandler(loadHereCache, ADD_CHAT);
+registerEvent(loadHereCache, ADDCONF);
 registerJoinHandler(updateJoinStatistic);
 registerLeaveHandler(updateLeaveStatistic);

@@ -41,6 +41,6 @@ def googleSearch(type, conference, nick, url):
 	else:
 		sendMsg(type, conference, nick, u'не найдено');
 
-registerCommandHandler(googleEn, u'гугльен', 10, u'Поиск через Google, по буржуйским сайтам', u'гугльен <текст>', (u'гугльен yandex', ), ANY | PARAM);
-registerCommandHandler(googleRu, u'гугльру', 10, u'Поиск через Google, по нашим, русским сайтам', u'гугльру <текст>', (u'гугльру yandex', ), ANY | PARAM);
-registerCommandHandler(google, u'гугль', 10, u'Поиск через Google', u'гугль <текст>', (u'гугль yandex', ), ANY | PARAM);
+registerCommand(googleEn, u'гугльен', 10, u'Поиск через Google, по буржуйским сайтам', u'гугльен <текст>', (u'гугльен yandex', ), ANY | PARAM);
+registerCommand(googleRu, u'гугльру', 10, u'Поиск через Google, по нашим, русским сайтам', u'гугльру <текст>', (u'гугльру yandex', ), ANY | PARAM);
+registerCommand(google, u'гугль', 10, u'Поиск через Google', u'гугль <текст>', (u'гугль yandex', ), ANY | PARAM);

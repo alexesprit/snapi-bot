@@ -67,7 +67,7 @@ def loadNotes():
 	global gNotes;
 	gNotes = database.DataBase(NOTE_FILE);
 
-registerPluginHandler(loadNotes, STARTUP);
-registerCommandHandler(addNote, u'заметка+', 10, u'Добавляет запись в ваш блокнот', u'заметка+ <что-то>', (u'заметка+ ы', ), ANY | PARAM);
-registerCommandHandler(delNote, u'заметка-', 10, u'Удаляет запись из вашего блокнота', u'заметка- <номер>', (u'заметка- 2', ), ANY | PARAM);
-registerCommandHandler(showNotes, u'заметки', 10, u'Показывает все записи из вашего блокнота. Параметр "сброс" очищает весь список ваших записей', u'заметки [параметры]', (u'заметки', u'заметки сброс'));
+registerEvent(loadNotes, STARTUP);
+registerCommand(addNote, u'заметка+', 10, u'Добавляет запись в ваш блокнот', u'заметка+ <что-то>', (u'заметка+ ы', ), ANY | PARAM);
+registerCommand(delNote, u'заметка-', 10, u'Удаляет запись из вашего блокнота', u'заметка- <номер>', (u'заметка- 2', ), ANY | PARAM);
+registerCommand(showNotes, u'заметки', 10, u'Показывает все записи из вашего блокнота. Параметр "сброс" очищает весь список ваших записей', u'заметки [параметры]', (u'заметки', u'заметки сброс'));

@@ -21,7 +21,7 @@ def showVersion(type, conference, nick, param):
 		sendMsg(type, conference, nick, u'я юзаю %s %s в %s' % (gVersion[0], gVersion[1], gVersion[2]));
 	else:
 		if(param):
-			if(chatInList(conference) and nickOnlineInChat(conference, param)):
+			if(conferenceInList(conference) and nickIsOnline(conference, param)):
 				jid = conference + '/' + param;
 			else:
 				return;
@@ -59,4 +59,4 @@ def _showVersion(stanza, verID, type, conference, nick, param):
 			else:
 				sendMsg(type, conference, nick, u'глючит клиент');			
 
-registerCommandHandler(showVersion, u'версия', 10, u'Показывает информацию о клиенте указанного пользователя', u'версия [ник]', (u'версия', u'версия Nick'));
+registerCommand(showVersion, u'версия', 10, u'Показывает информацию о клиенте указанного пользователя', u'версия [ник]', (u'версия', u'версия Nick'));

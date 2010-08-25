@@ -24,6 +24,6 @@ COLLECT_TIMEOUT = 300;
 def startCollecting():
 	sys.exc_clear();
 	gc.collect();
-	startTimer(COLLECT_TIMEOUT, startCollecting);	
+	startTimer(COLLECT_TIMEOUT, startCollecting);
 
-registerPluginHandler(startCollecting, INIT_2);
+registerEvent(startCollecting, INIT_2);

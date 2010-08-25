@@ -32,7 +32,7 @@ def _showPing(stanza, pingID, t0, type, conference, nick, param):
 
 def showPing(type, conference, nick, param):
 	if(param):
-		if(chatInList(conference) and nickOnlineInChat(conference, param)):
+		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			userJid = conference + '/' + param;
 		else:
 			return;
@@ -46,4 +46,4 @@ def showPing(type, conference, nick, param):
 	t0 = time.time();
 	gClient.SendAndCallForResponse(iq, _showPing, (pingID, t0, type, conference, nick, param, ));
 
-registerCommandHandler(showPing, u'пинг', 10, u'Пингует тебя или определённый ник', u'пинг [ник]', (u'пинг', u'пинг Nick'));
+registerCommand(showPing, u'пинг', 10, u'Пингует тебя или определённый ник', u'пинг [ник]', (u'пинг', u'пинг Nick'));

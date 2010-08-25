@@ -16,4 +16,4 @@ def sendStanza(source, conference, nick, param):
 	stanza = xmpp.simplexml.XML2Node(param);
 	gClient.send(stanza);
 
-registerCommandHandler(sendStanza, u'станза', 100, u'Топка', u'станза <херь>', (u'станза ololo', ), ANY | FROZEN | PARAM);
+registerCommand(sendStanza, u'станза', 100, u'Топка', u'станза <херь>', (u'станза ololo', ), ANY | FROZEN | PARAM);

@@ -16,7 +16,7 @@
 def checkNick(stanza, conference, nick, trueJid):
 	code = stanza.getStatusCode();
 	nick = ('303' != code) and nick or stanza.getNick();
-	if(nick):
+	if(nick.strip()):
 		command = nick.split()[0].strip().lower();
 		if(isCommand(command) or gMacros.hasMacros(command, conference) or gMacros.hasMacros(command)):
 			setRole(conference, nick, ROLE_NONE, u'меняй ник!!!');

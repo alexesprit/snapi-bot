@@ -55,5 +55,5 @@ def setActivity(type, jid, resource, param):
 		else:
 			sendMsg(type, jid, resource, u'поставила');
 
-registerCommandHandler(setActivity, u'активность', 100, u'Устанавливает активность для бота. "Cброс" в кач-ве параметра сбрасывает активность', u'активность <осн.|доп.|текст>', (u'активность doing_chores|doing_maintenance|ололо', ), ROSTER | PARAM);
-registerCommandHandler(setMood, u'настроение', 100, u'Устанавливает настроение для бота. "Cброс" в кач-ве параметра сбрасывает настроение', u'настроение <название|текст>', (u'настроение calm|ололо', ), ROSTER | PARAM);
+registerCommand(setActivity, u'активность', 100, u'Устанавливает активность для бота. "Cброс" в кач-ве параметра сбрасывает активность', u'активность <осн.|доп.|текст>', (u'активность doing_chores|doing_maintenance|ололо', ), ROSTER | PARAM);
+registerCommand(setMood, u'настроение', 100, u'Устанавливает настроение для бота. "Cброс" в кач-ве параметра сбрасывает настроение', u'настроение <название|текст>', (u'настроение calm|ололо', ), ROSTER | PARAM);

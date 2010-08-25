@@ -15,7 +15,7 @@
 
 def showHereTime(type, conference, nick, param):
 	userNick = param or nick;
-	if(nickOnlineInChat(conference, userNick)):
+	if(nickIsOnline(conference, userNick)):
 		joinedTime = getNickKey(conference, userNick, NICK_JOINED);
 		joinedTime = time2str(time.time() - joinedTime);
 		if(not param):
@@ -23,4 +23,4 @@ def showHereTime(type, conference, nick, param):
 		else:
 			sendMsg(type, conference, nick, u'%s уже здесь %s' % (userNick, joinedTime));
 
-registerCommandHandler(showHereTime, u'здесь', 10, u'Показывает, сколько времени пользователь сидит в конференции', u'здесь [ник]', (u'здесь', u'здесь Nick'), CHAT);
+registerCommand(showHereTime, u'здесь', 10, u'Показывает, сколько времени пользователь сидит в конференции', u'здесь [ник]', (u'здесь', u'здесь Nick'), CHAT);

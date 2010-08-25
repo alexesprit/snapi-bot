@@ -23,10 +23,10 @@ def addMessageToQueue(type, conference, nick, param):
 	if(len(param) >= 2):
 		userNick = param[0];
 		message = u'%s попросил меня передать тебе следующее:\n%s' % (nick, ' '.join(param[1:]));
-		if(nickOnlineInChat(conference, userNick)):
+		if(nickIsOnline(conference, userNick)):
 			sendMsg(PRIVATE, conference, userNick, message);
 			sendMsg(type, conference, nick, u'передала');
-		elif(nickInChat(conference, userNick)):
+		elif(nickInConference(conference, userNick)):
 			trueJid = getTrueJid(conference, userNick);
 			base = gSendCache[conference];
 			messages = base.getKey(trueJid);
@@ -52,5 +52,5 @@ def loadSendCache(conference):
 	gSendCache[conference] = database.DataBase(fileName);
 
 registerJoinHandler(checkQueue);
-registerPluginHandler(loadSendCache, ADD_CHAT);
-registerCommandHandler(addMessageToQueue, u'передать', 10, u'Запоминает сообщение и передаёт его указанному пользователю, как только он зайдёт в конференцию', u'передать <кому> <что>', (u'передать Nick хай!'), CHAT);
+registerEvent(loadSendCache, ADDCONF);
+registerCommand(addMessageToQueue, u'передать', 10, u'Запоминает сообщение и передаёт его указанному пользователю, как только он зайдёт в конференцию', u'передать <кому> <что>', (u'передать Nick хай!'), CHAT);

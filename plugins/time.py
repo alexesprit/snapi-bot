@@ -18,7 +18,7 @@ TIME_ID = 'time_id';
 
 def showUserTime(type, conference, nick, param):
 	if(param):
-		if(chatInList(conference) and nickOnlineInChat(conference, param)):
+		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			userJid = conference + '/' + param;
 		else:
 			return;
@@ -71,4 +71,4 @@ def _showUserTime(stanza, timeID, type, conference, nick, param):
 			else:
 				sendMsg(type, conference, nick, u'хехе, его клиент не дружит с этим');
 
-registerCommandHandler(showUserTime, u'часики', 10, u'Показывает время указанного пользователя', u'часики [ник]', (u'часики', u'часики Nick'));
+registerCommand(showUserTime, u'часики', 10, u'Показывает время указанного пользователя', u'часики [ник]', (u'часики', u'часики Nick'));

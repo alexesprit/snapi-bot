@@ -20,10 +20,10 @@ def _sendKeepAlivePacket(stanza, keepID, conference):
 	if(keepID == stanza.getID()):
 		if(ERROR == stanza.getType()):
 			if(stanza.getErrorCode() == '503'):
-				startTimer(REJOIN_TIMEOUT, joinGroupchat, (conference, getBotNick(conference), getChatKey(conference, 'password')));
+				startTimer(REJOIN_TIMEOUT, joinConference, (conference, getBotNick(conference), getChatKey(conference, 'password')));
 	
 def sendKeepAlivePacket():
-	for conference in getChatList():
+	for conference in getConferences():
 		iq = xmpp.Iq('get');
 		keepID = getUniqueID(KEEP_ID);
 		iq.setID(keepID);
@@ -35,4 +35,4 @@ def sendKeepAlivePacket():
 def startKeepAliveTimer():
 	startTimer(KEEPALIVE_TIMEOUT, sendKeepAlivePacket);
 
-registerPluginHandler(sendKeepAlivePacket, INIT_2);
+#registerEvent(sendKeepAlivePacket, INIT_2);

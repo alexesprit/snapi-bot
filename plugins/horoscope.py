@@ -29,4 +29,4 @@ def showHoroscope(type, conference, nick, param):
 		else:
 			sendMsg(type, conference, nick, u'не могу :(');
 
-registerCommandHandler(showHoroscope, u'гороскоп', 10, u'Показывает гороскоп для указанного знака гороскопа', u'гороскоп <знак>', (u'гороскоп рыбы', ), ANY | PARAM);
+registerCommand(showHoroscope, u'гороскоп', 10, u'Показывает гороскоп для указанного знака гороскопа', u'гороскоп <знак>', (u'гороскоп рыбы', ), ANY | PARAM);

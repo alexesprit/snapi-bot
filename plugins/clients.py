@@ -20,7 +20,7 @@ gClientsCache = {};
 
 def showClients(type, conference, nick, param):
 	userNick = param or nick;
-	if(nickOnlineInChat(conference, userNick)):
+	if(nickIsOnline(conference, userNick)):
 		trueJid = getTrueJid(conference, userNick);
 		base = gClientsCache[conference];
 		if(trueJid in base):
@@ -64,6 +64,6 @@ def loadClientsCache(conference):
 	fileName = CLIENTS_FILE % (conference);
 	gClientsCache[conference] = database.DataBase(fileName);
 
-registerPluginHandler(loadClientsCache, ADD_CHAT);
+registerEvent(loadClientsCache, ADDCONF);
 registerJoinHandler(clientsChecking);
-registerCommandHandler(showClients, u'клиенты', 10, u'Показывает, с каких клиентов заходил пользователь', u'клиенты [ник]', (u'клиенты', u'клиенты Niсk'), CHAT);
+registerCommand(showClients, u'клиенты', 10, u'Показывает, с каких клиентов заходил пользователь', u'клиенты [ник]', (u'клиенты', u'клиенты Niсk'), CHAT);

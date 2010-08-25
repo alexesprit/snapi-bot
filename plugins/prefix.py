@@ -27,9 +27,9 @@ def prefixControl(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'текущее значение: %s' % (getConfigKey(conference, CFG_PREFIX)));
 
-def setDefaultPrefix(groupChat):
-	if(getConfigKey(groupChat, CFG_PREFIX) is None):
-		setConfigKey(groupChat, CFG_PREFIX, None);
+def setDefaultPrefix(conference):
+	if(getConfigKey(conference, CFG_PREFIX) is None):
+		setConfigKey(conference, CFG_PREFIX, None);
 
-registerPluginHandler(setDefaultPrefix, ADD_CHAT);
-registerCommandHandler(prefixControl, u'префикс', 30, u'Устанавливает или отключает (если указать None) префикс для команд. Без параметра покажет текущее значение', u'префикс [что-то]', (u'префикс _', u'префикс None'), CHAT);
+registerEvent(setDefaultPrefix, ADDCONF);
+registerCommand(prefixControl, u'префикс', 30, u'Устанавливает или отключает (если указать None) префикс для команд. Без параметра покажет текущее значение', u'префикс [что-то]', (u'префикс _', u'префикс None'), CHAT);

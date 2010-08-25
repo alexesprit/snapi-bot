@@ -47,7 +47,7 @@ def serviceDiscovery(type, conference, nick, param):
 	gClient.SendAndCallForResponse(iq, _serviceDiscovery, (discoID, type, conference, nick, maxCount, searchKey, jid, ));
 
 def _serviceDiscovery(stanza, discoID, type, conference, nick, maxCount, searchKey, jid):
-	if(stanza and DISCO_ID == stanza.getID()):
+	if(discoID == stanza.getID()):
 		if(stanza.getType() == 'result'):
 			discoList = [];
 			itemCount = 0;
@@ -93,4 +93,4 @@ def _serviceDiscovery(stanza, discoID, type, conference, nick, maxCount, searchK
 		else:
 			sendMsg(type, conference, nick, u'не могу');
 
-registerCommandHandler(serviceDiscovery, u'диско', 10, u'Показывает результаты обзора сервисов для указанного жида. Также можно запросить обзор по узлу (формат запроса jid#node). Второй или третий (если даётся ограничитель кол-ва) параметр - поиск (ищет заданное слово в жиде и описании элемента диско). Если поисковым словом задать имя конференции до названия сервера (например qwerty@), то покажет место этой конференции в общем рейтинге. В общий чат может дать до 50 результатов, без указания кол-ва - 10. В приват может дать до 250, без указания кол-ва 50.', u'диско <сервер> [кол-во результатов] [поисковая строка]', (u'диско jabber.aq', u'диско conference.jabber.aq 5', u'диско conference.jabber.aq qwerty', u'диско conference.jabber.aq 5 qwerty', u'диско conference.jabber.aq qwerty@', u'диско jabber.aq#services'));
+registerCommand(serviceDiscovery, u'диско', 10, u'Показывает результаты обзора сервисов для указанного жида. Также можно запросить обзор по узлу (формат запроса jid#node). Второй или третий (если даётся ограничитель кол-ва) параметр - поиск (ищет заданное слово в жиде и описании элемента диско). Если поисковым словом задать имя конференции до названия сервера (например qwerty@), то покажет место этой конференции в общем рейтинге. В общий чат может дать до 50 результатов, без указания кол-ва - 10. В приват может дать до 250, без указания кол-ва 50.', u'диско <сервер> [кол-во результатов] [поисковая строка]', (u'диско jabber.aq', u'диско conference.jabber.aq 5', u'диско conference.jabber.aq qwerty', u'диско conference.jabber.aq 5 qwerty', u'диско conference.jabber.aq qwerty@', u'диско jabber.aq#services'));

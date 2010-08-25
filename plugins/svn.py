@@ -33,4 +33,4 @@ def showSvnLog(type, conference, nick, param):
 				sendMsg(type, conference, nick, pipe.read().decode('utf-8'));
 				break;
 
-registerCommandHandler(showSvnLog, u'svn', 10, u'Показывает лог с svn', u'svn <адрес> [кол-во]', (u'svn http://jimm-fork.googlecode.com/svn/trunk 5', ), ANY);
+registerCommand(showSvnLog, u'svn', 10, u'Показывает лог с svn', u'svn <адрес> [кол-во]', (u'svn http://jimm-fork.googlecode.com/svn/trunk 5', ), ANY);

@@ -70,7 +70,7 @@ xmpp.NS_ROSTER:				'RFC 3921: XMPP IM',
 
 def showFeatures(type, conference, nick, param):
 	if(param):
-		if(chatInList(conference) and nickOnlineInChat(conference, param)):
+		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			jid = conference + '/' + param;
 		else:
 			return;
@@ -109,4 +109,4 @@ def _showFeatures(stanza, featID, type, conference, nick, param):
 		else:
 			sendMsg(type, conference, nick, u'не могу :(');
 		
-registerCommandHandler(showFeatures, u'фичи', 10, u'Показывает, какие XEP-ы подерживает клиент указанного пользователя', u'фичи [ник]', (u'фичи', u'фичи Nick'));
+registerCommand(showFeatures, u'фичи', 10, u'Показывает, какие XEP-ы подерживает клиент указанного пользователя', u'фичи [ник]', (u'фичи', u'фичи Nick'));

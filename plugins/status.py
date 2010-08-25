@@ -15,28 +15,28 @@
 
 def showUserStatus(type, conference, nick, param):
 	userNick = param or nick;
-	if(nickOnlineInChat(conference, nick)):
-		statusMsg = getNickKey(conference, nick, 'stmsg');
-		status = getNickKey(conference, nick, 'status');
+	if(nickIsOnline(conference, userNick)):
+		show = getNickKey(conference, userNick, NICK_SHOW);
+		status = getNickKey(conference, userNick, NICK_STATUS);
 		if(param):
-			if(statusMsg):
-				sendMsg(type, conference, nick, u'%s сейчас %s (%s)' % (param, status, statusMsg));
+			if(status):
+				sendMsg(type, conference, nick, u'%s сейчас %s (%s)' % (userNick, show, status));
 			else:
-				sendMsg(type, conference, nick, u'%s сейчас %s' % (param, status));
+				sendMsg(type, conference, nick, u'%s сейчас %s' % (userNick, show));
 		else:
-			if(statusMsg):
-				sendMsg(type, conference, nick, u'ты сейчас %s (%s)' % (status, statusMsg));
+			if(status):
+				sendMsg(type, conference, nick, u'ты сейчас %s (%s)' % (show, status));
 			else:
-				sendMsg(type, conference, nick, u'ты сейчас %s' % (status));
+				sendMsg(type, conference, nick, u'ты сейчас %s' % (show));
 				
-registerCommandHandler(showUserStatus, u'статус', 10, u'Показывает статус указанного пользователя', u'статус [ник]', (u'статус', u'статус Nick'), CHAT);
+registerCommand(showUserStatus, u'статус', 10, u'Показывает статус указанного пользователя', u'статус [ник]', (u'статус', u'статус Nick'), CHAT);
 
 def updateStatus(stanza, conference, nick, trueJid):
-	if(chatInList(conference) and nickOnlineInChat(conference, nick)):
-		statusMsg = stanza.getStatus();
-		status = stanza.getShow();
-		setNickKey(conference, nick, 'status', status or u'online');
-		if(statusMsg):
-			setNickKey(conference, nick, 'stmsg', statusMsg);
+	if(conferenceInList(conference) and nickIsOnline(conference, nick)):
+		show = stanza.getShow();
+		status = stanza.getStatus();
+		setNickKey(conference, nick, NICK_SHOW, show or u'online');
+		if(status):
+			setNickKey(conference, nick, NICK_STATUS, status);
 
 registerPresenceHandler(updateStatus, CHAT);

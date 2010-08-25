@@ -53,7 +53,7 @@ def turnLastMessage(type, conference, nick, param):
 			else:
 				sendMsg(type, conference, nick, turnMessage(savedMsg));
 
-registerCommandHandler(turnLastMessage, u'turn', 10, u'Переключает раскладку для последнего сообщения пользователя, вызвавшего команду', u'turn [текст]', (u'turn', u'turn jkjkj'), CHAT);
+registerCommand(turnLastMessage, u'turn', 10, u'Переключает раскладку для последнего сообщения пользователя, вызвавшего команду', u'turn [текст]', (u'turn', u'turn jkjkj'), CHAT);
 
 def saveMessage(stanza, type, conference, nick, trueJid, body):
 	if(type == PUBLIC):
@@ -66,7 +66,7 @@ registerMessageHandler(saveMessage, CHAT);
 def initTurnCache(conference):
 	gTurnMsgCache[conference] = {};
 
-registerPluginHandler(initTurnCache, ADD_CHAT);
+registerEvent(initTurnCache, ADDCONF);
 	
 def clearTurnCache(conference, nick, trueJid, reason, code):
 	if(trueJid in gTurnMsgCache[conference]):

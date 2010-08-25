@@ -40,10 +40,9 @@ FLAG_ERROR = 'error';
 FLAG_WARNING = 'warning';
 FLAG_SUCCESS = 'success';
 
-ADD_CHAT = 1 << 1;
-DEL_CHAT = 1 << 2;
+ADDCONF = 1 << 1;
+DELCONF = 1 << 2;
 STARTUP = 1 << 3;
-# TODO сделать норм. название
 INIT_2 = 1 << 4;
 
 CHAT = 1 << 1;
@@ -66,6 +65,8 @@ NICK_HERE = 'here';
 NICK_MODER = 'moder';
 NICK_LEAVED = 'leaved';
 NICK_JOINED = 'joined';
+NICK_SHOW = 'show';
+NICK_STATUS = 'status';
 
 IDLE_TIMEOUT = 600;
 JOIN_TIMEOUT = 5;
@@ -93,9 +94,9 @@ gLeaveHandlers = [];
 gIqHandlers = [];
 gCmdHandlers = {};
 
-gPluginHandlers = {ADD_CHAT: [], DEL_CHAT: [], STARTUP: [], INIT_2: []};
+gEventHandlers = {ADDCONF: [], DELCONF: [], STARTUP: [], INIT_2: []};
 gPresenceHandlers = {ROSTER: [], CHAT: []};
-gMsgHandlers = {ROSTER: [], CHAT: []};
+gMessageHandlers = {ROSTER: [], CHAT: []};
 
 gGlobalAccess = {};
 gTempAccess = {};
@@ -105,10 +106,10 @@ gCommands = {};
 gCmdOff = {};
 gMacros = macros.Macros();
 
-gChats = {};
+gConferences = {};
 gIsJoined = {};
 gConfig = {};
-gAutoAway = {};
+
 gJokes = [];
 
 gID = 0;
@@ -122,32 +123,32 @@ gDebug.colors[FLAG_ERROR] = xmpp.Debug.colorBrightRed;
 gDebug.colors[FLAG_WARNING] = xmpp.Debug.colorYellow;
 gDebug.colors[FLAG_SUCCESS] = xmpp.Debug.colorBrightCyan;
 
-def registerMessageHandler(instance, type):
-	gMsgHandlers[type].append(instance);
-	
-def registerBotMessageHandler(instance):
-	gBotMsgHandlers.append(instance);
-
-def registerJoinHandler(instance):
-	gJoinHandlers.append(instance);
-
-def registerLeaveHandler(instance):
-	gLeaveHandlers.append(instance);
-
-def registerIqHandler(instance):
-	gIqHandlers.append(instance);
-
-def registerPresenceHandler(instance, type):
-	gPresenceHandlers[type].append(instance);
-
-def registerPluginHandler(instance, type):
-	gPluginHandlers[type].append(instance);
-
-def registerCommandHandler(instance, command, access, desc, syntax, examples, cmdType = ANY):
+def registerCommand(function, command, access, desc, syntax, examples, cmdType = ANY):
 	printf(command, FLAG_ERROR);
 
-def registerCommandHandler(instance, command, access, desc, syntax, examples, cmdType = ANY):
-	gCmdHandlers[command] = instance;
+def registerMessageHandler(function, type):
+	gMessageHandlers[type].append(function);
+	
+def registerBotMessageHandler(function):
+	gBotMsgHandlers.append(function);
+
+def registerJoinHandler(function):
+	gJoinHandlers.append(function);
+
+def registerLeaveHandler(function):
+	gLeaveHandlers.append(function);
+
+def registerIqHandler(function):
+	gIqHandlers.append(function);
+
+def registerPresenceHandler(function, type):
+	gPresenceHandlers[type].append(function);
+
+def registerEvent(function, type):
+	gEventHandlers[type].append(function);
+
+def registerCommand(function, command, access, desc, syntax, examples, cmdType = ANY):
+	gCmdHandlers[command] = function;
 	gCommands[command] = {'access': access, 'desc': desc, 'syntax': syntax, 'examples': examples, 'type': cmdType};
 
 def callBotMessageHandlers(type, jid, text):
@@ -156,7 +157,7 @@ def callBotMessageHandlers(type, jid, text):
 
 def callJoinHandlers(conference, nick, trueJid, aff, role):
 	for handler in gJoinHandlers:
-		startThread(handler, (conference, nick, trueJid, aff, role));
+		startThread(handler, (conference, nick, trueJid, aff, role, ));
 
 def callLeaveHandlers(conference, nick, trueJid, reason, code):
 	for handler in gLeaveHandlers:
@@ -164,7 +165,7 @@ def callLeaveHandlers(conference, nick, trueJid, reason, code):
 
 def callMessageHandlers(msgType, stanza, type, conference, nick, trueJid, body):
 	gInfo['msg'] += 1;
-	for handler in gMsgHandlers[msgType]:
+	for handler in gMessageHandlers[msgType]:
 		startThread(handler, (stanza, type, conference, nick, trueJid, body, ));
 
 def callIqHandlers(stanza, jid, resource):
@@ -176,7 +177,15 @@ def callPresenceHandlers(stanza, type, jid, resource, trueJid):
 	gInfo['prs'] += 1;
 	for handler in gPresenceHandlers[type]:
 		startThread(handler, (stanza, jid, resource, trueJid, ));
-	
+
+def callEventHandlers(type, param = None):
+	if(param):
+		for function in gEventHandlers[type]:
+			function(*param);
+	else:
+		for function in gEventHandlers[type]:
+			function();		
+
 def callCommandHandlers(command, type, jid, resource, param):
 	gInfo['cmd'] += 1;
 	if(command in gCmdHandlers):
@@ -185,20 +194,20 @@ def callCommandHandlers(command, type, jid, resource, param):
 def startThread(func, param = None):
 	gInfo['thr'] += 1;
 	if(param):
-		threading.Thread(None, execute, func.__name__, (func, param)).start();
+		threading.Thread(None, execute, func.__name__, (func, param, )).start();
 	else:
 		threading.Thread(None, execute, func.__name__, (func, )).start();
 
-def execute(instance, param = None):
+def execute(function, param = None):
 	try:
 		if(param):
 			with(gSemaphore):
-				instance(*param);
+				function(*param);
 		else:
 			with(gSemaphore):
-				instance();
+				function();
 	except(Exception):
-		errorHandler(instance.__name__);
+		errorHandler(function.__name__);
 		
 def startTimer(timeout, func, param = None):
 	gInfo['tmr'] += 1;
@@ -294,29 +303,25 @@ def setConfigKey(conference, key, value):
 
 def joinConferences(conferences):
 	for conference in conferences:
-		addConference(conference);
 		joinConference(conference, getBotNick(conference), getConfigKey(conference, 'password'));
 		saveChatConfig(conference);
-		time.sleep(JOIN_TIMEOUT);
 	printf('Entered in %d rooms' % (len(conferences)), FLAG_SUCCESS);
 
 def addConference(conference):
-	gChats[conference] = {};
+	gConferences[conference] = {};
 	gIsJoined[conference] = False;
-	writeFile(CHATLIST_FILE, str(gChats.keys()));
+	writeFile(CHATLIST_FILE, str(gConferences.keys()));
 	loadChatConfig(conference);
-	for process in gPluginHandlers[ADD_CHAT]:
+	for process in gEventHandlers[ADDCONF]:
 		process(conference);
 
 def delConference(conference):
-	if(getConfigKey(conference, CFG_AUTOAWAY)):
-		stopAwayTimer(conference);
-	for instance in gPluginHandlers[DEL_CHAT]:
-		instance(conference);
+	for function in gEventHandlers[DELCONF]:
+		function(conference);
 	del(gIsJoined[conference]);
 	del(gConfig[conference]);
-	del(gChats[conference]);
-	writeFile(CHATLIST_FILE, str(gChats.keys()));
+	del(gConferences[conference]);
+	writeFile(CHATLIST_FILE, str(gConferences.keys()));
 
 def joinConference(conference, nick, password):
 	setConfigKey(conference, 'nick', nick);
@@ -335,7 +340,7 @@ def joinConference(conference, nick, password):
 		mucTag.setTagData('password', password);
 	gClient.send(prs);
 
-def leaveconference(conference, status = None):
+def leaveConference(conference, status = None):
 	prs = xmpp.Presence(conference, UNAVAILABLE);
 	if(status):
 		prs.setStatus(status);
@@ -343,7 +348,7 @@ def leaveconference(conference, status = None):
 	delConference(conference);
 
 def getBotNick(conference):
-	if(conference in gChats):
+	if(conference in gConferences):
 		return(getConfigKey(conference, 'nick') or gBotNick);
 	return(gBotNick);
 	
@@ -377,24 +382,6 @@ def setBotStatus(conference, status, show, away = 0):
 		prs.setShow(show);
 	prs.addChild(node = getCapsNode());
 	gClient.send(prs);
-	if(getConfigKey(conference, CFG_AUTOAWAY)):
-		gAutoAway[conference]['away'] = away;
-		
-def hasAwayTimer(conference):
-	return(conference in gAutoAway);
-		
-def createAwayTimer(conference):
-	gAutoAway[conference] = {'away': 0, 'thr': None};
-	resetAwayTimer(conference, False);
-		
-def resetAwayTimer(conference, cancel = True):
-	if(cancel):
-		gAutoAway[conference]['thr'].cancel();
-	gAutoAway[conference]['thr'] = startTimer(IDLE_TIMEOUT, setBotStatus, (conference, time.strftime(u'I\'ve been away since %H:%M'), 'away', 1));
-	
-def stopAwayTimer(conference):
-	gAutoAway[conference]['thr'].cancel();
-	del(gAutoAway[conference]);	
 
 def setRole(conference, nick, role, reason):
 	iq = xmpp.Iq('set');
@@ -433,10 +420,10 @@ def isAvailableCommand(conference, command):
 	return(not(conference in gCmdOff and command in gCmdOff[conference]));
 
 def getNicks(conference):
-	return(gChats[conference].keys());
+	return(gConferences[conference].keys());
 
 def getOnlineNicks(conference):
-	return([x for x in gChats[conference] if(getNickKey(conference, x, NICK_HERE))]);
+	return([x for x in gConferences[conference] if(getNickKey(conference, x, NICK_HERE))]);
 
 def getJidList(conference, offline = False):
 	nicks = offline and getNicks(conference) or getOnlineNicks(conference);
@@ -449,28 +436,28 @@ def getTrueJid(jid, resource = None):
 	if(not resource):
 		if(jid.find('/') > -1):
 			jid, resource = jid.split('/', 1);
-	if(chatInList(jid)):
-		if(nickInChat(jid, resource)):
+	if(conferenceInList(jid)):
+		if(nickInConference(jid, resource)):
 			jid = getNickKey(jid, resource, 'jid');
 	return(jid);
 
-def getChatList():
-	return(gChats.keys());
+def getConferences():
+	return(gConferences.keys());
 
 def getNickKey(conference, nick, key):
-	return(gChats[conference][nick].get(key));
+	return(gConferences[conference][nick].get(key));
 
 def setNickKey(conference, nick, key, value):
-	gChats[conference][nick][key] = value;
+	gConferences[conference][nick][key] = value;
 
-def chatInList(conference):
-	return(conference in gChats);
+def conferenceInList(conference):
+	return(conference in gConferences);
 
-def nickInChat(conference, nick):
-	return(nick in gChats[conference]);
+def nickInConference(conference, nick):
+	return(nick in gConferences[conference]);
 
-def nickOnlineInChat(conference, nick):
-	return(nickInChat(conference, nick) and getNickKey(conference, nick, NICK_HERE));
+def nickIsOnline(conference, nick):
+	return(nickInConference(conference, nick) and getNickKey(conference, nick, NICK_HERE));
 
 def setTempAccess(conference, jid, level = 0):
 	gTempAccess[conference][jid] = None;	
@@ -509,7 +496,7 @@ def setTempGlobalAccess(jid, level = 0):
 def getAccess(conference, jid):
 	if(jid in gGlobalAccess):
 		return(gGlobalAccess[jid]);
-	if(conference in gChats):
+	if(conference in gConferences):
 		if(jid in gPermAccess[conference]):
 			return(gPermAccess[conference][jid]);
 		if(jid in gTempAccess[conference]):
@@ -561,11 +548,11 @@ def messageHandler(session, stanza):
 	message = message.strip();
 	if(not message):
 		return;
-	isConference = chatInList(conference);
+	isConference = conferenceInList(conference);
 	nick = fullJid.getResource();
 	msgType = isConference and CHAT or ROSTER;
 	if(type == PUBLIC and nick):
-		setNickKey(conference, nick, 'idle', time.time());
+		setNickKey(conference, nick, NICK_IDLE, time.time());
 	elif(type == ERROR):
 		errorCode = stanza.getErrorCode();
 		if(errorCode == '500'):
@@ -591,7 +578,7 @@ def messageHandler(session, stanza):
 			for x in [botNick + x for x in (':', ',')]:
 				if(message.startswith(x)):
 					message = message.replace(x, '').strip();
-		prefix = getConfigKey(conference, 'prefix');
+		prefix = getConfigKey(conference, CFG_PREFIX);
 		if(prefix):
 			if(message.startswith(prefix)):
 				message = message[len(prefix):].strip();
@@ -622,11 +609,6 @@ def messageHandler(session, stanza):
 					return;
 				if(not param and isCommandType(command, PARAM)):
 					return;
-				if(isConference):
-					if(getConfigKey(conference, 'autoaway')):
-						if(gAutoAway[conference]['away']):
-							setBotStatus(conference, getConfigKey(conference, 'status'), getConfigKey(conference, 'show'));
-						resetAwayTimer(conference);
 				callCommandHandlers(command, type, conference, nick, param);
 			else:
 				sendMsg(type, conference, nick, u'недостаточно прав');
@@ -639,7 +621,7 @@ def presenceHandler(session, stanza):
 		return;
 	nick = fullJid.getResource();
 	prsType =  stanza.getType();
-	if(chatInList(conference)):
+	if(conferenceInList(conference)):
 		trueJid = stanza.getJid();
 		if(trueJid):
 			trueJid = xmpp.JID(trueJid).getStripped();
@@ -647,13 +629,13 @@ def presenceHandler(session, stanza):
 		if(not prsType):
 			if(not trueJid):
 				sendToConference(conference, u'Без прав модератора работа невозможна!');
-				leaveconference(conference);
+				leaveConference(conference);
 				return;
-			if(not nickOnlineInChat(conference, nick)):
+			if(not nickIsOnline(conference, nick)):
 				aff = stanza.getAffiliation();
 				role = stanza.getRole();
-				if(not nickInChat(conference, nick)):
-					gChats[conference][nick] = {};
+				if(not nickInConference(conference, nick)):
+					gConferences[conference][nick] = {};
 				setNickKey(conference, nick, NICK_JID, trueJid);
 				setNickKey(conference, nick, NICK_IDLE, time.time());
 				setNickKey(conference, nick, NICK_HERE, True);
@@ -665,19 +647,14 @@ def presenceHandler(session, stanza):
 						gIsJoined[conference] = True;
 			role = stanza.getRole();
 			setNickKey(conference, nick, NICK_MODER, role == ROLE_MODERATOR);
-		elif(prsType == 'unavailable'):
+		elif(prsType == UNAVAILABLE):
 			code = stanza.getStatusCode();
 			reason = stanza.getReason() or stanza.getStatus();
-			if(code == '303'):
-				newNick = stanza.getNick();
-				nickData = gChats[conference][nick];
-				gChats[conference][newNick] = nickData;
-				setNickKey(conference, newNick, NICK_IDLE, time.time());
 			setNickKey(conference, nick, NICK_HERE, False);
 			setNickKey(conference, nick, NICK_LEAVED, time.time());
-			for key in (NICK_IDLE, NICK_MODER, 'status', 'stmsg',):
-				if(key in gChats[conference][nick]):
-					del(gChats[conference][nick][key]);
+			for key in (NICK_IDLE, NICK_MODER, NICK_STATUS, NICK_SHOW):
+				if(key in gConferences[conference][nick]):
+					del(gConferences[conference][nick][key]);
 			callLeaveHandlers(conference, nick, trueJid, reason, code);
 		elif(prsType == ERROR):
 			errorCode = stanza.getErrorCode();
@@ -686,9 +663,9 @@ def presenceHandler(session, stanza):
 			elif(errorCode == '404'):
 				delConference(conference);
 			elif(errorCode == '503'):
-				startTimer(REJOIN_TIMEOUT, conference, (conference, getBotNick(conference), getConfigKey(conference, 'password')));
+				startTimer(REJOIN_TIMEOUT, conference, (conference, getBotNick(conference), getConfigKey(conference, 'password'), ));
 			elif(errorCode in ('401', '403', '405')):
-				leaveconference(conference, u'got %s error code' % errorCode);
+				leaveConference(conference, u'got %s error code' % errorCode);
 		callPresenceHandlers(stanza, CHAT, conference, nick, trueJid);
 	else:
 		callPresenceHandlers(stanza, ROSTER, conference, nick, trueJid);
@@ -744,6 +721,9 @@ def restart():
 		os.remove(PID_FILE);
 	os.execl(sys.executable, sys.executable, sys.argv[0]);
 
+def test():
+	pass;
+
 def start():
 	global gRoster;
 	loadPlugins();
@@ -765,9 +745,7 @@ def start():
 		printf('Incorrect login/password', FLAG_ERROR);
 		os.abort();
 
-	for process in gPluginHandlers[STARTUP]:
-		startThread(process);
-		
+	callEventHandlers(STARTUP);		
 	gClient.RegisterHandler('message', messageHandler);
 	gClient.RegisterHandler('presence', presenceHandler);
 	gClient.RegisterHandler('iq', iqHandler);
@@ -781,10 +759,12 @@ def start():
 	createFile(CHATLIST_FILE, '[]');
 	conferences = eval(readFile(CHATLIST_FILE));
 	if(conferences):
+		for conference in conferences:
+			addConference(conference);
+		#threading.Thread(None, joinConferences, 'conf' + str(gInfo['thr']), (conferences, )).start();
 		startThread(joinConferences, (conferences, ));
 
-	for process in gPluginHandlers[INIT_2]:
-		startThread(process);
+	callEventHandlers(INIT_2);
 	while(1):
 		gClient.Process(10);
 
@@ -795,7 +775,7 @@ if(__name__ == '__main__'):
 			gInfo['start'] = time.time();
 			start();
 		else:
-			printf('Another instance is running (pid: %s)' % (pid), FLAG_ERROR);
+			printf('Another function is running (pid: %s)' % (pid), FLAG_ERROR);
 	except(KeyboardInterrupt):
 		if(gClient.isConnected()):
 			prs = xmpp.Presence(typ = UNAVAILABLE);
@@ -808,9 +788,9 @@ if(__name__ == '__main__'):
 		printf('Exception in main thread', FLAG_ERROR);
 		fileName = time.strftime(CRASHLOG_FILE);
 		writeFile(fileName, traceback.format_exc() + '\n', 'a');		
+		if(gClient.isConnected()):
+			prs = xmpp.Presence(typ = UNAVAILABLE);
+			prs.setStatus(u'что-то сломалось...');
+			gClient.send(prs);
 		if(gRestart):
-			if(gClient.isConnected()):
-				prs = xmpp.Presence(typ = UNAVAILABLE);
-				prs.setStatus(u'что-то сломалось...');
-				gClient.send(prs);
 			restart();

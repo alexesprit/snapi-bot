@@ -46,7 +46,7 @@ def addLocalMacros(type, conference, nick, param):
 		else:
 			sendMsg(type, conference, nick, u'недостаточно прав');
 
-registerCommandHandler(addLocalMacros, u'макроадд', 20, u'Добавить макрос. Тело макроса должно быть заключено в апострофы (`)', u'макроадд <название> `<макрос>`', (u'макроадд глюк `сказать /me подумал, что все глючат`', ), ANY | PARAM);
+registerCommand(addLocalMacros, u'макроадд', 20, u'Добавить макрос. Тело макроса должно быть заключено в апострофы (`)', u'макроадд <название> `<макрос>`', (u'макроадд глюк `сказать /me подумал, что все глючат`', ), ANY | PARAM);
 
 def addGlobalMacros(type, conference, nick, param):
 	macros = param.split()[0].lower();
@@ -72,7 +72,7 @@ def addGlobalMacros(type, conference, nick, param):
 		gMacros.add(raw[0], raw[1], access);
 		gMacros.saveMacroses();
 
-registerCommandHandler(addGlobalMacros, u'гмакроадд', 100, u'Добавить глобальный макрос. Тело макроса должно быть заключено в апострофы (`)', u'гмакроадд <название> `<макрос>`', (u'гмакроадд глюк `сказать /me подумал, что все глючат`', ), ANY | PARAM);
+registerCommand(addGlobalMacros, u'гмакроадд', 100, u'Добавить глобальный макрос. Тело макроса должно быть заключено в апострофы (`)', u'гмакроадд <название> `<макрос>`', (u'гмакроадд глюк `сказать /me подумал, что все глючат`', ), ANY | PARAM);
 
 def delLocalMacros(type, conference, nick, param):
 	if(gMacros.hasMacros(param, conference)):
@@ -134,7 +134,7 @@ def showGlobalMacrosInfo(type, conference, nick, param):
 def showMacrosList(type, conference, nick, parameters):
 	message, disMacroses, macroses = u'', [], [];
 	trueJid = getTrueJid(conference, nick);
-	isConference = chatInList(conference);
+	isConference = conferenceInList(conference);
 	if(isConference):
 		for macros in gMacros.getMacrosList(conference):
 			if(isAvailableCommand(conference, macros)):
@@ -225,28 +225,28 @@ def showGlobalMacroAccess(type, conference, nick, param):
 def loadMacroses(conference):
 	gMacros.loadMacroses(conference);
 
-registerPluginHandler(loadMacroses, ADD_CHAT);
+registerEvent(loadMacroses, ADDCONF);
 
 def unloadMacroses(conference):
 	gMacros.unloadMacroses(conference);
 
-registerPluginHandler(unloadMacroses, DEL_CHAT);
+registerEvent(unloadMacroses, DELCONF);
 	
 def loadGlobalMacroses():
 	gMacros.loadMacroses();
 
-registerPluginHandler(loadGlobalMacroses, STARTUP);
+registerEvent(loadGlobalMacroses, STARTUP);
 
-registerCommandHandler(delLocalMacros, u'макродел', 20, u'Удалить макроc', u'макродел <название>', (u'макродел глюк', ), CHAT);
-registerCommandHandler(delGlobalMacros, u'гмакродел', 100, u'Удалить глобальный макроc', u'ггмакродел <название>', (u'гмакродел глюк', ), ANY | PARAM);
+registerCommand(delLocalMacros, u'макродел', 20, u'Удалить макроc', u'макродел <название>', (u'макродел глюк', ), CHAT);
+registerCommand(delGlobalMacros, u'гмакродел', 100, u'Удалить глобальный макроc', u'ггмакродел <название>', (u'гмакродел глюк', ), ANY | PARAM);
 
-registerCommandHandler(expandLocalMacros, u'макроэксп', 20, u'Развернуть макроc, т.е. посмотреть на него в сыром виде', u'макроэксп <название> [параметры]', (u'макроэксп админ бот', ), CHAT);
-registerCommandHandler(expandGlobalMacros, u'гмакроэксп', 100, u'Развернуть макроc, т.е. посмотреть на него в сыром виде', u'гмакроэксп <название> [параметры]', (u'гмакроэксп админ бот', ), ANY | PARAM);
+registerCommand(expandLocalMacros, u'макроэксп', 20, u'Развернуть макроc, т.е. посмотреть на него в сыром виде', u'макроэксп <название> [параметры]', (u'макроэксп админ бот', ), CHAT);
+registerCommand(expandGlobalMacros, u'гмакроэксп', 100, u'Развернуть макроc, т.е. посмотреть на него в сыром виде', u'гмакроэксп <название> [параметры]', (u'гмакроэксп админ бот', ), ANY | PARAM);
 
-registerCommandHandler(showLocalMacrosInfo, u'макроинфо', 20, u'Открыть макрос, т.е. просто посмотреть как он выглядит', u'макроинфо [название]', (u'макроинфо глюк', ), CHAT);
-registerCommandHandler(showGlobalMacrosInfo, u'гмакроинфо', 100, u'Открыть глобальный макрос, т.е. просто посмотреть как он выглядит', u'гмакроинфо [название]', (u'гмакроинфо глюк', ), ANY | PARAM);
+registerCommand(showLocalMacrosInfo, u'макроинфо', 20, u'Открыть макрос, т.е. просто посмотреть как он выглядит', u'макроинфо [название]', (u'макроинфо глюк', ), CHAT);
+registerCommand(showGlobalMacrosInfo, u'гмакроинфо', 100, u'Открыть глобальный макрос, т.е. просто посмотреть как он выглядит', u'гмакроинфо [название]', (u'гмакроинфо глюк', ), ANY | PARAM);
 
-registerCommandHandler(showMacrosList, u'макролист', 10, u'Список макросов', None, (u'макролист', ), ANY | NONPARAM);
+registerCommand(showMacrosList, u'макролист', 10, u'Список макросов', None, (u'макролист', ), ANY | NONPARAM);
 
-registerCommandHandler(showLocalMacroAccess, u'макродоступ', 20, u'Изменить или посмотреть доступ к макросу', u'макродоступ <название> [доступ]', (u'макродоступ глюк 10', u'макродоступ глюк'), CHAT);
-registerCommandHandler(showGlobalMacroAccess, u'гмакродоступ', 100, u'Изменить или посмотреть доступ к глобальному макросу', u'гмакродоступ <название> [доступ]', (u'гмакродоступ админ 20', u'гмакродоступ админ'), ANY | PARAM);
+registerCommand(showLocalMacroAccess, u'макродоступ', 20, u'Изменить или посмотреть доступ к макросу', u'макродоступ <название> [доступ]', (u'макродоступ глюк 10', u'макродоступ глюк'), CHAT);
+registerCommand(showGlobalMacroAccess, u'гмакродоступ', 100, u'Изменить или посмотреть доступ к глобальному макросу', u'гмакродоступ <название> [доступ]', (u'гмакродоступ админ 20', u'гмакродоступ админ'), ANY | PARAM);

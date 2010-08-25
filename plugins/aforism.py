@@ -22,4 +22,4 @@ def showAforism(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'не получается');
 
-registerCommandHandler(showAforism, u'афор', 10, u'Показывает случайный афоризм', None, (u'афор', ), ANY | NONPARAM);
+registerCommand(showAforism, u'афор', 10, u'Показывает случайный афоризм', None, (u'афор', ), ANY | NONPARAM);

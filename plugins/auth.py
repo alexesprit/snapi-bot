@@ -71,11 +71,11 @@ def authControl(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_AUTH)));
 
-registerCommandHandler(authControl, u'авторизация', 30, u'Отключает (0) или включает (1) проверку вошедшего пользователя на человечность. Без параметра покажет текущее значение', u'авторизация [0/1]', (u'авторизация', u'авторизация 0'), CHAT);
+registerCommand(authControl, u'авторизация', 30, u'Отключает (0) или включает (1) проверку вошедшего пользователя на человечность. Без параметра покажет текущее значение', u'авторизация [0/1]', (u'авторизация', u'авторизация 0'), CHAT);
 
 def setAuthState(conference):
 	gAuthAnswer[conference] = {};
 	if(getConfigKey(conference, CFG_AUTH) is None):
 		setConfigKey(conference, CFG_AUTH, 0);
 
-registerPluginHandler(setAuthState, ADD_CHAT);
+registerEvent(setAuthState, ADDCONF);

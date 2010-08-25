@@ -15,7 +15,7 @@
 
 def showSeenTime(type, conference, nick, param):
 	userNick = param or nick;
-	if(nickInChat(conference, userNick)):
+	if(nickInConference(conference, userNick)):
 		seenTime = getNickKey(conference, userNick, NICK_LEAVED);
 		if(seenTime):
 			seenTime = time2str(time.time() - seenTime);
@@ -24,4 +24,4 @@ def showSeenTime(type, conference, nick, param):
 			else:
 				sendMsg(type, conference, nick, u'я видела %s %s назад' % (userNick, seenTime));
 
-registerCommandHandler(showSeenTime, u'когдабыл', 10, u'Показывает, сколько времени назад пользователь вышел из чата', u'когдабыл [ник]', (u'когдабыл Nick', ), CHAT);
+registerCommand(showSeenTime, u'когдабыл', 10, u'Показывает, сколько времени назад пользователь вышел из чата', u'когдабыл [ник]', (u'когдабыл Nick', ), CHAT);

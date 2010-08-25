@@ -16,4 +16,4 @@
 def showTest(type, conference, nick, param):
 	sendMsg(type, conference, nick, u'две полоски o_O');
 
-registerCommandHandler(showTest, u'тест', 10, u'Тест на беременность', None, (u'тест', ), ANY | NONPARAM);
+registerCommand(showTest, u'тест', 10, u'Тест на беременность', None, (u'тест', ), ANY | NONPARAM);

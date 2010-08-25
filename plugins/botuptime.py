@@ -26,4 +26,4 @@ def showBotUptime(type, conference, nick, parameters):
 	message += u'в данный момент активно %d потоков' % (threading.activeCount());
 	sendMsg(type, conference, nick, message);
 
-registerCommandHandler(showBotUptime, u'ботап', 10, u'Показывает статистику работы бота', None, (u'ботап', ), ANY | NONPARAM);
+registerCommand(showBotUptime, u'ботап', 10, u'Показывает статистику работы бота', None, (u'ботап', ), ANY | NONPARAM);

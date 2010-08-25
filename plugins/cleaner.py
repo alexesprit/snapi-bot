@@ -36,9 +36,9 @@ def cleanBase(base, keepTime):
 
 def startCleaning():
 	_cleanBase = cleanBase;
-	for groupChat in getChatList():
+	for conference in getConferences():
 		for item in CHAT_BASES:
-			base = globals()[item][groupChat];
+			base = globals()[item][conference];
 			_cleanBase(base, CHAT_KEEP_TIME);
 	for item in SINGLE_BASES:
 		base = globals()[item];
@@ -53,4 +53,4 @@ def startCleaning():
 def startCleanTimer():
 	startTimer(CLEAN_TIMEOUT, startCleaning);
 
-registerPluginHandler(startCleanTimer, INIT_2);
+registerEvent(startCleanTimer, INIT_2);

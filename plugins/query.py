@@ -54,7 +54,7 @@ def processIqStanzas(stanza, jid, resource):
 				query.addChild('feature', {'var': feat});
 		else:
 			iq = stanza.buildReply('error');
-			iq.addChild(node = stanza.getTag('query'));
+			#iq.addChild(node = stanza.getTag('query'));
 			error = iq.addChild('error', {'type': 'cancel'});
 			error.addChild('feature-not-implemented', {}, [], 'urn:ietf:params:xml:ns:xmpp-stanzas');
 		gClient.send(iq);

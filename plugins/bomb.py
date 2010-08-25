@@ -34,7 +34,7 @@ def giveBomb(type, conference, nick, param):
 		sendMsg(type, conference, nick, u'ага, хочешь без палева кинуть??? ]:->')
 		return;
 	userNick = param or random.choice(getOnlineNicks(conference));
-	if(nickOnlineInChat(conference, userNick)): 
+	if(nickIsOnline(conference, userNick)): 
 		trueJid = getTrueJid(conference, userNick);
 		if(bombMarked(conference, trueJid)):
 			sendMsg(type, conference, nick, u'в него уже кинули, ему хватит :-D');
@@ -53,7 +53,7 @@ def giveBomb(type, conference, nick, param):
 			gBombTimers[conference][trueJid] = startTimer(timeout, bombExec, (type, conference, nick, trueJid)); 
 
 def bombExec(type, conference, nick, trueJid):
-	if(nickOnlineInChat(conference, nick)):
+	if(nickIsOnline(conference, nick)):
 		sendMsg(type, conference, nick, u'надо было резать %s, чего тормозишь? :)' % (gBombAnswer[conference][trueJid]));
 		detonate(type, conference, nick);
 	else:
@@ -98,6 +98,6 @@ def initBombCache(conference):
 	gBombTimers[conference] = {};
 
 registerMessageHandler(bombColorsListener, CHAT);
-registerPluginHandler(initBombCache, ADD_CHAT);
-registerPluginHandler(clearBombCache, DEL_CHAT);
-registerCommandHandler(giveBomb, u'бомба', 15, u'Вручает пользователю бомбу. Если перерезать не тот провод, то будет кик или контузия. Если ник не указан, то берется произвольный ник из чата', u'бомба [ник]', (u'бомба', u'бомба Nick'), CHAT);
+registerEvent(initBombCache, ADDCONF);
+registerEvent(clearBombCache, DELCONF);
+registerCommand(giveBomb, u'бомба', 15, u'Вручает пользователю бомбу. Если перерезать не тот провод, то будет кик или контузия. Если ник не указан, то берется произвольный ник из чата', u'бомба [ник]', (u'бомба', u'бомба Nick'), CHAT);

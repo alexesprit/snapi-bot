@@ -28,4 +28,4 @@ def decipherExpression(type, conference, nick, param):
 		else:
 			sendMsg(type, conference, nick, u'не получается');
 
-registerCommandHandler(decipherExpression, u'шифр', 10, u'Расшифровывает слово', u'шифр <слово>', (u'шифр админ', ), ANY | PARAM);
+registerCommand(decipherExpression, u'шифр', 10, u'Расшифровывает слово', u'шифр <слово>', (u'шифр админ', ), ANY | PARAM);

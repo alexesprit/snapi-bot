@@ -48,7 +48,7 @@ def showServerInfo(type, conference, nick, param):
 	iq.setID(INFO_ID);
 	gClient.SendAndCallForResponse(iq, _showServerInfo, (type, conference, nick, param, ));
 
-registerCommandHandler(showServerInfo, u'инфа', 10, u'Возвращает статистику о сервере', u'инфа [сервер]', (u'инфа jabber.aq', ));
+registerCommand(showServerInfo, u'инфа', 10, u'Возвращает статистику о сервере', u'инфа [сервер]', (u'инфа jabber.aq', ));
 
 def _showServerUptime(stanza, type, conference, nick, param):
 	if(UPTIME_ID == stanza.getID()):
@@ -68,4 +68,4 @@ def showServerUptime(type, conference, nick, param):
 	iq.setID(UPTIME_ID);
 	gClient.SendAndCallForResponse(iq, _showServerUptime, (type, conference, nick, param, ));
 
-registerCommandHandler(showServerUptime, u'аптайм', 10, u'Показывает аптайм определённого сервера', u'аптайм [сервер]', (u'аптайм freize.org', ));
+registerCommand(showServerUptime, u'аптайм', 10, u'Показывает аптайм определённого сервера', u'аптайм [сервер]', (u'аптайм freize.org', ));

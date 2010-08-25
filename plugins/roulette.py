@@ -25,4 +25,4 @@ def playRoulette(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'не могу я в модера стрелять :(');
 
-registerCommandHandler(playRoulette, u'рр', 10, u'Старая добрая русская рулетка', u'рр', (u'рр', ), CHAT | NONPARAM);
+registerCommand(playRoulette, u'рр', 10, u'Старая добрая русская рулетка', u'рр', (u'рр', ), CHAT | NONPARAM);

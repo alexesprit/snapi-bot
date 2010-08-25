@@ -36,5 +36,5 @@ def setMsgLimitState(conference):
 	if(getConfigKey(conference, CFG_MSG) is None):
 		setConfigKey(conference, CFG_MSG, 1500);
 
-registerPluginHandler(setMsgLimitState, ADD_CHAT);
-registerCommandHandler(setMsgLimit, u'мсглимит', 30, u'Устанавливает или отключает (если в кач-ве параметра указать число, меньше 1) лимит на длину сообщения бота (большие сообщения будут перенаправляться в приват). Без параметра покажет текущее значение', u'мсглимит [число]', (u'мсглимит 1000'), CHAT);
+registerEvent(setMsgLimitState, ADDCONF);
+registerCommand(setMsgLimit, u'мсглимит', 30, u'Устанавливает или отключает (если в кач-ве параметра указать число, меньше 1) лимит на длину сообщения бота (большие сообщения будут перенаправляться в приват). Без параметра покажет текущее значение', u'мсглимит [число]', (u'мсглимит 1000'), CHAT);

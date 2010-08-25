@@ -22,12 +22,12 @@ DESC = (u'Ник', u'Имя', u'Пол', u'Д/р', u'Город', u'Страна
 
 def showVCard(type, conference, nick, param):
 	if(param):
-		if(chatInList(conference) and nickOnlineInChat(conference, param)):
+		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			userJid = conference + '/' + param;
 		else:
 			return;
 	else:
-		userJid = chatInList(conference) and (conference + '/' + nick) or conference;
+		userJid = conferenceInList(conference) and (conference + '/' + nick) or conference;
 	iq = xmpp.Iq('get');
 	iq.addChild('vCard', {}, [], xmpp.NS_VCARD);
 	iq.setTo(userJid);
@@ -83,4 +83,4 @@ def fillVCard(vcard):
 	items = ['%s: %s' % (DESC[i], vcard[TAGS[i]]) for i in range(0, len(TAGS)) if(TAGS[i] in vcard and vcard[TAGS[i]])];
 	return('\n'.join(items));
 
-registerCommandHandler(showVCard, u'визитка', 10, u'Показывает vCard указанного пользователя', u'визитка [ник]', (u'визитка', u'визитка Nick'));
+registerCommand(showVCard, u'визитка', 10, u'Показывает vCard указанного пользователя', u'визитка [ник]', (u'визитка', u'визитка Nick'));

@@ -14,12 +14,12 @@
 # GNU General Public License for more details.
 
 def botRestart(type, conference, nick, param):
-	nick = (chatInList(conference)) and nick or conference.split('@')[0];
+	nick = (conferenceInList(conference)) and nick or conference.split('@')[0];
 	if(param):
 		message = u'меня перезагружает %s (%s)' % (nick, param);
 	else:
 		message = u'меня перезагружает %s' % (nick);
-	for conference in getChatList():
+	for conference in getConferences():
 		if(isPopupEnabled(conference)):
 			sendToConference(conference, message);
 	prs = xmpp.Presence(typ = 'unavailable');
@@ -27,15 +27,15 @@ def botRestart(type, conference, nick, param):
 	gClient.send(prs);
 	restart();
 
-registerCommandHandler(botRestart, u'рестарт', 100, u'Перезапускает бота', u'рестарт [причина]', (u'рестарт', u'рестарт ы!'), ANY | FROZEN);
+registerCommand(botRestart, u'рестарт', 100, u'Перезапускает бота', u'рестарт [причина]', (u'рестарт', u'рестарт ы!'), ANY | FROZEN);
 
 def botShutdown(type, conference, nick, param):
-	nick = (chatInList(conference)) and nick or conference.split('@')[0];
+	nick = (conferenceInList(conference)) and nick or conference.split('@')[0];
 	if(param):
 		message = u'меня выключает %s (%s)' % (nick, param);
 	else:
 		message = u'меня выключает %s' % (nick);
-	for conference in getChatList():
+	for conference in getConferences():
 		if(isPopupEnabled(conference)):
 			sendToConference(conference, message);
 	prs = xmpp.Presence(typ = 'unavailable');
@@ -43,4 +43,4 @@ def botShutdown(type, conference, nick, param):
 	gClient.send(prs);
 	os.abort();
 
-registerCommandHandler(botShutdown, u'идиспать', 100, u'Остановка и полный выход бота', u'идиспать [причина]', (u'идиспать', u'идиспать обновления!11'), ANY | FROZEN);
+registerCommand(botShutdown, u'идиспать', 100, u'Остановка и полный выход бота', u'идиспать [причина]', (u'идиспать', u'идиспать обновления!11'), ANY | FROZEN);

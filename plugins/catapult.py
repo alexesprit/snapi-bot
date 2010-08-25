@@ -19,4 +19,4 @@ def runCatapult(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'не могу :(');
 
-registerCommandHandler(runCatapult, u'катапульту', 10, u'Катапульта', None, (u'катапульту', ), CHAT | NONPARAM);
+registerCommand(runCatapult, u'катапульту', 10, u'Катапульта', None, (u'катапульту', ), CHAT | NONPARAM);

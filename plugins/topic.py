@@ -18,4 +18,4 @@ def setTopic(type, conference, nick, param):
 	gClient.send(message);
 	sendMsg(type, conference, nick, u'поставила');
 
-registerCommandHandler(setTopic, u'топег', 20, u'Устанавливает тему в конференции', u'топег <текст>', (u'топег ололо', ), CHAT | PARAM);
+registerCommand(setTopic, u'топег', 20, u'Устанавливает тему в конференции', u'топег <текст>', (u'топег ололо', ), CHAT | PARAM);

@@ -22,6 +22,7 @@ def startStatusTimer():
 	elif(hour >= 0):
 		show = u'xa';
 	setRosterStatus(None, show, gPriority);
-	startTimer(3600 + random.randrange(-800, 801), startStatusTimer);
+	timeout = 3600 + random.randrange(-800, 801);
+	startTimer(timeout, startStatusTimer);
 
-registerPluginHandler(startStatusTimer, INIT_2);
+registerEvent(startStatusTimer, INIT_2);

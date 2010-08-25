@@ -18,7 +18,7 @@
 def showHelp(type, conference, nick, param):
 	if(param):
 		param = param.lower();
-		cmdType = chatInList(conference) and CHAT or ROSTER;
+		cmdType = conferenceInList(conference) and CHAT or ROSTER;
 		if(isCommand(param) and isCommandType(param, cmdType)):
 			message = gCommands[param]['desc'];
 			syntax = gCommands[param]['syntax'];
@@ -33,14 +33,14 @@ def showHelp(type, conference, nick, param):
 					message += u'\nЭта команда отключена в этой конференции!';
 			sendMsg(type, conference, nick, message);
 	else:
-		if(chatInList(conference)):
+		if(conferenceInList(conference)):
 			prefix = getConfigKey(conference, 'prefix') or '';
 		else:
 			prefix = '';
 		sendMsg(type, conference, nick, u'напишите "%sкоманды", чтобы узнать список всех команд, "%sпомощь <команда>" для получения справки по использованию команды' % (prefix, prefix));
 
 def showCommands(type, conference, nick, param):
-	cmdType = chatInList(conference) and CHAT or ROSTER;
+	cmdType = conferenceInList(conference) and CHAT or ROSTER;
 	availableCmds, disabledCmds = [], [];
 	message = '';
 	trueJid = getTrueJid(conference, nick);
@@ -64,5 +64,5 @@ def showCommands(type, conference, nick, param):
 		sendMsg(type, conference, nick, u'ушли');
 	sendMsg(PRIVATE, conference, nick, message);	
 
-registerCommandHandler(showHelp, u'помощь', 0, u'Даёт справку об определённой команде или выводит общую справку', u'помощь [команда]', (u'помощь', u'помощь пинг'), ANY | FROZEN);
-registerCommandHandler(showCommands, u'команды', 0, u'Показывает список всех команд', None, (u'команды', ), ANY | FROZEN | NONPARAM);
+registerCommand(showHelp, u'помощь', 0, u'Даёт справку об определённой команде или выводит общую справку', u'помощь [команда]', (u'помощь', u'помощь пинг'), ANY | FROZEN);
+registerCommand(showCommands, u'команды', 0, u'Показывает список всех команд', None, (u'команды', ), ANY | FROZEN | NONPARAM);

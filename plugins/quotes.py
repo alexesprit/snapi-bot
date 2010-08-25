@@ -27,7 +27,7 @@ def showBashOrgRu(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'не могу :(');
 
-registerCommandHandler(showBashOrgRu, u'бор', 10, u'Показывает случайную цитату из бора, Также можно вывести по заданному номеру', u'бор [номер]', (u'бор 223344', u'бор'));
+registerCommand(showBashOrgRu, u'бор', 10, u'Показывает случайную цитату из бора, Также можно вывести по заданному номеру', u'бор [номер]', (u'бор 223344', u'бор'));
 
 def showBashOrgRuAbyss(type, conference, nick, param):
 	rawHtml = urllib.urlopen('http://bash.org.ru/abysstop').read();
@@ -42,7 +42,7 @@ def showBashOrgRuAbyss(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'не могу :(');
 
-registerCommandHandler(showBashOrgRuAbyss, u'борб', 10, u'Показывает случайную цитату из бездны бора', None, (u'борб', ), ANY | NONPARAM);
+registerCommand(showBashOrgRuAbyss, u'борб', 10, u'Показывает случайную цитату из бездны бора', None, (u'борб', ), ANY | NONPARAM);
 
 def showItHappens(type, conference, nick, param):
 	rawHtml = urllib.urlopen('http://ithappens.ru/').read();
@@ -62,4 +62,4 @@ def showItHappens(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'не могу');
 
-registerCommandHandler(showItHappens, u'ит', 10, u'Показывает случайную цитату c ithappens.ru', None, (u'ит', ), ANY | NONPARAM);
+registerCommand(showItHappens, u'ит', 10, u'Показывает случайную цитату c ithappens.ru', None, (u'ит', ), ANY | NONPARAM);

@@ -17,4 +17,4 @@ def showRoster(type, conference, nick, param):
 	items = [u'%d) %s [%s]' % (i + 1, jid, gRoster.getSubscription(jid)) for i, jid in enumerate(gRoster.getItems())];
 	sendMsg(type, conference, nick,  u'смотри, кто у меня есть:\n' + '\n'.join(items));
 
-registerCommandHandler(showRoster, u'ростер', 100, u'Показывает содержимое ростера', u'ростер', (u'ростер'), ROSTER | NONPARAM);
+registerCommand(showRoster, u'ростер', 100, u'Показывает содержимое ростера', u'ростер', (u'ростер'), ROSTER | NONPARAM);
