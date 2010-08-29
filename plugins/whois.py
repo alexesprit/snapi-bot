@@ -15,7 +15,6 @@
 
 def showWhoIs(type, conference, nick, param):
 	rawHtml = urllib.urlopen('http://1whois.ru/index.php?url=%s' % (param)).read();
-	print rawHtml;
 	items = re.search('<blockquote>(.*?)</font></blockquote>', rawHtml, re.DOTALL);
 	if(items):
 		text = items.group(0);

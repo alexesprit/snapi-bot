@@ -83,7 +83,7 @@ gRoster = None;
 gDebug = xmpp.debug.Debug(gCoreDebug, validateFlags = False, prefix = '', showFlags = False, welcomeMsg = False);
 gTagPattern = re.compile('<(.*?)>');
 
-gSemaphore = threading.BoundedSemaphore();
+gSemaphore = threading.BoundedSemaphore(30);
 
 gInfo = {'start': 0, 'msg': 0, 'prs': 0, 'iq': 0, 'cmd': 0, 'thr': 0, 'err': 0, 'tmr': 0};
 gVersion = ('Jimm', '0.6.4v [06.07.2010]', 'NokiaE51-1/0.34.011');
@@ -721,9 +721,6 @@ def restart():
 		os.remove(PID_FILE);
 	os.execl(sys.executable, sys.executable, sys.argv[0]);
 
-def test():
-	pass;
-
 def start():
 	global gRoster;
 	loadPlugins();
@@ -761,7 +758,6 @@ def start():
 	if(conferences):
 		for conference in conferences:
 			addConference(conference);
-		#threading.Thread(None, joinConferences, 'conf' + str(gInfo['thr']), (conferences, )).start();
 		startThread(joinConferences, (conferences, ));
 
 	callEventHandlers(INIT_2);

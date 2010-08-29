@@ -57,6 +57,8 @@ def _showVersion(stanza, verID, type, conference, nick, param):
 				else:
 					sendMsg(type, conference, nick, u'%s юзает %s' % (param, version));
 			else:
-				sendMsg(type, conference, nick, u'глючит клиент');			
+				sendMsg(type, conference, nick, u'глючит клиент');
+		else:
+			sendMsg(type, conference, nick, u'глючит клиент');
 
 registerCommand(showVersion, u'версия', 10, u'Показывает информацию о клиенте указанного пользователя', u'версия [ник]', (u'версия', u'версия Nick'));

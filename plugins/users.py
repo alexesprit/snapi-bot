@@ -33,7 +33,7 @@ def showInMucUsers(type, conference, nick, param):
 	text += createNickList(nickList);
 	sendMsg(type, conference, nick, text);
 	
-registerCommand(showInMucUsers, u'инмук', 10, u'Показывает список участников, находящихся в конференции', None, (u'инмук', ), CHAT);
+registerCommand(showInMucUsers, u'инмук', 10, u'Показывает список участников, находящихся в конференции', None, (u'инмук', ), CHAT | NONPARAM);
 
 def showWhoWas(type, conference, nick, param):
 	nickList = getInMucList(conference, True);
@@ -41,7 +41,7 @@ def showWhoWas(type, conference, nick, param):
 	text += createNickList(nickList);
 	sendMsg(type, conference, nick, text);
 
-registerCommand(showWhoWas, u'хтобыл', 10, u'Показывает список участников, посетивших конференцию за сессию', None, (u'хтобыл', ), CHAT);
+registerCommand(showWhoWas, u'хтобыл', 10, u'Показывает список участников, посетивших конференцию за сессию', None, (u'хтобыл', ), CHAT | NONPARAM);
 	
 def showUserNicks(type, conference, nick, param):
 	userNick = param or nick;
@@ -60,4 +60,4 @@ def showUserNicks(type, conference, nick, param):
 			else:
 				sendMsg(type, conference, nick, u'ты известен как %s' % (', '.join(nicks)));
 
-registerCommand(showUserNicks, u'ники', 10, u'Выводит все ники пользователя', u'ники [ник]', (u'ники', u'ники Nick'), CHAT);
+registerCommand(showUserNicks, u'ники', 10, u'Выводит все ники пользователя', u'ники [ник]', (u'ники', u'ники Nick'), CHAT | NONPARAM);

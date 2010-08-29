@@ -36,11 +36,10 @@ class Dispatcher(PlugIn):
         DBG_LINE='dispatcher'
         self.handlers={}
         self._expected={}
-        self._defaultHandler=None
         self._pendingExceptions=[]
         self._eventHandler=None
         self._cycleHandlers=[]
-        self._exported_methods=[self.Process,self.RegisterHandler,self.RegisterDefaultHandler,\
+        self._exported_methods=[self.Process,self.RegisterHandler,\
         self.RegisterEventHandler,self.UnregisterCycleHandler,self.RegisterCycleHandler,\
         self.RegisterHandlerOnce,self.UnregisterHandler,self.RegisterProtocol,\
         self.WaitForResponse,self.SendAndWaitForResponse,self.send,self.disconnect,\
@@ -63,7 +62,6 @@ class Dispatcher(PlugIn):
         self.RegisterProtocol('iq',Iq)
         self.RegisterProtocol('presence',Presence)
         self.RegisterProtocol('message',Message)
-        self.RegisterDefaultHandler(self.returnStanzaHandler)
         self.RegisterHandler('error',self.streamErrorHandler,xmlns=NS_STREAMS)
 
     def plugin(self, owner):
@@ -190,11 +188,6 @@ class Dispatcher(PlugIn):
         try: self.handlers[xmlns][name][typ+ns].remove(pack)
         except ValueError: pass
 
-    def RegisterDefaultHandler(self,handler):
-        """ Specify the handler that will be used if no NodeProcessed exception were raised.
-            This is returnStanzaHandler by default. """
-        self._defaultHandler=handler
-
     def RegisterEventHandler(self,handler):
         """ Register handler that will process events. F.e. "FILERECEIVED" event. """
         self._eventHandler=handler
@@ -307,7 +300,6 @@ class Dispatcher(PlugIn):
                         self._pendingExceptions.insert(0, sys.exc_info())
                         return
                     user=0
-        if user and self._defaultHandler: self._defaultHandler(session,stanza)
 
     def WaitForResponse(self, ID, timeout=DefaultTimeout):
         """ Block and wait until stanza with specific "id" attribute will come.

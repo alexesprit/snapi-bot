@@ -35,10 +35,13 @@ def showWeather(type, conference, nick, param):
 			desc = desc.replace(' (', ', ');
 			desc = desc.replace(')', '');
 			message += u'[%s]\nТемпература: %s\n\n' % (title[1], desc);
-		message = u'Погода в городе %s\n%s' % (title[0], message);
-		if(PUBLIC == type):
-			sendMsg(type, conference, nick, u'скинула в личку');
-		sendMsg(PRIVATE, conference, nick, message);
+		if(message):
+			message = u'Погода в городе %s\n%s' % (param.capitalize(), message);
+			if(PUBLIC == type):
+				sendMsg(type, conference, nick, u'скинула в личку');
+			sendMsg(PRIVATE, conference, nick, message);
+		else:
+			sendMsg(type, conference, nick, u'не могу :(');
 	else:
 		sendMsg(type, conference, nick, u'не могу :(');
 

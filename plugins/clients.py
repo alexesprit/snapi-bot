@@ -44,11 +44,12 @@ def clientsChecking(conference, nick, trueJid, aff, role):
 	iq = xmpp.Iq('get');
 	iq.addChild('query', {}, [], xmpp.NS_VERSION);
 	iq.setTo(conference + '/' + nick);
-	iq.setID(CLIENTS_ID);
-	gClient.SendAndCallForResponse(iq, _clientsChecking, (conference, trueJid, ));
+	cliID = getUniqueID(CLIENTS_ID);
+	iq.setID(cliID);
+	gClient.SendAndCallForResponse(iq, _clientsChecking, (cliID, conference, trueJid, ));
 
-def _clientsChecking(stanza, conference, trueJid):
-	if(CLIENTS_ID == stanza.getID()):
+def _clientsChecking(stanza, cliID, conference, trueJid):
+	if(cliID == stanza.getID()):
 		if(stanza.getType() == 'result'):
 			base = gClientsCache[conference];
 			clients = base.getKey(trueJid);

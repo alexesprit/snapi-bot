@@ -66,6 +66,7 @@ def addGlobalMacros(type, conference, nick, param):
 			sendMsg(type, conference, nick, u'не вижу команду внутри макроса');
 			return;
 		if(gMacros.hasMacros(macros)):
+			access = gMacros.getAccess(macros);
 			sendMsg(type, conference, nick, u'заменила');
 		else:
 			sendMsg(type, conference, nick, u'добавила');

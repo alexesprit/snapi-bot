@@ -51,7 +51,6 @@ def resetQuizTimer(conference):
 		gQuizTimer[conference].cancel();
 	gInfo['tmr'] += 1;
 	gQuizTimer[conference] = startTimer(QUIZ_TIME_LIMIT, idleCheck, (conference, ));
-	#gQuizTimer[conference].start();		
 
 def getNewQuestion():
 	questionNum = random.randrange(0, QUIZ_TOTAL_LINES);

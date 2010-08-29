@@ -31,7 +31,8 @@ def leaveConf(type, conference, nick, param):
 	if(conferenceInList(conf)):
 		if(not conferenceInList(conference)):
 			sendMsg(type, conference, nick, u'ушла');
-		leaveConference(conf, u'меня уводит %s' % (nick));
+		myNick = (conferenceInList(conference)) and nick or conference.split('@')[0];
+		leaveConference(conf, u'меня уводит %s' % (myNick));
 	else:
 		sendMsg(type, conference, nick, u'а меня там нету');
 

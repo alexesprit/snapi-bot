@@ -13,6 +13,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+TURN_TIMEOUT = 0.6;
+
 TABLE_RU = u"йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё\"№;:? ";
 TABLE_EN = u"qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:\ZXCVBNM<>?~@#$^& ";
 gTable = dict(zip(TABLE_EN + TABLE_RU, TABLE_RU + TABLE_EN));
@@ -35,7 +37,7 @@ def turnLastMessage(type, conference, nick, param):
 		trueJid = getTrueJid(conference, nick);
 		if(trueJid not in gTurnMsgCache[conference]):
 			sendMsg(type, conference, nick, u'а ты ещё ничего не говорил');
-		elif(gTurnMsgCache[conference][trueJid] == u'turn'):
+		elif(gTurnMsgCache[conference][trueJid].lower() == u'turn'):
 			sendMsg(type, conference, nick, u'последнее, что ты сказал, это "turn" :-D');
 		else:
 			savedMsg = gTurnMsgCache[conference][trueJid];
@@ -58,7 +60,7 @@ registerCommand(turnLastMessage, u'turn', 10, u'Переключает раск�
 def saveMessage(stanza, type, conference, nick, trueJid, body):
 	if(type == PUBLIC):
 		if(trueJid != gJid and trueJid != conference):
-			time.sleep(0.5);
+			time.sleep(TURN_TIMEOUT);
 			gTurnMsgCache[conference][trueJid] = body;
 
 registerMessageHandler(saveMessage, CHAT);

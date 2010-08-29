@@ -19,7 +19,7 @@ VOTES_FILE = 'config/%s/vote.txt';
 gVoteCache = {};
 
 def getVoteText(conference):
-	voteText = u'Результаты голосования\nСоздатель: %(creator)s\nВопрос: %(question)s\n' % (gVoteCache[conference]);
+	voteText = u'Голосование\nСоздатель: %(creator)s\nВопрос: %(question)s\n' % (gVoteCache[conference]);
 	items = [u' * %s' % (x[0]) for x in gVoteCache[conference]['opinions']]
 	voteText += '\n'.join(items);
 	voteText += u'\nЧтобы проголосовать, напиши номер мнения, например "мнение 1"';
