@@ -34,7 +34,6 @@ def sendInvite(type, conference, nick, param):
 		inv.setTagData('reason', u'Вас приглашает ' + nick)
 	msg.addChild(node = x)
 	gClient.send(msg);
-	printf(msg, FLAG_WARNING);
 	sendMsg(type, conference, nick, u'кинула инвайт');
 			
 registerCommand(sendInvite, u'призвать', 10, u'Приглашет заданного пользователя в конференцию', u'призвать <ник/жид> [причина]', (u'призвать guy', u'призвать guy@jabber.aq есть дело'), CHAT | PARAM);

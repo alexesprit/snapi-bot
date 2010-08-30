@@ -31,18 +31,21 @@ def addNote(type, conference, nick, param):
 def delNote(type, conference, nick, param):
 	trueJid = getTrueJid(conference, nick);
 	if(trueJid in gNotes):
-		try:
-			num = int(param) - 1;
+		if(param.isdigit()):
 			notes = gNotes.getKey(trueJid);
-			del(notes[num]);
-			if(not notes):
-				gNotes.delKey(trueJid);
+			param = int(param) - 1;
+			if(param < len(notes)):
+				del(notes[param]);
+				if(not notes):
+					gNotes.delKey(trueJid);
+				else:
+					gNotes.setKey(trueJid, notes);
+				gNotes.save();
+				sendMsg(type, conference, nick, u'удалила');
 			else:
-				gNotes.setKey(trueJid, notes);
-			gNotes.save();
-			sendMsg(type, conference, nick, u'удалила');
-		except(ValueError, KeyError):
-			sendMsg(type, conference, nick, u'не получилось');
+				sendMsg(type, conference, nick, u'нет такого пункта');
+		else:
+			sendMsg(type, conference, nick, u'читай справку по команде');
 	else:
 		sendMsg(type, conference, nick, u'в твоём блокноте пусто');
 

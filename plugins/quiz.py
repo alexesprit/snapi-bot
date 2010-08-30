@@ -88,7 +88,7 @@ def quizStop(conference):
 	time.sleep(1);
 	if(conferenceInList(conference)):
 		gQuizScores[conference].save();
-		showScoreList(conference);
+		showScoreList(PUBLIC, conference);
 
 def checkAnswer(conference, nick, trueJid, answer):
 	rightAnswer = gQuizAnswer[conference].lower();
@@ -121,10 +121,9 @@ def answerListener(stanza, type, conference, nick, trueJid, text):
 	if(conference in gQuizAnswer):
 		checkAnswer(conference, nick, trueJid, text);
 
-def showScoreList(conference):
+def showScoreList(type, conference, nick = None):
 	base = gQuizScores[conference];
 	if(not base.isEmpty()):
-		result = u'(*) Cчет:\nНик, счет, ответов\n';
 		scores = [];
 		for jid in base.items():
 			item = base.getKey(jid);
@@ -133,9 +132,14 @@ def showScoreList(conference):
 		scores.reverse();
 		scores = scores[:10];
 		items = [u'%s) %s, %s, %s' % (i + 1, x[2], x[0], x[1]) for i, x in enumerate(scores)];
-		sendToConference(conference, result + '\n'.join(items));
+		if(nick):
+			message = u'статистика по игре:\nНик, счет, ответов\n';
+			sendMsg(type, conference, nick, message + '\n'.join(items));
+		else:
+			message = u'(*) Счёт:\nНик, счет, ответов\n';
+			sendToConference(conference, message + '\n'.join(items));
 	else:
-		sendToConference(conference, u'Статистика по игре отсутствует');
+		sendMsg(type, conference, nick, u'cтатистика по игре отсутствует');
 
 def startQuiz(type, conference, nick, param):
 	if(conference in gQuizAnswer):
@@ -173,7 +177,7 @@ def showHint(type, conference, nick, param):
 			askNewQuestion(conference, answer);
 
 def showScores(type, conference, nick, param):
-	showScoreList(conference);
+	showScoreList(type, conference, nick);
 
 def showQuestion(type, conference, nick, param):
 	if(conference in gQuizAnswer):
