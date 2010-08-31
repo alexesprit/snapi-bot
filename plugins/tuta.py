@@ -15,12 +15,12 @@
 
 HERE_FILE = 'config/%s/tuta.txt';
 
-gHereTimeCache = {};
+gHereTime = {};
 
 def showHereStatistic(type, conference, nick, param):
 	userNick = param or nick;
 	if(nickIsOnline(conference, userNick)):
-		base = gHereTimeCache[conference];
+		base = gHereTime[conference];
 		trueJid = getTrueJid(conference, userNick);
 		info = base.getKey(trueJid);
 		if(info):
@@ -33,12 +33,14 @@ def showHereStatistic(type, conference, nick, param):
 			message = u'%s всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d' % (message, time2str(totalTime), time2str(record), time2str(averageTime), joinCount);
 			sendMsg(type, conference, nick, message);
 		else:
-			sendMsg(type, conference, nick, u'нет статистики');
+			sendMsg(type, conference, nick, u'нет информации');
+	else:
+		sendMsg(type, conference, nick, u'а это кто?');
 
 registerCommand(showHereStatistic, u'тута', 10, u'Показывает кол-во часов, проведённое в чатике, максимальное и среднее', u'тута [ник]', (u'тута', ), CHAT);
 	
 def updateJoinStatistic(conference, nick, trueJid, aff, role):
-	base = gHereTimeCache[conference];
+	base = gHereTime[conference];
 	info = base.getKey(trueJid);
 	if(not info):
 		info = {'record': 0, 'count': 0, 'here': 0};
@@ -47,7 +49,7 @@ def updateJoinStatistic(conference, nick, trueJid, aff, role):
 	base.save();
 
 def updateLeaveStatistic(conference, nick, trueJid, reason, code):
-	base = gHereTimeCache[conference];
+	base = gHereTime[conference];
 	joinTime = getNickKey(conference, nick, 'joined');
 	if(joinTime):
 		info = base.getKey(trueJid);
@@ -60,7 +62,7 @@ def updateLeaveStatistic(conference, nick, trueJid, reason, code):
 
 def loadHereCache(conference):
 	fileName = HERE_FILE % (conference);
-	gHereTimeCache[conference] = database.DataBase(fileName);
+	gHereTime[conference] = database.DataBase(fileName);
 
 registerEvent(loadHereCache, ADDCONF);
 registerJoinHandler(updateJoinStatistic);

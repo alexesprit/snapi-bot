@@ -23,6 +23,8 @@ def setBotVersion(type, conference, nick, param):
 		gVersion = tuple(param.split('|'));
 		writeFile(VER_FILENAME, str(gVersion));
 		sendMsg(type, conference, nick, u'поняла, сейчас поставлю');
+	else:
+		sendMsg(type, conference, nick, u'читай справку по команде');
 
 registerCommand(setBotVersion, u'ботверсия', 100, u'Выставляет версию клиента у бота. Без параметра покажет текущее значение', u'ботверсия [клиент|версия|ось]', (u'ботверсия', u'ботверсия Jimm|0.6.4|Nokia 3310'), ROSTER);
 

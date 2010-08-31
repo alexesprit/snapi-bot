@@ -59,5 +59,7 @@ def showUserNicks(type, conference, nick, param):
 				sendMsg(type, conference, nick, u'%s известен как %s' % (userNick, ', '.join(nicks)));
 			else:
 				sendMsg(type, conference, nick, u'ты известен как %s' % (', '.join(nicks)));
+	else:
+		sendMsg(type, conference, nick, u'а это кто?');
 
 registerCommand(showUserNicks, u'ники', 10, u'Выводит все ники пользователя', u'ники [ник]', (u'ники', u'ники Nick'), CHAT | NONPARAM);

@@ -71,7 +71,7 @@ def convertValues(type, conference, nick, param):
 		values = ['%s - %s' % (x, gValues[x]) for x in gValues];
 		values.sort();
 		sendMsg(type, conference, nick, '\n'.join(values));
-	elif(param):
+	else:
 		if(len(param.split()) == 3):
 			param = param.upper().split();
 			try:

@@ -186,7 +186,7 @@ registerCommand(showOpinions, u'мнения', 11, u'Отдаёт текущие
 def endVote(type, conference, nick, param):
 	if(gVoteCache[conference]):
 		if(gVoteCache[conference]['finished']):
-			sendMsg(type, conference, nick, u'голосование уже закончено');
+			sendMsg(type, conference, nick, getResults(conference));
 		else:
 			trueJid = getTrueJid(conference, nick);
 			creatorJid = gVoteCache[conference]['creatorjid'];

@@ -13,15 +13,39 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+SEEN_FILE = 'config/%s/seen.txt';
+
+gSeen = {};
+
 def showSeenTime(type, conference, nick, param):
 	userNick = param or nick;
 	if(nickInConference(conference, userNick)):
-		seenTime = getNickKey(conference, userNick, NICK_LEAVED);
+		trueJid = getTrueJid(conference, userNick);
+		seenTime = gSeen[conference].getKey(trueJid);
 		if(seenTime):
+			seenDate = time.strftime('%H:%M, %d.%m.%Y', time.localtime(seenTime));
 			seenTime = time2str(time.time() - seenTime);
 			if(not param):
-				sendMsg(type, conference, nick, u'я видела тебя %s назад' % (seenTime));
+				sendMsg(type, conference, nick, u'я видела тебя %s назад (в %s)' % (seenTime, seenDate));
 			else:
-				sendMsg(type, conference, nick, u'я видела %s %s назад' % (userNick, seenTime));
+				sendMsg(type, conference, nick, u'я видела %s %s назад (в %s)' % (userNick, seenTime, seenDate));
+		else:
+			sendMsg(type, conference, nick, u'нет информации');
+	else:
+		sendMsg(type, conference, nick, u'а это кто?');
 
 registerCommand(showSeenTime, u'когдабыл', 10, u'Показывает, сколько времени назад пользователь вышел из чата', u'когдабыл [ник]', (u'когдабыл Nick', ), CHAT);
+
+def updateSeenTime(conference, nick, trueJid, reason, code):
+	if('303' != code):
+		gSeen[conference].setKey(trueJid, time.time());
+		gSeen[conference].save();
+
+registerLeaveHandler(updateSeenTime);
+
+def loadSeenBase(conference):
+	fileName = SEEN_FILE % (conference);
+	createFile(fileName, '{}');
+	gSeen[conference] = database.DataBase(fileName);
+
+registerEvent(loadSeenBase, ADDCONF);

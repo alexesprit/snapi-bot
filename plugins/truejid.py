@@ -19,5 +19,7 @@ def showTrueJid(type, conference, nick, param):
 			sendMsg(type, conference, nick, u'смотри в привате');
 		trueJid = getTrueJid(conference, param);
 		sendMsg(PRIVATE, conference, nick, u'реальный жид %s: %s' % (param, trueJid));
+	else:
+		sendMsg(type, conference, nick, u'а это кто?');
 
 registerCommand(showTrueJid, u'тружид', 20, u'Показывает реальный жид указанного ника', u'тружид <ник>', (u'тружид guy', ), CHAT | PARAM);

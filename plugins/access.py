@@ -73,6 +73,7 @@ def showUserAccess(type, conference, nick, param):
 		if(conferenceInList(conference) and nickInConference(conference, param)):
 			trueJid = getTrueJid(conference, param);
 		else:
+			sendMsg(type, conference, nick, u'а кто это?');
 			return;
 	level = getAccess(conference, trueJid);
 	if(level in ACCESS_DESC):
@@ -92,7 +93,7 @@ def setLocalAccess(type, conference, nick, param):
 			sendMsg(type, conference, nick, u'ошибочный запрос');
 			return;
 	userNick = param[0].strip();
-	if(nickIsOnline(conference, userNick)):
+	if(nickInConference(conference, userNick)):
 		myJid = getTrueJid(conference, nick);
 		myAccess = getAccess(conference, myJid);
 		userJid = getTrueJid(conference, userNick);
@@ -109,6 +110,8 @@ def setLocalAccess(type, conference, nick, param):
 		elif(len(param) == 3):
 			setPermAccess(conference, userJid, access)
 			sendMsg(type, conference, nick, u'выдан постоянный доступ');
+	else:
+		sendMsg(type, conference, nick, u'а кто это?');
 
 registerCommand(setLocalAccess, u'дать_доступ', 20, u'Устанавливает или снимает (если не писать уровень) уровень доступа для определённого пользователя на определённый уровень. Если указываеться третий параметр, то изменение происходит навсегда', u'дать_доступ <ник> [уровень] [навсегда]', (u'дать_доступ Nick 100', u'дать_доступ Nick 100 1'), CHAT | PARAM);
 
@@ -122,11 +125,13 @@ def setGlobalAccess(type, conference, nick, param):
 		if(nickInConference(conference, userNick)):
 			trueJid = getTrueJid(conference, userNick);
 		else:
+			sendMsg(type, conference, nick, u'а это кто?');
 			return;
 	else:
 		if(userNick.count('@')):
 			trueJid = userNick;
 		else:
+			sendMsg(type, conference, nick, u'а это кто?');
 			return;
 	if(len(param) == 2):
 		access = param[1];
@@ -139,7 +144,7 @@ def setGlobalAccess(type, conference, nick, param):
 		setPermGlobalAccess(trueJid);
 		sendMsg(type, conference, nick, u'сняла');
 
-registerCommand(setGlobalAccess, u'глобдоступ', 100, u'Устанавливает или снимает (если не писать уровень) уровень доступа для определённого пользователя на определённый уровень глобально', u'глобдоступ <ник> [уровень]', (u'глобдоступ guy', u'глобдоступ Nick 100'), CHAT | FROZEN | PARAM);
+registerCommand(setGlobalAccess, u'глобдоступ', 100, u'Устанавливает или снимает (если не писать уровень) уровень доступа для определённого пользователя на определённый уровень глобально', u'глобдоступ <ник/жид> [уровень]', (u'глобдоступ guy', u'глобдоступ Nick 100'), ANY | FROZEN | PARAM);
 
 def showGlobalAccesses(type, conference, nick, param):
 	if(not gGlobalAccess):

@@ -16,7 +16,7 @@
 
 QUEUE_CACHE_FILE = 'config/%s/send.txt';
 
-gSendCache = {};
+gSend = {};
 
 def addMessageToQueue(type, conference, nick, param):
 	param = param.split();
@@ -28,7 +28,7 @@ def addMessageToQueue(type, conference, nick, param):
 			sendMsg(type, conference, nick, u'передала');
 		elif(nickInConference(conference, userNick)):
 			trueJid = getTrueJid(conference, userNick);
-			base = gSendCache[conference];
+			base = gSend[conference];
 			messages = base.getKey(trueJid);
 			if(not messages):
 				messages = [];
@@ -36,9 +36,11 @@ def addMessageToQueue(type, conference, nick, param):
 			base.setKey(trueJid, messages);
 			base.save();
 			sendMsg(type, conference, nick, u'передам');
+		else:
+			sendMsg(type, conference, nick, u'а это кто?');
 
 def checkQueue(conference, nick, trueJid, aff, role):
-	base = gSendCache[conference];
+	base = gSend[conference];
 	messages = base.getKey(trueJid);
 	if(messages):
 		for message in messages:
@@ -49,7 +51,7 @@ def checkQueue(conference, nick, trueJid, aff, role):
 
 def loadSendCache(conference):
 	fileName = QUEUE_CACHE_FILE % (conference);
-	gSendCache[conference] = database.DataBase(fileName);
+	gSend[conference] = database.DataBase(fileName);
 
 registerJoinHandler(checkQueue);
 registerEvent(loadSendCache, ADDCONF);

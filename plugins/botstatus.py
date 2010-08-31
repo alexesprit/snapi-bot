@@ -22,7 +22,7 @@ def changeStatus(type, conference, nick, param):
 			status = args[1];
 	else:
 		status = param;
-	setBotStatus(conference, status, show, 0);
+	setBotStatus(conference, status, show);
 	setConfigKey(conference, 'status', status);
 	setConfigKey(conference, 'show', show);
 	saveChatConfig(conference);

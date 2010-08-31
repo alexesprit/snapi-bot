@@ -17,11 +17,11 @@
 SAVE_COUNT = 20;
 TALKERS_FILE = 'config/%s/talkers.txt';
 
-gTalkCache = {};
+gTalkers = {};
 gMsgCount = {};
 
 def showTopTalkers(type, conference, nick):
-	base = gTalkCache[conference];
+	base = gTalkers[conference];
 	if(base.isEmpty()):
 		sendMsg(type, conference, nick, u'база болтунов пуста');
 	else:
@@ -47,7 +47,7 @@ def clearStatistic(type, conference, nick):
 	conference = source[1];
 	trueJid = getTrueJid(conference, nick);
 	if(getAccess(conference, trueJid) >= 20):
-		base = gTalkCache[conference];
+		base = gTalkers[conference];
 		base.clear();
 		base.save();
 		sendMsg(type, conference, nick, u'база данных очищена');
@@ -66,7 +66,7 @@ def showTalkerInfo(type, conference, nick, param):
 			trueJid = getTrueJid(conference, param);
 		else:
 			return;
-		base = gTalkCache[conference];
+		base = gTalkers[conference];
 		statistic = base.getKey(trueJid);
 		if(statistic):
 			statisticLine = u'Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f';
@@ -82,7 +82,7 @@ def showTalkerInfo(type, conference, nick, param):
 
 def updateStatistic(stanza, type, conference, nick, trueJid, body):
 	if(trueJid != gJid and type == PUBLIC and nick):
-		base = gTalkCache[conference];
+		base = gTalkers[conference];
 		statistic = base.getKey(trueJid);
 		if(statistic):
 			statistic['nick'] = nick;
@@ -102,7 +102,7 @@ def updateStatistic(stanza, type, conference, nick, trueJid, body):
 
 def loadTalkCache(conference):
 	fileName = TALKERS_FILE % (conference);
-	gTalkCache[conference] = database.DataBase(fileName);
+	gTalkers[conference] = database.DataBase(fileName);
 	gMsgCount[conference] = 0;
 
 registerEvent(loadTalkCache, ADDCONF);

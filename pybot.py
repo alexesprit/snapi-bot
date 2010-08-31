@@ -63,7 +63,6 @@ NICK_JID = 'jid';
 NICK_IDLE = 'idle';
 NICK_HERE = 'here';
 NICK_MODER = 'moder';
-NICK_LEAVED = 'leaved';
 NICK_JOINED = 'joined';
 NICK_SHOW = 'show';
 NICK_STATUS = 'status';
@@ -374,7 +373,7 @@ def setRosterStatus(status, show, priority):
 	prs.addChild(node = getCapsNode());
 	gClient.send(prs);
 
-def setBotStatus(conference, status, show, away = 0):
+def setBotStatus(conference, status, show):
 	prs = xmpp.Presence(conference, priority = gPriority);
 	if(status):
 		prs.setStatus(status);
@@ -651,7 +650,6 @@ def presenceHandler(session, stanza):
 			code = stanza.getStatusCode();
 			reason = stanza.getReason() or stanza.getStatus();
 			setNickKey(conference, nick, NICK_HERE, False);
-			setNickKey(conference, nick, NICK_LEAVED, time.time());
 			for key in (NICK_IDLE, NICK_MODER, NICK_STATUS, NICK_SHOW):
 				if(key in gConferences[conference][nick]):
 					del(gConferences[conference][nick][key]);

@@ -28,6 +28,8 @@ def pokeUser(type, conference, nick, param):
 				elif(nickIsOnline(conference, param)):
 					message = random.choice(gPokes);
 					sendToConference(conference, u'/me ' + message % (param));
+				else:
+					sendMsg(type, conference, nick, u'а это кто?');
 			else:
 				sendMsg(type, conference, nick, u'шибко умный, да? ]:->');
 		else:

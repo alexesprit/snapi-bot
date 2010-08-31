@@ -16,13 +16,13 @@
 CLIENTS_FILE = 'config/%s/clients.txt';
 CLIENTS_ID = 'clients_id';
 
-gClientsCache = {};
+gClients = {};
 
 def showClients(type, conference, nick, param):
 	userNick = param or nick;
 	if(nickIsOnline(conference, userNick)):
 		trueJid = getTrueJid(conference, userNick);
-		base = gClientsCache[conference];
+		base = gClients[conference];
 		if(trueJid in base):
 			clients = base.getKey(trueJid);
 			if(clients):
@@ -32,13 +32,12 @@ def showClients(type, conference, nick, param):
 					message = param + u' заходил сюда с ';
 				sendMsg(type, conference, nick, message + u', '.join(clients));
 			else:
-				if(not param):
-					sendMsg(type, conference, nick, u'не знаю, с каких клиентов ты заходил');
-				else:
-					sendMsg(type, conference, nick, u'не знаю, с каких клиентов заходил %s' % param);
+				sendMsg(type, conference, nick, u'нет информации' % param);
+	else:
+		sendMsg(type, conference, nick, u'а это кто?');
 
 def clientsChecking(conference, nick, trueJid, aff, role):
-	base = gClientsCache[conference];
+	base = gClients[conference];
 	if(trueJid not in base):
 		base.setKey(trueJid, []);
 	iq = xmpp.Iq('get');
@@ -51,7 +50,7 @@ def clientsChecking(conference, nick, trueJid, aff, role):
 def _clientsChecking(stanza, cliID, conference, trueJid):
 	if(cliID == stanza.getID()):
 		if(stanza.getType() == 'result'):
-			base = gClientsCache[conference];
+			base = gClients[conference];
 			clients = base.getKey(trueJid);
 			for p in stanza.getQueryChildren():
 				if(p.getName() == 'name'):
@@ -63,7 +62,7 @@ def _clientsChecking(stanza, cliID, conference, trueJid):
 
 def loadClientsCache(conference):
 	fileName = CLIENTS_FILE % (conference);
-	gClientsCache[conference] = database.DataBase(fileName);
+	gClients[conference] = database.DataBase(fileName);
 
 registerEvent(loadClientsCache, ADDCONF);
 registerJoinHandler(clientsChecking);

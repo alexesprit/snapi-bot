@@ -19,7 +19,6 @@ STATS_ID = 'stats_id';
 UPTIME_ID = 'uptime_id';
 
 def _showServerStats(stanza, type, conference, nick, param):
-	print stanza;
 	if(STATS_ID == stanza.getID()):
 		if(RESULT == stanza.getType()):
 			message = u'Инфа о %s:' % param;

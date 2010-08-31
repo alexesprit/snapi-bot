@@ -22,5 +22,7 @@ def showHereTime(type, conference, nick, param):
 			sendMsg(type, conference, nick, u'ты уже здесь %s' % (joinedTime));
 		else:
 			sendMsg(type, conference, nick, u'%s уже здесь %s' % (userNick, joinedTime));
+	else:
+		sendMsg(type, conference, nick, u'а это кто?');
 
 registerCommand(showHereTime, u'здесь', 10, u'Показывает, сколько времени пользователь сидит в конференции', u'здесь [ник]', (u'здесь', u'здесь Nick'), CHAT);

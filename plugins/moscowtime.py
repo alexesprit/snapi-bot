@@ -16,14 +16,13 @@
 WEEKDAYS = (u'понедельник', u'вторник', u'среда', u'четверг', u'пятница', u'суббота', u'воскресенье');
 
 def showMoscowTime(type, conference, nick, param):
-	if(not param):
-		text = urllib.urlopen('http://www.zln.ru/time/').read();
-		items = re.search('<div id="servertime"(.*?)</div>', text, re.DOTALL);
-		if(items):
-			mskTime = unicode(decode(items.group(0)), 'windows-1251').strip();
-			message = u'московское время: %s (%s, %s)' % (mskTime, time.strftime('%d.%m.%y'), WEEKDAYS[time.localtime()[6]]);
-			sendMsg(type, conference, nick, message);
-		else:
-			sendMsg(type, conference, nick, u'не получается');
+	text = urllib.urlopen('http://www.zln.ru/time/').read();
+	items = re.search('<div id="servertime"(.*?)</div>', text, re.DOTALL);
+	if(items):
+		mskTime = unicode(decode(items.group(0)), 'windows-1251').strip();
+		message = u'московское время: %s (%s, %s)' % (mskTime, time.strftime('%d.%m.%y'), WEEKDAYS[time.localtime()[6]]);
+		sendMsg(type, conference, nick, message);
+	else:
+		sendMsg(type, conference, nick, u'не получается');
 
 registerCommand(showMoscowTime, u'время', 10, u'Показывает точное московское время', None, (u'время', ), ANY | NONPARAM);

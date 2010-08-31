@@ -35,6 +35,7 @@ def showPing(type, conference, nick, param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			userJid = conference + '/' + param;
 		else:
+			sendMsg(type, conference, nick, u'а это кто?');
 			return;
 	else:
 		userJid = conference + '/' + nick;

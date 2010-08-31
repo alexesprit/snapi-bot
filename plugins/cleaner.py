@@ -22,17 +22,20 @@ CHAT_KEEP_TIME = 86400 * 30;
 SINGLE_KEEP_TIME = 86400 * 90;
 LOGS_KEEP_TIME = 86400 * 10;
 
-CHAT_BASES = ('gClientsCache', 'gTalkCache', 'gQuizScores', 'gHereTimeCache', 'gSendCache');
+CHAT_BASES = ('gClients', 'gTalkers', 'gQuizScores', 'gHereTime', 'gSend', 'gSeen');
 SINGLE_BASES = ('gNotes', );
 
 def cleanBase(base, keepTime):
 	_getUpdateTime = base.getUpdateTime;
 	_delKey = base.delKey;
+	cleanedKeys = 0;
 	for key in base.items():
 		updateTime = _getUpdateTime(key);
 		if(time.time() - updateTime >= keepTime):
 			_delKey(key);
-	base.save();
+			cleanedKeys += 1;
+	if(cleanedKeys):
+		base.save();
 
 def startCleaning():
 	_cleanBase = cleanBase;
