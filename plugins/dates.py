@@ -15,11 +15,11 @@
 
 def showDates(type, conference, nick, param):
 	rawHtml = urllib.urlopen('http://wap.n-urengoy.ru/cgi-bin/wappr.pl').read();
-	rawHtml = rawHtml.replace('-----', '');
-	rawHtml = unicode(rawHtml, 'utf-8')
-	dates = re.findall('<br/>(.*?)<br/><br/>', rawHtml, re.DOTALL);
+	rawHtml = unicode(rawHtml, 'utf-8');
+	dates = rawHtml.split('<br/>-----<br/>');
+	dates = dates[1:-1];
 	if(dates):
-		dates = [decode(x).split('/')[0] for x in dates];
+		dates = [x.split('/')[0] for x in dates];
 		sendMsg(type, conference, nick, u'глянь, что я нашла:' + u'\n'.join(dates));
 	else:
 		sendMsg(type, conference, nick, u'ничего не нашла :(');

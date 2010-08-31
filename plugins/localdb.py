@@ -62,6 +62,8 @@ def setBaseKey(type, conference, nick, param):
 				sendMsg(type, conference, nick, u'прибила %s нафиг' % (key));
 			else:
 				sendMsg(type, conference, nick, u'%s и так нету :-P' % (key));
+	else:
+		sendMsg(type, conference, nick, u'читай справку по команде');
 
 def searchKey(type, conference, nick, param):
 	foundItems = [];

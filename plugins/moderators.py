@@ -40,6 +40,7 @@ def addModerator(type, conference, nick, param):
 	elif(param.count('@')):
 		trueJid = param;
 	else:
+		sendMsg(type, conference, nick, u'а это кто?');
 		return;
 	gModerators[conference].append(trueJid);
 	saveModerators(conference);
@@ -53,6 +54,7 @@ def delModerator(type, conference, nick, param):
 	elif(param.count('@')):
 		trueJid = param;
 	else:
+		sendMsg(type, conference, nick, u'а это кто?');
 		return;
 	if(trueJid in gModerators[conference]):
 		gModerators[conference].remove(trueJid);

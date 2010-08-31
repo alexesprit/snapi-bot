@@ -20,7 +20,7 @@ def showBotUptime(type, conference, nick, parameters):
 	memUsage = getUsedMemory();
 	if(memUsage): 
 		message += u'мной съедено %0.2f МБ памяти, ' % (memUsage);
-	(user, system, qqq, www, eee, ) = os.times();
+	(user, system) = os.times()[:2];
 	message += u'потрачено %.2f сек. процессора, %.2f сек. системного времени и в итоге %.2f сек. общесистемного времени. ' % (user, system, user + system);
 	message += u'я запустила %(tmr)d таймеров, породила %(thr)d потоков, %(err)d из них с ошибками, ' % (gInfo);
 	message += u'в данный момент активно %d потоков' % (threading.activeCount());

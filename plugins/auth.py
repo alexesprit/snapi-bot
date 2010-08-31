@@ -26,9 +26,9 @@ CFG_AUTH = 'auth';
 
 gAuthAnswer = {};
 
-def askAuthQuestion(conference, nick, trueJid, afl, role):
+def askAuthQuestion(conference, nick, trueJid, aff, role):
 	if(getConfigKey(conference, 'auth')):
-		if(afl == 'none'):
+		if(aff == AFF_NONE):
 			question = random.choice((AA, AB, AC, AD, AE, AF, AG, ));
 			setRole(conference, nick, 'visitor', u'неавторизованый участник');
 			message = u'Чтобы получить голос, реши пример: %(question)s. Как решишь, напиши мне ответ' % (question);

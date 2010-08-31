@@ -27,7 +27,7 @@ def setGreet(type, conference, nick, param):
 		elif(userNick in getNicks(conference)):
 			trueJid = getTrueJid(conference, userNick);
 		else:
-			sendMsg(type, conference, nick, u'кто это?');
+			sendMsg(type, conference, nick, u'а это кто?');
 			return;
 		if(not greet):
 			if(trueJid in gGreetCache[conference]):

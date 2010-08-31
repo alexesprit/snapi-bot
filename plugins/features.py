@@ -62,17 +62,22 @@ xmpp.NS_RECEIPTS:			'XEP-0184: Message Receipts',
 xmpp.NS_PING:				'XEP-0199: XMPP Ping',
 xmpp.NS_ENTITY_TIME:		'XEP-0202: Entity Time',
 xmpp.NS_DELAY:				'XEP-0203: Delayed Delivery',
+xmpp.NS_ATTENTION:			'XEP-0224: Attention',
+xmpp.NS_JINGLE:				'XEP-0234: Jingle File Transfer',
 xmpp.NS_CLIENT: 			'RFC 3921: XMPP IM',
 xmpp.NS_DIALBACK:			'RFC 3921: XMPP IM',
 xmpp.NS_PRIVACY:			'RFC 3921: XMPP IM',
 xmpp.NS_ROSTER:				'RFC 3921: XMPP IM',
 };
 
+gFeatList = FEATURES.keys();
+
 def showFeatures(type, conference, nick, param):
 	if(param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			jid = conference + '/' + param;
 		else:
+			sendMsg(type, conference, nick, u'а это кто?');
 			return;
 	else:
 		jid = conference + '/' + nick;
@@ -91,9 +96,9 @@ def _showFeatures(stanza, featID, type, conference, nick, param):
 				attr = p.getAttrs();
 				if('var' in attr):
 					for feat in attr['var'].split():
-						for y in FEATURES.keys():
-							if(feat.count(y) > 0):
-								featList.add(FEATURES[y])
+						for y in FEATURES:
+							if(feat.count(y)):
+								featList.add(FEATURES[y]);
 			if(featList):
 				featList = list(featList);
 				featList.sort();

@@ -28,6 +28,8 @@ def showUserStatus(type, conference, nick, param):
 				sendMsg(type, conference, nick, u'ты сейчас %s (%s)' % (show, status));
 			else:
 				sendMsg(type, conference, nick, u'ты сейчас %s' % (show));
+	else:
+		sendMsg(type, conference, nick, u'а это кто?');
 				
 registerCommand(showUserStatus, u'статус', 10, u'Показывает статус указанного пользователя', u'статус [ник]', (u'статус', u'статус Nick'), CHAT);
 

@@ -39,8 +39,6 @@ def changeAccess(stanza, conference, nick, trueJid):
 			roleAccess = ROLES[role];
 			affAccess = AFFILIATIONS[aff];
 			setTempAccess(conference, trueJid, roleAccess + affAccess);
-			if(AFF_OUTCAST == aff):
-				printf(stanza);
 		else:
 			for item in getOnlineNicks(conference):
 				if(getTrueJid(conference, item) == trueJid):
@@ -150,8 +148,10 @@ def showGlobalAccesses(type, conference, nick, param):
 	if(not gGlobalAccess):
 		sendMsg(type, conference, nick, u'нет глобальных доступов');
 	else:
+		if(PUBLIC == type):
+			sendMsg(type, conference, nick, u'ушли');
 		items = [u'%s [%d]' % (jid, gGlobalAccess[jid]) for jid in gGlobalAccess];
-		sendMsg(type, conference, nick, u'вот, что я нашла\n' + '\n'.join(items));
+		sendMsg(PRIVATE, conference, nick, u'вот, что я нашла\n' + '\n'.join(items));
 
 registerCommand(showGlobalAccesses, u'доступы', 100, u'Показывает все глобальные доступы', None, (u'доступы', ), ANY | NONPARAM);
 
@@ -159,8 +159,10 @@ def showLocalAccesses(type, conference, nick, param):
 	if(not gPermAccess[conference]):
 		sendMsg(type, conference, nick, u'нет локальных доступов');
 	else:
+		if(PUBLIC == type):
+			sendMsg(type, conference, nick, u'ушли');
 		items = [u'\n%s [%d]' % (jid, gPermAccess[conference][jid]) for jid in gPermAccess[conference]];
-		sendMsg(type, conference, nick, u'вот, что я нашла\n' + '\n'.join(items));
+		sendMsg(PRIVATE, conference, nick, u'вот, что я нашла\n' + '\n'.join(items));
 
 registerCommand(showLocalAccesses, u'локалдоступы', 20, u'Показывает все локальные доступы', None, (u'локалдоступы', ), CHAT | NONPARAM);
 

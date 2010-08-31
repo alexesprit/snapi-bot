@@ -18,7 +18,7 @@ gRecordsCache = {};
 
 def showRecord(type, conference, nick, param):
 	if(not gRecordsCache[conference]):
-		sendMsg(type, conference, nick, u'нет статистики пока что');
+		sendMsg(type, conference, nick, u'нет информации');
 	else:
 		sendMsg(type, conference, nick, u'рекорд посещаемости - %(count)d человек (%(time)s)' % (gRecordsCache[conference]));
 
