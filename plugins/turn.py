@@ -15,17 +15,29 @@
 
 TURN_TIMEOUT = 0.6;
 
-TABLE_RU = u"йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё\"№;:? ";
-TABLE_EN = u"qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:\ZXCVBNM<>?~@#$^& ";
-gTable = dict(zip(TABLE_EN + TABLE_RU, TABLE_RU + TABLE_EN));
+#TABLE_RU = u",№;:?&йцукенгшщзхъфывапролджэячсмитьбюёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮЁ";
+#TABLE_EN = u"?#$^,?qwertyuiop[]asdfghjkl;'zxcvbnm,.`QWERTYUIOP{}ASDFGHJKL:\ZXCVBNM<>~";
+
+BIG_RU = u'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,?';
+BIG_EN = u'QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?&';
+SML_RU = u"йцукенгшщзхъфывапролджэячсмитьбю.";
+SML_EN = u"qwertyuiop[]asdfghjkl;'zxcvbnm,./";
+
+TABLE_BIG = dict(zip(BIG_RU + BIG_EN, BIG_EN + BIG_RU));
+TABLE_SML = dict(zip(SML_RU + SML_EN, SML_EN + SML_RU));
 
 gTurnMsgCache = {};
 
-def getChar(char):
-	return(gTable.get(char, char));
+def getBigChar(char):
+	return(TABLE_BIG.get(char, char));
+
+def getSmlChar(char):
+	return(TABLE_SML.get(char, char));
 
 def turnMessage(text):
-	return(''.join(map(getChar, text)));
+	text = ''.join(map(getSmlChar, text));
+	text = ''.join(map(getBigChar, text));
+	return(text);
 
 def turnLastMessage(type, conference, nick, param):
 	if(not type == PUBLIC):

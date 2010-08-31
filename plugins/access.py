@@ -62,7 +62,7 @@ def logout(type, conference, nick, parameters):
 	setTempGlobalAccess(trueJid);
 	sendMsg(type, conference, nick, u'доступ снят');
 
-registerCommand(logout, u'логаут', 0, u'Разлогиниться', u'логаут', (u'логаут', ), ANY | FROZEN | NONPARAM);
+registerCommand(logout, u'логаут', 0, u'Разлогиниться', None, (u'логаут', ), ANY | FROZEN | NONPARAM);
 
 def showUserAccess(type, conference, nick, param):
 	levelDesc = '';

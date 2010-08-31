@@ -85,10 +85,8 @@ def quizStop(conference):
 	if(isTimerEnabled(conference)):
 		gQuizTimer[conference].cancel();
 		del(gQuizTimer[conference]);
-	time.sleep(1);
-	if(conferenceInList(conference)):
-		gQuizScores[conference].save();
-		showScoreList(PUBLIC, conference);
+	gQuizScores[conference].save();
+	showScoreList(PUBLIC, conference);
 
 def checkAnswer(conference, nick, trueJid, answer):
 	rightAnswer = gQuizAnswer[conference].lower();

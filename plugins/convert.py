@@ -96,4 +96,4 @@ def convertValues(type, conference, nick, param):
 			else:
 				sendMsg(type, conference, nick, u'читай помощь по команде');
 
-registerCommand(convertValues, u'перевести', 10, u'Перевод валют. "валюты" в качестве параметра покажет список валют для перевода', u'перевести <из> <в> <кол-во>', (u'перевести RUR USD 100.5', u'перевести валюты'), ANY | PARAM);
+registerCommand(convertValues, u'перевести', 10, u'Перевод валют. "валюты" в качестве параметра - список валют для перевода', u'перевести <из> <в> <кол-во>', (u'перевести RUR USD 100.5', u'перевести валюты'), ANY | PARAM);

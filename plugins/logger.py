@@ -19,7 +19,9 @@ CFG_LOG = 'log';
 def writeHeader(fp, jid, (year, month, day)):
 	date = u'%.2i.%.2i.%.2i' % (day, month, year);
 	cssData = readFile(LOGCSS_FILE);
-	fp.write(u'''<head>
+	fp.write(u'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dt">
+<head>
 <title>%s</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
@@ -58,13 +60,13 @@ def writeLog(type, jid, nick, body, aff = 0):
 	fp = getLogFile(type, jid, (year, month, day, ));
 	fp.write('<span class="timestamp"><a id="t%s" href="#t%s">[%s]</a></span>' % (link, link, timestamp));
 	if(not nick):
-		fp.write('<span class="system">' + body + '</span><br />\n')
+		fp.write('<span class="system"> ' + body + '</span><br />\n')
 	elif(body.startswith('/me')):
-		fp.write('<span class="emote">* %s%s</span><br />\n' % (nick, body[3:]));
+		fp.write('<span class="emote"> * %s%s</span><br />\n' % (nick, body[3:]));
 	else:
 		if(nick.startswith('@$$')):
 			className = nick[3:-3];
-			fp.write('<span class="%s">%s</span><br />\n' % (className, body));
+			fp.write('<span class="%s"> %s</span><br />\n' % (className, body));
 		else:
 			if(aff == 2):
 				fp.write('<span class="owner"> &lt;%s&gt;</span> %s<br />\n' % (nick, body));

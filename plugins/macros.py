@@ -46,7 +46,7 @@ def addLocalMacros(type, conference, nick, param):
 		else:
 			sendMsg(type, conference, nick, u'недостаточно прав');
 
-registerCommand(addLocalMacros, u'макроадд', 20, u'Добавить макрос. Тело макроса должно быть заключено в апострофы (`)', u'макроадд <название> `<макрос>`', (u'макроадд глюк `сказать /me подумал, что все глючат`', ), ANY | PARAM);
+registerCommand(addLocalMacros, u'макроадд', 20, u'Добавить макрос. Тело макроса должно быть заключено в апострофы (`)', u'макроадд <название> `<макрос>`', (u'макроадд глюк `сказать /me подумал, что все глючат`', ), CHAT | PARAM);
 
 def addGlobalMacros(type, conference, nick, param):
 	macros = param.split()[0].lower();
@@ -88,6 +88,8 @@ def delLocalMacros(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'нет такого макроса');
 
+registerCommand(delLocalMacros, u'макродел', 20, u'Удалить макроc', u'макродел <название>', (u'макродел глюк', ), CHAT);
+
 def delGlobalMacros(type, conference, nick, param):
 	if(gMacros.hasMacros(param)): 
 		gMacros.remove(param);
@@ -95,6 +97,8 @@ def delGlobalMacros(type, conference, nick, param):
 		sendMsg(type, conference, nick, u'убила');
 	else:
 		sendMsg(type, conference, nick, u'нет такого макроса');
+
+registerCommand(delGlobalMacros, u'гмакродел', 100, u'Удалить глобальный макроc', u'ггмакродел <название>', (u'гмакродел глюк', ), ANY | PARAM);
 
 def expandLocalMacros(type, conference, nick, param):
 	if(gMacros.hasMacros(param, conference)):
@@ -107,12 +111,16 @@ def expandLocalMacros(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'нет такого макроса');
 
+registerCommand(expandLocalMacros, u'макроэксп', 20, u'Развернуть макроc, т.е. посмотреть на него в сыром виде', u'макроэксп <название> [параметры]', (u'макроэксп админ бот', ), CHAT);
+
 def expandGlobalMacros(type, conference, nick, param):
 	macros = param.split()[0].lower();
 	if(gMacros.hasMacros(macros)):
 		sendMsg(type, conference, nick, gMacros.expand(param, (conference, nick, )));
 	else:
 		sendMsg(type, conference, nick, u'нет такого макроса');
+
+registerCommand(expandGlobalMacros, u'гмакроэксп', 100, u'Развернуть макроc, т.е. посмотреть на него в сыром виде', u'гмакроэксп <название> [параметры]', (u'гмакроэксп админ бот', ), ANY | PARAM);
 
 def showLocalMacrosInfo(type, conference, nick, param):
 	if(gMacros.hasMacros(param, conference)):
@@ -125,12 +133,67 @@ def showLocalMacrosInfo(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'нет такого макроса');
 
+registerCommand(showLocalMacrosInfo, u'макроинфо', 20, u'Открыть макрос, т.е. просто посмотреть как он выглядит', u'макроинфо [название]', (u'макроинфо глюк', ), CHAT);
+
 def showGlobalMacrosInfo(type, conference, nick, param):
 	param = param.lower();
 	if(gMacros.hasMacros(param)):
 		sendMsg(type, conference, nick, gMacros.getMacros(param));
 	else:
 		sendMsg(type, conference, nick, u'нет такого макроса');
+
+registerCommand(showGlobalMacrosInfo, u'гмакроинфо', 100, u'Открыть глобальный макрос, т.е. просто посмотреть как он выглядит', u'гмакроинфо [название]', (u'гмакроинфо глюк', ), ANY | PARAM);
+
+def showLocalMacroAccess(type, conference, nick, param):
+	param = param.split();
+	macros = param[0];
+	if(gMacros.hasMacros(macros, conference)):
+		if(len(param) == 2):
+			access = gMacros.getAccess(macros, conference);
+			trueJid = getTrueJid(conference, nick);
+			if(getAccess(conference, trueJid) >= access):
+				access = param[1];
+				if(access.isdigit()):
+					access = int(param[1]);
+					gMacros.setAccess(macros, access, conference);
+					gMacros.saveMacroses(conference);
+					sendMsg(type, conference, nick, u'дала');
+				else:
+					sendMsg(type, conference, nick, u'ошибочный запрос');
+			else:
+				sendMsg(type, conference, nick, u'недостаточно прав');
+		elif(len(param) == 1):
+			access = gMacros.getAccess(macros, conference);
+			sendMsg(type, conference, nick, str(access));
+		else:
+			sendMsg(type, conference, nick, u'ошибочный запрос');
+	else:
+		sendMsg(type, conference, nick, u'нету такого макроса');
+
+registerCommand(showLocalMacroAccess, u'макродоступ', 20, u'Изменить или посмотреть доступ к макросу', u'макродоступ <название> [доступ]', (u'макродоступ глюк 10', u'макродоступ глюк'), CHAT);
+
+def showGlobalMacroAccess(type, conference, nick, param):
+	param = param.split();
+	macros = param[0];
+	if(gMacros.hasMacros(macros)):
+		if(len(param) == 2):
+			access = param[1];
+			if(access.isdigit()):
+				access = int(param[1]);
+				gMacros.setAccess(macros, access);
+				gMacros.saveMacroses();
+				sendMsg(type, conference, nick, u'дала');
+			else:
+				sendMsg(type, conference, nick, u'ошибочный запрос');
+		elif(len(param) == 1):
+			access = gMacros.getAccess(macros);
+			sendMsg(type, conference, nick, str(access));
+		else:
+			sendMsg(type, conference, nick, u'ошибочный запрос');
+	else:
+		sendMsg(type, conference, nick, u'нету такого макроса');
+
+registerCommand(showGlobalMacroAccess, u'гмакродоступ', 100, u'Изменить или посмотреть доступ к глобальному макросу', u'гмакродоступ <название> [доступ]', (u'гмакродоступ админ 20', u'гмакродоступ админ'), ANY | PARAM);
 
 def showMacrosList(type, conference, nick, parameters):
 	message, disMacroses, macroses = u'', [], [];
@@ -176,53 +239,8 @@ def showMacrosList(type, conference, nick, parameters):
 	else:
 		sendMsg(type, conference, nick, u'нету макросов :(');
 
-def showLocalMacroAccess(type, conference, nick, param):
-	param = param.split();
-	macros = param[0];
-	if(gMacros.hasMacros(macros, conference)):
-		if(len(param) == 2):
-			access = gMacros.getAccess(macros, conference);
-			trueJid = getTrueJid(conference, nick);
-			if(getAccess(conference, trueJid) >= access):
-				access = param[1];
-				if(access.isdigit()):
-					access = int(param[1]);
-					gMacros.setAccess(macros, access, conference);
-					gMacros.saveMacroses(conference);
-					sendMsg(type, conference, nick, u'дала');
-				else:
-					sendMsg(type, conference, nick, u'ошибочный запрос');
-			else:
-				sendMsg(type, conference, nick, u'недостаточно прав');
-		elif(len(param) == 1):
-			access = gMacros.getAccess(macros, conference);
-			sendMsg(type, conference, nick, str(access));
-		else:
-			sendMsg(type, conference, nick, u'ошибочный запрос');
-	else:
-		sendMsg(type, conference, nick, u'нету такого макроса');
-		
-def showGlobalMacroAccess(type, conference, nick, param):
-	param = param.split();
-	macros = param[0];
-	if(gMacros.hasMacros(macros)):
-		if(len(param) == 2):
-			access = param[1];
-			if(access.isdigit()):
-				access = int(param[1]);
-				gMacros.setAccess(macros, access);
-				gMacros.saveMacroses();
-				sendMsg(type, conference, nick, u'дала');
-			else:
-				sendMsg(type, conference, nick, u'ошибочный запрос');
-		elif(len(param) == 1):
-			access = gMacros.getAccess(macros);
-			sendMsg(type, conference, nick, str(access));
-		else:
-			sendMsg(type, conference, nick, u'ошибочный запрос');
-	else:
-		sendMsg(type, conference, nick, u'нету такого макроса');
-			
+registerCommand(showMacrosList, u'макролист', 10, u'Список макросов', None, (u'макролист', ), ANY | NONPARAM);
+
 def loadMacroses(conference):
 	gMacros.loadMacroses(conference);
 
@@ -237,17 +255,3 @@ def loadGlobalMacroses():
 	gMacros.loadMacroses();
 
 registerEvent(loadGlobalMacroses, STARTUP);
-
-registerCommand(delLocalMacros, u'макродел', 20, u'Удалить макроc', u'макродел <название>', (u'макродел глюк', ), CHAT);
-registerCommand(delGlobalMacros, u'гмакродел', 100, u'Удалить глобальный макроc', u'ггмакродел <название>', (u'гмакродел глюк', ), ANY | PARAM);
-
-registerCommand(expandLocalMacros, u'макроэксп', 20, u'Развернуть макроc, т.е. посмотреть на него в сыром виде', u'макроэксп <название> [параметры]', (u'макроэксп админ бот', ), CHAT);
-registerCommand(expandGlobalMacros, u'гмакроэксп', 100, u'Развернуть макроc, т.е. посмотреть на него в сыром виде', u'гмакроэксп <название> [параметры]', (u'гмакроэксп админ бот', ), ANY | PARAM);
-
-registerCommand(showLocalMacrosInfo, u'макроинфо', 20, u'Открыть макрос, т.е. просто посмотреть как он выглядит', u'макроинфо [название]', (u'макроинфо глюк', ), CHAT);
-registerCommand(showGlobalMacrosInfo, u'гмакроинфо', 100, u'Открыть глобальный макрос, т.е. просто посмотреть как он выглядит', u'гмакроинфо [название]', (u'гмакроинфо глюк', ), ANY | PARAM);
-
-registerCommand(showMacrosList, u'макролист', 10, u'Список макросов', None, (u'макролист', ), ANY | NONPARAM);
-
-registerCommand(showLocalMacroAccess, u'макродоступ', 20, u'Изменить или посмотреть доступ к макросу', u'макродоступ <название> [доступ]', (u'макродоступ глюк 10', u'макродоступ глюк'), CHAT);
-registerCommand(showGlobalMacroAccess, u'гмакродоступ', 100, u'Изменить или посмотреть доступ к глобальному макросу', u'гмакродоступ <название> [доступ]', (u'гмакродоступ админ 20', u'гмакродоступ админ'), ANY | PARAM);
