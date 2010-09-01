@@ -15,10 +15,9 @@
 # GNU General Public License for more details.
 
 QUIZ_FILE = 'resource/questions.txt';
-QUIZ_QUESTIONS = 'resource/quizcount.txt';
 QUIZ_SCORES_FILE = 'config/%s/quiz.txt';
 
-QUIZ_TOTAL_LINES = int(eval(readFile(QUIZ_QUESTIONS)));
+QUIZ_TOTAL_LINES = len(file(QUIZ_FILE).readlines());
 QUIZ_TIME_LIMIT = 180;
 QUIZ_IDLE_LIMIT = 3;
 QUIZ_COEF = 2;
