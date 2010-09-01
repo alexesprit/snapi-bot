@@ -85,12 +85,18 @@ def loadLocalBase(conference):
 	fileName = LOCALDB_FILE % (conference);
 	createFile(fileName, '{}');
 	gLocalBase[conference] = eval(readFile(fileName));
-	
+
+registerEvent(loadLocalBase, ADDCONF);
+
+def unloadLocalBase(conference):
+	del(gLocalBase[conference]);
+
+registerEvent(unloadLocalBase, DELCONF);
+
 def saveLocalBase(conference):
 	fileName = LOCALDB_FILE % (conference);
 	writeFile(fileName, str(gLocalBase[conference]));
 
-registerEvent(loadLocalBase, ADDCONF);
 registerCommand(getKeyToPublic, u'???', 10, u'Ищет ответ на вопрос в локальной базе', u'??? <запрос>', (u'??? что-то', u'??? что-то ещё'), CHAT | PARAM);
 registerCommand(getKeyToPrivate, u'!??', 10, u'Ищет ответ на вопрос в локальной базе и посылает его в приват', u'!?? <ник> <запрос>', (u'!?? что-то', u'!?? guy что-то'), CHAT | PARAM);
 registerCommand(setBaseKey, u'!!!', 11, u'Устанавливает ответ на вопрос в локальной базе', u'!!! <запрос> = <ответ>', (u'!!! что-то = the best!', u'!!! что-то ещё ='), CHAT | PARAM);

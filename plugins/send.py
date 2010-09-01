@@ -39,6 +39,8 @@ def addMessageToQueue(type, conference, nick, param):
 		else:
 			sendMsg(type, conference, nick, u'а это кто?');
 
+registerCommand(addMessageToQueue, u'передать', 10, u'Запоминает сообщение и передаёт его указанному пользователю, как только он зайдёт в конференцию', u'передать <кому> <что>', (u'передать Nick хай!'), CHAT);
+
 def checkQueue(conference, nick, trueJid, aff, role):
 	base = gSend[conference];
 	messages = base.getKey(trueJid);
@@ -49,10 +51,15 @@ def checkQueue(conference, nick, trueJid, aff, role):
 		base.delKey(trueJid);
 		base.save();
 
+registerJoinHandler(checkQueue);
+
 def loadSendCache(conference):
 	fileName = QUEUE_CACHE_FILE % (conference);
 	gSend[conference] = database.DataBase(fileName);
 
-registerJoinHandler(checkQueue);
 registerEvent(loadSendCache, ADDCONF);
-registerCommand(addMessageToQueue, u'передать', 10, u'Запоминает сообщение и передаёт его указанному пользователю, как только он зайдёт в конференцию', u'передать <кому> <что>', (u'передать Nick хай!'), CHAT);
+
+def unloadSendCache(conference):
+	del(gSend[conference]);
+
+registerEvent(unloadSendCache, DELCONF);

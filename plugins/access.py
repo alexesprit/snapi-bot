@@ -15,17 +15,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-ROLE_NONE = 'none';
-ROLE_VISITOR = 'visitor';
-ROLE_PARTICIPANT = 'participant';
-ROLE_MODERATOR = 'moderator';
-
-AFF_OUTCAST = 'outcast';
-AFF_NONE = 'none';
-AFF_MEMBER = 'member';
-AFF_ADMIN = 'admin';
-AFF_OWNER = 'owner';
-
 ROLES = {ROLE_NONE: 0, ROLE_VISITOR: 0, ROLE_PARTICIPANT: 10, ROLE_MODERATOR: 15};
 AFFILIATIONS = {AFF_OUTCAST: 0, AFF_NONE: 0, AFF_MEMBER: 1, AFF_ADMIN: 5, AFF_OWNER: 15};
 ACCESS_DESC = {-100: u'(игнор)', 0: u'(никто)', 10: u'(юзер)', 11: u'(мембер)', 15: u'(модер)', 16: u'(модер)', 20: u'(админ)', 30: u'(овнер)', 100: u'(админ бота)'};

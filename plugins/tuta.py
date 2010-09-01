@@ -48,6 +48,8 @@ def updateJoinStatistic(conference, nick, trueJid, aff, role):
 	base.setKey(trueJid, info);
 	base.save();
 
+registerJoinHandler(updateJoinStatistic);
+
 def updateLeaveStatistic(conference, nick, trueJid, reason, code):
 	base = gHereTime[conference];
 	joinTime = getNickKey(conference, nick, 'joined');
@@ -60,10 +62,15 @@ def updateLeaveStatistic(conference, nick, trueJid, reason, code):
 			base.setKey(trueJid, info);
 			base.save();
 
+registerLeaveHandler(updateLeaveStatistic);
+
 def loadHereCache(conference):
 	fileName = HERE_FILE % (conference);
 	gHereTime[conference] = database.DataBase(fileName);
 
 registerEvent(loadHereCache, ADDCONF);
-registerJoinHandler(updateJoinStatistic);
-registerLeaveHandler(updateLeaveStatistic);
+
+def unloadHereCache(conference):
+	del(gHereTime[conference]);
+
+registerEvent(unloadHereCache, DELCONF);

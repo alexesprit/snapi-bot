@@ -30,7 +30,7 @@ def askAuthQuestion(conference, nick, trueJid, aff, role):
 	if(getConfigKey(conference, 'auth')):
 		if(aff == AFF_NONE):
 			question = random.choice((AA, AB, AC, AD, AE, AF, AG, ));
-			setRole(conference, nick, 'visitor', u'неавторизованый участник');
+			setRole(conference, nick, ROLE_VISITOR, u'неавторизованый участник');
 			message = u'Чтобы получить голос, реши пример: %(question)s. Как решишь, напиши мне ответ' % (question);
 			sendMsg(PRIVATE, conference, nick, message);
 			gAuthAnswer[conference][trueJid] = question['answer'];
@@ -48,7 +48,7 @@ def authAnswerListener(stanza, type, conference, nick, trueJid, body):
 		if(trueJid in gAuthAnswer[conference]):
 			if(gAuthAnswer[conference][trueJid] == body):
 				sendMsg(type, conference, nick, u'ок, признаю - ты не бот =)');
-				setRole(conference, nick, 'participant', u'авторизация пройдена');
+				setRole(conference, nick, ROLE_PARTICIPANT, u'авторизация пройдена');
 				del(gAuthAnswer[conference][trueJid]);
 			else:
 				sendMsg(type, conference, nick, u'неправильный ответ. подумай или заюзай гугл');
@@ -79,3 +79,8 @@ def setAuthState(conference):
 		setConfigKey(conference, CFG_AUTH, 0);
 
 registerEvent(setAuthState, ADDCONF);
+
+def unloadAuthCache(conference):
+	del(gAuthAnswer[conference]);
+
+registerEvent(unloadAuthCache, DELCONF);

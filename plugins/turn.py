@@ -81,7 +81,12 @@ def initTurnCache(conference):
 	gTurnMsgCache[conference] = {};
 
 registerEvent(initTurnCache, ADDCONF);
-	
+
+def unloadTurnCache(conference):
+	del(gTurnMsgCache[conference]);
+
+registerEvent(unloadTurnCache, DELCONF);
+
 def clearTurnCache(conference, nick, trueJid, reason, code):
 	if(trueJid in gTurnMsgCache[conference]):
 		del(gTurnMsgCache[conference][trueJid]);

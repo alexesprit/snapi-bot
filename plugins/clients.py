@@ -36,6 +36,8 @@ def showClients(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'а это кто?');
 
+registerCommand(showClients, u'клиенты', 10, u'Показывает, с каких клиентов заходил пользователь', u'клиенты [ник]', (u'клиенты', u'клиенты Niсk'), CHAT);
+
 def clientsChecking(conference, nick, trueJid, aff, role):
 	base = gClients[conference];
 	if(trueJid not in base):
@@ -46,6 +48,8 @@ def clientsChecking(conference, nick, trueJid, aff, role):
 	cliID = getUniqueID(CLIENTS_ID);
 	iq.setID(cliID);
 	gClient.SendAndCallForResponse(iq, _clientsChecking, (cliID, conference, trueJid, ));
+
+registerJoinHandler(clientsChecking);
 
 def _clientsChecking(stanza, cliID, conference, trueJid):
 	if(cliID == stanza.getID()):
@@ -65,5 +69,8 @@ def loadClientsCache(conference):
 	gClients[conference] = database.DataBase(fileName);
 
 registerEvent(loadClientsCache, ADDCONF);
-registerJoinHandler(clientsChecking);
-registerCommand(showClients, u'клиенты', 10, u'Показывает, с каких клиентов заходил пользователь', u'клиенты [ник]', (u'клиенты', u'клиенты Niсk'), CHAT);
+
+def unloadClientsCache(conference):
+	del(gClients[conference]);
+
+registerEvent(unloadClientsCache, DELCONF);

@@ -16,7 +16,6 @@
 from xml.dom import minidom;
 
 def showWeather(type, conference, nick, param):
-	#try:
 	query = urllib.urlencode({'q' : param.encode('cp1251')});
 	text = urllib.urlopen(u'http://pda.rp5.ru/?lang=ru&%s' % (query)).read();
 	if(text.count('1. <a href="')):
@@ -26,17 +25,17 @@ def showWeather(type, conference, nick, param):
 		code = text[:idx];
 
 		rawXml = minidom.parse(urllib.urlopen('http://rp5.ru/rss/%s' % (code)));
-		message = '';
+		message, city = '', None;
 		for x in rawXml.getElementsByTagName('item'):
 			title = x.getElementsByTagName('title')[0].firstChild.data.strip().split(': ', 1);
 			desc = x.getElementsByTagName('description')[0].firstChild.data.strip();
-			desc = desc.replace(', ', '\n');
+			city = title[0];
 			desc = desc.replace('%)', '%')
 			desc = desc.replace(' (', ', ');
 			desc = desc.replace(')', '');
 			message += u'[%s]\nТемпература: %s\n\n' % (title[1], desc);
 		if(message):
-			message = u'Погода в городе %s\n%s' % (param.capitalize(), message);
+			message = u'Погода в городе %s\n%s' % (city, message);
 			if(PUBLIC == type):
 				sendMsg(type, conference, nick, u'скинула в личку');
 			sendMsg(PRIVATE, conference, nick, message);

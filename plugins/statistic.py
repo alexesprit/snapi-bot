@@ -26,19 +26,27 @@ def showStatistic(type, conference, nick, param):
 	text += u'забанили %(ban)d. Также ники сменили %(nick)d раз, статусами нафлудили %(status)d раз.';
 	sendMsg(type, conference, nick, text % (gStats[conference]));
 
+registerCommand(showStatistic, u'статистика', 10, u'Статистика текущей конференции', None, (u'статистика', ), CHAT | NONPARAM);
+
 def botMessageUpdate(type, jid, text):
 	if(PUBLIC == type and text):
 		gStats[jid]['mymsg'] += 1;
 
+registerBotMessageHandler(botMessageUpdate);
+
 def messageUpdate(stanza, type, conference, nick, trueJid, text):
 	if(nick != getBotNick(conference)):
 		gStats[conference][type] += 1;
+
+registerMessageHandler(messageUpdate, CHAT);
 
 def joinUpdate(conference, nick, trueJid, aff, role):
 	if(not trueJid in gJoined[conference]):
 		gJoined[conference].append(trueJid);
 		gStats[conference]['join'] += 1;
 		gStats[conference][role] += 1;
+
+registerJoinHandler(joinUpdate);
 
 def leaveUpdate(conference, nick, trueJid, reason, code):
 	if(not trueJid in gLeaved[conference]):
@@ -51,6 +59,8 @@ def leaveUpdate(conference, nick, trueJid, reason, code):
 		gStats[conference]['ban'] += 1;
 		gBanned[conference].append(trueJid);
 
+registerLeaveHandler(leaveUpdate);
+
 def presenceUpdate(stanza, conference, nick, trueJid):
 	if(conferenceInList(conference)):
 		code = stanza.getStatusCode();
@@ -58,20 +68,25 @@ def presenceUpdate(stanza, conference, nick, trueJid):
 			gStats[conference]['nick'] += 1;
 		else:
 			type = stanza.getType();
-			if(not(type == 'unavailable' or type == 'available')):
+			if(type != 'unavailable'):
 				gStats[conference]['status'] += 1;
-		
+
+registerPresenceHandler(presenceUpdate, CHAT);
+	
 def createStatistic(conference):
-	gStats[conference] = {'nick': 0, 'status': 0, 'kick': 0, 'ban': 0, PRIVATE: 0, PUBLIC: 0, 'join': 0, 'leave': 0, 'mymsg': 0, 'moderator': 0, 'participant': 0, 'visitor': 0};
+	gStats[conference] = {'nick': 0, 'status': 0, 'kick': 0, 'ban': 0, PRIVATE: 0, PUBLIC: 0, 'join': 0, 'leave': 0, 'mymsg': 0, ROLE_MODERATOR: 0, ROLE_PARTICIPANT: 0, ROLE_VISITOR: 0};
 	gJoined[conference] = [];
 	gLeaved[conference] = [];
 	gKicked[conference] = [];
 	gBanned[conference] = [];
 
-registerJoinHandler(joinUpdate);
-registerLeaveHandler(leaveUpdate);
-registerPresenceHandler(presenceUpdate, CHAT);
-registerMessageHandler(messageUpdate, CHAT);
-registerBotMessageHandler(botMessageUpdate);
 registerEvent(createStatistic, ADDCONF);
-registerCommand(showStatistic, u'статистика', 10, u'Статистика текущей конференции', None, (u'статистика', ), CHAT | NONPARAM);
+
+def deleteStatistic(conference):
+	del(gStats[conference]);
+	del(gJoined[conference]);
+	del(gLeaved[conference]);
+	del(gKicked[conference]);
+	del(gBanned[conference]);
+
+registerEvent(deleteStatistic, DELCONF);

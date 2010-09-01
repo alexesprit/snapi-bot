@@ -16,42 +16,42 @@
 
 VOTES_FILE = 'config/%s/vote.txt';
 
-gVoteCache = {};
+gVotes = {};
 
 def getVoteText(conference):
-	voteText = u'Голосование\nСоздатель: %(creator)s\nВопрос: %(question)s\n' % (gVoteCache[conference]);
-	items = [u' * %s' % (x[0]) for x in gVoteCache[conference]['opinions']]
+	voteText = u'Голосование\nСоздатель: %(creator)s\nВопрос: %(question)s\n' % (gVotes[conference]);
+	items = [u' * %s' % (x[0]) for x in gVotes[conference]['opinions']]
 	voteText += '\n'.join(items);
 	voteText += u'\nЧтобы проголосовать, напиши номер мнения, например "мнение 1"';
 	return(voteText);
 
 def getResults(conference):
-	answers = [[x[1], x[0]] for x in gVoteCache[conference]['opinions']];
+	answers = [[x[1], x[0]] for x in gVotes[conference]['opinions']];
 	answers.sort();
 	answers.reverse();
-	voteText = u'Результаты голосования\nСоздатель: %(creator)s\nВопрос: %(question)s\n' % (gVoteCache[conference]);
+	voteText = u'Результаты голосования\nСоздатель: %(creator)s\nВопрос: %(question)s\n' % (gVotes[conference]);
 	items = [u' * %d место и %d голосов - %s' % (i + 1, x[0], x[1]) for i, x in enumerate(answers)];
 	return(voteText + '\n'.join(items));
 
 def saveVotes(conference):
 	fileName = VOTES_FILE % (conference);
-	writeFile(fileName, str(gVoteCache[conference]));
+	writeFile(fileName, str(gVotes[conference]));
 
 def vote(type, conference, nick, param):
-	if(gVoteCache[conference]):
-		if(gVoteCache[conference]['finished']):
+	if(gVotes[conference]):
+		if(gVotes[conference]['finished']):
 			sendMsg(type, conference, nick, u'голосование было завершено');
-		elif(not gVoteCache[conference]['started']):
+		elif(not gVotes[conference]['started']):
 			sendMsg(type, conference, nick, u'голосование ещё не запущено');
 		else:
 			trueJid = getTrueJid(conference, nick);
-			if(not trueJid in gVoteCache[conference]['voted']):
-				gVoteCache[conference]['voted'][trueJid] = False;
-			if(not gVoteCache[conference]['voted'][trueJid]):
+			if(not trueJid in gVotes[conference]['voted']):
+				gVotes[conference]['voted'][trueJid] = False;
+			if(not gVotes[conference]['voted'][trueJid]):
 				try:
 					n = int(param) - 1;
-					gVoteCache[conference]['opinions'][n][1] += 1;
-					gVoteCache[conference]['voted'][trueJid] = True;
+					gVotes[conference]['opinions'][n][1] += 1;
+					gVotes[conference]['voted'][trueJid] = True;
 					saveVotes(conference);
 					sendMsg(type, conference, nick, u'поняла');
 				except(IndexError, ValueError):
@@ -64,32 +64,32 @@ def vote(type, conference, nick, param):
 registerCommand(vote, u'мнение', 10, u'Для подачи мнения в текущем голосовании', u'мнение <номер>', (u'мнение 1', ), CHAT | PARAM);
 
 def newVote(type, conference, nick, param):
-	if(gVoteCache[conference]):
-		if(not gVoteCache[conference]['finished']):
+	if(gVotes[conference]):
+		if(not gVotes[conference]['finished']):
 			sendMsg(type, conference, nick, getVoteText(conference));
 		else:
 			sendMsg(type, conference, nick, getResults(conference));	
 	elif(param):
 		trueJid = getTrueJid(conference, nick);
-		gVoteCache[conference] = {'started': False, 'finished': False, 'creator': nick, 'creatorjid': getTrueJid(conference, nick), 'question': param, 'voted': {}, 'opinions': []};
+		gVotes[conference] = {'started': False, 'finished': False, 'creator': nick, 'creatorjid': getTrueJid(conference, nick), 'question': param, 'voted': {}, 'opinions': []};
 		saveVotes(conference);
 		sendMsg(type, conference, nick, u'Голосование создано! Чтобы добавить пункты напиши "пункт+ твой_пункт", удалить - "пункт- номер пункта". Начать голосование - команда "голосование+". Посмотреть текущие результаты - команда "мнения". Окончить голосование - команда "итоги"', True);
 
 registerCommand(newVote, u'голосование', 11, u'Создает новое голосование или показывает текущее (если имеется)', u'голосование [текст]', (u'голосование винды - сакс!', u'голосование'), CHAT);
 
 def startVote(type, conference, nick, parameters):
-	if(gVoteCache[conference]):
-		if(gVoteCache[conference]['started']):
+	if(gVotes[conference]):
+		if(gVotes[conference]['started']):
 			sendMsg(type, conference, nick, u'голосование уже запущено');
-		elif(gVoteCache[conference]['finished']):
+		elif(gVotes[conference]['finished']):
 			sendMsg(type, conference, nick, u'голосование было завершено');
-		elif(not gVoteCache[conference]['opinions']):
+		elif(not gVotes[conference]['opinions']):
 			sendMsg(type, conference, nick, u'голосование не имеет пунктов');
 		else:
 			trueJid = getTrueJid(conference, nick);
-			creatorJid = gVoteCache[conference]['creatorjid'];			
+			creatorJid = gVotes[conference]['creatorjid'];			
 			if(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
-				gVoteCache[conference]['started'] = True;
+				gVotes[conference]['started'] = True;
 				saveVotes(conference);
 				sendToConference(conference, getVoteText(conference));
 			else:
@@ -100,14 +100,14 @@ def startVote(type, conference, nick, parameters):
 registerCommand(startVote, u'голосование+', 11, u'Возобновляет голосование', None, (u'голосование+', ), CHAT | NONPARAM);
 
 def stopVote(type, conference, nick, param):
-	if(gVoteCache[conference]):
-		if(gVoteCache[conference]['finished']):
+	if(gVotes[conference]):
+		if(gVotes[conference]['finished']):
 			sendMsg(type, conference, nick, u'неприменимо к оконченному голосованию');
-		elif(gVoteCache[conference]['started']):
+		elif(gVotes[conference]['started']):
 			trueJid = getTrueJid(conference, nick);
-			creatorJid = gVoteCache[conference]['creatorjid'];			
+			creatorJid = gVotes[conference]['creatorjid'];			
 			if(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
-				gVoteCache[conference]['started'] = False;
+				gVotes[conference]['started'] = False;
 				saveVotes(conference);
 				sendMsg(type, conference, nick, u'голосование приостановлено');
 			else:
@@ -120,19 +120,19 @@ def stopVote(type, conference, nick, param):
 registerCommand(stopVote, u'голосование-', 11, u'Останавливает голосование, все данные сохраняются до продолжения голосования', u'голосование-', (u'голосование-'), CHAT | NONPARAM);
 
 def addOpinion(type, conference, nick, param):
-	if(gVoteCache[conference]):
-		if(gVoteCache[conference]['started']):
+	if(gVotes[conference]):
+		if(gVotes[conference]['started']):
 			sendMsg(type, conference, nick, u'неприменимо к запущеному голосованию, останови и добавь пункты');
-		elif(gVoteCache[conference]['finished']):
+		elif(gVotes[conference]['finished']):
 			sendMsg(type, conference, nick, u'неприменимо к оконченному голосованию');
 		else:
 			trueJid = getTrueJid(conference, nick);
-			creatorJid = gVoteCache[conference]['creatorjid'];
+			creatorJid = gVotes[conference]['creatorjid'];
 			if(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
-				if(param in [x[0] for x in gVoteCache[conference]['opinions']]):
+				if(param in [x[0] for x in gVotes[conference]['opinions']]):
 					sendMsg(type, conference, nick, u'уже есть такой пункт');
 				else:
-					gVoteCache[conference]['opinions'].append([param, 0]);
+					gVotes[conference]['opinions'].append([param, 0]);
 					saveVotes(conference);
 					sendMsg(type, conference, nick, u'добавила');
 			else:
@@ -143,18 +143,18 @@ def addOpinion(type, conference, nick, param):
 registerCommand(addOpinion, u'пункт+', 11, u'Добавляет пункт к текущему голосованию', u'пункт+ <пункт>', (u'пункт+ да', ), CHAT | PARAM);
 	
 def delOpinion(type, conference, nick, param):
-	if(gVoteCache[conference]):
-		if(gVoteCache[conference]['started']):
+	if(gVotes[conference]):
+		if(gVotes[conference]['started']):
 			sendMsg(type, conference, nick, u'неприменимо к запущеному голосованию, останови и добавь пункты');
-		elif(gVoteCache[conference]['finished']):
+		elif(gVotes[conference]['finished']):
 			sendMsg(type, conference, nick, u'неприменимо к оконченному голосованию');
 		else:
 			trueJid = getTrueJid(conference, nick);
-			creatorJid = gVoteCache[conference]['creatorjid'];
+			creatorJid = gVotes[conference]['creatorjid'];
 			if(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
 				try:
 					n = int(param) - 1;
-					del(gVoteCache[conference]['opinions'][n]);
+					del(gVotes[conference]['opinions'][n]);
 					saveVotes(conference);
 					sendMsg(type, conference, nick, u'удалила');
 				except(KeyError, IndexError):
@@ -167,10 +167,10 @@ def delOpinion(type, conference, nick, param):
 registerCommand(delOpinion , u'пункт-', 11, u'Удаляет пункт из голосования. Пункт указывается его номером', u'пункт- <номер_пункта>', (u'пункт- 5', ), CHAT | PARAM);
 	
 def showOpinions(type, conference, nick, param):
-	if(gVoteCache[conference]):
+	if(gVotes[conference]):
 		trueJid = getTrueJid(conference, nick);
-		creatorJid = gVoteCache[conference]['creatorjid'];
-		if(gVoteCache[conference]['finished']):
+		creatorJid = gVotes[conference]['creatorjid'];
+		if(gVotes[conference]['finished']):
 			sendMsg(type, conference, nick, getResults(conference));
 		elif(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
 			if(PUBLIC == type):
@@ -184,16 +184,16 @@ def showOpinions(type, conference, nick, param):
 registerCommand(showOpinions, u'мнения', 11, u'Отдаёт текущие результаты голосования в приват, не завершая голосования при этом', None, (u'мнения', ), CHAT | NONPARAM);
 
 def endVote(type, conference, nick, param):
-	if(gVoteCache[conference]):
-		if(gVoteCache[conference]['finished']):
+	if(gVotes[conference]):
+		if(gVotes[conference]['finished']):
 			sendMsg(type, conference, nick, getResults(conference));
 		else:
 			trueJid = getTrueJid(conference, nick);
-			creatorJid = gVoteCache[conference]['creatorjid'];
+			creatorJid = gVotes[conference]['creatorjid'];
 			if(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
-				gVoteCache[conference]['started'] = False;
-				gVoteCache[conference]['finished'] = True;
-				del(gVoteCache[conference]['voted']);
+				gVotes[conference]['started'] = False;
+				gVotes[conference]['finished'] = True;
+				del(gVotes[conference]['voted']);
 				saveVotes(conference);
 				sendToConference(conference, getResults(conference));
 			else:
@@ -204,10 +204,10 @@ def endVote(type, conference, nick, param):
 registerCommand(endVote, u'итоги', 11, u'Завершает голование и показывает его результаты', None, (u'итоги', ), CHAT | NONPARAM);
 
 def showVote(conference, nick, trueJid, aff, role):
-	if(gVoteCache[conference]):
-		if(gVoteCache[conference]['started']):
-			if(not trueJid in gVoteCache[conference]['voted']):
-				gVoteCache[conference]['voted'][trueJid] = False;
+	if(gVotes[conference]):
+		if(gVotes[conference]['started']):
+			if(not trueJid in gVotes[conference]['voted']):
+				gVotes[conference]['voted'][trueJid] = False;
 				saveVotes(conference);
 				sendMsg(PRIVATE, conference, nick, getVoteText(conference));
 
@@ -216,6 +216,11 @@ registerJoinHandler(showVote);
 def loadVotes(conference):
 	fileName = VOTES_FILE % (conference);
 	createFile(fileName, '{}');
-	gVoteCache[conference] = eval(readFile(fileName));
+	gVotes[conference] = eval(readFile(fileName));
 
 registerEvent(loadVotes, ADDCONF);
+
+def unloadVotes(conference):
+	del(gVotes[conference]);
+
+registerEvent(unloadVotes, DELCONF);

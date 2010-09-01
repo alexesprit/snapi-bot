@@ -75,6 +75,8 @@ def bombColorsListener(stanza, type, conference, nick, trueJid, param):
 			del(gBombColors[conference][trueJid]);
 			del(gBombTimers[conference][trueJid]);
 
+registerMessageHandler(bombColorsListener, CHAT);
+
 def detonate(type, conference, nick):
 	num = random.randrange(0, 10);
 	if(num < 1 or getNickKey(conference, nick, NICK_MODER)):
@@ -94,12 +96,12 @@ def clearBombCache(conference):
 	del(gBombColors[conference]);
 	del(gBombTimers[conference]);	
 
+registerEvent(clearBombCache, DELCONF);
+
 def initBombCache(conference):
 	gBombColors[conference] = {};
 	gBombAnswer[conference] = {};
 	gBombTimers[conference] = {};
 
-registerMessageHandler(bombColorsListener, CHAT);
 registerEvent(initBombCache, ADDCONF);
-registerEvent(clearBombCache, DELCONF);
 registerCommand(giveBomb, u'бомба', 15, u'Вручает пользователю бомбу. Если перерезать не тот провод, то будет кик или контузия. Если ник не указан, то берется произвольный ник из чата', u'бомба [ник]', (u'бомба', u'бомба Nick'), CHAT);

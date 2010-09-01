@@ -49,3 +49,8 @@ def loadSeenBase(conference):
 	gSeen[conference] = database.DataBase(fileName);
 
 registerEvent(loadSeenBase, ADDCONF);
+
+def unloadSeenBase(conference):
+	del(gSeen[conference]);
+
+registerEvent(unloadSeenBase, DELCONF);

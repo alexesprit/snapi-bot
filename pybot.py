@@ -67,6 +67,17 @@ NICK_JOINED = 'joined';
 NICK_SHOW = 'show';
 NICK_STATUS = 'status';
 
+ROLE_NONE = 'none';
+ROLE_VISITOR = 'visitor';
+ROLE_PARTICIPANT = 'participant';
+ROLE_MODERATOR = 'moderator';
+
+AFF_OUTCAST = 'outcast';
+AFF_NONE = 'none';
+AFF_MEMBER = 'member';
+AFF_ADMIN = 'admin';
+AFF_OWNER = 'owner';
+
 IDLE_TIMEOUT = 600;
 JOIN_TIMEOUT = 5;
 REJOIN_TIMEOUT = 120;

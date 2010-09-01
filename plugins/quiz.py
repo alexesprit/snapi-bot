@@ -186,6 +186,12 @@ def loadQuizScores(conference):
 	gQuizScores[conference] = database.DataBase(fileName);
 
 registerEvent(loadQuizScores, ADDCONF);
+
+def unloadQuizScores(conference):
+	del(gQuizScores[conference]);
+
+registerEvent(unloadQuizScores, DELCONF);
+
 registerMessageHandler(answerListener, CHAT);
 registerCommand(startQuiz, u'старт', 10, u'Запуск игры', None, (u'старт', ), CHAT | NONPARAM);
 registerCommand(stopQuiz, u'стоп', 10, u'Остановка игры', None, (u'стоп', ), CHAT | NONPARAM);

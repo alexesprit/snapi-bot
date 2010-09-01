@@ -22,6 +22,8 @@ def showRecord(type, conference, nick, param):
 	else:
 		sendMsg(type, conference, nick, u'рекорд посещаемости - %(count)d человек (%(time)s)' % (gRecordsCache[conference]));
 
+registerCommand(showRecord, u'рекорд', 10, u'Показывает рекорд посещаемости конференции', None, (u'рекорд', ), CHAT | NONPARAM);
+
 def calculateRecord(conference, nick, trueJid, aff, role):
 	userCount = len(getJidList(conference))
 	lastCount = gRecordsCache[conference] and gRecordsCache[conference]['count'] or 0;
@@ -30,11 +32,16 @@ def calculateRecord(conference, nick, trueJid, aff, role):
 		gRecordsCache[conference]['count'] = userCount;
 		writeFile(REC_FILE % (conference), str(gRecordsCache[conference]));
 
+registerJoinHandler(calculateRecord);
+
 def loadRecordCache(conference):
 	fileName = REC_FILE % (conference);
 	createFile(fileName, '{}');
 	gRecordsCache[conference] = eval(readFile(fileName));
 
 registerEvent(loadRecordCache, ADDCONF);
-registerJoinHandler(calculateRecord);
-registerCommand(showRecord, u'рекорд', 10, u'Показывает рекорд посещаемости конференции', u'рекорд', (u'рекорд'), CHAT | NONPARAM);
+
+def unloadRecordCache(conference):
+	del(gRecordsCache[conference]);
+
+registerEvent(unloadRecordCache, DELCONF);

@@ -80,6 +80,8 @@ def showTalkerInfo(type, conference, nick, param):
 		else:
 			sendMsg(type, conference, nick, u'твоя статистика отсутствует');
 
+registerCommand(showTalkerInfo, u'болтун', 10, u'Показывает статистику болтливости указанного пользователя', u'болтун [ник]', (u'болтун Nick', u'болтун топ'), CHAT);
+
 def updateStatistic(stanza, type, conference, nick, trueJid, body):
 	if(trueJid != gJid and type == PUBLIC and nick):
 		base = gTalkers[conference];
@@ -100,11 +102,16 @@ def updateStatistic(stanza, type, conference, nick, trueJid, body):
 		else:
 			gMsgCount[conference] += 1;
 
+registerMessageHandler(updateStatistic, CHAT);
+
 def loadTalkCache(conference):
 	fileName = TALKERS_FILE % (conference);
 	gTalkers[conference] = database.DataBase(fileName);
 	gMsgCount[conference] = 0;
 
 registerEvent(loadTalkCache, ADDCONF);
-registerMessageHandler(updateStatistic, CHAT);
-registerCommand(showTalkerInfo, u'болтун', 10, u'Показывает статистику болтливости указанного пользователя', u'болтун [ник]', (u'болтун Nick', u'болтун топ'), CHAT);
+
+def unloadTalkCache(conference):
+	del(gTalkers[conference]);
+
+registerEvent(unloadTalkCache, DELCONF);

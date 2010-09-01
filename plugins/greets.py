@@ -15,7 +15,7 @@
 
 GREET_FILENAME = 'config/%s/greets.txt';
 
-gGreetCache = {};
+gGreets = {};
 
 def setGreet(type, conference, nick, param):
 	rawGreet = param.split('=', 1);
@@ -30,22 +30,29 @@ def setGreet(type, conference, nick, param):
 			sendMsg(type, conference, nick, u'а это кто?');
 			return;
 		if(not greet):
-			if(trueJid in gGreetCache[conference]):
-				del(gGreetCache[conference][trueJid]);
+			if(trueJid in gGreets[conference]):
+				del(gGreets[conference][trueJid]);
 		else:
-			gGreetCache[conference][trueJid] = greet;
-		writeFile(GREET_FILENAME % (conference), str(gGreetCache[conference]));
+			gGreets[conference][trueJid] = greet;
+		writeFile(GREET_FILENAME % (conference), str(gGreets[conference]));
 		sendMsg(type, conference, nick, u'запомнила');
 
+registerCommand(setGreet, u'приветствие', 30, u'Добавляет приветствие для определённого ника/жида', u'приветствие <ник/жид> = [текст]', (u'приветствие Nick = something', ), CHAT | PARAM);
+
 def sendGreeting(conference, nick, trueJid, aff, role):
-	if(trueJid in gGreetCache[conference]):
-		sendMsg(PUBLIC, conference, nick, gGreetCache[conference][trueJid]);
+	if(trueJid in gGreets[conference]):
+		sendMsg(PUBLIC, conference, nick, gGreets[conference][trueJid]);
+
+registerJoinHandler(sendGreeting);
 
 def loadGreetings(conference):
 	fileName = GREET_FILENAME % (conference);
 	createFile(fileName, '{}');
-	gGreetCache[conference] = eval(readFile(fileName));
+	gGreets[conference] = eval(readFile(fileName));
 
-registerJoinHandler(sendGreeting);
 registerEvent(loadGreetings, ADDCONF);
-registerCommand(setGreet, u'приветствие', 30, u'Добавляет приветствие для определённого ника/жида', u'приветствие <ник/жид> = [текст]', (u'приветствие Nick = something', ), CHAT | PARAM);
+
+def unloadGreetings(conference):
+	del(gGreets[conference]);
+
+registerEvent(unloadGreetings, DELCONF);
