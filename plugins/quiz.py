@@ -17,7 +17,7 @@
 QUIZ_FILE = 'resource/questions.txt';
 QUIZ_SCORES_FILE = 'config/%s/quiz.txt';
 
-QUIZ_TOTAL_LINES = len(file(QUIZ_FILE).readlines());
+QUIZ_TOTAL_LINES = sum(1 for i in open(QUIZ_FILE, 'r'));
 QUIZ_TIME_LIMIT = 180;
 QUIZ_IDLE_LIMIT = 3;
 QUIZ_COEF = 2;
