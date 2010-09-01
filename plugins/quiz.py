@@ -15,11 +15,13 @@
 # GNU General Public License for more details.
 
 QUIZ_FILE = 'resource/questions.txt';
+QUIZ_QUESTIONS = 'resource/quizcount.txt';
 QUIZ_SCORES_FILE = 'config/%s/quiz.txt';
 
-QUIZ_TOTAL_LINES = 33693;
+QUIZ_TOTAL_LINES = int(eval(readFile(QUIZ_QUESTIONS)));
 QUIZ_TIME_LIMIT = 180;
 QUIZ_IDLE_LIMIT = 3;
+QUIZ_COEF = 2;
 
 gQuizScores = {};
 
@@ -91,15 +93,11 @@ def quizStop(conference):
 def checkAnswer(conference, nick, trueJid, answer):
 	rightAnswer = gQuizAnswer[conference].lower();
 	userAnswer = answer.lower();
-	if(rightAnswer == userAnswer):
-		answerTime = int(time.time() - gQuizAskTime[conference]);
-		letterCount = len(gQuizHint[conference]);
-		openedLetters = letterCount - gQuizHint[conference].count('*');
-		if(openedLetters):
-			procent = openedLetters * 100 / letterCount;
-		else:
-			procent = 10;
-		points = QUIZ_TIME_LIMIT / answerTime * 10 / procent;
+	if(rightAnswer == userAnswer):	
+		answerTime = time.time() - gQuizAskTime[conference];
+		wLength = len(gQuizHint[conference]);
+		closedLetters = gQuizHint[conference].count('*');
+		points = int(wLength * closedLetters * (QUIZ_COEF / answerTime));
 		if(points):
 			sendToConference(conference, u'(!) %s, поздравляю! +%d в банк! Верный ответ: %s' % (nick, points, rightAnswer));
 		else:
