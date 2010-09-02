@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showBotUptime(type, conference, nick, parameters):
+def showBotUptime(msgType, conference, nick, parameters):
 	uptime = int(time.time() - gInfo['start']);
 	message = u'я работаю уже %s, ' % (time2str(uptime));
 	message += u'получено %(msg)d сообщений, обработано %(prs)d презенсов и %(iq)d iq-запросов, а также выполнено %(cmd)d команд. ' % (gInfo);
@@ -24,6 +24,6 @@ def showBotUptime(type, conference, nick, parameters):
 	message += u'потрачено %.2f сек. процессора, %.2f сек. системного времени и в итоге %.2f сек. общесистемного времени. ' % (user, system, user + system);
 	message += u'я запустила %(tmr)d таймеров, породила %(thr)d потоков, %(err)d из них с ошибками, ' % (gInfo);
 	message += u'в данный момент активно %d потоков' % (threading.activeCount());
-	sendMsg(type, conference, nick, message);
+	sendMsg(msgType, conference, nick, message);
 
 registerCommand(showBotUptime, u'ботап', 10, u'Показывает статистику работы бота', None, (u'ботап', ), ANY | NONPARAM);

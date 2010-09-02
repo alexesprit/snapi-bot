@@ -17,7 +17,7 @@ SEEN_FILE = 'config/%s/seen.txt';
 
 gSeen = {};
 
-def showSeenTime(type, conference, nick, param):
+def showSeenTime(msgType, conference, nick, param):
 	userNick = param or nick;
 	if(nickInConference(conference, userNick)):
 		trueJid = getTrueJid(conference, userNick);
@@ -26,13 +26,13 @@ def showSeenTime(type, conference, nick, param):
 			seenDate = time.strftime('%H:%M, %d.%m.%Y', time.localtime(seenTime));
 			seenTime = time2str(time.time() - seenTime);
 			if(not param):
-				sendMsg(type, conference, nick, u'я видела тебя %s назад (в %s)' % (seenTime, seenDate));
+				sendMsg(msgType, conference, nick, u'я видела тебя %s назад (в %s)' % (seenTime, seenDate));
 			else:
-				sendMsg(type, conference, nick, u'я видела %s %s назад (в %s)' % (userNick, seenTime, seenDate));
+				sendMsg(msgType, conference, nick, u'я видела %s %s назад (в %s)' % (userNick, seenTime, seenDate));
 		else:
-			sendMsg(type, conference, nick, u'нет информации');
+			sendMsg(msgType, conference, nick, u'нет информации');
 	else:
-		sendMsg(type, conference, nick, u'а это кто?');
+		sendMsg(msgType, conference, nick, u'а это кто?');
 
 registerCommand(showSeenTime, u'когдабыл', 10, u'Показывает, сколько времени назад пользователь вышел из чата', u'когдабыл [ник]', (u'когдабыл Nick', ), CHAT);
 

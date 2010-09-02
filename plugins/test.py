@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showTest(type, conference, nick, param):
-	sendMsg(type, conference, nick, u'две полоски o_O');
+def showTest(msgType, conference, nick, param):
+	sendMsg(msgType, conference, nick, u'две полоски o_O');
 
 registerCommand(showTest, u'тест', 10, u'Тест на беременность', None, (u'тест', ), ANY | NONPARAM);

@@ -18,14 +18,14 @@ QUEUE_CACHE_FILE = 'config/%s/send.txt';
 
 gSend = {};
 
-def addMessageToQueue(type, conference, nick, param):
+def addMessageToQueue(msgType, conference, nick, param):
 	param = param.split();
 	if(len(param) >= 2):
 		userNick = param[0];
 		message = u'%s попросил меня передать тебе следующее:\n%s' % (nick, ' '.join(param[1:]));
 		if(nickIsOnline(conference, userNick)):
 			sendMsg(PRIVATE, conference, userNick, message);
-			sendMsg(type, conference, nick, u'передала');
+			sendMsg(msgType, conference, nick, u'передала');
 		elif(nickInConference(conference, userNick)):
 			trueJid = getTrueJid(conference, userNick);
 			base = gSend[conference];
@@ -35,9 +35,9 @@ def addMessageToQueue(type, conference, nick, param):
 			messages.append(message);
 			base.setKey(trueJid, messages);
 			base.save();
-			sendMsg(type, conference, nick, u'передам');
+			sendMsg(msgType, conference, nick, u'передам');
 		else:
-			sendMsg(type, conference, nick, u'а это кто?');
+			sendMsg(msgType, conference, nick, u'а это кто?');
 
 registerCommand(addMessageToQueue, u'передать', 10, u'Запоминает сообщение и передаёт его указанному пользователю, как только он зайдёт в конференцию', u'передать <кому> <что>', (u'передать Nick хай!'), CHAT);
 

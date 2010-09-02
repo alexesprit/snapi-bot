@@ -16,12 +16,12 @@
 
 TIME_ID = 'time_id';
 
-def showUserTime(type, conference, nick, param):
+def showUserTime(msgType, conference, nick, param):
 	if(param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			userJid = conference + '/' + param;
 		else:
-			sendMsg(type, conference, nick, u'а это кто?');
+			sendMsg(msgType, conference, nick, u'а это кто?');
 			return;
 	else:
 		userJid = conference + '/' + nick;
@@ -30,9 +30,9 @@ def showUserTime(type, conference, nick, param):
 	iq.setTo(userJid);
 	timeID = getUniqueID(TIME_ID);
 	iq.setID(timeID);
-	gClient.SendAndCallForResponse(iq, _showUserTime, (timeID, type, conference, nick, param));
+	gClient.SendAndCallForResponse(iq, _showUserTime, (timeID, msgType, conference, nick, param));
 
-def _showUserTime(stanza, timeID, type, conference, nick, param):
+def _showUserTime(stanza, timeID, msgType, conference, nick, param):
 	if(timeID == stanza.getID()):
 		if(stanza.getType() == 'result'):
 			tzo, utc = '', '' ;
@@ -61,15 +61,15 @@ def _showUserTime(stanza, timeID, type, conference, nick, param):
 				time = '%02d:%02d:%02d' % (hours, minutes, seconds);
 				date = '%02d.%02d.%02d' % (day, month, year);
 				if(param):
-					sendMsg(type, conference, nick, u'у %s сейчас %s (%s)' % (param, time, date));
+					sendMsg(msgType, conference, nick, u'у %s сейчас %s (%s)' % (param, time, date));
 				else:
-					sendMsg(type, conference, nick, u'у тебя сейчас %s (%s)' % (time, date));
+					sendMsg(msgType, conference, nick, u'у тебя сейчас %s (%s)' % (time, date));
 			else:
-				sendMsg(type, conference, nick, u'твой клиент - глюк, инфы не хватает');
+				sendMsg(msgType, conference, nick, u'твой клиент - глюк, инфы не хватает');
 		elif(stanza.getType() == 'error'):
 			if(not param):
-				sendMsg(type, conference, nick, u'хехе, твой клиент не дружит с этим');
+				sendMsg(msgType, conference, nick, u'хехе, твой клиент не дружит с этим');
 			else:
-				sendMsg(type, conference, nick, u'хехе, его клиент не дружит с этим');
+				sendMsg(msgType, conference, nick, u'хехе, его клиент не дружит с этим');
 
 registerCommand(showUserTime, u'часики', 10, u'Показывает время указанного пользователя', u'часики [ник]', (u'часики', u'часики Nick'));

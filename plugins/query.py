@@ -55,12 +55,12 @@ def processIqStanzas(stanza, jid, resource):
 		elif(stanza.getTags('query', {}, xmpp.NS_DISCO_INFO)):
 			iq = stanza.buildReply('result');
 			query = iq.addChild('query', {}, [], xmpp.NS_DISCO_ITEMS);
-			query.addChild('identity', {'category': 'client', 'type': 'phone', 'name': 'Jimm'});
+			query.addChild('identity', {'category': 'client', 'msgType': 'phone', 'name': 'Jimm'});
 			for feat in BOT_FEATURES:
 				query.addChild('feature', {'var': feat});
 		else:
 			iq = stanza.buildReply('error');
-			error = iq.addChild('error', {'type': 'cancel'});
+			error = iq.addChild('error', {'msgType': 'cancel'});
 			error.addChild('feature-not-implemented', {}, [], 'urn:ietf:params:xml:ns:xmpp-stanzas');
 		gClient.send(iq);
 

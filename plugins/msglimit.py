@@ -15,22 +15,22 @@
 
 CFG_MSG = 'msg';
 
-def setMsgLimit(type, conference, nick, param):
+def setMsgLimit(msgType, conference, nick, param):
 	if(param):
 		if(param.isdigit()):
 			param = int(param);
 			if(param > 0):
 				param = max(100, param);
 				setConfigKey(conference, CFG_MSG, param);
-				sendMsg(type, conference, nick, u'установлен лимит на %d символов' % (param));
+				sendMsg(msgType, conference, nick, u'установлен лимит на %d символов' % (param));
 			else:
 				setConfigKey(conference, CFG_MSG, 0);
-				sendMsg(type, conference, nick, u'ограничение на кол-во симолов отключено');
+				sendMsg(msgType, conference, nick, u'ограничение на кол-во симолов отключено');
 			saveChatConfig(conference);
 		else:
-			sendMsg(type, conference, nick, u'прочитай помощь по команде');
+			sendMsg(msgType, conference, nick, u'прочитай помощь по команде');
 	else:
-		sendMsg(type, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_MSG)));
+		sendMsg(msgType, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_MSG)));
 		
 def setMsgLimitState(conference):
 	if(getConfigKey(conference, CFG_MSG) is None):

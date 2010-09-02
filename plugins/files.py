@@ -18,7 +18,7 @@ import shutil;
 DIR = 1;
 FILE = 2;
 
-def showDirectory(type, conference, nick, param):
+def showDirectory(msgType, conference, nick, param):
 	if(os.path.exists(param)):
 		if(os.path.isdir(param)):
 			items = os.listdir(param);
@@ -32,24 +32,24 @@ def showDirectory(type, conference, nick, param):
 						content.append(item);
 				content.sort();
 				text += '\n'.join(content);
-				sendMsg(type, conference, nick, text);
+				sendMsg(msgType, conference, nick, text);
 			else:
-				sendMsg(type, conference, nick, u'папка пуста');
+				sendMsg(msgType, conference, nick, u'папка пуста');
 		else:
-			sendMsg(type, conference, nick,	u'а это не папка :)');
+			sendMsg(msgType, conference, nick,	u'а это не папка :)');
 	else:
-		sendMsg(type, conference, nick,	u'не найдено');
+		sendMsg(msgType, conference, nick,	u'не найдено');
 
-def deletePath(type, conference, nick, param):
+def deletePath(msgType, conference, nick, param):
 	answer = deleteFile(param);
 	if(answer == DIR):
-		sendMsg(type, conference, nick,	u'папка удалена');
+		sendMsg(msgType, conference, nick,	u'папка удалена');
 	elif(answer == FILE):
-		sendMsg(type, conference, nick,	u'файл удалён');
+		sendMsg(msgType, conference, nick,	u'файл удалён');
 	else:
-		sendMsg(type, conference, nick,	u'не найдено');
+		sendMsg(msgType, conference, nick,	u'не найдено');
 		
-def deleteFromConfig(type, conference, nick, param):
+def deleteFromConfig(msgType, conference, nick, param):
 	files, dirs = 0, 0;
 	for conf in getConferences():
 		path = 'config/%s/%s' % (conf, param);
@@ -58,7 +58,7 @@ def deleteFromConfig(type, conference, nick, param):
 			dirs += 1;
 		elif(answer == FILE):
 			files += 1;
-	sendMsg(type, conference, nick, u'удалено %d папок и %d файлов' % (dirs, files));
+	sendMsg(msgType, conference, nick, u'удалено %d папок и %d файлов' % (dirs, files));
 	
 def deleteFile(path):
 	if(os.path.exists(path)):

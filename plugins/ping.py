@@ -17,7 +17,7 @@
 
 PING_ID = 'ping_id';
 
-def _showPing(stanza, pingID, t0, type, conference, nick, param):
+def _showPing(stanza, pingID, t0, msgType, conference, nick, param):
 	if(pingID == stanza.getID()):
 		if(RESULT == stanza.getType()):	
 			ping = time.time() - t0;
@@ -26,16 +26,16 @@ def _showPing(stanza, pingID, t0, type, conference, nick, param):
 			else:
 				message = random.choice((u'твой понг составляет', u'скорость отклика сервера для тебя равна', u'скорость отправки твоих пакетов', u'опа! что я откопала! это же твой понг:', ));
 			message += u' %s сек.' % (str(round(ping , 2)));
-			sendMsg(type, conference, nick, message);
+			sendMsg(msgType, conference, nick, message);
 		else:
-			sendMsg(type, conference, nick, u'не пингуется :(');
+			sendMsg(msgType, conference, nick, u'не пингуется :(');
 
-def showPing(type, conference, nick, param):
+def showPing(msgType, conference, nick, param):
 	if(param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			userJid = conference + '/' + param;
 		else:
-			sendMsg(type, conference, nick, u'а это кто?');
+			sendMsg(msgType, conference, nick, u'а это кто?');
 			return;
 	else:
 		userJid = conference + '/' + nick;
@@ -45,6 +45,6 @@ def showPing(type, conference, nick, param):
 	pingID = getUniqueID(PING_ID);
 	iq.setID(pingID);
 	t0 = time.time();
-	gClient.SendAndCallForResponse(iq, _showPing, (pingID, t0, type, conference, nick, param, ));
+	gClient.SendAndCallForResponse(iq, _showPing, (pingID, t0, msgType, conference, nick, param, ));
 
 registerCommand(showPing, u'пинг', 10, u'Пингует тебя или определённый ник', u'пинг [ник]', (u'пинг', u'пинг Nick'));

@@ -15,13 +15,13 @@
 
 gAnecdotePattern = re.compile("<div style='color: #000000;(.*?)<a href='http://anekdot.odessa.ua/' target='_blank'>", re.DOTALL);
 
-def showAnecdote(type, conference, nick, param):
+def showAnecdote(msgType, conference, nick, param):
 	rawHtml = urllib.urlopen('http://anekdot.odessa.ua/rand-anekdot.php').read();
 	items = gAnecdotePattern.search(rawHtml);
 	if(items):
 		anecdote = decode(items.group(0).replace('<br />\n', '\n'));
-		sendMsg(type, conference, nick, unicode(anecdote, 'windows-1251'));
+		sendMsg(msgType, conference, nick, unicode(anecdote, 'windows-1251'));
 	else:
-		sendMsg(type, conference, nick, u'не получается');
+		sendMsg(msgType, conference, nick, u'не получается');
 
 registerCommand(showAnecdote, u'анекдот', 10, u'Показывает случайный анекдот', None, (u'анекдот', ), ANY | NONPARAM);

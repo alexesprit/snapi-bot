@@ -15,7 +15,7 @@
 
 CMDOFF_FILENAME = 'config/%s/cmdoff.txt';
 
-def cmdSwitchOff(type, conference, nick, param):
+def cmdSwitchOff(msgType, conference, nick, param):
 	validCmd, invalidCmd, alreadySwitched, nonSwitched = [], [], [], [];
 	message = u'';
 	if(param):
@@ -51,11 +51,11 @@ def cmdSwitchOff(type, conference, nick, param):
 			message = u'в этой конференции отключены следующие команды:\n' + ', '.join(validCmdReplic);
 		else:
 			message = u'в этой конференции включены все команды';
-	sendMsg(type, conference, nick, message);
+	sendMsg(msgType, conference, nick, message);
 
 registerCommand(cmdSwitchOff, u'комвыкл', 30, u'Отключает определённые команды для текущей конференции. Без параметров показывает список отключенных команд', u'комвыкл [команды]', (u'комвыкл', u'комвыкл тык диско версия пинг', ), CHAT | FROZEN);
 
-def cmdSwitchOn(type, conference, nick, param):
+def cmdSwitchOn(msgType, conference, nick, param):
 	validCmd, invalidCmd, alreadySwitched = [], [], [];
 	message = u'';
 	param = param.split();
@@ -78,7 +78,7 @@ def cmdSwitchOn(type, conference, nick, param):
 		invalidCmd.sort();
 		message += u'\nперечисленное ниже не является командами:\n' + ', '.join(invalidCmd);
 	saveCommands(conference);
-	sendMsg(type, conference, nick, message);
+	sendMsg(msgType, conference, nick, message);
 
 registerCommand(cmdSwitchOn, u'комвкл', 30, u'Включает определённые команды для текущей конференции', u'комвкл <команды>', (u'комвкл тык диско версия пинг', ), CHAT | FROZEN | PARAM);
 

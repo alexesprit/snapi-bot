@@ -43,33 +43,33 @@ def clearAuthCache(conference, nick, trueJid, reason, code):
 
 registerLeaveHandler(clearAuthCache);
 
-def authAnswerListener(stanza, type, conference, nick, trueJid, body):
-	if(PRIVATE == type):
+def authAnswerListener(stanza, msgType, conference, nick, trueJid, body):
+	if(PRIVATE == msgType):
 		if(trueJid in gAuthAnswer[conference]):
 			if(gAuthAnswer[conference][trueJid] == body):
-				sendMsg(type, conference, nick, u'ок, признаю - ты не бот =)');
+				sendMsg(msgType, conference, nick, u'ок, признаю - ты не бот =)');
 				setRole(conference, nick, ROLE_PARTICIPANT, u'авторизация пройдена');
 				del(gAuthAnswer[conference][trueJid]);
 			else:
-				sendMsg(type, conference, nick, u'неправильный ответ. подумай или заюзай гугл');
+				sendMsg(msgType, conference, nick, u'неправильный ответ. подумай или заюзай гугл');
 
 registerMessageHandler(authAnswerListener, CHAT);
 
-def authControl(type, conference, nick, param):
+def authControl(msgType, conference, nick, param):
 	if(param):
 		if(param.isdigit()):
 			param = int(param);
 			if(param == 1):
 				setConfigKey(conference, CFG_AUTH, 1);
-				sendMsg(type, conference, nick, u'авторизация включена');
+				sendMsg(msgType, conference, nick, u'авторизация включена');
 			else:
 				setConfigKey(conference, CFG_AUTH, 0);
-				sendMsg(type, conference, nick, u'авторизация отключена');
+				sendMsg(msgType, conference, nick, u'авторизация отключена');
 			saveChatConfig(conference);
 		else:
-			sendMsg(type, conference, nick, u'прочитай помощь по команде');
+			sendMsg(msgType, conference, nick, u'прочитай помощь по команде');
 	else:
-		sendMsg(type, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_AUTH)));
+		sendMsg(msgType, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_AUTH)));
 
 registerCommand(authControl, u'авторизация', 30, u'Отключает (0) или включает (1) проверку вошедшего пользователя на человечность. Без параметра покажет текущее значение', u'авторизация [0/1]', (u'авторизация', u'авторизация 0'), CHAT);
 

@@ -27,11 +27,11 @@ def dnsQuery(query):
 	except(socket.gaierror, socket.herror):
 		return(None);
 
-def showServerDns(type, conference, nick, param):
+def showServerDns(msgType, conference, nick, param):
 	answer = dnsQuery(param);
 	if(answer):
-		sendMsg(type, conference, nick, answer);
+		sendMsg(msgType, conference, nick, answer);
 	else:
-		sendMsg(type, conference, nick, u'не могу');
+		sendMsg(msgType, conference, nick, u'не могу');
 
 registerCommand(showServerDns, u'днс', 10, u'Показывает ответ от DNS для определённого хоста или IP адреса', u'днс <хост/IP>', (u'днс jabber.aq', u'днс 127.0.0.1'), ANY | PARAM);

@@ -13,13 +13,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showAforism(type, conference, nick, param):
+def showAforism(msgType, conference, nick, param):
 	rawHtml = urllib.urlopen('http://skio.ru/quotes/humour_quotes.php').read();
 	items = re.search('<form id="qForm" method="post"><div align="center">(.*?)</div>', rawHtml, re.DOTALL);
 	if(items):
 		aforism = decode(items.group(0));	
-		sendMsg(type, conference, nick, unicode(aforism, 'windows-1251'));
+		sendMsg(msgType, conference, nick, unicode(aforism, 'windows-1251'));
 	else:
-		sendMsg(type, conference, nick, u'не получается');
+		sendMsg(msgType, conference, nick, u'не получается');
 
 registerCommand(showAforism, u'афор', 10, u'Показывает случайный афоризм', None, (u'афор', ), ANY | NONPARAM);

@@ -17,7 +17,7 @@ GREET_FILENAME = 'config/%s/greets.txt';
 
 gGreets = {};
 
-def setGreet(type, conference, nick, param):
+def setGreet(msgType, conference, nick, param):
 	rawGreet = param.split('=', 1);
 	if(len(rawGreet) == 2):
 		userNick = rawGreet[0].strip();
@@ -27,7 +27,7 @@ def setGreet(type, conference, nick, param):
 		elif(userNick in getNicks(conference)):
 			trueJid = getTrueJid(conference, userNick);
 		else:
-			sendMsg(type, conference, nick, u'а это кто?');
+			sendMsg(msgType, conference, nick, u'а это кто?');
 			return;
 		if(not greet):
 			if(trueJid in gGreets[conference]):
@@ -35,7 +35,7 @@ def setGreet(type, conference, nick, param):
 		else:
 			gGreets[conference][trueJid] = greet;
 		writeFile(GREET_FILENAME % (conference), str(gGreets[conference]));
-		sendMsg(type, conference, nick, u'запомнила');
+		sendMsg(msgType, conference, nick, u'запомнила');
 
 registerCommand(setGreet, u'приветствие', 30, u'Добавляет приветствие для определённого ника/жида', u'приветствие <ник/жид> = [текст]', (u'приветствие Nick = something', ), CHAT | PARAM);
 

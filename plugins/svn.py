@@ -15,7 +15,7 @@
 
 URLS = ('http://', 'https://', 'svn://');
 
-def showSvnLog(type, conference, nick, param):
+def showSvnLog(msgType, conference, nick, param):
 	if(param):
 		for x in URLS:
 			if(param.startswith(x)):
@@ -24,13 +24,13 @@ def showSvnLog(type, conference, nick, param):
 					try:
 						count = int(param[1]);
 					except(ValueError):
-						sendMsg(type, conference, nick, u'прочитай помощь по команде');
+						sendMsg(msgType, conference, nick, u'прочитай помощь по команде');
 						return;
 				else:
 					count = 10;
 				url = param[0];
 				pipe = os.popen('svn log %s --limit %d' % (url, count));
-				sendMsg(type, conference, nick, pipe.read().decode('utf-8'));
+				sendMsg(msgType, conference, nick, pipe.read().decode('utf-8'));
 				break;
 
 registerCommand(showSvnLog, u'svn', 10, u'Показывает лог с svn', u'svn <адрес> [кол-во]', (u'svn http://jimm-fork.googlecode.com/svn/trunk 5', ), ANY);

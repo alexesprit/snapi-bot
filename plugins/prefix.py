@@ -15,17 +15,17 @@
 
 CFG_PREFIX = 'prefix';
 
-def prefixControl(type, conference, nick, param):
+def prefixControl(msgType, conference, nick, param):
 	if(param):
 		if(param.lower() != 'none'):
 			setConfigKey(conference, CFG_PREFIX, param);
-			sendMsg(type, conference, nick, u'установлен префикс: %s' % (param));
+			sendMsg(msgType, conference, nick, u'установлен префикс: %s' % (param));
 		else:
 			setConfigKey(conference, CFG_PREFIX, None);
-			sendMsg(type, conference, nick, u'префикс для команд отключен');
+			sendMsg(msgType, conference, nick, u'префикс для команд отключен');
 		saveChatConfig(conference);
 	else:
-		sendMsg(type, conference, nick, u'текущее значение: %s' % (getConfigKey(conference, CFG_PREFIX)));
+		sendMsg(msgType, conference, nick, u'текущее значение: %s' % (getConfigKey(conference, CFG_PREFIX)));
 
 def setDefaultPrefix(conference):
 	if(getConfigKey(conference, CFG_PREFIX) is None):

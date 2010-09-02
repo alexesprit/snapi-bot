@@ -17,7 +17,7 @@ NOTE_FILE = 'config/notepad.txt';
 
 gNotes = {};
 
-def addNote(type, conference, nick, param):
+def addNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick);
 	notes = gNotes.getKey(trueJid);
 	if(not notes):
@@ -26,9 +26,9 @@ def addNote(type, conference, nick, param):
 	notes.append(date + param);
 	gNotes.setKey(trueJid, notes);
 	gNotes.save();
-	sendMsg(type, conference, nick, u'записала');
+	sendMsg(msgType, conference, nick, u'записала');
 
-def delNote(type, conference, nick, param):
+def delNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick);
 	if(trueJid in gNotes):
 		if(param.isdigit()):
@@ -41,30 +41,30 @@ def delNote(type, conference, nick, param):
 				else:
 					gNotes.setKey(trueJid, notes);
 				gNotes.save();
-				sendMsg(type, conference, nick, u'удалила');
+				sendMsg(msgType, conference, nick, u'удалила');
 			else:
-				sendMsg(type, conference, nick, u'нет такого пункта');
+				sendMsg(msgType, conference, nick, u'нет такого пункта');
 		else:
-			sendMsg(type, conference, nick, u'читай справку по команде');
+			sendMsg(msgType, conference, nick, u'читай справку по команде');
 	else:
-		sendMsg(type, conference, nick, u'в твоём блокноте пусто');
+		sendMsg(msgType, conference, nick, u'в твоём блокноте пусто');
 
-def showNotes(type, conference, nick, param):
+def showNotes(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick);
 	if(param == u'сброс'):
 		if(trueJid in gNotes):
 			gNotes.delKey(trueJid);
 			gNotes.save();
-			sendMsg(type, conference, nick, u'удалила');
+			sendMsg(msgType, conference, nick, u'удалила');
 		else:
-			sendMsg(type, conference, nick, u'а у тебя и так ничего нет :P');
+			sendMsg(msgType, conference, nick, u'а у тебя и так ничего нет :P');
 	elif(not param):
 		if(trueJid in gNotes):
 			message = u'твои заметки:\n';
 			items = [u'%d) %s' % (i + 1, x) for i, x in enumerate(gNotes.getKey(trueJid))];
-			sendMsg(type, conference, nick, message + '\n'.join(items));
+			sendMsg(msgType, conference, nick, message + '\n'.join(items));
 		else:
-			sendMsg(type, conference, nick, u'в твоём блокноте пусто');
+			sendMsg(msgType, conference, nick, u'в твоём блокноте пусто');
 
 def loadNotes():
 	global gNotes;

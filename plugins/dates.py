@@ -13,15 +13,15 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showDates(type, conference, nick, param):
+def showDates(msgType, conference, nick, param):
 	rawHtml = urllib.urlopen('http://wap.n-urengoy.ru/cgi-bin/wappr.pl').read();
 	rawHtml = unicode(rawHtml, 'utf-8');
 	dates = rawHtml.split('<br/>-----<br/>');
 	dates = dates[1:-1];
 	if(dates):
 		dates = [x.split('/')[0] for x in dates];
-		sendMsg(type, conference, nick, u'глянь, что я нашла:' + u'\n'.join(dates));
+		sendMsg(msgType, conference, nick, u'глянь, что я нашла:' + u'\n'.join(dates));
 	else:
-		sendMsg(type, conference, nick, u'ничего не нашла :(');
+		sendMsg(msgType, conference, nick, u'ничего не нашла :(');
 
 registerCommand(showDates, u'праздники', 10, u'Показывает праздники на сегодня и завтра', None, (u'праздники', ));

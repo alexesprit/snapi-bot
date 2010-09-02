@@ -136,8 +136,8 @@ gDebug.colors[FLAG_SUCCESS] = xmpp.Debug.colorBrightCyan;
 def registerCommand(function, command, access, desc, syntax, examples, cmdType = ANY):
 	printf(command, FLAG_ERROR);
 
-def registerMessageHandler(function, type):
-	gMessageHandlers[type].append(function);
+def registerMessageHandler(function, msgType):
+	gMessageHandlers[msgType].append(function);
 	
 def registerBotMessageHandler(function):
 	gBotMsgHandlers.append(function);
@@ -151,19 +151,19 @@ def registerLeaveHandler(function):
 def registerIqHandler(function):
 	gIqHandlers.append(function);
 
-def registerPresenceHandler(function, type):
-	gPresenceHandlers[type].append(function);
+def registerPresenceHandler(function, prsType):
+	gPresenceHandlers[prsType].append(function);
 
-def registerEvent(function, type):
-	gEventHandlers[type].append(function);
+def registerEvent(function, evtType):
+	gEventHandlers[evtType].append(function);
 
 def registerCommand(function, command, access, desc, syntax, examples, cmdType = ANY):
 	gCmdHandlers[command] = function;
-	gCommands[command] = {'access': access, 'desc': desc, 'syntax': syntax, 'examples': examples, 'type': cmdType};
+	gCommands[command] = {'access': access, 'desc': desc, 'syntax': syntax, 'examples': examples, 'msgType': cmdType};
 
-def callBotMessageHandlers(type, jid, text):
+def callBotMessageHandlers(msgType, jid, text):
 	for handler in gBotMsgHandlers:
-		startThread(handler, (type, jid, text, ));
+		startThread(handler, (msgType, jid, text, ));
 
 def callJoinHandlers(conference, nick, trueJid, aff, role):
 	for handler in gJoinHandlers:
@@ -173,33 +173,33 @@ def callLeaveHandlers(conference, nick, trueJid, reason, code):
 	for handler in gLeaveHandlers:
 		startThread(handler, (conference, nick, trueJid, reason, code, ));
 
-def callMessageHandlers(msgType, stanza, type, conference, nick, trueJid, body):
+def callMessageHandlers(msgType, stanza, evtType, conference, nick, trueJid, body):
 	gInfo['msg'] += 1;
-	for handler in gMessageHandlers[msgType]:
-		startThread(handler, (stanza, type, conference, nick, trueJid, body, ));
+	for handler in gMessageHandlers[evtType]:
+		startThread(handler, (stanza, msgType, conference, nick, trueJid, body, ));
 
 def callIqHandlers(stanza, jid, resource):
 	gInfo['iq'] += 1;
 	for handler in gIqHandlers:
 		startThread(handler, (stanza, jid, resource, ));
 
-def callPresenceHandlers(stanza, type, jid, resource, trueJid):
+def callPresenceHandlers(stanza, prsType, jid, resource, trueJid):
 	gInfo['prs'] += 1;
-	for handler in gPresenceHandlers[type]:
+	for handler in gPresenceHandlers[prsType]:
 		startThread(handler, (stanza, jid, resource, trueJid, ));
 
-def callEventHandlers(type, param = None):
+def callEventHandlers(evtType, param = None):
 	if(param):
-		for function in gEventHandlers[type]:
+		for function in gEventHandlers[evtType]:
 			function(*param);
 	else:
-		for function in gEventHandlers[type]:
+		for function in gEventHandlers[evtType]:
 			function();		
 
-def callCommandHandlers(command, type, jid, resource, param):
+def callCommandHandlers(command, cmdType, jid, resource, param):
 	gInfo['cmd'] += 1;
 	if(command in gCmdHandlers):
-		startThread(gCmdHandlers[command], (type, jid, resource, param, ));
+		startThread(gCmdHandlers[command], (cmdType, jid, resource, param, ));
 
 def startThread(func, param = None):
 	gInfo['thr'] += 1;
@@ -271,9 +271,9 @@ def decode(text):
 def createFile(path, data):
 	path = path.encode('utf-8');
 	if(not os.access(path, os.F_OK)):
-		dir = os.path.dirname(path);
-		if(not os.path.exists(dir)):
-			os.makedirs(dir);
+		dirName = os.path.dirname(path);
+		if(not os.path.exists(dirName)):
+			os.makedirs(dirName);
 		printf('Create: %s' % path, FLAG_WRITE);
 		f = file(path, 'w');
 		f.write(data);
@@ -401,7 +401,8 @@ def setRole(conference, nick, role, reason):
 		role = query.addChild('item', {'jid': nick, 'role': role});
 	else:
 		role = query.addChild('item', {'nick': nick, 'role': role});
-	role.setTagData('reason', reason);
+	if(reason):
+		role.setTagData('reason', reason);
 	iq.addChild(node = query);
 	gClient.send(iq);
 
@@ -413,7 +414,8 @@ def setAffiliation(conference, nick, aff, reason):
 		aff = query.addChild('item', {'jid': nick, 'affiliation': aff});
 	else:
 		aff = query.addChild('item', {'nick': nick, 'affiliation': aff});
-	aff.setTagData('reason', reason);
+	if(reason):
+		aff.setTagData('reason', reason);
 	iq.addChild(node = query);
 	gClient.send(iq);
 
@@ -423,8 +425,8 @@ def isAdmin(jid):
 def isCommand(command):
 	return(command in gCommands);
 
-def isCommandType(command, type):
-	return(gCommands[command]['type'] & type);
+def isCommandType(command, cmdType):
+	return(gCommands[command]['msgType'] & cmdType);
 
 def isAvailableCommand(conference, command):
 	return(not(conference in gCmdOff and command in gCmdOff[conference]));
@@ -515,55 +517,56 @@ def getAccess(conference, jid):
 		return(11);
 	return(0);
 
-def sendTo(type, jid, text):
+def sendTo(msgType, jid, text):
 	message = xmpp.Message(jid);
-	message.setType(type);
+	message.setType(msgType);
 	text = text.strip();
 	if(text):
 		message.setBody(text);
 	gClient.send(message);
-	callBotMessageHandlers(type, jid, text);
+	callBotMessageHandlers(msgType, jid, text);
 
 def sendToConference(conference, text):
 	sendTo(PUBLIC, conference, text);
 		
-def sendMsg(type, conference, nick, text, force = False):
-	if(type == PUBLIC):
+def sendMsg(msgType, conference, nick, text, force = False):
+	if(msgType == PUBLIC):
 		fools = getConfigKey(conference, 'fools');
 		if(fools and not random.randrange(0, 30)):
 			text = random.choice(gJokes);
 		elif(not force):
 			msgLimit = getConfigKey(conference, 'msg');
 			if(msgLimit and len(text) > msgLimit):
-				sendMsg(type, conference, nick, u'смотри в привате (лимит %d символов)' % (msgLimit), True);
-				type = PRIVATE;
-	if(type == PUBLIC):
+				sendMsg(msgType, conference, nick, u'смотри в привате (лимит %d символов)' % (msgLimit), True);
+				msgType = PRIVATE;
+	if(msgType == PUBLIC):
 		text = u'%s: %s' % (nick, text);
 		jid = conference;
 	else:
 		jid = u'%s/%s' % (conference, nick);
-	sendTo(type, jid, text);
+	sendTo(msgType, jid, text);
 
 def messageHandler(session, stanza):
-	type = stanza.getType();
-	# FIXME check 'headline' type
-	if(stanza.timestamp or HEADLINE == type or 'normal' == type):
+	msgType = stanza.getType();
+	if(stanza.timestamp or HEADLINE == msgType or 'normal' == msgType):
 		return;
 	fullJid = stanza.getFrom();
-	trueJid = getTrueJid(fullJid);
 	conference = fullJid.getStripped();
+	isConference = conferenceInList(conference);
+	if(PUBLIC == msgType and not isConference):
+		return;
+	trueJid = getTrueJid(fullJid);
 	if(getAccess(conference, trueJid) == -100):
 		return;
 	message = stanza.getBody() or '';
 	message = message.strip();
 	if(not message):
 		return;
-	isConference = conferenceInList(conference);
 	nick = fullJid.getResource();
-	msgType = isConference and CHAT or ROSTER;
-	if(type == PUBLIC and nick):
-		setNickKey(conference, nick, NICK_IDLE, time.time());
-	elif(type == ERROR):
+	if(msgType == PUBLIC):
+		if(nickInConference(conference, nick)):
+			setNickKey(conference, nick, NICK_IDLE, time.time());
+	elif(msgType == ERROR):
 		errorCode = stanza.getErrorCode();
 		if(errorCode == '500'):
 			time.sleep(0.5);
@@ -579,7 +582,8 @@ def messageHandler(session, stanza):
 			reportMsg.setID(stanza.getID());
 			reportMsg.addChild('received', {}, [], xmpp.NS_RECEIPTS);
 			gClient.send(reportMsg);
-	callMessageHandlers(msgType, stanza, type, conference, nick, trueJid, message);
+	cmdType = isConference and CHAT or ROSTER;
+	callMessageHandlers(msgType, stanza, cmdType, conference, nick, trueJid, message);
 	if(isConference):
 		botNick = getBotNick(conference);
 		if(botNick == nick):
@@ -594,7 +598,7 @@ def messageHandler(session, stanza):
 				message = message[len(prefix):].strip();
 				if(not message):
 					return;
-			elif(type == PUBLIC):
+			elif(msgType == PUBLIC):
 				return;
 	body = message.split();
 	command = body[0].lower();
@@ -612,16 +616,16 @@ def messageHandler(session, stanza):
 		if(not isAvailableCommand(conference, command)):
 			return;
 	if(isAvailableCommand(conference, command)):
-		if(isCommandType(command, msgType)):
+		if(isCommandType(command, cmdType)):
 			if(getAccess(conference, trueJid) >= access):
 				param = (len(body) > 1) and ' '.join(body[1:]) or None;
 				if(param and isCommandType(command, NONPARAM)):
 					return;
 				if(not param and isCommandType(command, PARAM)):
 					return;
-				callCommandHandlers(command, type, conference, nick, param);
+				callCommandHandlers(command, msgType, conference, nick, param);
 			else:
-				sendMsg(type, conference, nick, u'недостаточно прав');
+				sendMsg(msgType, conference, nick, u'недостаточно прав');
 
 def presenceHandler(session, stanza):
 	fullJid = stanza.getFrom();
@@ -635,7 +639,6 @@ def presenceHandler(session, stanza):
 		trueJid = stanza.getJid();
 		if(trueJid):
 			trueJid = xmpp.JID(trueJid).getStripped();
-		# FIXME check for type;
 		if(not prsType):
 			if(not trueJid):
 				sendToConference(conference, u'Без прав модератора работа невозможна!');

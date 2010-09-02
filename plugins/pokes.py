@@ -15,8 +15,8 @@
 
 gPokes = [];
 
-def pokeUser(type, conference, nick, param):
-	if(type == PUBLIC):
+def pokeUser(msgType, conference, nick, param):
+	if(msgType == PUBLIC):
 		if(param):
 			botNick = getBotNick(conference);
 			if(param != botNick):
@@ -29,13 +29,13 @@ def pokeUser(type, conference, nick, param):
 					message = random.choice(gPokes);
 					sendToConference(conference, u'/me ' + message % (param));
 				else:
-					sendMsg(type, conference, nick, u'а это кто?');
+					sendMsg(msgType, conference, nick, u'а это кто?');
 			else:
-				sendMsg(type, conference, nick, u'шибко умный, да? ]:->');
+				sendMsg(msgType, conference, nick, u'шибко умный, да? ]:->');
 		else:
-			sendMsg(type, conference, nick, u'мазохист? :D');
+			sendMsg(msgType, conference, nick, u'мазохист? :D');
 	else:
-		sendMsg(type, conference, nick, u':-P');
+		sendMsg(msgType, conference, nick, u':-P');
 
 registerCommand(pokeUser, u'тык', 10, u'Тыкает пользователя. Заставляет его обратить внимание на вас', u'тык <ник>', (u'тык Nick', ), CHAT);
 

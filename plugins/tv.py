@@ -23,7 +23,7 @@ def getChannelCode(channelName):
 			if(x.lower() in channelName):
 				return(gChannels[x]);
 
-def showTvProgramm(type, conference, nick, param):
+def showTvProgramm(msgType, conference, nick, param):
 	channelCode = getChannelCode(param);
 	program = '';
 	if(channelCode):
@@ -32,15 +32,16 @@ def showTvProgramm(type, conference, nick, param):
 			if(x.startswith('<div>')):
 				program += decode(x);
 	if(program):
-		sendMsg(type, conference, nick, program);
+		sendMsg(msgType, conference, nick, unicode(program, 'utf-8'));
 	else:
-		sendMsg(type, conference, nick, u'нету на сегодня программы');
+		sendMsg(msgType, conference, nick, u'нету на сегодня программы');
 
 registerCommand(showTvProgramm, u'тв', 10, u'Показать телепрограму для определённого канала', u'тв <название>', (u'тв первый'), ANY | PARAM);
 
-def showTvList(type, conference, nick, parameters):
-	if(PUBLIC == type):
-		sendMsg(type, conference, nick, u'скинула в приват');
+def showTvList(msgType, conference, nick, parameters):
+	printf(msgType);
+	if(PUBLIC == msgType):
+		sendMsg(msgType, conference, nick, u'скинула в приват');
 	tvList = [u'%s - %s' % (gChannels[x], x) for x in gChannels];
 	tvList.sort();
 	sendMsg(PRIVATE, conference, nick, u'список каналов:\n' + '\n'.join(tvList));

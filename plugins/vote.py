@@ -37,12 +37,12 @@ def saveVotes(conference):
 	fileName = VOTES_FILE % (conference);
 	writeFile(fileName, str(gVotes[conference]));
 
-def vote(type, conference, nick, param):
+def vote(msgType, conference, nick, param):
 	if(gVotes[conference]):
 		if(gVotes[conference]['finished']):
-			sendMsg(type, conference, nick, u'голосование было завершено');
+			sendMsg(msgType, conference, nick, u'голосование было завершено');
 		elif(not gVotes[conference]['started']):
-			sendMsg(type, conference, nick, u'голосование ещё не запущено');
+			sendMsg(msgType, conference, nick, u'голосование ещё не запущено');
 		else:
 			trueJid = getTrueJid(conference, nick);
 			if(not trueJid in gVotes[conference]['voted']):
@@ -53,38 +53,38 @@ def vote(type, conference, nick, param):
 					gVotes[conference]['opinions'][n][1] += 1;
 					gVotes[conference]['voted'][trueJid] = True;
 					saveVotes(conference);
-					sendMsg(type, conference, nick, u'поняла');
+					sendMsg(msgType, conference, nick, u'поняла');
 				except(IndexError, ValueError):
-					sendMsg(type, conference, nick, u'нет такого пункта');
+					sendMsg(msgType, conference, nick, u'нет такого пункта');
 			else:
-				sendMsg(type, conference, nick, u'2-ой раз голосовать не надо :P');
+				sendMsg(msgType, conference, nick, u'2-ой раз голосовать не надо :P');
 	else:
-		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
+		sendMsg(msgType, conference, nick, u'сейчас нет никаких голосований');
 
 registerCommand(vote, u'мнение', 10, u'Для подачи мнения в текущем голосовании', u'мнение <номер>', (u'мнение 1', ), CHAT | PARAM);
 
-def newVote(type, conference, nick, param):
+def newVote(msgType, conference, nick, param):
 	if(gVotes[conference]):
 		if(not gVotes[conference]['finished']):
-			sendMsg(type, conference, nick, getVoteText(conference));
+			sendMsg(msgType, conference, nick, getVoteText(conference));
 		else:
-			sendMsg(type, conference, nick, getResults(conference));	
+			sendMsg(msgType, conference, nick, getResults(conference));	
 	elif(param):
 		trueJid = getTrueJid(conference, nick);
 		gVotes[conference] = {'started': False, 'finished': False, 'creator': nick, 'creatorjid': getTrueJid(conference, nick), 'question': param, 'voted': {}, 'opinions': []};
 		saveVotes(conference);
-		sendMsg(type, conference, nick, u'Голосование создано! Чтобы добавить пункты напиши "пункт+ твой_пункт", удалить - "пункт- номер пункта". Начать голосование - команда "голосование+". Посмотреть текущие результаты - команда "мнения". Окончить голосование - команда "итоги"', True);
+		sendMsg(msgType, conference, nick, u'Голосование создано! Чтобы добавить пункты напиши "пункт+ твой_пункт", удалить - "пункт- номер пункта". Начать голосование - команда "голосование+". Посмотреть текущие результаты - команда "мнения". Окончить голосование - команда "итоги"', True);
 
 registerCommand(newVote, u'голосование', 11, u'Создает новое голосование или показывает текущее (если имеется)', u'голосование [текст]', (u'голосование винды - сакс!', u'голосование'), CHAT);
 
-def startVote(type, conference, nick, parameters):
+def startVote(msgType, conference, nick, parameters):
 	if(gVotes[conference]):
 		if(gVotes[conference]['started']):
-			sendMsg(type, conference, nick, u'голосование уже запущено');
+			sendMsg(msgType, conference, nick, u'голосование уже запущено');
 		elif(gVotes[conference]['finished']):
-			sendMsg(type, conference, nick, u'голосование было завершено');
+			sendMsg(msgType, conference, nick, u'голосование было завершено');
 		elif(not gVotes[conference]['opinions']):
-			sendMsg(type, conference, nick, u'голосование не имеет пунктов');
+			sendMsg(msgType, conference, nick, u'голосование не имеет пунктов');
 		else:
 			trueJid = getTrueJid(conference, nick);
 			creatorJid = gVotes[conference]['creatorjid'];			
@@ -93,61 +93,61 @@ def startVote(type, conference, nick, parameters):
 				saveVotes(conference);
 				sendToConference(conference, getVoteText(conference));
 			else:
-				sendMsg(type, conference, nick, u'недостаточно прав');			
+				sendMsg(msgType, conference, nick, u'недостаточно прав');			
 	else:
-		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
+		sendMsg(msgType, conference, nick, u'сейчас нет никаких голосований');
 
 registerCommand(startVote, u'голосование+', 11, u'Возобновляет голосование', None, (u'голосование+', ), CHAT | NONPARAM);
 
-def stopVote(type, conference, nick, param):
+def stopVote(msgType, conference, nick, param):
 	if(gVotes[conference]):
 		if(gVotes[conference]['finished']):
-			sendMsg(type, conference, nick, u'неприменимо к оконченному голосованию');
+			sendMsg(msgType, conference, nick, u'неприменимо к оконченному голосованию');
 		elif(gVotes[conference]['started']):
 			trueJid = getTrueJid(conference, nick);
 			creatorJid = gVotes[conference]['creatorjid'];			
 			if(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
 				gVotes[conference]['started'] = False;
 				saveVotes(conference);
-				sendMsg(type, conference, nick, u'голосование приостановлено');
+				sendMsg(msgType, conference, nick, u'голосование приостановлено');
 			else:
-				sendMsg(type, conference, nick, u'ага, щаззз');
+				sendMsg(msgType, conference, nick, u'ага, щаззз');
 		else:
-			sendMsg(type, conference, nick, u'голосование уже приостановлено');
+			sendMsg(msgType, conference, nick, u'голосование уже приостановлено');
 	else:
-		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
+		sendMsg(msgType, conference, nick, u'сейчас нет никаких голосований');
 
 registerCommand(stopVote, u'голосование-', 11, u'Останавливает голосование, все данные сохраняются до продолжения голосования', u'голосование-', (u'голосование-'), CHAT | NONPARAM);
 
-def addOpinion(type, conference, nick, param):
+def addOpinion(msgType, conference, nick, param):
 	if(gVotes[conference]):
 		if(gVotes[conference]['started']):
-			sendMsg(type, conference, nick, u'неприменимо к запущеному голосованию, останови и добавь пункты');
+			sendMsg(msgType, conference, nick, u'неприменимо к запущеному голосованию, останови и добавь пункты');
 		elif(gVotes[conference]['finished']):
-			sendMsg(type, conference, nick, u'неприменимо к оконченному голосованию');
+			sendMsg(msgType, conference, nick, u'неприменимо к оконченному голосованию');
 		else:
 			trueJid = getTrueJid(conference, nick);
 			creatorJid = gVotes[conference]['creatorjid'];
 			if(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
 				if(param in [x[0] for x in gVotes[conference]['opinions']]):
-					sendMsg(type, conference, nick, u'уже есть такой пункт');
+					sendMsg(msgType, conference, nick, u'уже есть такой пункт');
 				else:
 					gVotes[conference]['opinions'].append([param, 0]);
 					saveVotes(conference);
-					sendMsg(type, conference, nick, u'добавила');
+					sendMsg(msgType, conference, nick, u'добавила');
 			else:
-				sendMsg(type, conference, nick, u'недостаточно прав');
+				sendMsg(msgType, conference, nick, u'недостаточно прав');
 	else:
-		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
+		sendMsg(msgType, conference, nick, u'сейчас нет никаких голосований');
 
 registerCommand(addOpinion, u'пункт+', 11, u'Добавляет пункт к текущему голосованию', u'пункт+ <пункт>', (u'пункт+ да', ), CHAT | PARAM);
 	
-def delOpinion(type, conference, nick, param):
+def delOpinion(msgType, conference, nick, param):
 	if(gVotes[conference]):
 		if(gVotes[conference]['started']):
-			sendMsg(type, conference, nick, u'неприменимо к запущеному голосованию, останови и добавь пункты');
+			sendMsg(msgType, conference, nick, u'неприменимо к запущеному голосованию, останови и добавь пункты');
 		elif(gVotes[conference]['finished']):
-			sendMsg(type, conference, nick, u'неприменимо к оконченному голосованию');
+			sendMsg(msgType, conference, nick, u'неприменимо к оконченному голосованию');
 		else:
 			trueJid = getTrueJid(conference, nick);
 			creatorJid = gVotes[conference]['creatorjid'];
@@ -156,37 +156,37 @@ def delOpinion(type, conference, nick, param):
 					n = int(param) - 1;
 					del(gVotes[conference]['opinions'][n]);
 					saveVotes(conference);
-					sendMsg(type, conference, nick, u'удалила');
+					sendMsg(msgType, conference, nick, u'удалила');
 				except(KeyError, IndexError):
-					sendMsg(type, conference, nick, u'нет такого пункта');
+					sendMsg(msgType, conference, nick, u'нет такого пункта');
 			else:
-				sendMsg(type, conference, nick, u'недостаточно прав');
+				sendMsg(msgType, conference, nick, u'недостаточно прав');
 	else:
-		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
+		sendMsg(msgType, conference, nick, u'сейчас нет никаких голосований');
 
 registerCommand(delOpinion , u'пункт-', 11, u'Удаляет пункт из голосования. Пункт указывается его номером', u'пункт- <номер_пункта>', (u'пункт- 5', ), CHAT | PARAM);
 	
-def showOpinions(type, conference, nick, param):
+def showOpinions(msgType, conference, nick, param):
 	if(gVotes[conference]):
 		trueJid = getTrueJid(conference, nick);
 		creatorJid = gVotes[conference]['creatorjid'];
 		if(gVotes[conference]['finished']):
-			sendMsg(type, conference, nick, getResults(conference));
+			sendMsg(msgType, conference, nick, getResults(conference));
 		elif(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
-			if(PUBLIC == type):
-				sendMsg(type, conference, nick, u'ушли в приват');
+			if(PUBLIC == msgType):
+				sendMsg(msgType, conference, nick, u'ушли в приват');
 			sendMsg(PRIVATE, conference, nick, getResults(conference));
 		else:
-			sendMsg(type, conference, nick, u'жди окончания голосования :-p');
+			sendMsg(msgType, conference, nick, u'жди окончания голосования :-p');
 	else:
-		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
+		sendMsg(msgType, conference, nick, u'сейчас нет никаких голосований');
 
 registerCommand(showOpinions, u'мнения', 11, u'Отдаёт текущие результаты голосования в приват, не завершая голосования при этом', None, (u'мнения', ), CHAT | NONPARAM);
 
-def endVote(type, conference, nick, param):
+def endVote(msgType, conference, nick, param):
 	if(gVotes[conference]):
 		if(gVotes[conference]['finished']):
-			sendMsg(type, conference, nick, getResults(conference));
+			sendMsg(msgType, conference, nick, getResults(conference));
 		else:
 			trueJid = getTrueJid(conference, nick);
 			creatorJid = gVotes[conference]['creatorjid'];
@@ -197,9 +197,9 @@ def endVote(type, conference, nick, param):
 				saveVotes(conference);
 				sendToConference(conference, getResults(conference));
 			else:
-				sendMsg(type, conference, nick, u'недостаточно прав');
+				sendMsg(msgType, conference, nick, u'недостаточно прав');
 	else:
-		sendMsg(type, conference, nick, u'сейчас нет никаких голосований');
+		sendMsg(msgType, conference, nick, u'сейчас нет никаких голосований');
 
 registerCommand(endVote, u'итоги', 11, u'Завершает голование и показывает его результаты', None, (u'итоги', ), CHAT | NONPARAM);
 

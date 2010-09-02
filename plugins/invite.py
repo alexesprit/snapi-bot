@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def sendInvite(type, conference, nick, param):
+def sendInvite(msgType, conference, nick, param):
 	reason = '';
 	if(not param.count('@')):
 		userNick = param.split()[0];
@@ -34,6 +34,6 @@ def sendInvite(type, conference, nick, param):
 		inv.setTagData('reason', u'Вас приглашает ' + nick)
 	msg.addChild(node = x)
 	gClient.send(msg);
-	sendMsg(type, conference, nick, u'кинула инвайт');
+	sendMsg(msgType, conference, nick, u'кинула инвайт');
 			
 registerCommand(sendInvite, u'призвать', 10, u'Приглашет заданного пользователя в конференцию', u'призвать <ник/жид> [причина]', (u'призвать guy', u'призвать guy@jabber.aq есть дело'), CHAT | PARAM);

@@ -18,21 +18,21 @@ CFG_POPUPS = 'popups';
 def isPopupEnabled(conference):
 	return(getConfigKey(conference, CFG_POPUPS));
 
-def popupsControl(type, conference, nick, param):
+def popupsControl(msgType, conference, nick, param):
 	if(param):
 		if(param.isdigit()):
 			param = int(param);
 			if(param == 1):
 				setConfigKey(conference, CFG_POPUPS, 1);
-				sendMsg(type, conference, nick, u'оповещения включены');
+				sendMsg(msgType, conference, nick, u'оповещения включены');
 			else:
 				setConfigKey(conference, CFG_POPUPS, 0);
-				sendMsg(type, conference, nick, u'оповещения выключены');
+				sendMsg(msgType, conference, nick, u'оповещения выключены');
 			saveChatConfig(conference);
 		else:
-			sendMsg(type, conference, nick, u'прочитай помощь по команде');
+			sendMsg(msgType, conference, nick, u'прочитай помощь по команде');
 	else:
-		sendMsg(type, conference, nick, u'текущее значение: %s' % (getConfigKey(conference, CFG_POPUPS)));
+		sendMsg(msgType, conference, nick, u'текущее значение: %s' % (getConfigKey(conference, CFG_POPUPS)));
 	
 def setPopupsState(conference):
 	if(getConfigKey(conference, CFG_POPUPS) is None):

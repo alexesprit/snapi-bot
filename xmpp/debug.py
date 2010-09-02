@@ -142,7 +142,7 @@ class Debug:
 
 		self._removeDuplicates();
 		if(logFile):
-			if(type(logFile) == type('')):
+			if(isinstance(logFile, str)):
 				try:
 					self._fh = open(logFile, 'w');
 				except:
@@ -175,7 +175,7 @@ class Debug:
 		validFlags = [];
 		if(not activeFlags):
 			self.activeFlags = [];
-		elif(type(activeFlags) in (types.TupleType, types.ListType)):
+		elif(isinstance(activeFlags, tuple) or isinstance(activeFlags, list)):
 			for flag in activeFlags:
 				if(flag not in self.debugFlags):
 					sys.stderr.write('Invalid debugflag given: %s\n' % flag);

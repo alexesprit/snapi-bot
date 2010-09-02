@@ -39,18 +39,18 @@ def turnMessage(text):
 	text = ''.join(map(getBigChar, text));
 	return(text);
 
-def turnLastMessage(type, conference, nick, param):
-	if(not type == PUBLIC):
-		sendMsg(type, conference, nick, u'тока в чате');
+def turnLastMessage(msgType, conference, nick, param):
+	if(not msgType == PUBLIC):
+		sendMsg(msgType, conference, nick, u'тока в чате');
 		return;
 	if(param):
-		sendMsg(type, conference, nick, turnMessage(param));
+		sendMsg(msgType, conference, nick, turnMessage(param));
 	else:
 		trueJid = getTrueJid(conference, nick);
 		if(trueJid not in gTurnMsgCache[conference]):
-			sendMsg(type, conference, nick, u'а ты ещё ничего не говорил');
+			sendMsg(msgType, conference, nick, u'а ты ещё ничего не говорил');
 		elif(gTurnMsgCache[conference][trueJid].lower() == u'turn'):
-			sendMsg(type, conference, nick, u'последнее, что ты сказал, это "turn" :-D');
+			sendMsg(msgType, conference, nick, u'последнее, что ты сказал, это "turn" :-D');
 		else:
 			savedMsg = gTurnMsgCache[conference][trueJid];
 			receiver = None;
@@ -65,12 +65,12 @@ def turnLastMessage(type, conference, nick, param):
 			if(receiver):
 				sendToConference(conference, u'%s (от %s)' % (turnMessage(savedMsg), nick));
 			else:
-				sendMsg(type, conference, nick, turnMessage(savedMsg));
+				sendMsg(msgType, conference, nick, turnMessage(savedMsg));
 
 registerCommand(turnLastMessage, u'turn', 10, u'Переключает раскладку для последнего сообщения пользователя, вызвавшего команду', u'turn [текст]', (u'turn', u'turn jkjkj'), CHAT);
 
-def saveMessage(stanza, type, conference, nick, trueJid, body):
-	if(type == PUBLIC):
+def saveMessage(stanza, msgType, conference, nick, trueJid, body):
+	if(msgType == PUBLIC):
 		if(trueJid != gJid and trueJid != conference):
 			time.sleep(TURN_TIMEOUT);
 			gTurnMsgCache[conference][trueJid] = body;

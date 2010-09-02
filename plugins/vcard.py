@@ -20,12 +20,12 @@ VCARD_ID = 'vcard_id';
 TAGS = ('NICKNAME', 'FN', 'GENDER', 'BDAY', 'LOCALITY', 'CTRY', u'ORGNAME', 'ROLE', 'TITLE', 'NUMBER', 'URL', 'EMAIL', 'DESC')
 DESC = (u'Ник', u'Имя', u'Пол', u'Д/р', u'Город', u'Страна', u'Огранизация', u'Профессия', u'Должность', u'Телефон', u'Сайт', u'E-mail', u'Заметки')
 
-def showVCard(type, conference, nick, param):
+def showVCard(msgType, conference, nick, param):
 	if(param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			userJid = conference + '/' + param;
 		else:
-			sendMsg(type, conference, nick, u'а это кто?');
+			sendMsg(msgType, conference, nick, u'а это кто?');
 			return;
 	else:
 		userJid = conferenceInList(conference) and (conference + '/' + nick) or conference;
@@ -34,9 +34,9 @@ def showVCard(type, conference, nick, param):
 	iq.setTo(userJid);
 	vcardID = getUniqueID(VCARD_ID);
 	iq.setID(vcardID);
-	gClient.SendAndCallForResponse(iq, _showVCard, (vcardID, type, conference, nick, param, ));
+	gClient.SendAndCallForResponse(iq, _showVCard, (vcardID, msgType, conference, nick, param, ));
 
-def _showVCard(stanza, vcardID, type, conference, nick, param):
+def _showVCard(stanza, vcardID, msgType, conference, nick, param):
 	if(vcardID == stanza.getID()):
 		if(stanza.getType() == 'result'):
 			queryNode = stanza.getChildren();
@@ -55,21 +55,21 @@ def _showVCard(stanza, vcardID, type, conference, nick, param):
 				message = fillVCard(vcard);
 				if(message):
 					if(not param):
-						sendMsg(type, conference, nick, u'про тебя я знаю следующее:\n%s' % (message));
+						sendMsg(msgType, conference, nick, u'про тебя я знаю следующее:\n%s' % (message));
 					else:
-						sendMsg(type, conference, nick, u'про %s я знаю следующее:\n%s' % (param, message));
+						sendMsg(msgType, conference, nick, u'про %s я знаю следующее:\n%s' % (param, message));
 				else:
-					sendMsg(type, conference, nick, u'пустой вкард');
+					sendMsg(msgType, conference, nick, u'пустой вкард');
 			else:
 				if(not param):
-					sendMsg(type, conference, nick, u'вкард заполни сначала');
+					sendMsg(msgType, conference, nick, u'вкард заполни сначала');
 				else:
-					sendMsg(type, conference, nick, u'передай ему, чтобы он свой вкард сначала заполнил');
+					sendMsg(msgType, conference, nick, u'передай ему, чтобы он свой вкард сначала заполнил');
 		elif(stanza.getType() == 'error'):
 			if(not param):
-				sendMsg(type, conference, nick, u'хехе, твой клиент ничего не знает про вкарды');
+				sendMsg(msgType, conference, nick, u'хехе, твой клиент ничего не знает про вкарды');
 			else:
-				sendMsg(type, conference, nick, u'хехе, его клиент ничего не знает про вкарды');
+				sendMsg(msgType, conference, nick, u'хехе, его клиент ничего не знает про вкарды');
 				
 def fillVCard(vcard):
 	name = '';

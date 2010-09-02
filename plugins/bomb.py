@@ -29,15 +29,15 @@ def getRandomColors():
 def bombMarked(conference, trueJid):
 	return(trueJid in gBombAnswer[conference]);
 
-def giveBomb(type, conference, nick, param):
-	if(PRIVATE == type):
-		sendMsg(type, conference, nick, u'ага, хочешь без палева кинуть??? ]:->')
+def giveBomb(msgType, conference, nick, param):
+	if(PRIVATE == msgType):
+		sendMsg(msgType, conference, nick, u'ага, хочешь без палева кинуть??? ]:->')
 		return;
 	userNick = param or random.choice(getOnlineNicks(conference));
 	if(nickIsOnline(conference, userNick)): 
 		trueJid = getTrueJid(conference, userNick);
 		if(bombMarked(conference, trueJid)):
-			sendMsg(type, conference, nick, u'в него уже кинули, ему хватит :-D');
+			sendMsg(msgType, conference, nick, u'в него уже кинули, ему хватит :-D');
 		else:
 			colors = getRandomColors();
 			gBombAnswer[conference][trueJid] = random.choice(colors);
@@ -49,46 +49,46 @@ def giveBomb(type, conference, nick, param):
 			else:
 				# это не баг, это фича :)
 				message = u'хаха, тебе не повезло, у тебя бомба БЕЗ проводов! она взорвётся через %s' % (time2str(timeout));
-			sendMsg(type, conference, userNick, message);
-			gBombTimers[conference][trueJid] = startTimer(timeout, bombExec, (type, conference, nick, trueJid));
+			sendMsg(msgType, conference, userNick, message);
+			gBombTimers[conference][trueJid] = startTimer(timeout, bombExec, (msgType, conference, nick, trueJid));
 	else:
-		sendMsg(type, conference, nick, u'а это кто?');			
+		sendMsg(msgType, conference, nick, u'а это кто?');			
 
-def bombExec(type, conference, nick, trueJid):
+def bombExec(msgType, conference, nick, trueJid):
 	if(nickIsOnline(conference, nick)):
-		sendMsg(type, conference, nick, u'надо было резать %s, чего тормозишь? :)' % (gBombAnswer[conference][trueJid]));
-		detonate(type, conference, nick);
+		sendMsg(msgType, conference, nick, u'надо было резать %s, чего тормозишь? :)' % (gBombAnswer[conference][trueJid]));
+		detonate(msgType, conference, nick);
 	else:
-		sendMsg(type, conference, nick, u'трус :/');
+		sendMsg(msgType, conference, nick, u'трус :/');
 
-def bombColorsListener(stanza, type, conference, nick, trueJid, param):
+def bombColorsListener(stanza, msgType, conference, nick, trueJid, param):
 	if(bombMarked(conference, trueJid)):
 		color = param.lower();
 		if(color in gBombColors[conference][trueJid]):
 			gBombTimers[conference][trueJid].cancel();
 			if(color in gBombAnswer[conference][trueJid]):
-				sendMsg(type, conference, nick, u'бомба обезврежена!');
+				sendMsg(msgType, conference, nick, u'бомба обезврежена!');
 			else:
-				sendMsg(type, conference, nick, u':-| блин, надо было резать %s' % gBombAnswer[conference][trueJid]);
-				detonate(type, conference, nick);
+				sendMsg(msgType, conference, nick, u':-| блин, надо было резать %s' % gBombAnswer[conference][trueJid]);
+				detonate(msgType, conference, nick);
 			del(gBombAnswer[conference][trueJid]);
 			del(gBombColors[conference][trueJid]);
 			del(gBombTimers[conference][trueJid]);
 
 registerMessageHandler(bombColorsListener, CHAT);
 
-def detonate(type, conference, nick):
+def detonate(msgType, conference, nick):
 	num = random.randrange(0, 10);
 	if(num < 1 or getNickKey(conference, nick, NICK_MODER)):
-		sendMsg(type, conference, nick, u'бомба глюкнула...');
+		sendMsg(msgType, conference, nick, u'бомба глюкнула...');
 	elif(num < 7):
 		setRole(conference, nick, ROLE_NONE, u'бабах!!!');
 	else:
 		setRole(conference, nick, ROLE_VISITOR, u'бабах!!!');
 		timeout = random.randrange(100, 501);
-		startTimer(timeout, voiceUser, (type, conference, nick));
+		startTimer(timeout, voiceUser, (msgType, conference, nick));
 
-def voiceUser(type, conference, nick):
+def voiceUser(msgType, conference, nick):
 	setRole(conference, nick, ROLE_PARTICIPANT, u'none');
 
 def clearBombCache(conference):

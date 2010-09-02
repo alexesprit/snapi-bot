@@ -13,13 +13,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def yandexSearch(type, conference, nick, param):
+def yandexSearch(msgType, conference, nick, param):
 	query = urllib.urlencode({'query' : param.encode("utf-8")});
 	rawHtml = urllib.urlopen('http://yandex.ru/msearch?s=all&%s' % (query)).read();
 	rawHtml = unicode(rawHtml, 'utf-8');
 	items = re.findall('<li>(.*?)<div class="www">(.*?)</li>', rawHtml, re.DOTALL);
 	if(items):
-		if(PUBLIC == type):
+		if(PUBLIC == msgType):
 			text = items[0][0].strip();
 			url = items[0][1];
 			message = u'%shttp://%s' % (text, url);
@@ -27,8 +27,8 @@ def yandexSearch(type, conference, nick, param):
 			items = [u'%shttp://%s' % (item[0].strip(), item[1]) for item in items[:5]];
 			message = '\n'.join(items);
 		message = message.replace('...', '');
-		sendMsg(type, conference, nick, decode(message));	
+		sendMsg(msgType, conference, nick, decode(message));	
 	else:
-		sendMsg(type, conference, nick, u'По вашему запросу ничего не найдено');
+		sendMsg(msgType, conference, nick, u'По вашему запросу ничего не найдено');
 
 registerCommand(yandexSearch, u'яндекс', 10, u'Поиск в Яндексе', u'яндекс <запрос>', (u'яндекс google'), ANY | PARAM);

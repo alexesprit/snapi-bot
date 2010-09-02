@@ -17,16 +17,16 @@
 
 DISCO_ID = 'disco_id';
 
-def serviceDiscovery(type, conference, nick, param):
+def serviceDiscovery(msgType, conference, nick, param):
 	param = param or gHost;
 	args = param.split(' ', 2);
 	searchKey, jid = None, args[0];
-	maxCount = (PUBLIC == type) and 10 or 50;
+	maxCount = (PUBLIC == msgType) and 10 or 50;
 	if(len(args) > 1):
 		count = args[1];
 		if(count.isdigit()):
 			count = int(count);
-			if(PUBLIC == type):
+			if(PUBLIC == msgType):
 				maxCount = min(50, count);
 			else:
 				maxCount = min(250, count);	
@@ -43,9 +43,9 @@ def serviceDiscovery(type, conference, nick, param):
 		iq.setTo(jid);
 	discoID = getUniqueID(DISCO_ID);
 	iq.setID(discoID);
-	gClient.SendAndCallForResponse(iq, _serviceDiscovery, (discoID, type, conference, nick, maxCount, searchKey, jid, ));
+	gClient.SendAndCallForResponse(iq, _serviceDiscovery, (discoID, msgType, conference, nick, maxCount, searchKey, jid, ));
 
-def _serviceDiscovery(stanza, discoID, type, conference, nick, maxCount, searchKey, jid):
+def _serviceDiscovery(stanza, discoID, msgType, conference, nick, maxCount, searchKey, jid):
 	if(discoID == stanza.getID()):
 		if(stanza.getType() == 'result'):
 			discoList = [];
@@ -80,15 +80,15 @@ def _serviceDiscovery(stanza, discoID, type, conference, nick, maxCount, searchK
 					discoList.append(u'%d) %s' % (itemCount, item[0]));
 			if(discoList):
 				if(0 == maxCount):
-					sendMsg(type, conference, nick, u'всего %d пунктов' % (itemCount));
+					sendMsg(msgType, conference, nick, u'всего %d пунктов' % (itemCount));
 				else:
 					if(itemCount > maxCount):
 						discoList = discoList[:maxCount];
 						discoList.append(u'всего %d пунктов' % (itemCount));
-					sendMsg(type, conference, nick, u'надискаверила:\n' + u'\n'.join(discoList));
+					sendMsg(msgType, conference, nick, u'надискаверила:\n' + u'\n'.join(discoList));
 			else:
-				sendMsg(type, conference, nick, u'пустое диско');
+				sendMsg(msgType, conference, nick, u'пустое диско');
 		else:
-			sendMsg(type, conference, nick, u'не могу');
+			sendMsg(msgType, conference, nick, u'не могу');
 
 registerCommand(serviceDiscovery, u'диско', 10, u'Показывает результаты обзора сервисов для указанного жида. Также можно запросить обзор по узлу (формат запроса jid#node). Второй или третий (если даётся ограничитель кол-ва) параметр - поиск (ищет заданное слово в жиде и описании элемента диско). Если поисковым словом задать имя конференции до названия сервера (например qwerty@), то покажет место этой конференции в общем рейтинге. В общий чат может дать до 50 результатов, без указания кол-ва - 10. В приват может дать до 250, без указания кол-ва 50.', u'диско <сервер> [кол-во результатов] [поисковая строка]', (u'диско jabber.aq', u'диско conference.jabber.aq 5', u'диско conference.jabber.aq qwerty', u'диско conference.jabber.aq 5 qwerty', u'диско conference.jabber.aq qwerty@', u'диско jabber.aq#services'));

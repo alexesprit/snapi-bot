@@ -19,24 +19,24 @@ gLeaved = {};
 gKicked = {};
 gBanned = {};
 
-def showStatistic(type, conference, nick, param):
+def showStatistic(msgType, conference, nick, param):
 	text = u'за время, проведённое мной в конфе, вы запостили %(groupchat)d мессаг в чат и %(chat)d мессаг мне в личку, ';
 	text += u'я же запостила %(mymsg)d сообщений. Всего сюда заходили %(join)d человек, из них %(moderator)d модеров, ';
 	text += u'%(participant)d участников и %(visitor)d посетителей. Вышло же %(leave)d человек; модеры выгнали %(kick)d человек и '
 	text += u'забанили %(ban)d. Также ники сменили %(nick)d раз, статусами нафлудили %(status)d раз.';
-	sendMsg(type, conference, nick, text % (gStats[conference]));
+	sendMsg(msgType, conference, nick, text % (gStats[conference]));
 
 registerCommand(showStatistic, u'статистика', 10, u'Статистика текущей конференции', None, (u'статистика', ), CHAT | NONPARAM);
 
-def botMessageUpdate(type, jid, text):
-	if(PUBLIC == type and text):
+def botMessageUpdate(msgType, jid, text):
+	if(PUBLIC == msgType and text):
 		gStats[jid]['mymsg'] += 1;
 
 registerBotMessageHandler(botMessageUpdate);
 
-def messageUpdate(stanza, type, conference, nick, trueJid, text):
+def messageUpdate(stanza, msgType, conference, nick, trueJid, text):
 	if(nick != getBotNick(conference)):
-		gStats[conference][type] += 1;
+		gStats[conference][msgType] += 1;
 
 registerMessageHandler(messageUpdate, CHAT);
 
@@ -67,8 +67,8 @@ def presenceUpdate(stanza, conference, nick, trueJid):
 		if(code == '303'):
 			gStats[conference]['nick'] += 1;
 		else:
-			type = stanza.getType();
-			if(type != 'unavailable'):
+			msgType = stanza.getType();
+			if(msgType != 'unavailable'):
 				gStats[conference]['status'] += 1;
 
 registerPresenceHandler(presenceUpdate, CHAT);

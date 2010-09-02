@@ -14,15 +14,15 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def playRoulette(type, conference, nick, param):
+def playRoulette(msgType, conference, nick, param):
 	if(not getNickKey(conference, nick, NICK_MODER)):
 		if(not random.randrange(0, 6)):
-			sendMsg(type, conference, nick, u'ЩЁЛК!');
+			sendMsg(msgType, conference, nick, u'ЩЁЛК!');
 		else:
 			sendToConference(conference, u'/me выстрелила в %s' % (nick));
 			time.sleep(0.5);
 			setRole(conference, nick, 'none', u'ПЫЩЩЬ-ПТЫДЫЩЬ!');
 	else:
-		sendMsg(type, conference, nick, u'не могу я в модера стрелять :(');
+		sendMsg(msgType, conference, nick, u'не могу я в модера стрелять :(');
 
 registerCommand(playRoulette, u'рр', 10, u'Старая добрая русская рулетка', u'рр', (u'рр', ), CHAT | NONPARAM);

@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def botRestart(type, conference, nick, param):
+def botRestart(msgType, conference, nick, param):
 	nick = (conferenceInList(conference)) and nick or conference.split('@')[0];
 	if(param):
 		message = u'меня перезагружает %s (%s)' % (nick, param);
@@ -29,7 +29,7 @@ def botRestart(type, conference, nick, param):
 
 registerCommand(botRestart, u'рестарт', 100, u'Перезапускает бота', u'рестарт [причина]', (u'рестарт', u'рестарт ы!'), ANY | FROZEN);
 
-def botShutdown(type, conference, nick, param):
+def botShutdown(msgType, conference, nick, param):
 	nick = (conferenceInList(conference)) and nick or conference.split('@')[0];
 	if(param):
 		message = u'меня выключает %s (%s)' % (nick, param);

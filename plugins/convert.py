@@ -66,18 +66,18 @@ gValues = {u'AUD': u'Австралийский доллар',
 gConvPattern = re.compile('<TD><B>(.*?)</B>(.*?)<TD><B>(.*?)</B>(.*?)<TD><B>(.*?)</B></TD>', re.DOTALL);
 gConvUrl = 'http://conv.rbc.ru/convert.shtml?mode=calc&source=cb.0&tid_from=%s&commission=1&tid_to=%s&summa=%s&day=%s&month=%s&year=%s';
 
-def convertValues(type, conference, nick, param):
+def convertValues(msgType, conference, nick, param):
 	if(param == u'валюты'):
 		values = ['%s - %s' % (x, gValues[x]) for x in gValues];
 		values.sort();
-		sendMsg(type, conference, nick, '\n'.join(values));
+		sendMsg(msgType, conference, nick, '\n'.join(values));
 	else:
 		if(len(param.split()) == 3):
 			param = param.upper().split();
 			try:
 				count = float(param[2]);
 			except(ValueError):
-				sendMsg(type, conference, nick, u'читай помощь по команде');
+				sendMsg(msgType, conference, nick, u'читай помощь по команде');
 				return;
 			frm = param[0];
 			to = param[1];
@@ -90,10 +90,10 @@ def convertValues(type, conference, nick, param):
 				if(items):
 					text = u'%s %s = %s %s\n1 %s = %s %s' % (count, frm, items.group(5), to, frm, items.group(3), to);
 					text = text.replace('BASE', 'RUR');
-					sendMsg(type, conference, nick, decode(text));
+					sendMsg(msgType, conference, nick, decode(text));
 				else:
-					sendMsg(type, conference, nick, u'не получается');
+					sendMsg(msgType, conference, nick, u'не получается');
 			else:
-				sendMsg(type, conference, nick, u'читай помощь по команде');
+				sendMsg(msgType, conference, nick, u'читай помощь по команде');
 
 registerCommand(convertValues, u'перевести', 10, u'Перевод валют. "валюты" в качестве параметра - список валют для перевода', u'перевести <из> <в> <кол-во>', (u'перевести RUR USD 100.5', u'перевести валюты'), ANY | PARAM);

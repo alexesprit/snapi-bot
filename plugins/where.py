@@ -13,14 +13,14 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showWhereIsBot(type, conference, nick, param):
+def showWhereIsBot(msgType, conference, nick, param):
 	confCount = len(getConferences());
 	if(confCount):
 		message = u'я сижу в %d конфах:\n' % (confCount);
 		infoList = [u'%s (%d чел.)' % (conf, len(getJidList(conf))) for conf in getConferences()];
 		message += '\n'.join(infoList);
-		sendMsg(type, conference, nick, message);
+		sendMsg(msgType, conference, nick, message);
 	else:
-		sendMsg(type, conference, nick, u'я пока нигде не сижу');
+		sendMsg(msgType, conference, nick, u'я пока нигде не сижу');
 
 registerCommand(showWhereIsBot, u'хдебот', 10, u'Показывает, в каких конфах сидит бот', None, (u'хдебот', ), ANY | NONPARAM);

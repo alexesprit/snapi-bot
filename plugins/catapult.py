@@ -13,10 +13,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def runCatapult(type, conference, nick, param):
+def runCatapult(msgType, conference, nick, param):
 	if(not getNickKey(conference, nick, NICK_MODER)):
 		setRole(conference, nick, 'none', u'КАТАПУЛЬТИРУЮСЬ!');
 	else:
-		sendMsg(type, conference, nick, u'не могу :(');
+		sendMsg(msgType, conference, nick, u'не могу :(');
 
 registerCommand(runCatapult, u'катапульту', 10, u'Катапульта', None, (u'катапульту', ), CHAT | NONPARAM);

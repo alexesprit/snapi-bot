@@ -15,7 +15,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showHelp(type, conference, nick, param):
+def showHelp(msgType, conference, nick, param):
 	if(param):
 		param = param.lower();
 		cmdType = conferenceInList(conference) and CHAT or ROSTER;
@@ -31,15 +31,15 @@ def showHelp(type, conference, nick, param):
 				message += u'\nМин. уровень доступа: %d' % (gCommands[param]['access']);
 				if(not isAvailableCommand(conference, param)):
 					message += u'\nЭта команда отключена в этой конференции!';
-			sendMsg(type, conference, nick, message);
+			sendMsg(msgType, conference, nick, message);
 	else:
 		if(conferenceInList(conference)):
 			prefix = getConfigKey(conference, 'prefix') or '';
 		else:
 			prefix = '';
-		sendMsg(type, conference, nick, u'напишите "%sкоманды", чтобы узнать список всех команд, "%sпомощь <команда>" для получения справки по использованию команды' % (prefix, prefix));
+		sendMsg(msgType, conference, nick, u'напишите "%sкоманды", чтобы узнать список всех команд, "%sпомощь <команда>" для получения справки по использованию команды' % (prefix, prefix));
 
-def showCommands(type, conference, nick, param):
+def showCommands(msgType, conference, nick, param):
 	cmdType = conferenceInList(conference) and CHAT or ROSTER;
 	availableCmds, disabledCmds = [], [];
 	message = '';
@@ -60,8 +60,8 @@ def showCommands(type, conference, nick, param):
 	if(disabledCmds):
 		disabledCmds.sort();
 		message += u'\n\nОтключенные команды:\n%s' % (', '.join(disabledCmds));
-	if(PUBLIC == type):
-		sendMsg(type, conference, nick, u'ушли');
+	if(PUBLIC == msgType):
+		sendMsg(msgType, conference, nick, u'ушли');
 	sendMsg(PRIVATE, conference, nick, message);	
 
 registerCommand(showHelp, u'помощь', 0, u'Даёт справку об определённой команде или выводит общую справку', u'помощь [команда]', (u'помощь', u'помощь пинг'), ANY | FROZEN);

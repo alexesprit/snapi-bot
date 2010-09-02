@@ -15,43 +15,43 @@
 
 MUC_ID = 'muc_id';
 
-def _showSomeList(stanza, mucID, type, conference, nick):
+def _showSomeList(stanza, mucID, msgType, conference, nick):
 	if(mucID == stanza.getID()):
 		if(stanza.getType() == 'result'):
 			items = [u'%d) %s' % (i + 1, p.getAttrs()['jid']) for i, p in enumerate(stanza.getQueryChildren())];
 			if(items):
 				message = u'смотри, что я нашла:\n';
-				if(type == PUBLIC):
-					sendMsg(type, conference, nick, u'смотри в привате');
+				if(msgType == PUBLIC):
+					sendMsg(msgType, conference, nick, u'смотри в привате');
 				sendMsg(PRIVATE, conference, nick, message + '\n'.join(items));
 			else:
-				sendMsg(type, conference, nick, u'список пуст');
+				sendMsg(msgType, conference, nick, u'список пуст');
 		else:
-			sendMsg(type, conference, nick, u'не получается :(');
+			sendMsg(msgType, conference, nick, u'не получается :(');
 
-def showSomeList(type, conference, nick, aff):
+def showSomeList(msgType, conference, nick, aff):
 	iq = xmpp.Iq('get', xmpp.NS_MUC_ADMIN, payload = [xmpp.Node('item', {'affiliation': aff})]);
 	iq.setTo(conference);
 	mucID = getUniqueID(MUC_ID);
 	iq.setID(mucID);
-	gClient.SendAndCallForResponse(iq, _showSomeList, (mucID, type, conference, nick, ));
+	gClient.SendAndCallForResponse(iq, _showSomeList, (mucID, msgType, conference, nick, ));
 
-def showBanList(type, conference, nick, param):
-	showSomeList(type, conference, nick, AFF_OUTCAST);
+def showBanList(msgType, conference, nick, param):
+	showSomeList(msgType, conference, nick, AFF_OUTCAST);
 
 registerCommand(showBanList, u'банлист', 20, u'Показывает список забаненных', None, (u'банлист', ), CHAT | NONPARAM);
 
-def showMemberList(type, conference, nick, param):
-	showSomeList(type, conference, nick, AFF_MEMBER);
+def showMemberList(msgType, conference, nick, param):
+	showSomeList(msgType, conference, nick, AFF_MEMBER);
 
 registerCommand(showMemberList, u'мемберлист', 20, u'Показывает список мемберов', None, (u'мемберлист', ), CHAT | NONPARAM);
 
-def showAdminList(type, conference, nick, param):
-	showSomeList(type, conference, nick, AFF_ADMIN);
+def showAdminList(msgType, conference, nick, param):
+	showSomeList(msgType, conference, nick, AFF_ADMIN);
 
 registerCommand(showAdminList, u'админлист', 20, u'Показывает список админов', None, (u'админлист', ), CHAT | NONPARAM);
 
-def showOwnerList(type, conference, nick, param):
-	showSomeList(type, conference, nick, AFF_OWNER);
+def showOwnerList(msgType, conference, nick, param):
+	showSomeList(msgType, conference, nick, AFF_OWNER);
 
 registerCommand(showOwnerList, u'овнерлист', 20, u'Показывает список овнеров', None, (u'овнерлист', ), CHAT | NONPARAM);

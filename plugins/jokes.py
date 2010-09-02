@@ -15,21 +15,21 @@
 
 CFG_JOKES = 'jokes';
 
-def jokesControl(type, conference, nick, param):
+def jokesControl(msgType, conference, nick, param):
 	if(param):
 		if(param.isdigit()):
 			param = int(param);
 			if(param == 1):
 				setConfigKey(conference, CFG_JOKES, 1);
-				sendMsg(type, conference, nick, u'шуточки включены');
+				sendMsg(msgType, conference, nick, u'шуточки включены');
 			else:
 				setConfigKey(conference, CFG_JOKES, 0);
-				sendMsg(type, conference, nick, u'шуточки отключены');
+				sendMsg(msgType, conference, nick, u'шуточки отключены');
 			saveChatConfig(conference);
 		else:
-			sendMsg(type, conference, nick, u'прочитай помощь по команде');
+			sendMsg(msgType, conference, nick, u'прочитай помощь по команде');
 	else:
-		sendMsg(type, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_JOKES)));
+		sendMsg(msgType, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_JOKES)));
 
 registerCommand(jokesControl, u'шуточки', 30, u'Отключает (0) или включает (1) шуточки, которыми бот порою подменяет ответ. Без параметра покажет текущее значение', u'шуточки [0/1]', (u'шуточки', u'шуточки 0'), CHAT);
 

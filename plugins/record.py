@@ -16,11 +16,11 @@
 REC_FILE = 'config/%s/record.txt';
 gRecordsCache = {};
 
-def showRecord(type, conference, nick, param):
+def showRecord(msgType, conference, nick, param):
 	if(not gRecordsCache[conference]):
-		sendMsg(type, conference, nick, u'нет информации');
+		sendMsg(msgType, conference, nick, u'нет информации');
 	else:
-		sendMsg(type, conference, nick, u'рекорд посещаемости - %(count)d человек (%(time)s)' % (gRecordsCache[conference]));
+		sendMsg(msgType, conference, nick, u'рекорд посещаемости - %(count)d человек (%(time)s)' % (gRecordsCache[conference]));
 
 registerCommand(showRecord, u'рекорд', 10, u'Показывает рекорд посещаемости конференции', None, (u'рекорд', ), CHAT | NONPARAM);
 

@@ -15,16 +15,16 @@
 
 VER_FILE = 'config/version.txt';
 
-def setBotVersion(type, conference, nick, param):
+def setBotVersion(msgType, conference, nick, param):
 	global gVersion;
 	if(not param):
-		sendMsg(type, conference, nick, u'|'.join(gVersion));
+		sendMsg(msgType, conference, nick, u'|'.join(gVersion));
 	elif(param.count('|') == 2):
 		gVersion = tuple(param.split('|'));
 		writeFile(VER_FILENAME, str(gVersion));
-		sendMsg(type, conference, nick, u'поняла, сейчас поставлю');
+		sendMsg(msgType, conference, nick, u'поняла, сейчас поставлю');
 	else:
-		sendMsg(type, conference, nick, u'читай справку по команде');
+		sendMsg(msgType, conference, nick, u'читай справку по команде');
 
 registerCommand(setBotVersion, u'ботверсия', 100, u'Выставляет версию клиента у бота. Без параметра покажет текущее значение', u'ботверсия [клиент|версия|ось]', (u'ботверсия', u'ботверсия Jimm|0.6.4|Nokia 3310'), ROSTER);
 

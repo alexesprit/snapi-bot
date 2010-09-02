@@ -15,7 +15,7 @@
 
 from xml.dom import minidom;
 
-def showWeather(type, conference, nick, param):
+def showWeather(msgType, conference, nick, param):
 	query = urllib.urlencode({'q' : param.encode('cp1251')});
 	text = urllib.urlopen(u'http://pda.rp5.ru/?lang=ru&%s' % (query)).read();
 	if(text.count('1. <a href="')):
@@ -36,12 +36,12 @@ def showWeather(type, conference, nick, param):
 			message += u'[%s]\nТемпература: %s\n\n' % (title[1], desc);
 		if(message):
 			message = u'Погода в городе %s\n%s' % (city, message);
-			if(PUBLIC == type):
-				sendMsg(type, conference, nick, u'скинула в личку');
+			if(PUBLIC == msgType):
+				sendMsg(msgType, conference, nick, u'скинула в личку');
 			sendMsg(PRIVATE, conference, nick, message);
 		else:
-			sendMsg(type, conference, nick, u'не могу :(');
+			sendMsg(msgType, conference, nick, u'не могу :(');
 	else:
-		sendMsg(type, conference, nick, u'не могу :(');
+		sendMsg(msgType, conference, nick, u'не могу :(');
 
 registerCommand(showWeather, u'погода', 10, u'Показывает погоду', u'погода <город>', (u'погода Москва', ), ANY | PARAM);

@@ -18,8 +18,8 @@
 	заняться чем-то полезным :)
 '''
 
-def setMood(type, jid, resource, param):
-	if(param == u'сброс' or param.count('|') == 1):
+def setMood(msgType, jid, resource, param):
+	if(param == u'сброс' or param.count('|')):
 		iq = xmpp.Iq('set');
 		pubsub = iq.addChild('pubsub', {}, [], xmpp.NS_PUBSUB);
 		pubNode = xmpp.Node('publish', {'node': xmpp.NS_MOOD});
@@ -32,14 +32,14 @@ def setMood(type, jid, resource, param):
 		pubsub.addChild(node = pubNode);
 		gClient.send(iq);
 		if(param == u'сброс'):
-			sendMsg(type, jid, resource, u'сбросила');
+			sendMsg(msgType, jid, resource, u'сбросила');
 		else:
-			sendMsg(type, jid, resource, u'поставила');
+			sendMsg(msgType, jid, resource, u'поставила');
 	else:
-		sendMsg(type, conference, nick, u'читай справку по команде');
+		sendMsg(msgType, jid, nick, u'читай справку по команде');
 
-def setActivity(type, jid, resource, param):
-	if(param == u'сброс' or param.count('|') == 2):
+def setActivity(msgType, jid, resource, param):
+	if(param == u'сброс' or param.count('|')):
 		iq = xmpp.Iq('set');
 		pubsub = iq.addChild('pubsub', {}, [], xmpp.NS_PUBSUB);
 		pubNode = xmpp.Node('publish', {'node': xmpp.NS_ACTIVITY});
@@ -47,17 +47,18 @@ def setActivity(type, jid, resource, param):
 		if(param.count('|')):
 			param = param.split('|');
 			act = actNode.addChild(node = xmpp.Node(param[0]));
-			act.addChild(node = xmpp.Node(param[1]));
+			if(param[1]):
+				act.addChild(node = xmpp.Node(param[1]));
 			actNode.setTagData('text', param[2]);
 		pubNode.addChild('item', {}, [actNode], '');
 		pubsub.addChild(node = pubNode);
 		gClient.send(iq);
 		if(param == u'сброс'):
-			sendMsg(type, jid, resource, u'сбросила');
+			sendMsg(msgType, jid, resource, u'сбросила');
 		else:
-			sendMsg(type, jid, resource, u'поставила');
+			sendMsg(msgType, jid, resource, u'поставила');
 	else:
-		sendMsg(type, conference, nick, u'читай справку по команде');
+		sendMsg(msgType, jid, nick, u'читай справку по команде');
 
 registerCommand(setActivity, u'активность', 100, u'Устанавливает активность для бота. "Cброс" в кач-ве параметра сбрасывает активность', u'активность <осн.|доп.|текст>', (u'активность doing_chores|doing_maintenance|ололо', ), ROSTER | PARAM);
 registerCommand(setMood, u'настроение', 100, u'Устанавливает настроение для бота. "Cброс" в кач-ве параметра сбрасывает настроение', u'настроение <название|текст>', (u'настроение calm|ололо', ), ROSTER | PARAM);

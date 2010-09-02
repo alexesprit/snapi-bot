@@ -16,15 +16,15 @@
 
 VER_ID = 'ver_id';
 
-def showVersion(type, conference, nick, param):
+def showVersion(msgType, conference, nick, param):
 	if(param == getBotNick(conference)):
-		sendMsg(type, conference, nick, u'я юзаю %s %s в %s' % (gVersion[0], gVersion[1], gVersion[2]));
+		sendMsg(msgType, conference, nick, u'я юзаю %s %s в %s' % (gVersion[0], gVersion[1], gVersion[2]));
 	else:
 		if(param):
 			if(conferenceInList(conference) and nickIsOnline(conference, param)):
 				jid = conference + '/' + param;
 			else:
-				sendMsg(type, conference, nick, u'а это кто?');
+				sendMsg(msgType, conference, nick, u'а это кто?');
 				return;
 		else:
 			jid = conference + '/' + nick;
@@ -32,9 +32,9 @@ def showVersion(type, conference, nick, param):
 		iq.setTo(jid);
 		verID = getUniqueID(VER_ID);
 		iq.setID(verID);
-		gClient.SendAndCallForResponse(iq, _showVersion, (verID, type, conference, nick, param, ));
+		gClient.SendAndCallForResponse(iq, _showVersion, (verID, msgType, conference, nick, param, ));
 
-def _showVersion(stanza, verID, type, conference, nick, param):
+def _showVersion(stanza, verID, msgType, conference, nick, param):
 	if(verID == stanza.getID()):
 		if(stanza.getType() == 'result'):
 			name, ver, os = '', '', '';
@@ -54,12 +54,12 @@ def _showVersion(stanza, verID, type, conference, nick, param):
 				version += u' в ' + os;
 			if(version):
 				if(not param):
-					sendMsg(type, conference, nick, u'ты юзаешь %s' % (version));
+					sendMsg(msgType, conference, nick, u'ты юзаешь %s' % (version));
 				else:
-					sendMsg(type, conference, nick, u'%s юзает %s' % (param, version));
+					sendMsg(msgType, conference, nick, u'%s юзает %s' % (param, version));
 			else:
-				sendMsg(type, conference, nick, u'глючит клиент');
+				sendMsg(msgType, conference, nick, u'глючит клиент');
 		else:
-			sendMsg(type, conference, nick, u'глючит клиент');
+			sendMsg(msgType, conference, nick, u'глючит клиент');
 
 registerCommand(showVersion, u'версия', 10, u'Показывает информацию о клиенте указанного пользователя', u'версия [ник]', (u'версия', u'версия Nick'));

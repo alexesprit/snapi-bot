@@ -13,8 +13,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showRoster(type, conference, nick, param):
+def showRoster(msgType, conference, nick, param):
 	items = [u'%d) %s [%s]' % (i + 1, jid, gRoster.getSubscription(jid)) for i, jid in enumerate(gRoster.getItems())];
-	sendMsg(type, conference, nick,  u'смотри, кто у меня есть:\n' + '\n'.join(items));
+	sendMsg(msgType, conference, nick,  u'смотри, кто у меня есть:\n' + '\n'.join(items));
 
 registerCommand(showRoster, u'ростер', 100, u'Показывает содержимое ростера', None, (u'ростер', ), ROSTER | NONPARAM);

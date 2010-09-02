@@ -13,9 +13,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def setBotNick(type, conference, nick, param):
+def setBotNick(msgType, conference, nick, param):
 	joinConference(conference, param, getConfigKey(conference, 'password'));
 	saveChatConfig(conference);
-	sendMsg(type, conference, nick, u'запомнила');
+	sendMsg(msgType, conference, nick, u'запомнила');
 
 registerCommand(setBotNick, u'ботник', 30, u'Меняет ник бота', u'ботник <ник>', (u'ботник ПеЛоТкО.о', ), CHAT | PARAM);

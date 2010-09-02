@@ -13,9 +13,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def setTopic(type, conference, nick, param):
+def setTopic(msgType, conference, nick, param):
 	message = xmpp.Message(to = conference, typ = PUBLIC, subject = param);
 	gClient.send(message);
-	sendMsg(type, conference, nick, u'поставила');
+	sendMsg(msgType, conference, nick, u'поставила');
 
 registerCommand(setTopic, u'топег', 20, u'Устанавливает тему в конференции', u'топег <текст>', (u'топег ололо', ), CHAT | PARAM);

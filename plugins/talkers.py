@@ -20,10 +20,10 @@ TALKERS_FILE = 'config/%s/talkers.txt';
 gTalkers = {};
 gMsgCount = {};
 
-def showTopTalkers(type, conference, nick):
+def showTopTalkers(msgType, conference, nick):
 	base = gTalkers[conference];
 	if(base.isEmpty()):
-		sendMsg(type, conference, nick, u'база болтунов пуста');
+		sendMsg(msgType, conference, nick, u'база болтунов пуста');
 	else:
 		topList = [];
 		replic = u'Статистика топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n';
@@ -41,24 +41,24 @@ def showTopTalkers(type, conference, nick):
 		topList.reverse();
 		topList = topList[:10];
 		items = [topListLine % (i + 1, x[4], x[0], x[1], x[2], x[3]) for i, x in enumerate(topList)];
-		sendMsg(type, conference, nick, replic + '\n'.join(items));
+		sendMsg(msgType, conference, nick, replic + '\n'.join(items));
 
-def clearStatistic(type, conference, nick):
+def clearStatistic(msgType, conference, nick):
 	conference = source[1];
 	trueJid = getTrueJid(conference, nick);
 	if(getAccess(conference, trueJid) >= 20):
 		base = gTalkers[conference];
 		base.clear();
 		base.save();
-		sendMsg(type, conference, nick, u'база данных очищена');
+		sendMsg(msgType, conference, nick, u'база данных очищена');
 	else:
-		sendMsg(type, conference, nick, u'недостаточно прав');
+		sendMsg(msgType, conference, nick, u'недостаточно прав');
 
-def showTalkerInfo(type, conference, nick, param):
+def showTalkerInfo(msgType, conference, nick, param):
 	if(param == u'топ'):
-		showTopTalkers(type, conference, nick);
+		showTopTalkers(msgType, conference, nick);
 	elif(param == u'сброс'):
-		clearStatistic(type, conference, nick);
+		clearStatistic(msgType, conference, nick);
 	else:
 		if(not param):
 			trueJid = getTrueJid(conference, nick);
@@ -76,14 +76,14 @@ def showTalkerInfo(type, conference, nick, param):
 			nick = statistic['nick'];
 			wordsPerMsg = (float(words)) / (messages + meMessages)
 			message = statisticLine % (nick, messages, meMessages, words, wordsPerMsg);
-			sendMsg(type, conference, nick, message);
+			sendMsg(msgType, conference, nick, message);
 		else:
-			sendMsg(type, conference, nick, u'твоя статистика отсутствует');
+			sendMsg(msgType, conference, nick, u'твоя статистика отсутствует');
 
 registerCommand(showTalkerInfo, u'болтун', 10, u'Показывает статистику болтливости указанного пользователя', u'болтун [ник]', (u'болтун Nick', u'болтун топ'), CHAT);
 
-def updateStatistic(stanza, type, conference, nick, trueJid, body):
-	if(trueJid != gJid and type == PUBLIC and nick):
+def updateStatistic(stanza, msgType, conference, nick, trueJid, body):
+	if(trueJid != gJid and msgType == PUBLIC and nick):
 		base = gTalkers[conference];
 		statistic = base.getKey(trueJid);
 		if(statistic):

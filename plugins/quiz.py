@@ -112,11 +112,11 @@ def checkAnswer(conference, nick, trueJid, answer):
 		base.setKey(trueJid, scores);
 		askNewQuestion(conference);
 
-def answerListener(stanza, type, conference, nick, trueJid, text):
+def answerListener(stanza, msgType, conference, nick, trueJid, text):
 	if(conference in gQuizAnswer):
 		checkAnswer(conference, nick, trueJid, text);
 
-def showScoreList(type, conference, nick = None):
+def showScoreList(msgType, conference, nick = None):
 	base = gQuizScores[conference];
 	if(not base.isEmpty()):
 		scores = [];
@@ -129,29 +129,29 @@ def showScoreList(type, conference, nick = None):
 		items = [u'%s) %s, %s, %s' % (i + 1, x[2], x[0], x[1]) for i, x in enumerate(scores)];
 		if(nick):
 			message = u'статистика по игре:\nНик, счет, ответов\n';
-			sendMsg(type, conference, nick, message + '\n'.join(items));
+			sendMsg(msgType, conference, nick, message + '\n'.join(items));
 		else:
 			message = u'(*) Счёт:\nНик, счет, ответов\n';
 			sendToConference(conference, message + '\n'.join(items));
 	else:
-		sendMsg(type, conference, nick, u'cтатистика по игре отсутствует');
+		sendMsg(msgType, conference, nick, u'cтатистика по игре отсутствует');
 
-def startQuiz(type, conference, nick, param):
+def startQuiz(msgType, conference, nick, param):
 	if(conference in gQuizAnswer):
-		sendMsg(type, conference, nick, u'Викторина уже существует!');
+		sendMsg(msgType, conference, nick, u'Викторина уже существует!');
 	else:
 		askNewQuestion(conference);
 
-def stopQuiz(type, conference, nick, param):
+def stopQuiz(msgType, conference, nick, param):
 	if(conference in gQuizAnswer):
 		sendToConference(conference, u'(!) Викторина остановлена');
 		quizStop(conference);
 
-def askQuestion(type, conference, nick, param):
+def askQuestion(msgType, conference, nick, param):
 	if(conference in gQuizAnswer):
 		askNewQuestion(conference, gQuizAnswer[conference]);
 
-def showHint(type, conference, nick, param):
+def showHint(msgType, conference, nick, param):
 	if(conference in gQuizAnswer):
 		answer = gQuizAnswer[conference];
 		hint = gQuizHint[conference];
@@ -171,12 +171,12 @@ def showHint(type, conference, nick, param):
 		else:
 			askNewQuestion(conference, answer);
 
-def showScores(type, conference, nick, param):
-	showScoreList(type, conference, nick);
+def showScores(msgType, conference, nick, param):
+	showScoreList(msgType, conference, nick);
 
-def showQuestion(type, conference, nick, param):
+def showQuestion(msgType, conference, nick, param):
 	if(conference in gQuizAnswer):
-		sendMsg(type, conference, nick, u'(*) Текущий вопрос: \n' + gQuizQuestion[conference]);
+		sendMsg(msgType, conference, nick, u'(*) Текущий вопрос: \n' + gQuizQuestion[conference]);
 		
 def loadQuizScores(conference):
 	fileName = QUIZ_SCORES_FILE % (conference);

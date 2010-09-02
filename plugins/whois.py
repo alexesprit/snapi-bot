@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showWhoIs(type, conference, nick, param):
+def showWhoIs(msgType, conference, nick, param):
 	rawHtml = urllib.urlopen('http://1whois.ru/index.php?url=%s' % (param)).read();
 	items = re.search('<blockquote>(.*?)</font></blockquote>', rawHtml, re.DOTALL);
 	if(items):
@@ -21,8 +21,8 @@ def showWhoIs(type, conference, nick, param):
 		text = text.replace('<br />', '');
 		text = text.replace('&nbsp;', '');
 		text = decode(text);
-		sendMsg(type, conference, nick, unicode(text, 'cp1251'));
+		sendMsg(msgType, conference, nick, unicode(text, 'cp1251'));
 	else:
-		sendMsg(type, conference, nick, u'не могу :(');
+		sendMsg(msgType, conference, nick, u'не могу :(');
 
 registerCommand(showWhoIs, u'хтоэто', 10, u'Показывает информацию о домене', u'хтоэто <адрес>', (u'хтоэто jabber.ru', ), ANY | PARAM);

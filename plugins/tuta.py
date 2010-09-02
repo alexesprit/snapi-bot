@@ -17,7 +17,7 @@ HERE_FILE = 'config/%s/tuta.txt';
 
 gHereTime = {};
 
-def showHereStatistic(type, conference, nick, param):
+def showHereStatistic(msgType, conference, nick, param):
 	userNick = param or nick;
 	if(nickIsOnline(conference, userNick)):
 		base = gHereTime[conference];
@@ -31,11 +31,11 @@ def showHereStatistic(type, conference, nick, param):
 			record = max(info['record'], hereTime);
 			message = param and userNick or u'ты';
 			message = u'%s всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d' % (message, time2str(totalTime), time2str(record), time2str(averageTime), joinCount);
-			sendMsg(type, conference, nick, message);
+			sendMsg(msgType, conference, nick, message);
 		else:
-			sendMsg(type, conference, nick, u'нет информации');
+			sendMsg(msgType, conference, nick, u'нет информации');
 	else:
-		sendMsg(type, conference, nick, u'а это кто?');
+		sendMsg(msgType, conference, nick, u'а это кто?');
 
 registerCommand(showHereStatistic, u'тута', 10, u'Показывает кол-во часов, проведённое в чатике, максимальное и среднее', u'тута [ник]', (u'тута', ), CHAT);
 	

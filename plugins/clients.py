@@ -18,7 +18,7 @@ CLIENTS_ID = 'clients_id';
 
 gClients = {};
 
-def showClients(type, conference, nick, param):
+def showClients(msgType, conference, nick, param):
 	userNick = param or nick;
 	if(nickIsOnline(conference, userNick)):
 		trueJid = getTrueJid(conference, userNick);
@@ -30,11 +30,11 @@ def showClients(type, conference, nick, param):
 					message = u'ты заходил сюда с ';
 				else:
 					message = param + u' заходил сюда с ';
-				sendMsg(type, conference, nick, message + u', '.join(clients));
+				sendMsg(msgType, conference, nick, message + u', '.join(clients));
 			else:
-				sendMsg(type, conference, nick, u'нет информации' % param);
+				sendMsg(msgType, conference, nick, u'нет информации' % param);
 	else:
-		sendMsg(type, conference, nick, u'а это кто?');
+		sendMsg(msgType, conference, nick, u'а это кто?');
 
 registerCommand(showClients, u'клиенты', 10, u'Показывает, с каких клиентов заходил пользователь', u'клиенты [ник]', (u'клиенты', u'клиенты Niсk'), CHAT);
 

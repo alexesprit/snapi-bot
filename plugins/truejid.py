@@ -13,13 +13,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showTrueJid(type, conference, nick, param):
+def showTrueJid(msgType, conference, nick, param):
 	if(nickInConference(conference, param)):
-		if(PUBLIC == type):
-			sendMsg(type, conference, nick, u'смотри в привате');
+		if(PUBLIC == msgType):
+			sendMsg(msgType, conference, nick, u'смотри в привате');
 		trueJid = getTrueJid(conference, param);
 		sendMsg(PRIVATE, conference, nick, u'реальный жид %s: %s' % (param, trueJid));
 	else:
-		sendMsg(type, conference, nick, u'а это кто?');
+		sendMsg(msgType, conference, nick, u'а это кто?');
 
 registerCommand(showTrueJid, u'тружид', 20, u'Показывает реальный жид указанного ника', u'тружид <ник>', (u'тружид guy', ), CHAT | PARAM);

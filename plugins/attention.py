@@ -13,8 +13,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def attentionListener(stanza, type, jid, resource, trueJid, body):
+def attentionListener(stanza, msgType, jid, resource, trueJid, body):
 	if(stanza.getTags('attention')):
-		sendMsg(type, jid, resource, u'эй, чочо надо?');
+		sendMsg(msgType, jid, resource, u'эй, чочо надо?');
 
 registerMessageHandler(attentionListener, ROSTER);

@@ -26,28 +26,28 @@ LANGUAGES = {u'en': u'английский', u'ja': u'японский', u'ru': 
 			u'fi': u'финский', u'fr': u'французский', u'hi': u'хинди', u'hr': u'хорватский', u'cs': u'чешский', u'sv': u'шведский', 
 			u'et': u'эстонский'};
 
-def translateText(type, conference, nick, param):
+def translateText(msgType, conference, nick, param):
 	param = param.split(None, 2);
 	if(len(param) == 3):
 		(src, target, text) = param;
 		if(src in LANGUAGES and target in LANGUAGES):
 			if(src == 'auto'):
 				if(target == 'auto'):
-					sendMsg(type, conference, nick, u'ошибочный запрос. прочитай помощь по использованию команды');
+					sendMsg(msgType, conference, nick, u'ошибочный запрос. прочитай помощь по использованию команды');
 					return;
 				else:
 					src = detectLanguage(text);
 					if(src):
 						if(not src in LANGUAGES):
-							sendMsg(type, conference, nick, u'не могу понять, что это за язык (%s)' % (src));
+							sendMsg(msgType, conference, nick, u'не могу понять, что это за язык (%s)' % (src));
 							return;
 					else:
-						sendMsg(type, conference, nick, u'не могу перевести');
+						sendMsg(msgType, conference, nick, u'не могу перевести');
 			text = getTranslatedText(text, src, target);
 			if(text):
-				sendMsg(type, conference, nick, XMLUnescape(text));
+				sendMsg(msgType, conference, nick, XMLUnescape(text));
 			else:
-				sendMsg(type, conference, nick, u'не могу перевести');
+				sendMsg(msgType, conference, nick, u'не могу перевести');
 
 def getTranslatedText(text, src, target):
 	try:

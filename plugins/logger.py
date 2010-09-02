@@ -24,7 +24,7 @@ def writeHeader(fp, jid, (year, month, day)):
 <head>
 <title>%s</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<style type="text/css">
+<style msgType="text/css">
 <!--%s-->
 </style>
 </head>
@@ -33,7 +33,7 @@ def writeHeader(fp, jid, (year, month, day)):
 <tt>
 ''' % (u' - '.join([jid, date]), cssData, jid, date));
 
-def getLogFile(type, jid, (year, month, day)):
+def getLogFile(msgType, jid, (year, month, day)):
 	fileName = u'%s/%s/%d/%02d/%02d.html' % (gLogDir, jid, year, month, day);
 	fileName = fileName.encode('utf-8');
 	if(os.path.exists(fileName)):
@@ -47,7 +47,7 @@ def getLogFile(type, jid, (year, month, day)):
 def regexUrl(matchobj):
 	return('<a href="' + matchobj.group(0) + '">' + matchobj.group(0) + '</a>');
 	
-def writeLog(type, jid, nick, body, aff = 0):
+def writeLog(msgType, jid, nick, body, aff = 0):
 	decimal = str(int(math.modf(time.time())[0] * 100000));
 	(year, month, day, hour, minute, second, weekday, yearday, daylightsavings) = time.localtime();
 	body = xmpp.simplexml.XMLescape(body);
@@ -57,7 +57,7 @@ def writeLog(type, jid, nick, body, aff = 0):
 	nick = nick.encode('utf-8');
 	timestamp = '%02d:%02d:%02d' % (hour, minute, second);
 	link = timestamp + '.' + decimal;
-	fp = getLogFile(type, jid, (year, month, day, ));
+	fp = getLogFile(msgType, jid, (year, month, day, ));
 	fp.write('<span class="timestamp"><a id="t%s" href="#t%s">[%s]</a></span>' % (link, link, timestamp));
 	if(not nick):
 		fp.write('<span class="system"> ' + body + '</span><br />\n')
@@ -76,13 +76,13 @@ def writeLog(type, jid, nick, body, aff = 0):
 				fp.write('<span class="self"> &lt;%s&gt;</span> %s<br />\n' % (nick, body));
 	fp.close();
 
-def writeMessage(stanza, type, conference, nick, trueJid, text):
-	if(PUBLIC == type and getConfigKey(conference, CFG_LOG)):
+def writeMessage(stanza, msgType, conference, nick, trueJid, text):
+	if(PUBLIC == msgType and getConfigKey(conference, CFG_LOG)):
 		aff = 0;
 		if(nick and getNickKey(conference, nick, NICK_MODER)):
 			level = getAccess(conference, trueJid);
 			aff = (level >= 30) and 2 or 1;
-		writeLog(type, conference, nick, text, aff);
+		writeLog(msgType, conference, nick, text, aff);
 
 def writeUserJoin(conference, nick, trueJid, aff, role):
 	if(getConfigKey(conference, CFG_LOG)):
@@ -109,26 +109,26 @@ def writeUserLeave(conference, nick, trueJid, reason, code):
 def writePresence(stanza, conference, nick, trueJid):
 	if(getConfigKey(conference, CFG_LOG)):
 		code = stanza.getStatusCode();
-		type = stanza.getType();
+		msgType = stanza.getType();
 		if(code == '303'):
 			newnick = stanza.getNick();
 			writeLog(PUBLIC, conference, '@$$nick$$@', u'%s сменил ник на %s' % (nick, newnick));
 
-def loggingControl(type, conference, nick, param):
+def loggingControl(msgType, conference, nick, param):
 	if(param):
 		if(param.isdigit()):
 			param = int(param);
 			if(param == 1):
 				setConfigKey(conference, CFG_LOG, 1);
-				sendMsg(type, conference, nick, u'логирование включено');
+				sendMsg(msgType, conference, nick, u'логирование включено');
 			else:
 				setConfigKey(conference, CFG_LOG, 0);
-				sendMsg(type, conference, nick, u'логирование отключено');
+				sendMsg(msgType, conference, nick, u'логирование отключено');
 			saveChatConfig(conference);
 		else:
-			sendMsg(type, conference, nick, u'прочитай помощь по команде');
+			sendMsg(msgType, conference, nick, u'прочитай помощь по команде');
 	else:
-		sendMsg(type, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_LOG)));
+		sendMsg(msgType, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_LOG)));
 
 def setLoggingState(conference):
 	if(getConfigKey(conference, CFG_LOG) is None):

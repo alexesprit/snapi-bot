@@ -15,8 +15,8 @@
 
 CLEAR_ITERATIONS = 20;
 
-def clearConference(type, conference, nick, param):
-	sendMsg(type, conference, nick, u'сейчас уберу...');
+def clearConference(msgType, conference, nick, param):
+	sendMsg(msgType, conference, nick, u'сейчас уберу...');
 	for i in xrange(CLEAR_ITERATIONS):
 		sendToConference(conference, '');
 		time.sleep(2);

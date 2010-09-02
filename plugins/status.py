@@ -13,23 +13,23 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showUserStatus(type, conference, nick, param):
+def showUserStatus(msgType, conference, nick, param):
 	userNick = param or nick;
 	if(nickIsOnline(conference, userNick)):
 		show = getNickKey(conference, userNick, NICK_SHOW);
 		status = getNickKey(conference, userNick, NICK_STATUS);
 		if(param):
 			if(status):
-				sendMsg(type, conference, nick, u'%s сейчас %s (%s)' % (userNick, show, status));
+				sendMsg(msgType, conference, nick, u'%s сейчас %s (%s)' % (userNick, show, status));
 			else:
-				sendMsg(type, conference, nick, u'%s сейчас %s' % (userNick, show));
+				sendMsg(msgType, conference, nick, u'%s сейчас %s' % (userNick, show));
 		else:
 			if(status):
-				sendMsg(type, conference, nick, u'ты сейчас %s (%s)' % (show, status));
+				sendMsg(msgType, conference, nick, u'ты сейчас %s (%s)' % (show, status));
 			else:
-				sendMsg(type, conference, nick, u'ты сейчас %s' % (show));
+				sendMsg(msgType, conference, nick, u'ты сейчас %s' % (show));
 	else:
-		sendMsg(type, conference, nick, u'а это кто?');
+		sendMsg(msgType, conference, nick, u'а это кто?');
 				
 registerCommand(showUserStatus, u'статус', 10, u'Показывает статус указанного пользователя', u'статус [ник]', (u'статус', u'статус Nick'), CHAT);
 

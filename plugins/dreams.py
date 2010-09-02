@@ -13,13 +13,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showDreamInfo(type, conference, nick, param):
+def showDreamInfo(msgType, conference, nick, param):
 	query = urllib.urlencode({'key' : param.encode('cp1251')});
 	text = unicode(urllib.urlopen('http://www.sonnik.ru/search.php?%s' % (query)).read(), 'windows-1251');
 	items = re.search(r'<div id="mntxt">(.*?)</p>', text, re.DOTALL);
 	text = decode(items.group(0));
-	if(PUBLIC == type):
-		sendMsg(type, conference, nick, u'ушло в приват');
+	if(PUBLIC == msgType):
+		sendMsg(msgType, conference, nick, u'ушло в приват');
 	sendMsg(PRIVATE, conference, nick, text);
 
 registerCommand(showDreamInfo, u'сонник', 10, u'Толкователь снов', u'сонник <что-то>', (u'сонник деньги', ), ANY | PARAM);

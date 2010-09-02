@@ -31,41 +31,41 @@ def setUserAffiliation(conference, param, aff):
 		return(True);
 	return(False);
 
-def setOutcast(type, conference, nick, param):
+def setOutcast(msgType, conference, nick, param):
 	if(setUserAffiliation(conference, param, AFF_OUTCAST)):
-		sendMsg(type, conference, nick, u'сделала');
+		sendMsg(msgType, conference, nick, u'сделала');
 	
-def setNone(type, conference, nick, param):
+def setNone(msgType, conference, nick, param):
 	if(setUserAffiliation(conference, param, AFF_NONE)):
-		sendMsg(type, conference, nick, u'сделала');
+		sendMsg(msgType, conference, nick, u'сделала');
 	
-def setMember(type, conference, nick, param):
+def setMember(msgType, conference, nick, param):
 	if(setUserAffiliation(conference, param, AFF_MEMBER)):
-		sendMsg(type, conference, nick, u'сделала');
+		sendMsg(msgType, conference, nick, u'сделала');
 	
-def setAdmin(type, conference, nick, param):
+def setAdmin(msgType, conference, nick, param):
 	if(setUserAffiliation(conference, param, AFF_ADMIN)):
-		sendMsg(type, conference, nick, u'сделала');
+		sendMsg(msgType, conference, nick, u'сделала');
 	
-def setOwner(type, conference, nick, param):
+def setOwner(msgType, conference, nick, param):
 	if(setUserAffiliation(conference, param, AFF_OWNER)):
-		sendMsg(type, conference, nick, u'сделала');
+		sendMsg(msgType, conference, nick, u'сделала');
 	
-def setKick(type, conference, nick, param):
+def setKick(msgType, conference, nick, param):
 	if(setUserRole(conference, param, ROLE_NONE)):
-		sendMsg(type, conference, nick, u'сделала');
+		sendMsg(msgType, conference, nick, u'сделала');
 		
-def setVisitor(type, conference, nick, param):
+def setVisitor(msgType, conference, nick, param):
 	if(setUserRole(conference, param, ROLE_VISITOR)):
-		sendMsg(type, conference, nick, u'сделала');
+		sendMsg(msgType, conference, nick, u'сделала');
 	
-def setParticipant(type, conference, nick, param):
+def setParticipant(msgType, conference, nick, param):
 	if(setUserRole(conference, param, ROLE_PARTICIPANT)):
-		sendMsg(type, conference, nick, u'сделала');
+		sendMsg(msgType, conference, nick, u'сделала');
 
-def setModerator(type, conference, nick, param):
+def setModerator(msgType, conference, nick, param):
 	if(setUserRole(conference, param, ROLE_MODERATOR)):
-		sendMsg(type, conference, nick, u'сделала');
+		sendMsg(msgType, conference, nick, u'сделала');
 
 registerCommand(setOutcast, u'бан', 20, u'Банит пользователя', u'бан <ник/жид>', (u'бан bot@freize.org', u'бан Nick'), CHAT | PARAM);
 registerCommand(setNone, u'избани', 20, u'Разбанивает пользователя', u'избани <ник/жид>', (u'избани bot@freize.org', u'избани Nick'), CHAT | PARAM);

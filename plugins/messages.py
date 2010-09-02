@@ -13,21 +13,21 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def sendToAdmins(type, conference, nick, param):
+def sendToAdmins(msgType, conference, nick, param):
 	for admin in gAdmins:
 		msg(admin, u'Сообщение от %s из %s:\n%s' % (conference, nick, param));
-	sendMsg(type, conference, nick, u'ваше сообщение отправлено');
+	sendMsg(msgType, conference, nick, u'ваше сообщение отправлено');
 
-def sendToConferences(type, conference, nick, param):
+def sendToConferences(msgType, conference, nick, param):
 	conferences = getConferences();
 	count = 0;
 	for conf in conferences:
 		if(isPopupEnabled(conf)):
 			sendToConference(conf, u'Новости от администрации:\n%s' % param);
 			count += 1;
-	sendMsg(type, conference, nick, 'мессага ушла в %d конференций из %d' % (count, len(conferences)));
+	sendMsg(msgType, conference, nick, 'мессага ушла в %d конференций из %d' % (count, len(conferences)));
 	
-def messageToChat(type, conference, nick, param):
+def messageToChat(msgType, conference, nick, param):
 	sendToConference(conference, param);
 
 registerCommand(sendToConferences, u'мессага_конфам', 100, u'Отправляет сообщение по всем конференциям, в которых сидит бот', u'мессага_конфам [сообщение]', (u'мессага_конфам привет!11'), ANY | PARAM);

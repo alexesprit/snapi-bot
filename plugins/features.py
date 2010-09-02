@@ -72,12 +72,12 @@ xmpp.NS_ROSTER:				'RFC 3921: XMPP IM',
 
 gFeatList = FEATURES.keys();
 
-def showFeatures(type, conference, nick, param):
+def showFeatures(msgType, conference, nick, param):
 	if(param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			jid = conference + '/' + param;
 		else:
-			sendMsg(type, conference, nick, u'а это кто?');
+			sendMsg(msgType, conference, nick, u'а это кто?');
 			return;
 	else:
 		jid = conference + '/' + nick;
@@ -86,9 +86,9 @@ def showFeatures(type, conference, nick, param):
 	iq.addChild('query', {}, [], 'http://jabber.org/protocol/disco#info');
 	featID = getUniqueID(FEAT_ID);
 	iq.setID(featID);
-	gClient.SendAndCallForResponse(iq, _showFeatures, (featID, type, conference, nick, param, ));
+	gClient.SendAndCallForResponse(iq, _showFeatures, (featID, msgType, conference, nick, param, ));
 
-def _showFeatures(stanza, featID, type, conference, nick, param):
+def _showFeatures(stanza, featID, msgType, conference, nick, param):
 	if(featID == stanza.getID()):
 		if(stanza.getType() == 'result'):
 			featList = set();
@@ -106,12 +106,12 @@ def _showFeatures(stanza, featID, type, conference, nick, param):
 					answer = u'клиент %s поддерживает следующие стандарты:\n%s' % (param, '\n'.join(featList));
 				else:
 					answer = u'твой клиент поддерживает следующие стандарты:\n%s' % ('\n'.join(featList));
-				if(PUBLIC == type):
-					sendMsg(type, conference, nick, u'ушли');
+				if(PUBLIC == msgType):
+					sendMsg(msgType, conference, nick, u'ушли');
 				sendMsg(PRIVATE, conference, nick, answer);
 			else:
-				sendMsg(type, conference, nick, u'нет инфы');
+				sendMsg(msgType, conference, nick, u'нет инфы');
 		else:
-			sendMsg(type, conference, nick, u'не могу :(');
+			sendMsg(msgType, conference, nick, u'не могу :(');
 		
 registerCommand(showFeatures, u'фичи', 10, u'Показывает, какие XEP-ы подерживает клиент указанного пользователя', u'фичи [ник]', (u'фичи', u'фичи Nick'));

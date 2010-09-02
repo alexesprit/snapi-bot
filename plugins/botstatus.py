@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def changeStatus(type, conference, nick, param):
+def changeStatus(msgType, conference, nick, param):
 	args = param.split(' ', 1);
 	show, status = '', '';
 	if(args[0] in ('away', 'xa', 'dnd', 'chat')):
