@@ -22,15 +22,19 @@ from __future__ import with_statement;
 import codecs, math, os, random, re, sys, threading, time, traceback, types, urllib;
 import database, macros, simplejson, xmpp;
 
+CONFIG_DIR = 'config';
 PLUGIN_DIR = 'plugins';
+SYSLOG_DIR = 'syslogs';
+RESOURCE_DIR = 'resource';
+
 PID_FILE = 'pid.txt';
-CONFIG_FILE = 'config.py';
-CHATLIST_FILE = 'config/conferences.txt';
-GLOBACCESS_FILE = 'config/access.txt';
-PERMACCESS_FILE = 'config/%s/access.txt';
-CHATCONFIG_FILE = 'config/%s/config.txt';
-ERRORLOG_FILE = 'syslogs/%Y.%m.%d_error.txt';
-CRASHLOG_FILE = 'syslogs/%Y.%m.%d_crash.txt';
+BOTCONFIG_FILE = 'config.py';
+
+ACCESS_FILE = 'access.txt';
+CONFIG_FILE = 'config.txt';
+CONF_FILE = 'conferences.txt';
+ERROR_FILE = '%Y.%m.%d_error.txt';
+CRASH_FILE = '%Y.%m.%d_crash.txt';
 
 FLAG_INFO = 'info';
 FLAG_READ = 'read';
@@ -40,10 +44,10 @@ FLAG_ERROR = 'error';
 FLAG_WARNING = 'warning';
 FLAG_SUCCESS = 'success';
 
-ADDCONF = 1 << 1;
-DELCONF = 1 << 2;
-STARTUP = 1 << 3;
-INIT_2 = 1 << 4;
+ADDCONF = 0x1;
+DELCONF = 0x2;
+STARTUP = 0x3;
+INIT_2 = 0x4;
 
 CHAT = 1 << 1;
 ROSTER = 1 << 2;
@@ -84,8 +88,14 @@ REJOIN_TIMEOUT = 120;
 RETRY_TIMEOUT = 15;
 RECONNECT_DELAY = 5;
 
+CMD_DESC = 0x1;
+CMD_ACCESS = 0x2;
+CMD_SYNTAX = 0x3;
+CMD_EXAMPLE = 0x4;
+CMD_TYPE = 0x5;
+
 os.chdir(os.path.dirname(sys.argv[0]));
-execfile(CONFIG_FILE) in globals();
+execfile(BOTCONFIG_FILE) in globals();
 
 gUserName, gServer = gJid.split('@');
 gClient = xmpp.Client(server = gServer, port = gPort, debug = gXmppDebug);
@@ -159,7 +169,7 @@ def registerEvent(function, evtType):
 
 def registerCommand(function, command, access, desc, syntax, examples, cmdType = ANY):
 	gCmdHandlers[command] = function;
-	gCommands[command] = {'access': access, 'desc': desc, 'syntax': syntax, 'examples': examples, 'msgType': cmdType};
+	gCommands[command] = {CMD_ACCESS: access, CMD_DESC: desc, CMD_SYNTAX: syntax, CMD_EXAMPLE: examples, CMD_TYPE: cmdType};
 
 def callBotMessageHandlers(msgType, jid, text):
 	for handler in gBotMsgHandlers:
@@ -167,26 +177,26 @@ def callBotMessageHandlers(msgType, jid, text):
 
 def callJoinHandlers(conference, nick, trueJid, aff, role):
 	for handler in gJoinHandlers:
-		startThread(handler, (conference, nick, trueJid, aff, role, ));
+		startThread(handler, (conference, nick, trueJid, aff, role));
 
 def callLeaveHandlers(conference, nick, trueJid, reason, code):
 	for handler in gLeaveHandlers:
-		startThread(handler, (conference, nick, trueJid, reason, code, ));
+		startThread(handler, (conference, nick, trueJid, reason, code));
 
 def callMessageHandlers(msgType, stanza, evtType, conference, nick, trueJid, body):
 	gInfo['msg'] += 1;
 	for handler in gMessageHandlers[evtType]:
-		startThread(handler, (stanza, msgType, conference, nick, trueJid, body, ));
+		startThread(handler, (stanza, msgType, conference, nick, trueJid, body));
 
 def callIqHandlers(stanza, jid, resource):
 	gInfo['iq'] += 1;
 	for handler in gIqHandlers:
-		startThread(handler, (stanza, jid, resource, ));
+		startThread(handler, (stanza, jid, resource));
 
 def callPresenceHandlers(stanza, prsType, jid, resource, trueJid):
 	gInfo['prs'] += 1;
 	for handler in gPresenceHandlers[prsType]:
-		startThread(handler, (stanza, jid, resource, trueJid, ));
+		startThread(handler, (stanza, jid, resource, trueJid));
 
 def callEventHandlers(evtType, param = None):
 	if(param):
@@ -199,12 +209,12 @@ def callEventHandlers(evtType, param = None):
 def callCommandHandlers(command, cmdType, jid, resource, param):
 	gInfo['cmd'] += 1;
 	if(command in gCmdHandlers):
-		startThread(gCmdHandlers[command], (cmdType, jid, resource, param, ));
+		startThread(gCmdHandlers[command], (cmdType, jid, resource, param));
 
 def startThread(func, param = None):
 	gInfo['thr'] += 1;
 	if(param):
-		threading.Thread(None, execute, func.__name__, (func, param, )).start();
+		threading.Thread(None, execute, func.__name__, (func, param)).start();
 	else:
 		threading.Thread(None, execute, func.__name__, (func, )).start();
 
@@ -296,13 +306,19 @@ def writeFile(path, data, mode = 'w'):
 	f.write(data);
 	f.close();
 
+def getConfigPath(*param):
+	return(os.path.join(CONFIG_DIR, *param));
+
+def getFilePath(*param):
+	return(os.path.join(*param));
+
 def loadChatConfig(conference):
-	fileName = CHATCONFIG_FILE % (conference);
+	fileName = getConfigPath(conference, CONFIG_FILE);
 	createFile(fileName, '{}');
 	gConfig[conference] = eval(readFile(fileName));
 
 def saveChatConfig(conference):
-	fileName = CHATCONFIG_FILE % (conference);
+	fileName = getConfigPath(conference, CONFIG_FILE);
 	writeFile(fileName, str(gConfig[conference]));
 
 def getConfigKey(conference, key):
@@ -320,7 +336,7 @@ def joinConferences(conferences):
 def addConference(conference):
 	gConferences[conference] = {};
 	gIsJoined[conference] = False;
-	writeFile(CHATLIST_FILE, str(gConferences.keys()));
+	writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()));
 	loadChatConfig(conference);
 	for process in gEventHandlers[ADDCONF]:
 		process(conference);
@@ -331,7 +347,7 @@ def delConference(conference):
 	del(gIsJoined[conference]);
 	del(gConfig[conference]);
 	del(gConferences[conference]);
-	writeFile(CHATLIST_FILE, str(gConferences.keys()));
+	writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()));
 
 def joinConference(conference, nick, password):
 	setConfigKey(conference, 'nick', nick);
@@ -426,7 +442,7 @@ def isCommand(command):
 	return(command in gCommands);
 
 def isCommandType(command, cmdType):
-	return(gCommands[command]['msgType'] & cmdType);
+	return(gCommands[command][CMD_TYPE] & cmdType);
 
 def isAvailableCommand(conference, command):
 	return(not(conference in gCmdOff and command in gCmdOff[conference]));
@@ -603,7 +619,7 @@ def messageHandler(session, stanza):
 	body = message.split();
 	command = body[0].lower();
 	if(isCommand(command)):
-		access = gCommands[command]['access'];
+		access = gCommands[command][CMD_ACCESS];
 	else:
 		if(gMacros.hasMacros(command)):
 			access = gMacros.getAccess(command);
@@ -694,7 +710,7 @@ def iqHandler(session, stanza):
 def errorHandler(funcName):
 	gInfo['err'] += 1;
 	printf('Exception in %s function' % (funcName), FLAG_ERROR);
-	fileName = time.strftime(ERRORLOG_FILE);
+	fileName = getFilePath(SYSLOG_DIR, time.strftime(ERROR_FILE));
 	writeFile(fileName, traceback.format_exc() + '\n', 'a');
 
 def loadPlugins():
@@ -765,8 +781,9 @@ def start():
 
 	printf('Now I am ready to work :)');
 
-	createFile(CHATLIST_FILE, '[]');
-	conferences = eval(readFile(CHATLIST_FILE));
+	fileName = getConfigPath(CONF_FILE);
+	createFile(fileName, '[]');
+	conferences = eval(readFile(fileName));
 	if(conferences):
 		for conference in conferences:
 			addConference(conference);
@@ -794,7 +811,7 @@ if(__name__ == '__main__'):
 			restart();
 	except(Exception):
 		printf('Exception in main thread', FLAG_ERROR);
-		fileName = time.strftime(CRASHLOG_FILE);
+		fileName = getFilePath(SYSLOG_DIR, time.strftime(ERROR_FILE));
 		writeFile(fileName, traceback.format_exc() + '\n', 'a');		
 		if(gClient.isConnected()):
 			prs = xmpp.Presence(typ = UNAVAILABLE);
@@ -802,3 +819,5 @@ if(__name__ == '__main__'):
 			gClient.send(prs);
 		if(gRestart):
 			restart();
+		else:
+			os.abort();

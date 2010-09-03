@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-CLIENTS_FILE = 'config/%s/clients.txt';
+CLIENTS_FILE = 'clients.txt';
 CLIENTS_ID = 'clients_id';
 
 gClients = {};
@@ -65,7 +65,7 @@ def _clientsChecking(stanza, cliID, conference, trueJid):
 						base.save();
 
 def loadClientsCache(conference):
-	fileName = CLIENTS_FILE % (conference);
+	fileName = getConfigPath(conference, CLIENTS_FILE);
 	gClients[conference] = database.DataBase(fileName);
 
 registerEvent(loadClientsCache, ADDCONF);

@@ -34,38 +34,56 @@ def setUserAffiliation(conference, param, aff):
 def setOutcast(msgType, conference, nick, param):
 	if(setUserAffiliation(conference, param, AFF_OUTCAST)):
 		sendMsg(msgType, conference, nick, u'сделала');
-	
+	else:
+		sendMsg(msgType, conference, nick, u'а это кто?');
+
 def setNone(msgType, conference, nick, param):
 	if(setUserAffiliation(conference, param, AFF_NONE)):
 		sendMsg(msgType, conference, nick, u'сделала');
-	
+	else:
+		sendMsg(msgType, conference, nick, u'а это кто?');
+
 def setMember(msgType, conference, nick, param):
 	if(setUserAffiliation(conference, param, AFF_MEMBER)):
 		sendMsg(msgType, conference, nick, u'сделала');
-	
+	else:
+		sendMsg(msgType, conference, nick, u'а это кто?');
+
 def setAdmin(msgType, conference, nick, param):
 	if(setUserAffiliation(conference, param, AFF_ADMIN)):
 		sendMsg(msgType, conference, nick, u'сделала');
-	
+	else:
+		sendMsg(msgType, conference, nick, u'а это кто?');
+
 def setOwner(msgType, conference, nick, param):
 	if(setUserAffiliation(conference, param, AFF_OWNER)):
 		sendMsg(msgType, conference, nick, u'сделала');
+	else:
+		sendMsg(msgType, conference, nick, u'а это кто?');
 	
 def setKick(msgType, conference, nick, param):
 	if(setUserRole(conference, param, ROLE_NONE)):
 		sendMsg(msgType, conference, nick, u'сделала');
+	else:
+		sendMsg(msgType, conference, nick, u'а это кто?');
 		
 def setVisitor(msgType, conference, nick, param):
 	if(setUserRole(conference, param, ROLE_VISITOR)):
 		sendMsg(msgType, conference, nick, u'сделала');
-	
+	else:
+		sendMsg(msgType, conference, nick, u'а это кто?');
+
 def setParticipant(msgType, conference, nick, param):
 	if(setUserRole(conference, param, ROLE_PARTICIPANT)):
 		sendMsg(msgType, conference, nick, u'сделала');
+	else:
+		sendMsg(msgType, conference, nick, u'а это кто?');
 
 def setModerator(msgType, conference, nick, param):
 	if(setUserRole(conference, param, ROLE_MODERATOR)):
 		sendMsg(msgType, conference, nick, u'сделала');
+	else:
+		sendMsg(msgType, conference, nick, u'а это кто?');
 
 registerCommand(setOutcast, u'бан', 20, u'Банит пользователя', u'бан <ник/жид>', (u'бан bot@freize.org', u'бан Nick'), CHAT | PARAM);
 registerCommand(setNone, u'избани', 20, u'Разбанивает пользователя', u'избани <ник/жид>', (u'избани bot@freize.org', u'избани Nick'), CHAT | PARAM);

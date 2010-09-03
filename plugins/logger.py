@@ -109,7 +109,7 @@ def writeUserLeave(conference, nick, trueJid, reason, code):
 def writePresence(stanza, conference, nick, trueJid):
 	if(getConfigKey(conference, CFG_LOG)):
 		code = stanza.getStatusCode();
-		msgType = stanza.getType();
+		prsType = stanza.getType();
 		if(code == '303'):
 			newnick = stanza.getNick();
 			writeLog(PUBLIC, conference, '@$$nick$$@', u'%s сменил ник на %s' % (nick, newnick));

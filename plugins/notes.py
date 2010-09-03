@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-NOTE_FILE = 'config/notepad.txt';
+NOTE_FILE = 'notepad.txt';
 
 gNotes = {};
 
@@ -68,7 +68,7 @@ def showNotes(msgType, conference, nick, param):
 
 def loadNotes():
 	global gNotes;
-	gNotes = database.DataBase(NOTE_FILE);
+	gNotes = database.DataBase(getConfigPath(NOTE_FILE));
 
 registerEvent(loadNotes, STARTUP);
 registerCommand(addNote, u'заметка+', 10, u'Добавляет запись в ваш блокнот', u'заметка+ <что-то>', (u'заметка+ ы', ), ANY | PARAM);

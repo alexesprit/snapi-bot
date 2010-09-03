@@ -27,7 +27,7 @@ def addLocalMacros(msgType, conference, nick, param):
 			return;
 		command = raw[1].split()[0];
 		if(isCommand(command)):
-			access = gCommands[command]['access'];
+			access = gCommands[command][CMD_ACCESS];
 		elif(gMacros.hasMacros(command)):
 			access = gMacros.getAccess(command);
 		elif(gMacros.hasMacros(command, conference)):
@@ -59,7 +59,7 @@ def addGlobalMacros(msgType, conference, nick, param):
 			return;
 		command = raw[1].split()[0];
 		if(isCommand(command)):
-			access = gCommands[command]['access'];
+			access = gCommands[command][CMD_ACCESS];
 		elif(gMacros.hasMacros(command)):
 			access = gMacros.getAccess(command);
 		else:

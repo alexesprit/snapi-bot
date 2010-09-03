@@ -20,15 +20,15 @@ def showHelp(msgType, conference, nick, param):
 		param = param.lower();
 		cmdType = conferenceInList(conference) and CHAT or ROSTER;
 		if(isCommand(param) and isCommandType(param, cmdType)):
-			message = gCommands[param]['desc'];
-			syntax = gCommands[param]['syntax'];
+			message = gCommands[param][CMD_DESC];
+			syntax = gCommands[param][CMD_SYNTAX];
 			if(syntax):
-				message += u'\nСинтаксис: %s' % (gCommands[param]['syntax']);
+				message += u'\nСинтаксис: %s' % (syntax);
 			message += u'\nПримеры:'
-			for example in gCommands[param]['examples']:
+			for example in gCommands[param][CMD_EXAMPLE]:
 				message += u'\n * %s' % (example);
 			if(cmdType == CHAT):
-				message += u'\nМин. уровень доступа: %d' % (gCommands[param]['access']);
+				message += u'\nМин. уровень доступа: %d' % (gCommands[param][CMD_ACCESS]);
 				if(not isAvailableCommand(conference, param)):
 					message += u'\nЭта команда отключена в этой конференции!';
 			sendMsg(msgType, conference, nick, message);
@@ -46,7 +46,7 @@ def showCommands(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick);
 	for cmd in gCommands:
 		if(isCommandType(cmd, cmdType)):
-			if(getAccess(conference, trueJid) >= gCommands[cmd]['access']):
+			if(getAccess(conference, trueJid) >= gCommands[cmd][CMD_ACCESS]):
 				if(cmdType == ROSTER):
 					availableCmds.append(cmd);
 				else:

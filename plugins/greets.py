@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-GREET_FILENAME = 'config/%s/greets.txt';
+GREET_FILE = 'greets.txt';
 
 gGreets = {};
 
@@ -34,7 +34,8 @@ def setGreet(msgType, conference, nick, param):
 				del(gGreets[conference][trueJid]);
 		else:
 			gGreets[conference][trueJid] = greet;
-		writeFile(GREET_FILENAME % (conference), str(gGreets[conference]));
+		fileName = getConfigPath(conference, GREET_FILE);
+		writeFile(fileName, str(gGreets[conference]));
 		sendMsg(msgType, conference, nick, u'запомнила');
 
 registerCommand(setGreet, u'приветствие', 30, u'Добавляет приветствие для определённого ника/жида', u'приветствие <ник/жид> = [текст]', (u'приветствие Nick = something', ), CHAT | PARAM);
@@ -46,7 +47,7 @@ def sendGreeting(conference, nick, trueJid, aff, role):
 registerJoinHandler(sendGreeting);
 
 def loadGreetings(conference):
-	fileName = GREET_FILENAME % (conference);
+	fileName = getConfigPath(conference, GREET_FILE);
 	createFile(fileName, '{}');
 	gGreets[conference] = eval(readFile(fileName));
 

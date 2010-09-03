@@ -52,7 +52,7 @@ def deletePath(msgType, conference, nick, param):
 def deleteFromConfig(msgType, conference, nick, param):
 	files, dirs = 0, 0;
 	for conf in getConferences():
-		path = 'config/%s/%s' % (conf, param);
+		path = getConfigPath(conf, param);
 		answer = deleteFile(path);
 		if(answer == DIR):
 			dirs += 1;

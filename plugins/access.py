@@ -157,15 +157,16 @@ registerCommand(showLocalAccesses, u'локалдоступы', 20, u'Показ
 
 def loadGlobalAccesses():
 	global gGlobalAccess;
-	createFile(GLOBACCESS_FILE, '{}');
-	gGlobalAccess = eval(readFile(GLOBACCESS_FILE));
+	fileName = getConfigPath(ACCESS_FILE);
+	createFile(fileName, '{}');
+	gGlobalAccess = eval(readFile(fileName));
 	for jid in gAdmins:
 		gGlobalAccess[jid] = 100;
 
 registerEvent(loadGlobalAccesses, STARTUP);
 
 def loadLocalAccesses(conference):
-	fileName = PERMACCESS_FILE % (conference);
+	fileName = getConfigPath(conference, ACCESS_FILE);
 	createFile(fileName, '{}');
 	gPermAccess[conference] = eval(readFile(fileName));
 	gTempAccess[conference] = {};

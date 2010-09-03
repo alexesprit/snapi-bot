@@ -46,8 +46,8 @@ def startCleaning():
 	for item in SINGLE_BASES:
 		base = globals()[item];
 		_cleanBase(base, SINGLE_KEEP_TIME);
-	for log in os.listdir('syslogs'):
-		logPath = os.path.join('syslogs', log);
+	for log in os.listdir(SYSLOG_DIR):
+		logPath = os.path.join(SYSLOG_DIR, log);
 		changeTime = os.path.getctime(logPath);
 		if(time.time() - changeTime > LOGS_KEEP_TIME):
 			os.remove(logPath);

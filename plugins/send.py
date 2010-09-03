@@ -14,7 +14,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-QUEUE_CACHE_FILE = 'config/%s/send.txt';
+SEND_FILE = 'send.txt';
 
 gSend = {};
 
@@ -54,7 +54,7 @@ def checkQueue(conference, nick, trueJid, aff, role):
 registerJoinHandler(checkQueue);
 
 def loadSendCache(conference):
-	fileName = QUEUE_CACHE_FILE % (conference);
+	fileName = getConfigPath(conference, SEND_FILE);
 	gSend[conference] = database.DataBase(fileName);
 
 registerEvent(loadSendCache, ADDCONF);

@@ -13,16 +13,16 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-MODERATORS_FILE = 'config/%s/moderators.txt';
+MODERATORS_FILE = 'moderators.txt';
 
 gModerators = {};
 
 def saveModerators(conference):
-	fileName = MODERATORS_FILE % (conference);
+	fileName = getConfigPath(conference, MODERATORS_FILE);
 	writeFile(fileName, str(gModerators[conference]));
 
 def loadModerators(conference):
-	fileName = MODERATORS_FILE % (conference);
+	fileName = getConfigPath(conference, MODERATORS_FILE);
 	createFile(fileName, '[]');
 	gModerators[conference] = eval(readFile(fileName));
 

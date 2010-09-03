@@ -14,7 +14,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-VOTES_FILE = 'config/%s/vote.txt';
+VOTE_FILE = 'vote.txt';
 
 gVotes = {};
 
@@ -34,7 +34,7 @@ def getResults(conference):
 	return(voteText + '\n'.join(items));
 
 def saveVotes(conference):
-	fileName = VOTES_FILE % (conference);
+	fileName = getConfigPath(conference, VOTE_FILE);
 	writeFile(fileName, str(gVotes[conference]));
 
 def vote(msgType, conference, nick, param):
@@ -214,7 +214,7 @@ def showVote(conference, nick, trueJid, aff, role):
 registerJoinHandler(showVote);
 
 def loadVotes(conference):
-	fileName = VOTES_FILE % (conference);
+	fileName = getConfigPath(conference, VOTE_FILE);
 	createFile(fileName, '{}');
 	gVotes[conference] = eval(readFile(fileName));
 

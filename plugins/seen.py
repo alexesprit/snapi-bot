@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-SEEN_FILE = 'config/%s/seen.txt';
+SEEN_FILE = 'seen.txt';
 
 gSeen = {};
 
@@ -44,7 +44,7 @@ def updateSeenTime(conference, nick, trueJid, reason, code):
 registerLeaveHandler(updateSeenTime);
 
 def loadSeenBase(conference):
-	fileName = SEEN_FILE % (conference);
+	fileName = getConfigPath(conference, SEEN_FILE);
 	createFile(fileName, '{}');
 	gSeen[conference] = database.DataBase(fileName);
 

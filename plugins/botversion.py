@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-VER_FILE = 'config/version.txt';
+VER_FILE = 'version.txt';
 
 def setBotVersion(msgType, conference, nick, param):
 	global gVersion;
@@ -21,7 +21,8 @@ def setBotVersion(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u'|'.join(gVersion));
 	elif(param.count('|') == 2):
 		gVersion = tuple(param.split('|'));
-		writeFile(VER_FILENAME, str(gVersion));
+		fileName = getConfigPath(VER_FILE);
+		writeFile(fileName, str(gVersion));
 		sendMsg(msgType, conference, nick, u'поняла, сейчас поставлю');
 	else:
 		sendMsg(msgType, conference, nick, u'читай справку по команде');
@@ -30,7 +31,8 @@ registerCommand(setBotVersion, u'ботверсия', 100, u'Выставляе�
 
 def loadBotVersion():
 	global gVersion;
-	createFile(VER_FILE, str(gVersion));
-	gVersion = eval(readFile(VER_FILE));
+	fileName = getConfigPath(VER_FILE);
+	createFile(fileName, str(gVersion));
+	gVersion = eval(readFile(fileName));
 
 registerEvent(loadBotVersion, STARTUP);

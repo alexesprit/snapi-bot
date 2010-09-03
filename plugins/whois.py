@@ -14,7 +14,8 @@
 # GNU General Public License for more details.
 
 def showWhoIs(msgType, conference, nick, param):
-	rawHtml = urllib.urlopen('http://1whois.ru/index.php?url=%s' % (param)).read();
+	query = urllib.urlencode({'url' : param.encode('utf-8')});
+	rawHtml = urllib.urlopen('http://1whois.ru/index.php?%s' % (query)).read();
 	items = re.search('<blockquote>(.*?)</font></blockquote>', rawHtml, re.DOTALL);
 	if(items):
 		text = items.group(0);

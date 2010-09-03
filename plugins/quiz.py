@@ -14,13 +14,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-QUIZ_FILE = 'resource/questions.txt';
-QUIZ_SCORES_FILE = 'config/%s/quiz.txt';
+QUIZ_FILE = 'questions.txt';
+QUIZ_SCORES_FILE = 'quiz.txt';
 
-QUIZ_TOTAL_LINES = sum(1 for i in open(QUIZ_FILE, 'r'));
+QUIZ_TOTAL_LINES = sum(1 for i in open(getFilePath(RESOURCE_DIR, QUIZ_FILE), 'r'));
 QUIZ_TIME_LIMIT = 180;
 QUIZ_IDLE_LIMIT = 3;
-QUIZ_COEF = 2;
+QUIZ_COEF = 3;
 
 gQuizScores = {};
 
@@ -179,7 +179,7 @@ def showQuestion(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u'(*) Текущий вопрос: \n' + gQuizQuestion[conference]);
 		
 def loadQuizScores(conference):
-	fileName = QUIZ_SCORES_FILE % (conference);
+	fileName = getConfigPath(conference, QUIZ_SCORES_FILE);
 	gQuizScores[conference] = database.DataBase(fileName);
 
 registerEvent(loadQuizScores, ADDCONF);

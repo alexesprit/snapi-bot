@@ -16,6 +16,9 @@
 import os, random, re;
 import __main__, xmpp;
 
+MACROS_FILE = 'macros.txt';
+MACCESS_FILE = 'macrosaccess.txt';
+
 def getRand(args, source):
 	try:
 		f = int(args[0]);
@@ -99,82 +102,82 @@ class Macros:
 	accessList = {};
 	macroCommands = MacroCommands();
 
-	def loadMacroses(self, groupChat = None):
-		if(groupChat):
-			macrosFileName = 'config/%s/macros.txt' % (groupChat);
-			accessFileName = 'config/%s/macrosaccess.txt' % (groupChat);
+	def loadMacroses(self, conference = None):
+		if(conference):
+			macrosFileName = __main__.getConfigPath(conference, MACROS_FILE);
+			accessFileName = __main__.getConfigPath(conference, MACCESS_FILE);
 			
 			__main__.createFile(macrosFileName, '{}');
 			__main__.createFile(accessFileName, '{}');
 
-			self.macrosList[groupChat] = eval(__main__.readFile(macrosFileName));
-			self.accessList[groupChat] = eval(__main__.readFile(accessFileName));
+			self.macrosList[conference] = eval(__main__.readFile(macrosFileName));
+			self.accessList[conference] = eval(__main__.readFile(accessFileName));
 		else:
-			macrosFileName = 'config/macros.txt';
-			accessFileName = 'config/macrosaccess.txt';
-			
+			macrosFileName = __main__.getConfigPath(MACROS_FILE);
+			accessFileName = __main__.getConfigPath(MACCESS_FILE);
+
 			__main__.createFile(macrosFileName, '{}');
 			__main__.createFile(accessFileName, '{}');
 
 			self.gMacrosList = eval(__main__.readFile(macrosFileName));
 			self.gAccessList = eval(__main__.readFile(accessFileName));
 
-	def saveMacroses(self, groupChat = None):
-		if(groupChat):
-			for x in self.macrosList.keys():
-				__main__.writeFile('config/' + x + '/macros.txt', str(self.macrosList[x]));
-			for x in self.accessList.keys():
-				__main__.writeFile('config/' + x + '/macrosaccess.txt', str(self.accessList[x]));
+	def saveMacroses(self, conference = None):
+		if(conference):
+			macrosFileName = __main__.getConfigPath(conference, MACROS_FILE);
+			accessFileName = __main__.getConfigPath(conference, MACCESS_FILE);
+			__main__.writeFile(accessFileName, str(self.macrosList[conference]));
+			__main__.writeFile(macrosFileName, str(self.accessList[conference]));
 		else:
 			__main__.writeFile('config/macros.txt', str(self.gMacrosList));
 			__main__.writeFile('config/macrosaccess.txt', str(self.gAccessList));
 			
-	def unloadMacroses(self, groupChat):
-		if(groupChat in self.macrosList):
-			del(self.macrosList[groupChat]);
+	def unloadMacroses(self, conference):
+		if(conference in self.macrosList):
+			del(self.macrosList[conference]);
 
-	def getMacrosList(self, groupChat = None):
-		if(groupChat):
-			return(self.macrosList[groupChat].keys());
+	def getMacrosList(self, conference = None):
+		if(conference):
+			return(self.macrosList[conference].keys());
 		else:
 			return(self.gMacrosList.keys());
 
-	def getMacros(self, macros, groupChat = None):
-		if(groupChat):
-			return(self.macrosList[groupChat].get(macros));
+	def getMacros(self, macros, conference = None):
+		if(conference):
+			return(self.macrosList[conference].get(macros));
 		else:
 			return(self.gMacrosList.get(macros));
 		
-	def hasMacros(self, macros, groupChat = None):
-		if(groupChat):
-			return(macros in self.macrosList[groupChat]);
+	def hasMacros(self, macros, conference = None):
+		if(conference):
+			return(macros in self.macrosList[conference]);
 		else:
 			return(macros in self.gMacrosList);
 			
-	def getAccess(self, macros, groupChat = None):
-		if(groupChat):
-			return(self.accessList[groupChat].get(macros));
+	def getAccess(self, macros, conference = None):
+		if(conference):
+			return(self.accessList[conference].get(macros));
 		else:
 			return(self.gAccessList[macros]);
 
-	def setAccess(self, macros, access, groupChat = None):
-		if(groupChat):
-			self.accessList[groupChat][macros] = access;
+	def setAccess(self, macros, access, conference = None):
+		if(conference):
+			self.accessList[conference][macros] = access;
 		else:
 			self.gAccessList[macros] = access;
 
-	def add(self, macros, param, access, groupChat = None):
-		if(groupChat):
-			self.macrosList[groupChat][macros] = param;
+	def add(self, macros, param, access, conference = None):
+		if(conference):
+			self.macrosList[conference][macros] = param;
 		else:
 			self.gMacrosList[macros] = param;
-		self.setAccess(macros, access, groupChat);
+		self.setAccess(macros, access, conference);
 
-	def remove(self, macros, groupChat = None):
-		if(groupChat):
-			if(macros in self.macrosList[groupChat]):
-				del(self.macrosList[groupChat][macros]);
-				del(self.accessList[groupChat][macros]);
+	def remove(self, macros, conference = None):
+		if(conference):
+			if(macros in self.macrosList[conference]):
+				del(self.macrosList[conference][macros]);
+				del(self.accessList[conference][macros]);
 		else:
 			if(macros in  self.gMacrosList):
 				del(self.gMacrosList[macros]);

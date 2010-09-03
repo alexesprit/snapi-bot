@@ -15,7 +15,7 @@
 # GNU General Public License for more details.
 
 SAVE_COUNT = 20;
-TALKERS_FILE = 'config/%s/talkers.txt';
+TALKERS_FILE = 'talkers.txt';
 
 gTalkers = {};
 gMsgCount = {};
@@ -105,7 +105,7 @@ def updateStatistic(stanza, msgType, conference, nick, trueJid, body):
 registerMessageHandler(updateStatistic, CHAT);
 
 def loadTalkCache(conference):
-	fileName = TALKERS_FILE % (conference);
+	fileName = getConfigPath(conference, TALKERS_FILE);
 	gTalkers[conference] = database.DataBase(fileName);
 	gMsgCount[conference] = 0;
 

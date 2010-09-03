@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-HERE_FILE = 'config/%s/tuta.txt';
+HERE_FILE = 'tuta.txt';
 
 gHereTime = {};
 
@@ -65,7 +65,7 @@ def updateLeaveStatistic(conference, nick, trueJid, reason, code):
 registerLeaveHandler(updateLeaveStatistic);
 
 def loadHereCache(conference):
-	fileName = HERE_FILE % (conference);
+	fileName = getConfigPath(conference, HERE_FILE);
 	gHereTime[conference] = database.DataBase(fileName);
 
 registerEvent(loadHereCache, ADDCONF);

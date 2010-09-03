@@ -14,7 +14,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-LOCALDB_FILE = 'config/%s/localdb.txt';
+LOCALDB_FILE = 'localdb.txt';
 
 gLocalBase = {};
 
@@ -82,7 +82,7 @@ def showAllKeys(msgType, conference, nick, parameters):
 		sendMsg(msgType, conference, nick, 'база пуста!');
 
 def loadLocalBase(conference):
-	fileName = LOCALDB_FILE % (conference);
+	fileName = getConfigPath(conference, LOCALDB_FILE);
 	createFile(fileName, '{}');
 	gLocalBase[conference] = eval(readFile(fileName));
 
@@ -94,7 +94,7 @@ def unloadLocalBase(conference):
 registerEvent(unloadLocalBase, DELCONF);
 
 def saveLocalBase(conference):
-	fileName = LOCALDB_FILE % (conference);
+	fileName = getConfigFile(conference, LOCALDB_FILE);
 	writeFile(fileName, str(gLocalBase[conference]));
 
 registerCommand(getKeyToPublic, u'???', 10, u'Ищет ответ на вопрос в локальной базе', u'??? <запрос>', (u'??? что-то', u'??? что-то ещё'), CHAT | PARAM);

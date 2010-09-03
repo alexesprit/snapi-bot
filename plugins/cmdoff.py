@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-CMDOFF_FILENAME = 'config/%s/cmdoff.txt';
+CMDOFF_FILE = 'cmdoff.txt';
 
 def cmdSwitchOff(msgType, conference, nick, param):
 	validCmd, invalidCmd, alreadySwitched, nonSwitched = [], [], [], [];
@@ -83,11 +83,11 @@ def cmdSwitchOn(msgType, conference, nick, param):
 registerCommand(cmdSwitchOn, u'комвкл', 30, u'Включает определённые команды для текущей конференции', u'комвкл <команды>', (u'комвкл тык диско версия пинг', ), CHAT | FROZEN | PARAM);
 
 def saveCommands(conference):
-	fileName = CMDOFF_FILENAME % (conference);
+	fileName = getConfigPath(conference, CMDOFF_FILE);
 	writeFile(fileName, str(gCmdOff[conference]));
 
 def loadCommands(conference):
-	fileName = CMDOFF_FILENAME % (conference);
+	fileName = getConfigPath(conference, CMDOFF_FILE);
 	createFile(fileName, '[]');
 	gCmdOff[conference] = eval(readFile(fileName));
 

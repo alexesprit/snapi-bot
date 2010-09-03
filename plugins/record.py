@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-REC_FILE = 'config/%s/record.txt';
+REC_FILE = 'record.txt';
 gRecordsCache = {};
 
 def showRecord(msgType, conference, nick, param):
@@ -30,12 +30,13 @@ def calculateRecord(conference, nick, trueJid, aff, role):
 	if(userCount >= lastCount):
 		gRecordsCache[conference]['time'] = time.strftime('%d.%m.%y, %H:%M');
 		gRecordsCache[conference]['count'] = userCount;
-		writeFile(REC_FILE % (conference), str(gRecordsCache[conference]));
+		fileName = getConfigPath(conference, REC_FILE);
+		writeFile(fileName, str(gRecordsCache[conference]));
 
 registerJoinHandler(calculateRecord);
 
 def loadRecordCache(conference):
-	fileName = REC_FILE % (conference);
+	fileName = getConfigPath(conference, REC_FILE);
 	createFile(fileName, '{}');
 	gRecordsCache[conference] = eval(readFile(fileName));
 
