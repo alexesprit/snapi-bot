@@ -126,8 +126,8 @@ class Macros:
 		if(conference):
 			macrosFileName = __main__.getConfigPath(conference, MACROS_FILE);
 			accessFileName = __main__.getConfigPath(conference, MACCESS_FILE);
-			__main__.writeFile(accessFileName, str(self.macrosList[conference]));
-			__main__.writeFile(macrosFileName, str(self.accessList[conference]));
+			__main__.writeFile(macrosFileName, str(self.macrosList[conference]));
+			__main__.writeFile(accessFileName, str(self.accessList[conference]));
 		else:
 			__main__.writeFile('config/macros.txt', str(self.gMacrosList));
 			__main__.writeFile('config/macrosaccess.txt', str(self.gAccessList));
@@ -192,27 +192,27 @@ class Macros:
 			if(command in self.macrosList[conference]):
 				exp = self.replace(self.macrosList[conference][command], param, context);
 		if(command in self.gMacrosList):
-			exp = self.replace(self.gMacrosList[command], param, context);
+			t = self.gMacrosList[command];
+			exp = self.replace(t, param, context);
 		if(not exp):
 			return(cmd);
 		rexp = self.expand(exp, context, conference);
 		return(rexp);
 
 	def replace(self, macros, param, context):
-		expanded = macros;
-		if(expanded.count('$*')):
-			expanded = expanded.replace('$*', ' '.join(param));
+		if(macros.count('$*')):
+			macros = macros.replace('$*', ' '.join(param));
 		else:
 			for i, n in enumerate(re.findall('\$[0-9]+', expanded)):
 				if(len(param) <= i):
 					break;
-				expanded = expanded.replace(n, param[i]);
-		for i in self.macroCommands.parseCommand(expanded):
+				macros = macros.replace(n, param[i]);
+		for i in self.macroCommands.parseCommand(macros):
 			cmd = [x.strip() for x in i.split(',')];
 			res = self.macroCommands.proccess(cmd, context);
 			if(res):
-				expanded = expanded.replace('%%(%s)' % i, res);
-		return(expanded);
+				macros = macros.replace('%%(%s)' % i, res);
+		return(macros);
 
 	def charMap(self, x, i):
 		ret = i['level'];

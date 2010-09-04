@@ -517,15 +517,17 @@ def setTempAccess(conference, jid, level = 0):
 		del(gTempAccess[conference][jid]);
 
 def setPermAccess(conference, jid, level = 0):
+	fileName = getConfigPath(conference, ACCESS_FILE);
 	gPermAccess[conference][jid] = None;
 	if(level):
 		gPermAccess[conference][jid] = level;
 	else:
 		del(gPermAccess[conference][jid]);
-	writeFile(PERMACCESS_FILE % conference, str(gPermAccess[conference]));
+	writeFile(fileName, str(gPermAccess[conference]));
 
 def setPermGlobalAccess(jid, level = 0):
-	tempAccess = eval(readFile(GLOBACCESS_FILE));
+	fileName = getConfigPath(ACCESS_FILE);
+	tempAccess = eval(readFile(fileName));
 	tempAccess[jid] = None;
 	gGlobalAccess[jid] = None;
 	if(level):
@@ -534,7 +536,7 @@ def setPermGlobalAccess(jid, level = 0):
 	else:
 		del(tempAccess[jid]);
 		del(gGlobalAccess[jid]);
-	writeFile(GLOBACCESS_FILE, str(tempAccess));
+	writeFile(fileName, str(tempAccess));
 
 def setTempGlobalAccess(jid, level = 0):
 	gGlobalAccess[jid] = None;
@@ -638,8 +640,8 @@ def messageHandler(session, stanza):
 					return;
 			elif(msgType == PUBLIC):
 				return;
-	body = message.split();
-	command = body[0].lower();
+	rawBody = message.split();
+	command = rawBody[0].lower();
 	if(isCommand(command)):
 		access = gCommands[command][CMD_ACCESS];
 	else:
@@ -649,14 +651,13 @@ def messageHandler(session, stanza):
 			access = gMacros.getAccess(command, conference);
 		else:
 			return;
-		body = gMacros.expand(message, (conference, nick, ), conference).split();
-		command = body[0].lower();
-		if(not isAvailableCommand(conference, command)):
-			return;
+		message = gMacros.expand(message, (conference, nick, ), conference);
+		rawBody = message.split();
+		command = rawBody[0].lower();
 	if(isAvailableCommand(conference, command)):
 		if(isCommandType(command, cmdType)):
 			if(getAccess(conference, trueJid) >= access):
-				if(len(body) > 1):
+				if(len(rawBody) > 1):
 					param = message[(message.find(' ') + 1):].strip();
 				else:
 					param = None;
@@ -835,12 +836,13 @@ if(__name__ == '__main__'):
 			prs = xmpp.Presence(typ = UNAVAILABLE);
 			prs.setStatus(u'выключаюсь (CTRL+C)');
 			gClient.send(prs);
+		os.abort();
 	except(SystemExit):
 		if(gRestart):
 			restart();
 	except(Exception):
 		printf('Exception in main thread', FLAG_ERROR);
-		fileName = getFilePath(SYSLOG_DIR, time.strftime(ERROR_FILE));
+		fileName = getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE));
 		writeFile(fileName, traceback.format_exc() + '\n', 'a');		
 		if(gClient.isConnected()):
 			prs = xmpp.Presence(typ = UNAVAILABLE);
