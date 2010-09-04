@@ -82,6 +82,21 @@ AFF_MEMBER = 'member';
 AFF_ADMIN = 'admin';
 AFF_OWNER = 'owner';
 
+ROLES = {
+	ROLE_NONE: 0, 
+	ROLE_VISITOR: 0, 
+	ROLE_PARTICIPANT: 10, 
+	ROLE_MODERATOR: 15
+};
+
+AFFILIATIONS = {
+	AFF_OUTCAST: 0, 
+	AFF_NONE: 0, 
+	AFF_MEMBER: 1, 
+	AFF_ADMIN: 5, 
+	AFF_OWNER: 15
+};
+
 IDLE_TIMEOUT = 600;
 JOIN_TIMEOUT = 5;
 REJOIN_TIMEOUT = 120;
@@ -469,6 +484,13 @@ def getTrueJid(jid, resource = None):
 			jid = getNickKey(jid, resource, 'jid');
 	return(jid);
 
+def getNickByJid(conference, trueJid, offline = False):
+	nicks = offline and getNicks(conference) or getOnlineNicks(conference);
+	for nick in nicks:
+		if(getNickKey(conference, nick, NICK_JID) == trueJid):
+			return(nick);
+	return(None);
+
 def getConferences():
 	return(gConferences.keys());
 
@@ -634,7 +656,10 @@ def messageHandler(session, stanza):
 	if(isAvailableCommand(conference, command)):
 		if(isCommandType(command, cmdType)):
 			if(getAccess(conference, trueJid) >= access):
-				param = (len(body) > 1) and ' '.join(body[1:]) or None;
+				if(len(body) > 1):
+					param = message[(message.find(' ') + 1):].strip();
+				else:
+					param = None;
 				if(param and isCommandType(command, NONPARAM)):
 					return;
 				if(not param and isCommandType(command, PARAM)):
@@ -660,9 +685,9 @@ def presenceHandler(session, stanza):
 				sendToConference(conference, u'Без прав модератора работа невозможна!');
 				leaveConference(conference);
 				return;
+			aff = stanza.getAffiliation();
+			role = stanza.getRole();
 			if(not nickIsOnline(conference, nick)):
-				aff = stanza.getAffiliation();
-				role = stanza.getRole();
 				if(not nickInConference(conference, nick)):
 					gConferences[conference][nick] = {};
 				setNickKey(conference, nick, NICK_JID, trueJid);
@@ -674,12 +699,16 @@ def presenceHandler(session, stanza):
 				else:
 					if(nick == getBotNick(conference)):
 						gIsJoined[conference] = True;
-			role = stanza.getRole();
+			roleAccess = ROLES[role];
+			affAccess = AFFILIATIONS[aff];
+			setTempAccess(conference, trueJid, roleAccess + affAccess);
 			setNickKey(conference, nick, NICK_MODER, role == ROLE_MODERATOR);
 		elif(prsType == UNAVAILABLE):
 			code = stanza.getStatusCode();
 			reason = stanza.getReason() or stanza.getStatus();
 			setNickKey(conference, nick, NICK_HERE, False);
+			if(not getNickByJid(conference, trueJid)):
+				setTempAccess(conference, trueJid);
 			for key in (NICK_IDLE, NICK_MODER, NICK_STATUS, NICK_SHOW):
 				if(key in gConferences[conference][nick]):
 					del(gConferences[conference][nick][key]);

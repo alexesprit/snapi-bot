@@ -15,26 +15,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-ROLES = {ROLE_NONE: 0, ROLE_VISITOR: 0, ROLE_PARTICIPANT: 10, ROLE_MODERATOR: 15};
-AFFILIATIONS = {AFF_OUTCAST: 0, AFF_NONE: 0, AFF_MEMBER: 1, AFF_ADMIN: 5, AFF_OWNER: 15};
 ACCESS_DESC = {-100: u'(игнор)', 0: u'(никто)', 10: u'(юзер)', 11: u'(мембер)', 15: u'(модер)', 16: u'(модер)', 20: u'(админ)', 30: u'(овнер)', 100: u'(админ бота)'};
-
-def changeAccess(stanza, conference, nick, trueJid):
-	msgType = stanza.getType();
-	if(ERROR != msgType):
-		if(UNAVAILABLE != msgType):
-			role = stanza.getRole();
-			aff = stanza.getAffiliation();
-			roleAccess = ROLES[role];
-			affAccess = AFFILIATIONS[aff];
-			setTempAccess(conference, trueJid, roleAccess + affAccess);
-		else:
-			for item in getOnlineNicks(conference):
-				if(getTrueJid(conference, item) == trueJid):
-					return;
-			setTempAccess(conference, trueJid);
-
-registerPresenceHandler(changeAccess, CHAT);
 
 def login(msgType, conference, nick, param):
 	if(msgType == PRIVATE and param == gAdminPass):

@@ -50,7 +50,7 @@ def giveBomb(msgType, conference, nick, param):
 				# это не баг, это фича :)
 				message = u'хаха, тебе не повезло, у тебя бомба БЕЗ проводов! она взорвётся через %s' % (time2str(timeout));
 			sendMsg(msgType, conference, userNick, message);
-			gBombTimers[conference][trueJid] = startTimer(timeout, bombExec, (msgType, conference, nick, trueJid));
+			gBombTimers[conference][trueJid] = startTimer(timeout, bombExec, (msgType, conference, userNick, trueJid));
 	else:
 		sendMsg(msgType, conference, nick, u'а это кто?');			
 

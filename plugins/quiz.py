@@ -55,7 +55,7 @@ def resetQuizTimer(conference):
 
 def getNewQuestion():
 	questionNum = random.randrange(0, QUIZ_TOTAL_LINES);
-	fp = file(QUIZ_FILE);
+	fp = file(getFilePath(RESOURCE_DIR, QUIZ_FILE));
 	for i in xrange(QUIZ_TOTAL_LINES):
 		if(i == questionNum):
 			(question, answer) = fp.readline().decode('utf-8').strip().split('|', 1);
