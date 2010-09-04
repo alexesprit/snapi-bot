@@ -203,7 +203,7 @@ class Macros:
 		if(macros.count('$*')):
 			macros = macros.replace('$*', ' '.join(param));
 		else:
-			for i, n in enumerate(re.findall('\$[0-9]+', expanded)):
+			for i, n in enumerate(re.findall('\$[0-9]+', macros)):
 				if(len(param) <= i):
 					break;
 				macros = macros.replace(n, param[i]);
