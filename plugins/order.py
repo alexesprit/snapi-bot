@@ -13,77 +13,52 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def setUserRole(conference, param, role):
+def setUserRole(msgType, conference, nick, param, role):
 	param = param.split();
-	nick = param[0];	
-	if(nick.count('@') or nickInConference(conference, nick)):
+	user = param[0];	
+	if(user.count('@') or nickInConference(conference, user)):
 		reason = (len(param) > 1) and ' '.join(param[1:]) or '';
-		setRole(conference, nick, role, reason);
-		return(True);
-	return(False);
+		setRole(conference, user, role, reason);
+		sendMsg(msgType, conference, nick, u'сделала');
+	else:
+		sendMsg(msgType, conference, nick, u'а это кто?');
 	
-def setUserAffiliation(conference, param, aff):
+def setUserAffiliation(msgType, conference, nick, param, aff):
 	param = param.split();
-	nick = param[0];	
-	if(nick.count('@') or nickInConference(conference, nick)):
+	user = param[0];	
+	if(user.count('@') or nickInConference(conference, user)):
 		reason = (len(param) > 1) and ' '.join(param[1:]) or '';
-		setAffiliation(conference, nick, aff, reason);
-		return(True);
-	return(False);
+		setAffiliation(conference, user, aff, reason);
+		sendMsg(msgType, conference, nick, u'сделала');
+	else:
+		sendMsg(msgType, conference, nick, u'а это кто?');
 
 def setOutcast(msgType, conference, nick, param):
-	if(setUserAffiliation(conference, param, AFF_OUTCAST)):
-		sendMsg(msgType, conference, nick, u'сделала');
-	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+	setUserAffiliation(msgType, conference, nick, param, AFF_OUTCAST);
 
 def setNone(msgType, conference, nick, param):
-	if(setUserAffiliation(conference, param, AFF_NONE)):
-		sendMsg(msgType, conference, nick, u'сделала');
-	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+	setUserAffiliation(msgType, conference, nick, param, AFF_NONE);
 
-def setMember(msgType, conference, nick, param):
-	if(setUserAffiliation(conference, param, AFF_MEMBER)):
-		sendMsg(msgType, conference, nick, u'сделала');
-	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+def setMember(msgType, conference, nick, param): 
+	setUserAffiliation(msgType, conference, nick, param, AFF_MEMBER);
 
 def setAdmin(msgType, conference, nick, param):
-	if(setUserAffiliation(conference, param, AFF_ADMIN)):
-		sendMsg(msgType, conference, nick, u'сделала');
-	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+	setUserAffiliation(msgType, conference, nick, param, AFF_ADMIN);
 
 def setOwner(msgType, conference, nick, param):
-	if(setUserAffiliation(conference, param, AFF_OWNER)):
-		sendMsg(msgType, conference, nick, u'сделала');
-	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+	setUserAffiliation(msgType, conference, nick, param, AFF_OWNER);
 	
 def setKick(msgType, conference, nick, param):
-	if(setUserRole(conference, param, ROLE_NONE)):
-		sendMsg(msgType, conference, nick, u'сделала');
-	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+	setUserRole(msgType, conference, nick, param, ROLE_NONE);
 		
 def setVisitor(msgType, conference, nick, param):
-	if(setUserRole(conference, param, ROLE_VISITOR)):
-		sendMsg(msgType, conference, nick, u'сделала');
-	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+	setUserRole(msgType, conference, nick, param, ROLE_VISITOR);
 
 def setParticipant(msgType, conference, nick, param):
-	if(setUserRole(conference, param, ROLE_PARTICIPANT)):
-		sendMsg(msgType, conference, nick, u'сделала');
-	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+	setUserRole(msgType, conference, nick, param, ROLE_PARTICIPANT);
 
 def setModerator(msgType, conference, nick, param):
-	if(setUserRole(conference, param, ROLE_MODERATOR)):
-		sendMsg(msgType, conference, nick, u'сделала');
-	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+	setUserRole(msgType, conference, nick, param, ROLE_MODERATOR);
 
 registerCommand(setOutcast, u'бан', 20, u'Банит пользователя', u'бан <ник/жид>', (u'бан bot@freize.org', u'бан Nick'), CHAT | PARAM);
 registerCommand(setNone, u'избани', 20, u'Разбанивает пользователя', u'избани <ник/жид>', (u'избани bot@freize.org', u'избани Nick'), CHAT | PARAM);

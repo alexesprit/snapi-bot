@@ -24,6 +24,7 @@ QUIZ_COEF = 3;
 
 gQuizScores = {};
 
+gQuizEnable = {};
 gQuizAnswer = {};
 gQuizQuestion = {};
 gQuizHint = {};
@@ -72,6 +73,7 @@ def askNewQuestion(conference, lastAnswer = None):
 	gQuizIdleCount[conference] = 0;
 	gQuizAskTime[conference] = time.time();
 	resetQuizTimer(conference);
+	gQuizEnable[conference] = True;
 	if(lastAnswer):
 		sendToConference(conference, u'(!) Правильный ответ: %s, cмена вопроса:\n%s' % (lastAnswer, question));
 	else:
@@ -83,6 +85,7 @@ def quizStop(conference):
 	del(gQuizHint[conference]);
 	del(gQuizIdleCount[conference]);
 	del(gQuizAskTime[conference]);
+	gQuizEnable[conference] = False;
 	if(isTimerEnabled(conference)):
 		gQuizTimer[conference].cancel();
 		del(gQuizTimer[conference]);
@@ -110,10 +113,11 @@ def checkAnswer(conference, nick, trueJid, answer):
 		else:
 			scores = [nick, points, 1];
 		base.setKey(trueJid, scores);
+		gQuizEnable[conference] = False;
 		askNewQuestion(conference);
 
 def answerListener(stanza, msgType, conference, nick, trueJid, text):
-	if(conference in gQuizAnswer):
+	if(gQuizEnable[conference]):
 		checkAnswer(conference, nick, trueJid, text);
 
 def showScoreList(msgType, conference, nick = None):
@@ -137,22 +141,22 @@ def showScoreList(msgType, conference, nick = None):
 		sendMsg(msgType, conference, nick, u'cтатистика по игре отсутствует');
 
 def startQuiz(msgType, conference, nick, param):
-	if(conference in gQuizAnswer):
+	if(gQuizEnable[conference]):
 		sendMsg(msgType, conference, nick, u'Викторина уже существует!');
 	else:
 		askNewQuestion(conference);
 
 def stopQuiz(msgType, conference, nick, param):
-	if(conference in gQuizAnswer):
+	if(gQuizEnable[conference]):
 		sendToConference(conference, u'(!) Викторина остановлена');
 		quizStop(conference);
 
 def askQuestion(msgType, conference, nick, param):
-	if(conference in gQuizAnswer):
+	if(gQuizEnable[conference]):
 		askNewQuestion(conference, gQuizAnswer[conference]);
 
 def showHint(msgType, conference, nick, param):
-	if(conference in gQuizAnswer):
+	if(gQuizEnable[conference]):
 		answer = gQuizAnswer[conference];
 		hint = gQuizHint[conference];
 		hiddenLetters = '';
@@ -175,12 +179,13 @@ def showScores(msgType, conference, nick, param):
 	showScoreList(msgType, conference, nick);
 
 def showQuestion(msgType, conference, nick, param):
-	if(conference in gQuizAnswer):
+	if(gQuizEnable[conference]):
 		sendMsg(msgType, conference, nick, u'(*) Текущий вопрос: \n' + gQuizQuestion[conference]);
 		
 def loadQuizScores(conference):
 	fileName = getConfigPath(conference, QUIZ_SCORES_FILE);
 	gQuizScores[conference] = database.DataBase(fileName);
+	gQuizEnable[conference] = False;
 
 registerEvent(loadQuizScores, ADDCONF);
 

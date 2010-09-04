@@ -31,4 +31,4 @@ def yandexSearch(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'По вашему запросу ничего не найдено');
 
-registerCommand(yandexSearch, u'яндекс', 10, u'Поиск в Яндексе', u'яндекс <запрос>', (u'яндекс google'), ANY | PARAM);
+registerCommand(yandexSearch, u'яндекс', 10, u'Поиск в Яндексе', u'яндекс <запрос>', (u'яндекс google', ), ANY | PARAM);

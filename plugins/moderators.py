@@ -17,55 +17,76 @@ MODERATORS_FILE = 'moderators.txt';
 
 gModerators = {};
 
-def saveModerators(conference):
+def saveAutoModerators(conference):
 	fileName = getConfigPath(conference, MODERATORS_FILE);
 	writeFile(fileName, str(gModerators[conference]));
 
-def loadModerators(conference):
+def loadAutoModerators(conference):
 	fileName = getConfigPath(conference, MODERATORS_FILE);
 	createFile(fileName, '[]');
 	gModerators[conference] = eval(readFile(fileName));
 
-registerEvent(loadModerators, ADDCONF);
+registerEvent(loadAutoModerators, ADDCONF);
 
-def setModerator(conference, nick, trueJid, aff, role):
+def setAutoModerator(conference, nick, trueJid, aff, role):
 	if(trueJid in gModerators[conference]):
 		setRole(conference, nick, ROLE_MODERATOR, u'автомодератор');
 
-registerJoinHandler(setModerator);
+registerJoinHandler(setAutoModerator);
 
-def addModerator(msgType, conference, nick, param):
-	if(nickInConference(conference, param)):
-		trueJid = getTrueJid(conference, param);
+def addAutoModerator(msgType, conference, nick, param):
+	user = param;
+	setModeratorRole = False;
+	if(nickInConference(conference, user)):
+		trueJid = getTrueJid(conference, user);
+		if(getNickKey(conference, user, NICK_HERE)):
+			setModeratorRole = True;
 	elif(param.count('@')):
-		trueJid = param;
+		trueJid = user;
+		user = getNickByJid(conference, trueJid);
+		if(user):
+			setModeratorRole = True;
 	else:
 		sendMsg(msgType, conference, nick, u'а это кто?');
 		return;
-	gModerators[conference].append(trueJid);
-	saveModerators(conference);
-	sendMsg(msgType, conference, nick, u'добавила');
+	if(trueJid not in gModerators[conference]):
+		gModerators[conference].append(trueJid);
+		saveAutoModerators(conference);
+		sendMsg(msgType, conference, nick, u'добавила');
+		if(setModeratorRole):
+			setRole(conference, user, ROLE_MODERATOR);
+	else:
+		sendMsg(msgType, conference, nick, u'%s уже есть в списке' % (param));
 
-registerCommand(addModerator, u'модер+', 20, u'Добавляет ник или жид в список автомодераторов', u'модер+ <ник/жид>', (u'модер+ Nick', u'модер+ nick@jabber.ru'), CHAT | PARAM);
+registerCommand(addAutoModerator, u'модер+', 20, u'Добавляет ник или жид в список автомодераторов', u'модер+ <ник/жид>', (u'модер+ Nick', u'модер+ nick@jabber.ru'), CHAT | PARAM);
 
-def delModerator(msgType, conference, nick, param):
-	if(nickInConference(conference, param)):
-		trueJid = getTrueJid(conference, param);
+def delAutoModerator(msgType, conference, nick, param):
+	user = param;
+	setParticipantRole = False;
+	if(nickInConference(conference, user)):
+		trueJid = getTrueJid(conference, user);
+		if(getNickKey(conference, user, NICK_HERE)):
+			setParticipantRole = True;
 	elif(param.count('@')):
-		trueJid = param;
+		trueJid = user;
+		user = getNickByJid(conference, trueJid);
+		if(user):
+			setParticipantRole = True;
 	else:
 		sendMsg(msgType, conference, nick, u'а это кто?');
 		return;
 	if(trueJid in gModerators[conference]):
 		gModerators[conference].remove(trueJid);
-		saveModerators(conference);
+		saveAutoModerators(conference);
 		sendMsg(msgType, conference, nick, u'удалила');
+		if(setParticipantRole):
+			setRole(conference, user, ROLE_PARTICIPANT);
 	else:
 		sendMsg(msgType, conference, nick, u'а %s итак нет в списке' % (param));
 
-registerCommand(delModerator, u'модер-', 20, u'Удаляет ник или жид из списка автомодераторов', u'модер- <ник/жид>', (u'модер- Nick', u'модер- nick@jabber.ru'), CHAT | PARAM);
+registerCommand(delAutoModerator, u'модер-', 20, u'Удаляет ник или жид из списка автомодераторов', u'модер- <ник/жид>', (u'модер- Nick', u'модер- nick@jabber.ru'), CHAT | PARAM);
 
-def showModerator(msgType, conference, nick, param):
+def showAutoModerators(msgType, conference, nick, param):
 	if(gModerators[conference]):
 		items = [u'%d) %s' % (i + 1, moder) for i, moder in enumerate(gModerators[conference])];
 		message = u'список автомодераторов:\n%s' % ('\n'.join(items));
@@ -73,4 +94,4 @@ def showModerator(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'список автомодераторов пуст');
 
-registerCommand(showModerator, u'модер*', 20, u'Показывает список автомодераторов', None, (u'модер*', ), CHAT | NONPARAM);
+registerCommand(showAutoModerators, u'модер*', 20, u'Показывает список автомодераторов', None, (u'модер*', ), CHAT | NONPARAM);

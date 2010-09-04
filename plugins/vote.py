@@ -117,7 +117,7 @@ def stopVote(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'сейчас нет никаких голосований');
 
-registerCommand(stopVote, u'голосование-', 11, u'Останавливает голосование, все данные сохраняются до продолжения голосования', u'голосование-', (u'голосование-'), CHAT | NONPARAM);
+registerCommand(stopVote, u'голосование-', 11, u'Останавливает голосование, все данные сохраняются до продолжения голосования', u'голосование-', (u'голосование-', ), CHAT | NONPARAM);
 
 def addOpinion(msgType, conference, nick, param):
 	if(gVotes[conference]):

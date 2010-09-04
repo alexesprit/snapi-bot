@@ -158,9 +158,6 @@ gDebug.colors[FLAG_ERROR] = xmpp.Debug.colorBrightRed;
 gDebug.colors[FLAG_WARNING] = xmpp.Debug.colorYellow;
 gDebug.colors[FLAG_SUCCESS] = xmpp.Debug.colorBrightCyan;
 
-def registerCommand(function, command, access, desc, syntax, examples, cmdType = ANY):
-	printf(command, FLAG_ERROR);
-
 def registerMessageHandler(function, msgType):
 	gMessageHandlers[msgType].append(function);
 	
@@ -424,7 +421,7 @@ def setBotStatus(conference, status, show):
 	prs.addChild(node = getCapsNode());
 	gClient.send(prs);
 
-def setRole(conference, nick, role, reason):
+def setRole(conference, nick, role, reason = None):
 	iq = xmpp.Iq('set');
 	iq.setTo(conference);
 	query = xmpp.Node('query', {'xmlns': xmpp.NS_MUC_ADMIN});
@@ -437,7 +434,7 @@ def setRole(conference, nick, role, reason):
 	iq.addChild(node = query);
 	gClient.send(iq);
 
-def setAffiliation(conference, nick, aff, reason):
+def setAffiliation(conference, nick, aff, reason = None):
 	iq = xmpp.Iq('set');
 	iq.setTo(conference);
 	query = xmpp.Node('query', {'xmlns': xmpp.NS_MUC_ADMIN});

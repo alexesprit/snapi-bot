@@ -30,6 +30,6 @@ def sendToConferences(msgType, conference, nick, param):
 def messageToChat(msgType, conference, nick, param):
 	sendToConference(conference, param);
 
-registerCommand(sendToConferences, u'мессага_конфам', 100, u'Отправляет сообщение по всем конференциям, в которых сидит бот', u'мессага_конфам [сообщение]', (u'мессага_конфам привет!11'), ANY | PARAM);
-registerCommand(sendToAdmins, u'мессага_админу', 10, u'Отправляет сообщение всем администраторам бота', u'мессага_админу <сообщение>', (u'мессага_админу привет!11'), ANY | PARAM);
+registerCommand(sendToConferences, u'мессага_конфам', 100, u'Отправляет сообщение по всем конференциям, в которых сидит бот', u'мессага_конфам [сообщение]', (u'мессага_конфам привет!11', ), ANY | PARAM);
+registerCommand(sendToAdmins, u'мессага_админу', 10, u'Отправляет сообщение всем администраторам бота', u'мессага_админу <сообщение>', (u'мессага_админу привет!11', ), ANY | PARAM);
 registerCommand(messageToChat, u'сказать', 20, u'Говорить через бота в конференции', u'сказать <сообщение>', (u'сказать салют пиплы', ), CHAT | PARAM);

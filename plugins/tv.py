@@ -36,7 +36,7 @@ def showTvProgramm(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'нету на сегодня программы');
 
-registerCommand(showTvProgramm, u'тв', 10, u'Показать телепрограму для определённого канала', u'тв <название>', (u'тв первый'), ANY | PARAM);
+registerCommand(showTvProgramm, u'тв', 10, u'Показать телепрограму для определённого канала', u'тв <название>', (u'тв первый', ), ANY | PARAM);
 
 def showTvList(msgType, conference, nick, parameters):
 	printf(msgType);
@@ -46,7 +46,7 @@ def showTvList(msgType, conference, nick, parameters):
 	tvList.sort();
 	sendMsg(PRIVATE, conference, nick, u'список каналов:\n' + '\n'.join(tvList));
 	
-registerCommand(showTvList, u'твлист', 10, u'Просмотреть список каналов, доступных для просмотра программы', None, (u'твлист'), ANY | NONPARAM);
+registerCommand(showTvList, u'твлист', 10, u'Просмотреть список каналов, доступных для просмотра программы', None, (u'твлист', ), ANY | NONPARAM);
 
 def loadChannels():
 	global gChannels;
