@@ -94,7 +94,7 @@ def unloadLocalBase(conference):
 registerEvent(unloadLocalBase, DELCONF);
 
 def saveLocalBase(conference):
-	fileName = getConfigFile(conference, LOCALDB_FILE);
+	fileName = getConfigPath(conference, LOCALDB_FILE);
 	writeFile(fileName, str(gLocalBase[conference]));
 
 registerCommand(getKeyToPublic, u'???', 10, u'Ищет ответ на вопрос в локальной базе', u'??? <запрос>', (u'??? что-то', u'??? что-то ещё'), CHAT | PARAM);
