@@ -14,35 +14,35 @@
 # GNU General Public License for more details.
 
 REC_FILE = 'record.txt';
-gRecordsCache = {};
+gRecords = {};
 
 def showRecord(msgType, conference, nick, param):
-	if(not gRecordsCache[conference]):
+	if(not gRecords[conference]):
 		sendMsg(msgType, conference, nick, u'нет информации');
 	else:
-		sendMsg(msgType, conference, nick, u'рекорд посещаемости - %(count)d человек (%(time)s)' % (gRecordsCache[conference]));
+		sendMsg(msgType, conference, nick, u'рекорд посещаемости - %(count)d человек (%(time)s)' % (gRecords[conference]));
 
 registerCommand(showRecord, u'рекорд', 10, u'Показывает рекорд посещаемости конференции', None, (u'рекорд', ), CHAT | NONPARAM);
 
 def calculateRecord(conference, nick, trueJid, aff, role):
 	userCount = len(getJidList(conference))
-	lastCount = gRecordsCache[conference] and gRecordsCache[conference]['count'] or 0;
+	lastCount = gRecords[conference] and gRecords[conference]['count'] or 0;
 	if(userCount >= lastCount):
-		gRecordsCache[conference]['time'] = time.strftime('%d.%m.%y, %H:%M');
-		gRecordsCache[conference]['count'] = userCount;
+		gRecords[conference]['time'] = time.strftime('%d.%m.%y, %H:%M');
+		gRecords[conference]['count'] = userCount;
 		fileName = getConfigPath(conference, REC_FILE);
-		writeFile(fileName, str(gRecordsCache[conference]));
+		writeFile(fileName, str(gRecords[conference]));
 
 registerJoinHandler(calculateRecord);
 
 def loadRecordCache(conference):
 	fileName = getConfigPath(conference, REC_FILE);
 	createFile(fileName, '{}');
-	gRecordsCache[conference] = eval(readFile(fileName));
+	gRecords[conference] = eval(readFile(fileName));
 
 registerEvent(loadRecordCache, ADDCONF);
 
 def unloadRecordCache(conference):
-	del(gRecordsCache[conference]);
+	del(gRecords[conference]);
 
 registerEvent(unloadRecordCache, DELCONF);

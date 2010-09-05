@@ -89,13 +89,13 @@ def quizStop(conference):
 	if(isTimerEnabled(conference)):
 		gQuizTimer[conference].cancel();
 		del(gQuizTimer[conference]);
-	gQuizScores[conference].save();
 	showScoreList(PUBLIC, conference);
 
 def checkAnswer(conference, nick, trueJid, answer):
 	rightAnswer = gQuizAnswer[conference].lower();
 	userAnswer = answer.lower();
 	if(rightAnswer == userAnswer):	
+		gQuizEnable[conference] = False;
 		answerTime = time.time() - gQuizAskTime[conference];
 		wLength = len(gQuizHint[conference]);
 		closedLetters = gQuizHint[conference].count('*');
@@ -113,7 +113,7 @@ def checkAnswer(conference, nick, trueJid, answer):
 		else:
 			scores = [nick, points, 1];
 		base.setKey(trueJid, scores);
-		gQuizEnable[conference] = False;
+		base.save();
 		askNewQuestion(conference);
 
 def answerListener(stanza, msgType, conference, nick, trueJid, text):

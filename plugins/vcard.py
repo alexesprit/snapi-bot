@@ -38,7 +38,7 @@ def showVCard(msgType, conference, nick, param):
 
 def _showVCard(stanza, vcardID, msgType, conference, nick, param):
 	if(vcardID == stanza.getID()):
-		if(stanza.getType() == 'result'):
+		if(RESULT == stanza.getType()):
 			queryNode = stanza.getChildren();
 			if(queryNode):
 				vcard = {};
@@ -64,12 +64,12 @@ def _showVCard(stanza, vcardID, msgType, conference, nick, param):
 				if(not param):
 					sendMsg(msgType, conference, nick, u'вкард заполни сначала');
 				else:
-					sendMsg(msgType, conference, nick, u'передай ему, чтобы он свой вкард сначала заполнил');
-		elif(stanza.getType() == 'error'):
+					sendMsg(msgType, conference, nick, u'пусть %s сначала вкард заполнит' % (param));
+		elif(ERROR == stanza.getType()):
 			if(not param):
 				sendMsg(msgType, conference, nick, u'хехе, твой клиент ничего не знает про вкарды');
 			else:
-				sendMsg(msgType, conference, nick, u'хехе, его клиент ничего не знает про вкарды');
+				sendMsg(msgType, conference, nick, u'хехе, клиент у %s ничего не знает про вкарды' % (param));
 				
 def fillVCard(vcard):
 	name = '';

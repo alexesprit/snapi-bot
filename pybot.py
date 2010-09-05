@@ -60,6 +60,7 @@ PRIVATE = 'chat';
 PUBLIC = 'groupchat';
 ERROR = 'error';
 HEADLINE = 'headline';
+NORMAL = 'normal';
 RESULT = 'result';
 UNAVAILABLE = 'unavailable';
 
@@ -239,7 +240,7 @@ def execute(function, param = None):
 			with(gSemaphore):
 				function();
 	except(Exception):
-		errorHandler(function.__name__);
+		saveException(function.__name__);
 		
 def startTimer(timeout, func, param = None):
 	gInfo['tmr'] += 1;
@@ -585,7 +586,7 @@ def sendMsg(msgType, conference, nick, text, force = False):
 
 def messageHandler(session, stanza):
 	msgType = stanza.getType();
-	if(stanza.timestamp or HEADLINE == msgType or 'normal' == msgType):
+	if(stanza.timestamp or HEADLINE == msgType or NORMAL == msgType):
 		return;
 	fullJid = stanza.getFrom();
 	conference = fullJid.getStripped();
@@ -629,14 +630,15 @@ def messageHandler(session, stanza):
 			for x in [botNick + x for x in (':', ',')]:
 				if(message.startswith(x)):
 					message = message.replace(x, '').strip();
+					break;
 		prefix = getConfigKey(conference, CFG_PREFIX);
 		if(prefix):
 			if(message.startswith(prefix)):
 				message = message[len(prefix):].strip();
-				if(not message):
-					return;
 			elif(msgType == PUBLIC):
 				return;
+		if(not message):
+			return;
 	rawBody = message.split();
 	command = rawBody[0].lower();
 	if(isCommand(command)):
@@ -651,7 +653,7 @@ def messageHandler(session, stanza):
 		message = gMacros.expand(message, (conference, nick, ), conference);
 		rawBody = message.split();
 		command = rawBody[0].lower();
-	if(isAvailableCommand(conference, command)):
+	if(isCommand(command) and isAvailableCommand(conference, command)):
 		if(isCommandType(command, cmdType)):
 			if(getAccess(conference, trueJid) >= access):
 				if(len(rawBody) > 1):
@@ -734,7 +736,7 @@ def iqHandler(session, stanza):
 		return;
 	callIqHandlers(stanza, bareJid, resource);
 
-def errorHandler(funcName):
+def saveException(funcName):
 	gInfo['err'] += 1;
 	printf('Exception in %s function' % (funcName), FLAG_ERROR);
 	fileName = getFilePath(SYSLOG_DIR, time.strftime(ERROR_FILE));
@@ -752,7 +754,7 @@ def loadPlugins():
 				exec(file(path)) in globals();
 				validPlugins += 1;
 		except(SyntaxError, NameError):
-			errorHandler('loadPlugins');
+			saveException('loadPlugins');
 			invalidPlugins += 1;
 	if(not invalidPlugins):
 		printf('Loaded %d plugins' % (validPlugins), FLAG_SUCCESS);
@@ -788,7 +790,9 @@ def start():
 		if(gRestart):
 			printf('Sleeping for %d seconds...' % RETRY_TIMEOUT);
 			time.sleep(RETRY_TIMEOUT);
-		sys.exit(1);
+			restart();
+		else:
+			os.abort();
 
 	printf('Waiting For Authentication...');
 	if(gClient.auth(gUserName, gPassword, gResource)):
@@ -834,9 +838,6 @@ if(__name__ == '__main__'):
 			prs.setStatus(u'выключаюсь (CTRL+C)');
 			gClient.send(prs);
 		os.abort();
-	except(SystemExit):
-		if(gRestart):
-			restart();
 	except(Exception):
 		printf('Exception in main thread', FLAG_ERROR);
 		fileName = getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE));

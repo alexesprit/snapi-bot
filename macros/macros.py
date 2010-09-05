@@ -225,17 +225,14 @@ class Macros:
 		elif(x == '\\'):
 			i['esc'] = True;
 			ret = 0;
-		elif(x == '`'):
-			i['arg'] = not i['arg'];
-			ret = 0;
 		elif(x == ' '):
-			if(not i['arg'] and not i['context']):
+			if(not i['context']):
 				i['level'] += 1;
 				ret = 0;
 		return(ret);
 
 	def getMap(self, inp):
-		i = {'arg': False, 'context': False, 'level': 1, 'esc': False};
+		i = {'context': False, 'level': 1, 'esc': False};
 		return([self.charMap(x, i) for x in list(inp)]);
 
 	def parseCommand(self, cmd):

@@ -15,65 +15,77 @@
 # GNU General Public License for more details.
 
 def addLocalMacros(msgType, conference, nick, param):
-	macros = param.split()[0].lower();
-	if(isCommand(macros)):
-		sendMsg(msgType, conference, nick, u'это имя уже занято командой');
-	elif(gMacros.hasMacros(macros)):
-		sendMsg(msgType, conference, nick, u'не могу, глобальный макрос есть такой :(');
+	rawMacros = param.split('=', 1);
+	if(len(rawMacros) != 2):
+		sendMsg(msgType, conference, nick, u'читай справку по команде');
+		return;
 	else:
-		raw = gMacros.parseCommand(param);
-		if(len(raw) < 2):
-			sendMsg(msgType, conference, nick, u'мало аргументов');
-			return;
-		command = raw[1].split()[0];
-		if(isCommand(command)):
-			access = gCommands[command][CMD_ACCESS];
-		elif(gMacros.hasMacros(command)):
-			access = gMacros.getAccess(command);
-		elif(gMacros.hasMacros(command, conference)):
-			access = gMacros.getAccess(command, conference);
+		macros, body = rawMacros;
+		macros = macros.strip();
+		body = body.strip();
+	if(macros and body):
+		if(isCommand(macros)):
+			sendMsg(msgType, conference, nick, u'это имя уже занято командой');
+		elif(gMacros.hasMacros(macros)):
+			sendMsg(msgType, conference, nick, u'не могу, глобальный макрос есть такой :(');
 		else:
-			sendMsg(msgType, conference, nick, u'не вижу команду внутри макроса');
-			return;
-		trueJid = getTrueJid(conference, nick);
-		if(getAccess(conference, trueJid) >= access):
-			if(gMacros.hasMacros(macros, conference)):
-				sendMsg(msgType, conference, nick, u'заменила');
+			command = body.split()[0];
+			if(isCommand(command)):
+				access = gCommands[command][CMD_ACCESS];
+			elif(gMacros.hasMacros(command)):
+				access = gMacros.getAccess(command);
+			elif(gMacros.hasMacros(command, conference)):
+				access = gMacros.getAccess(command, conference);
 			else:
-				sendMsg(msgType, conference, nick, u'добавила');		
-			gMacros.add(raw[0], raw[1], access, conference);
-			gMacros.saveMacroses(conference);
-		else:
-			sendMsg(msgType, conference, nick, u'недостаточно прав');
+				sendMsg(msgType, conference, nick, u'не вижу команду внутри макроса');
+				return;
+			trueJid = getTrueJid(conference, nick);
+			if(getAccess(conference, trueJid) >= access):
+				if(gMacros.hasMacros(macros, conference)):
+					sendMsg(msgType, conference, nick, u'заменила');
+				else:
+					sendMsg(msgType, conference, nick, u'добавила');		
+				gMacros.add(macros, body, access, conference);
+				gMacros.saveMacroses(conference);
+			else:
+				sendMsg(msgType, conference, nick, u'недостаточно прав');
+	else:
+		sendMsg(msgType, conference, nick, u'читай справку по команде');
 
-registerCommand(addLocalMacros, u'макроадд', 20, u'Добавить макрос. Тело макроса должно быть заключено в апострофы (`)', u'макроадд <название> `<макрос>`', (u'макроадд глюк `сказать /me подумал, что все глючат`', ), CHAT | PARAM);
+registerCommand(addLocalMacros, u'макроадд', 20, u'Добавить макрос', u'макроадд <название>=<макрос>', (u'макроадд глюк=сказать /me подумал, что все глючат', ), CHAT | PARAM);
 
 def addGlobalMacros(msgType, conference, nick, param):
-	macros = param.split()[0].lower();
-	if(isCommand(macros)):
-		sendMsg(msgType, conference, nick, u'это имя уже занято командой');
+	rawMacros = param.split('=', 1);
+	if(len(rawMacros) != 2):
+		sendMsg(msgType, conference, nick, u'читай справку по команде');
+		return;
 	else:
-		raw = gMacros.parseCommand(param);
-		if(len(raw) < 2):
-			sendMsg(msgType, conference, nick, u'мало аргументов');
-			return;
-		command = raw[1].split()[0];
-		if(isCommand(command)):
-			access = gCommands[command][CMD_ACCESS];
-		elif(gMacros.hasMacros(command)):
-			access = gMacros.getAccess(command);
+		macros, body = rawMacros;
+		macros = macros.strip();
+		body = body.strip();
+	if(macros and body):
+		if(isCommand(macros)):
+			sendMsg(msgType, conference, nick, u'это имя уже занято командой');
 		else:
-			sendMsg(msgType, conference, nick, u'не вижу команду внутри макроса');
-			return;
-		if(gMacros.hasMacros(macros)):
-			access = gMacros.getAccess(macros);
-			sendMsg(msgType, conference, nick, u'заменила');
-		else:
-			sendMsg(msgType, conference, nick, u'добавила');
-		gMacros.add(raw[0], raw[1], access);
-		gMacros.saveMacroses();
+			command = body.split()[0];
+			if(isCommand(command)):
+				access = gCommands[command][CMD_ACCESS];
+			elif(gMacros.hasMacros(command)):
+				access = gMacros.getAccess(command);
+			else:
+				sendMsg(msgType, conference, nick, u'не вижу команду внутри макроса');
+				return;
+			if(gMacros.hasMacros(macros)):
+				access = gMacros.getAccess(macros);
+				sendMsg(msgType, conference, nick, u'заменила');
+			else:
+				sendMsg(msgType, conference, nick, u'добавила');
+			gMacros.add(macros, body, access);
+			gMacros.saveMacroses();
+	else:
+		sendMsg(msgType, conference, nick, u'читай справку по команде');
 
-registerCommand(addGlobalMacros, u'гмакроадд', 100, u'Добавить глобальный макрос. Тело макроса должно быть заключено в апострофы (`)', u'гмакроадд <название> `<макрос>`', (u'гмакроадд глюк `сказать /me подумал, что все глючат`', ), ANY | PARAM);
+registerCommand(addGlobalMacros, u'гмакроадд', 100, u'Добавить глобальный макрос', u'гмакроадд <название>=<макрос>', (u'гмакроадд глюк=сказать /me подумал, что все глючат', ), ANY | PARAM);
 
 def delLocalMacros(msgType, conference, nick, param):
 	if(gMacros.hasMacros(param, conference)):

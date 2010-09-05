@@ -18,10 +18,10 @@ TURN_TIMEOUT = 0.6;
 #TABLE_RU = u",№;:?&йцукенгшщзхъфывапролджэячсмитьбюёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮЁ";
 #TABLE_EN = u"?#$^,?qwertyuiop[]asdfghjkl;'zxcvbnm,.`QWERTYUIOP{}ASDFGHJKL:\ZXCVBNM<>~";
 
-BIG_RU = u'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,?';
-BIG_EN = u'QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?&';
-SML_RU = u"йцукенгшщзхъфывапролджэячсмитьбю.";
-SML_EN = u"qwertyuiop[]asdfghjkl;'zxcvbnm,./";
+BIG_RU = u'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,?Ё';
+BIG_EN = u'QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?&~';
+SML_RU = u"йцукенгшщзхъфывапролджэячсмитьбю.ё";
+SML_EN = u"qwertyuiop[]asdfghjkl;'zxcvbnm,./`";
 
 TABLE_BIG = dict(zip(BIG_RU + BIG_EN, BIG_EN + BIG_RU));
 TABLE_SML = dict(zip(SML_RU + SML_EN, SML_EN + SML_RU));

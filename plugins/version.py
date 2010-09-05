@@ -36,7 +36,7 @@ def showVersion(msgType, conference, nick, param):
 
 def _showVersion(stanza, verID, msgType, conference, nick, param):
 	if(verID == stanza.getID()):
-		if(stanza.getType() == 'result'):
+		if(RESULT == stanza.getType()):
 			name, ver, os = '', '', '';
 			for p in stanza.getQueryChildren():
 				if(p.getName() == 'name'):
@@ -58,7 +58,7 @@ def _showVersion(stanza, verID, msgType, conference, nick, param):
 				else:
 					sendMsg(msgType, conference, nick, u'%s юзает %s' % (param, version));
 			else:
-				sendMsg(msgType, conference, nick, u'глючит клиент');
+				sendMsg(msgType, conference, nick, u'клиент глюк, инфы не хватает');
 		else:
 			sendMsg(msgType, conference, nick, u'глючит клиент');
 

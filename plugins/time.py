@@ -65,11 +65,11 @@ def _showUserTime(stanza, timeID, msgType, conference, nick, param):
 				else:
 					sendMsg(msgType, conference, nick, u'у тебя сейчас %s (%s)' % (time, date));
 			else:
-				sendMsg(msgType, conference, nick, u'твой клиент - глюк, инфы не хватает');
+				sendMsg(msgType, conference, nick, u'клиент глюк, инфы не хватает');
 		elif(stanza.getType() == 'error'):
 			if(not param):
 				sendMsg(msgType, conference, nick, u'хехе, твой клиент не дружит с этим');
 			else:
-				sendMsg(msgType, conference, nick, u'хехе, его клиент не дружит с этим');
+				sendMsg(msgType, conference, nick, u'хехе, клиент у %s не дружит с этим' % (param));
 
 registerCommand(showUserTime, u'часики', 10, u'Показывает время указанного пользователя', u'часики [ник]', (u'часики', u'часики Nick'));

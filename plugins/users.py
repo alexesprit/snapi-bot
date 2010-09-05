@@ -51,14 +51,14 @@ def showUserNicks(msgType, conference, nick, param):
 		nicks = nickList[trueJid];
 		if(len(nicks) < 2):
 			if(param):
-				sendMsg(msgType, conference, nick, u'не видела, чтобы ' + userNick + u' менял ник');
+				sendMsg(msgType, conference, nick, u'не видела, чтобы ник у %s менялся' % (userNick));
 			else:
-				sendMsg(msgType, conference, nick, u'не видела, чтобы ты менял ник');
+				sendMsg(msgType, conference, nick, u'не видела, чтобы твой ник менялся');
 		else:
 			if(param):
-				sendMsg(msgType, conference, nick, u'%s известен как %s' % (userNick, ', '.join(nicks)));
+				sendMsg(msgType, conference, nick, u'я знаю %s как %s' % (userNick, ', '.join(nicks)));
 			else:
-				sendMsg(msgType, conference, nick, u'ты известен как %s' % (', '.join(nicks)));
+				sendMsg(msgType, conference, nick, u'я знаю тебя как %s' % (', '.join(nicks)));
 	else:
 		sendMsg(msgType, conference, nick, u'а это кто?');
 
