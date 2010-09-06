@@ -595,6 +595,7 @@ def messageHandler(session, stanza):
 		return;
 	trueJid = getTrueJid(fullJid);
 	if(getAccess(conference, trueJid) == -100):
+		printf('ignoring %s' % (trueJid));
 		return;
 	message = stanza.getBody() or '';
 	message = message.strip();
@@ -670,14 +671,12 @@ def messageHandler(session, stanza):
 
 def presenceHandler(session, stanza):
 	fullJid = stanza.getFrom();
-	trueJid = getTrueJid(fullJid);
-	conference = fullJid.getStripped();
-	if(getAccess(conference, trueJid) == -100):
-		return;
-	nick = fullJid.getResource();
 	prsType =  stanza.getType();
-	if(conferenceInList(conference)):
+	jid = fullJid.getStripped();
+	if(conferenceInList(jid)):
+		conference = jid;
 		trueJid = stanza.getJid();
+		nick = fullJid.getResource();
 		if(trueJid):
 			trueJid = xmpp.JID(trueJid).getStripped();
 		if(not prsType):
@@ -725,15 +724,16 @@ def presenceHandler(session, stanza):
 				leaveConference(conference, u'got %s error code' % errorCode);
 		callPresenceHandlers(stanza, CHAT, conference, nick, trueJid);
 	else:
-		callPresenceHandlers(stanza, ROSTER, conference, nick, trueJid);
+		resource = fullJid.getResource();
+		callPresenceHandlers(stanza, ROSTER, jid, resource, None);
 
 def iqHandler(session, stanza):
 	fullJid = stanza.getFrom();
-	trueJid = getTrueJid(fullJid);
 	bareJid = fullJid.getStripped();
-	resource = fullJid.getResource()
+	trueJid = getTrueJid(fullJid);
 	if(getAccess(bareJid, trueJid) == -100):
 		return;
+	resource = fullJid.getResource();
 	callIqHandlers(stanza, bareJid, resource);
 
 def saveException(funcName):

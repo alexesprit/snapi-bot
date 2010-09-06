@@ -54,12 +54,13 @@ def setLocalAccess(msgType, conference, nick, param):
 	param = param.split();
 	access = 0;
 	if(len(param) > 1):
-		access = param[1];
-		if(access.isdigit() and -100 <= int(access) <= 100):
-			access = int(access);
-		else:
+		try:
+			access = int(param[1]);
+			if(100 > access or -100 < access):
+				sendMsg(msgType, conference, nick, u'ошибочный запрос');
+		except(ValueError):
 			sendMsg(msgType, conference, nick, u'ошибочный запрос');
-			return;
+			return;			
 	userNick = param[0].strip();
 	if(nickInConference(conference, userNick)):
 		myJid = getTrueJid(conference, nick);
@@ -102,11 +103,14 @@ def setGlobalAccess(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u'а это кто?');
 			return;
 	if(len(param) == 2):
-		access = param[1];
-		if(access.isdigit()):
-			setPermGlobalAccess(trueJid, int(access));
-			sendMsg(msgType, conference, nick, u'дала');
-		else:
+		try:
+			access = int(param[1]);
+			if(-100 <= access <= 100):
+				setPermGlobalAccess(trueJid, int(access));
+				sendMsg(msgType, conference, nick, u'дала');
+			else:
+				sendMsg(msgType, conference, nick, u'ошибочный запрос');
+		except(ValueError):
 			sendMsg(msgType, conference, nick, u'ошибочный запрос');
 	else:
 		setPermGlobalAccess(trueJid);

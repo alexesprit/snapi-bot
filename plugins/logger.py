@@ -90,17 +90,17 @@ def writeUserJoin(conference, nick, trueJid, aff, role):
 
 def writeUserLeave(conference, nick, trueJid, reason, code):
 	if(getConfigKey(conference, CFG_LOG)):
-		if(code == '307'):
+		if('307' == code):
 			if(reason):
 				writeLog(PUBLIC, conference, '@$$kick$$@', u'%s выгнали из комнаты (%s)' % (nick, reason));
 			else:
 				writeLog(PUBLIC, conference, '@$$kick$$@', u'%s выгнали из комнаты' % (nick));		
-		elif(code == '301'):
+		elif('301' == code ):
 			if(reason):
 				writeLog(PUBLIC, conference, '@$$ban$$@', u'%s забанили (%s)' % (nick, reason));
 			else:
 				writeLog(PUBLIC, conference, '@$$ban$$@', '@$$userban$$@');	
-		else:
+		elif('303' != code):
 			if(reason):
 				writeLog(PUBLIC, conference, '@$$leave$$@', u'%s вышел из комнаты (%s)' % (nick, reason));
 			else:
