@@ -36,7 +36,7 @@ def setMood(msgType, jid, resource, param):
 		else:
 			sendMsg(msgType, jid, resource, u'поставила');
 	else:
-		sendMsg(msgType, jid, nick, u'читай справку по команде');
+		sendMsg(msgType, jid, resource, u'читай справку по команде');
 
 def setActivity(msgType, jid, resource, param):
 	if(param == u'сброс' or param.count('|')):
@@ -58,7 +58,7 @@ def setActivity(msgType, jid, resource, param):
 		else:
 			sendMsg(msgType, jid, resource, u'поставила');
 	else:
-		sendMsg(msgType, jid, nick, u'читай справку по команде');
+		sendMsg(msgType, jid, resource, u'читай справку по команде');
 
 registerCommand(setActivity, u'активность', 100, u'Устанавливает активность для бота. "Cброс" в кач-ве параметра сбрасывает активность', u'активность <осн.|доп.|текст>', (u'активность doing_chores|doing_maintenance|ололо', ), ROSTER | PARAM);
 registerCommand(setMood, u'настроение', 100, u'Устанавливает настроение для бота. "Cброс" в кач-ве параметра сбрасывает настроение', u'настроение <название|текст>', (u'настроение calm|ололо', ), ROSTER | PARAM);
