@@ -15,7 +15,7 @@
 
 def showAforism(msgType, conference, nick, param):
 	rawHtml = urllib.urlopen('http://skio.ru/quotes/humour_quotes.php').read();
-	items = re.search('<form id="qForm" method="post"><div align="center">(.*?)</div>', rawHtml, re.DOTALL);
+	items = re.search('<form id="qForm" method="post"><div align="center">(.+?)</div>', rawHtml, re.DOTALL);
 	if(items):
 		aforism = decode(items.group(0));	
 		sendMsg(msgType, conference, nick, unicode(aforism, 'windows-1251'));

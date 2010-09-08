@@ -17,7 +17,7 @@ def yandexSearch(msgType, conference, nick, param):
 	query = urllib.urlencode({'query' : param.encode("utf-8")});
 	rawHtml = urllib.urlopen('http://yandex.ru/msearch?s=all&%s' % (query)).read();
 	rawHtml = unicode(rawHtml, 'utf-8');
-	items = re.findall('<li>(.*?)<div class="www">(.*?)</li>', rawHtml, re.DOTALL);
+	items = re.findall('<li>(.+?)<div class="www">(.+?)</li>', rawHtml, re.DOTALL);
 	if(items):
 		if(PUBLIC == msgType):
 			text = items[0][0].strip();

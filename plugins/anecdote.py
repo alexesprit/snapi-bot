@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-gAnecdotePattern = re.compile("<div style='color: #000000;(.*?)<a href='http://anekdot.odessa.ua/' target='_blank'>", re.DOTALL);
+gAnecdotePattern = re.compile("<div style='color: #000000;(.+?)<a href='http://anekdot.odessa.ua/' target='_blank'>", re.DOTALL);
 
 def showAnecdote(msgType, conference, nick, param):
 	rawHtml = urllib.urlopen('http://anekdot.odessa.ua/rand-anekdot.php').read();
