@@ -248,6 +248,7 @@ def startTimer(timeout, func, param = None):
 		timer = threading.Timer(timeout, func, param);
 	else:
 		timer = threading.Timer(timeout, func);
+	timer.setName(func.__name__);
 	timer.start();
 	return(timer);
 
