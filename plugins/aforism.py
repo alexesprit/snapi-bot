@@ -13,12 +13,38 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+AFOR_PAGES = (
+		'biz_quotes.php',
+		'rich_quotes.php',
+		'family_quotes.php',
+		'kids_quotes.php',
+		'friend_quotes.php',
+		'human_quotes.php',
+		'health_quotes.php',
+		'beauty_quotes.php',
+		'love_quotes.php',
+		'world_quotes.php',
+		'wisdom_quotes.php',
+		'menwomen_quotes.php',
+		'science_quotes.php',
+		'edu_quotes.php',
+		'pessimism_quotes.php',
+		'politics_quotes.php',
+		'truth_quotes.php',
+		'religion_quotes.php',
+		'death_quotes.php',
+		'happy_quotes.php',
+		'work_quotes.php',
+		'humour_quotes.php',
+);
+
 def showAforism(msgType, conference, nick, param):
-	rawHtml = urllib.urlopen('http://skio.ru/quotes/humour_quotes.php').read();
+	randPage = random.choice(AFOR_PAGES);
+	rawHtml = urllib.urlopen('http://skio.ru/quotes/%s' % (randPage)).read();
 	items = re.search('<form id="qForm" method="post"><div align="center">(.+?)</div>', rawHtml, re.DOTALL);
 	if(items):
-		aforism = decode(items.group(0));	
-		sendMsg(msgType, conference, nick, unicode(aforism, 'windows-1251'));
+		aforism = decode(items.group(0));
+		sendMsg(msgType, conference, nick, unicode(aforism, 'cp1251'));
 	else:
 		sendMsg(msgType, conference, nick, u'не получается');
 

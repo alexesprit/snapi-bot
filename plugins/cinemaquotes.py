@@ -1,0 +1,31 @@
+# coding: utf-8;
+
+# cinemauotes.py
+# Initial Copyright (c) 2010 -Esprit-
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+QUOTES_COUNT = 38;
+
+def showQuote(msgType, conference, nick, param):
+	pageNum = random.randrange(1, QUOTES_COUNT + 1);
+	rawHtml = urllib.urlopen('http://skio.ru/afofilms/kino%d.php' % (pageNum)).read();
+	items = re.search('<ul type="circle"(.+?)</ul>', rawHtml, re.DOTALL);
+	if(items):
+		rawHtml = items.group(0);
+		items = re.findall('<li>(.+?)</li>', rawHtml, re.DOTALL);
+		quote = random.choice(items);
+		quote = decode(quote);
+		sendMsg(msgType, conference, nick, unicode(quote, 'cp1251'));
+	else:
+		sendMsg(msgType, conference, nick, u'не получается');
+
+registerCommand(showQuote, u'киноцитата', 10, u'Показывает случайную цитату из кино', None, (u'киноцитата', ), ANY | NONPARAM);
