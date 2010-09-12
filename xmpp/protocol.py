@@ -333,7 +333,7 @@ class JID:
 
 class Protocol(Node):
     """ A "stanza" object class. Contains methods that are common for presences, iqs and messages. """
-    def __init__(self, name=None, to=None, typ=None, frm=None, attrs={}, payload=[], timestamp=None, xmlns=None, node=None):
+    def __init__(self, name=None, to=None, typ=None, frm=None, attrs=None, payload=None, timestamp=None, xmlns=None, node=None):
         """ Constructor, name is the name of the stanza i.e. 'message' or 'presence' or 'iq'.
             to is the value of 'to' attribure, 'typ' - 'type' attribute
             frn - from attribure, attrs - other attributes mapping, payload - same meaning as for simplexml payload definition
@@ -422,7 +422,7 @@ class Protocol(Node):
 
 class Message(Protocol):
     """ XMPP Message stanza - "push" mechanism."""
-    def __init__(self, to=None, body=None, typ=None, subject=None, attrs={}, frm=None, payload=[], timestamp=None, xmlns=NS_CLIENT, node=None):
+    def __init__(self, to=None, body=None, typ=None, subject=None, attrs=None, frm=None, payload=None, timestamp=None, xmlns=None, node=None):
         """ Create message object. You can specify recipient, text of message, type of message
             any additional attributes, sender of the message, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
             Alternatively you can pass in the other XML object as the 'node' parameted to replicate it as message. """
@@ -457,7 +457,7 @@ class Message(Protocol):
 
 class Presence(Protocol):
     """ XMPP Presence object."""
-    def __init__(self, to=None, typ=None, priority=None, show=None, status=None, attrs={}, frm=None, timestamp=None, payload=[], xmlns=NS_CLIENT, node=None):
+    def __init__(self, to=None, typ=None, priority=None, show=None, status=None, attrs=None, frm=None, timestamp=None, payload=None, xmlns=None, node=None):
         """ Create presence object. You can specify recipient, type of message, priority, show and status values
             any additional attributes, sender of the presence, timestamp, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
             Alternatively you can pass in the other XML object as the 'node' parameted to replicate it as presence. """
@@ -518,7 +518,7 @@ class Presence(Protocol):
 
 class Iq(Protocol): 
     """ XMPP Iq object - get/set dialog mechanism. """
-    def __init__(self, typ=None, queryNS=None, attrs={}, to=None, frm=None, payload=[], xmlns=NS_CLIENT, node=None):
+    def __init__(self, typ=None, queryNS=None, attrs=None, to=None, frm=None, payload=None, xmlns=None, node=None):
         """ Create Iq object. You can specify type, query namespace
             any additional attributes, recipient of the iq, sender of the iq, any additional payload (f.e. jabber:x:data node) and namespace in one go.
             Alternatively you can pass in the other XML object as the 'node' parameted to replicate it as an iq. """
@@ -597,7 +597,7 @@ class DataField(Node):
     """ This class is used in the DataForm class to describe the single data item.
         If you are working with jabber:x:data (XEP-0004, XEP-0068, XEP-0122) 
         then you will need to work with instances of this class. """
-    def __init__(self,name=None,value=None,typ=None,required=0,label=None,desc=None,options=[],node=None):
+    def __init__(self,name=None,value=None,typ=None,required=0,label=None,desc=None,options=None,node=None):
         """ Create new data field of specified name,value and type.
             Also 'required','desc' and 'options' fields can be set.
             Alternatively other XML object can be passed in as the 'node' parameted to replicate it as a new datafiled.

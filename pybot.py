@@ -98,6 +98,16 @@ AFFILIATIONS = {
 	AFF_OWNER: 15
 };
 
+ESCAPE_MAP = {
+	'&apos;': '\'',
+	'&gt;': '>',
+	'&lt;': '<',
+	'&amp;': '&',
+	'&quot;': '"',
+	'&nbsp;': ' ',
+	'&mdash;': '-'	
+};
+
 IDLE_TIMEOUT = 600;
 JOIN_TIMEOUT = 5;
 REJOIN_TIMEOUT = 120;
@@ -281,11 +291,8 @@ def time2str(time):
 	return(rep);
 
 def XMLUnescape(s):
-	s = s.replace('&apos;', '\'');
-	s = s.replace('&gt;', '>');
-	s = s.replace('&lt;', '<');
-	s = s.replace('&amp;', '&');
-	s = s.replace('&quot;', '"');
+	for char in ESCAPE_MAP:
+		s = s.replace(char, ESCAPE_MAP[char]);
 	return(s);
 
 def decode(text):
@@ -641,7 +648,8 @@ def messageHandler(session, stanza):
 				return;
 		if(not message):
 			return;
-	rawBody = message.split();
+	message = gMacros.expand(message, (conference, nick, ), conference);
+	rawBody = message.split(None, 1);
 	command = rawBody[0].lower();
 	if(isCommand(command)):
 		access = gCommands[command][CMD_ACCESS];
@@ -652,14 +660,11 @@ def messageHandler(session, stanza):
 			access = gMacros.getAccess(command, conference);
 		else:
 			return;
-		message = gMacros.expand(message, (conference, nick, ), conference);
-		rawBody = message.split();
-		command = rawBody[0].lower();
 	if(isCommand(command) and isAvailableCommand(conference, command)):
 		if(isCommandType(command, cmdType)):
 			if(getAccess(conference, trueJid) >= access):
 				if(len(rawBody) > 1):
-					param = message[(message.find(' ') + 1):].strip();
+					param = rawBody[1].strip();
 				else:
 					param = None;
 				if(param and isCommandType(command, NONPARAM)):

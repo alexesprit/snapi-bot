@@ -225,7 +225,7 @@ class HTTPPROXYsocket(TCPsocket):
 
 	def plugin(self, owner):
 		""" Starts connection. Used interally. Returns non-empty string on success."""
-		owner.debug_flags.append(DBG_CONNECT_PROXY)
+		owner.debugFlags.append(DBG_CONNECT_PROXY)
 		return TCPsocket.plugin(self,owner)
 
 	def connect(self,dupe=None):

@@ -87,7 +87,7 @@ class Dispatcher(PlugIn):
         self.Stream._dispatch_depth=2
         self.Stream.dispatch=self.dispatch
         self.Stream.stream_header_received=self._check_stream_start
-        self._owner.debug_flags.append(simplexml.DBG_NODEBUILDER)
+        self._owner.debugFlags.append(simplexml.DBG_NODEBUILDER)
         self.Stream.DEBUG=self._owner.DEBUG
         self.Stream.features=None
         self._metastream=Node('stream:stream')

@@ -19,7 +19,7 @@ def showAnecdote(msgType, conference, nick, param):
 	rawHtml = urllib.urlopen('http://anekdot.odessa.ua/rand-anekdot.php').read();
 	items = gAnecdotePattern.search(rawHtml);
 	if(items):
-		anecdote = decode(items.group(0).replace('<br />\n', '\n'));
+		anecdote = decode(items.group(0));
 		sendMsg(msgType, conference, nick, unicode(anecdote, 'windows-1251'));
 	else:
 		sendMsg(msgType, conference, nick, u'не получается');

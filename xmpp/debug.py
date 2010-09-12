@@ -18,7 +18,7 @@ _version_ = '1.4.0'
 Generic debug class
 
 Other modules can always define extra debug flags for local usage, as long as
-they make sure they append them to debug_flags
+they make sure they append them to debugFlags
 
 Also its always a good thing to prefix local flags with something, to reduce risk
 of coliding flags. Nothing breaks if two flags would be identical, but it might 
@@ -62,8 +62,8 @@ Define your flags in yor modules like this:
 
 from debug import *
 
-DBG_INIT = 'init'                ; debug_flags.append( DBG_INIT )
-DBG_CONNECTION = 'connection'    ; debug_flags.append( DBG_CONNECTION )
+DBG_INIT = 'init'                ; debugFlags.append( DBG_INIT )
+DBG_CONNECTION = 'connection'    ; debugFlags.append( DBG_CONNECTION )
 
 The reason for having a double statement wis so we can validate params
 and catch all undefined debug flags
@@ -71,10 +71,10 @@ and catch all undefined debug flags
 This gives us control over all used flags, and makes it easier to allow
 global debugging in your code, just do something like
 
-foo = Debug( debug_flags )
+foo = Debug( debugFlags )
 
 group flags, that is a flag in it self containing multiple flags should be
-defined without the debug_flags.append() sequence, since the parts are already
+defined without the debugFlags.append() sequence, since the parts are already
 in the list, also they must of course be defined after the flags they depend on ;)
 example:
 
@@ -107,7 +107,7 @@ class Debug:
 	colors = {};
     
 	def __init__( self,
-				activeFlags = [],
+				activeFlags = None,
 				logFile = sys.stderr,
 				#
 				# prefix and sufix can either be set globaly or per call.
@@ -136,11 +136,13 @@ class Debug:
 				validateFlags = True,
 				welcomeMsg = True):
 		
-		self.debugFlags = activeFlags;
+		if(activeFlags):
+			self.debugFlags = activeFlags;
+			self.removeDuplicates();
+		else:
+			self.debugFlags = [];
 		if(welcomeMsg):
 			welcomeMsg = activeFlags and 1 or 0;
-
-		self._removeDuplicates();
 		if(logFile):
 			if(isinstance(logFile, str)):
 				try:
@@ -175,6 +177,7 @@ class Debug:
 		validFlags = [];
 		if(not activeFlags):
 			self.activeFlags = [];
+			return;
 		elif(isinstance(activeFlags, tuple) or isinstance(activeFlags, list)):
 			for flag in activeFlags:
 				if(flag not in self.debugFlags):
@@ -190,7 +193,7 @@ class Debug:
 			for flag in flags:
 				validFlags.append(flag.strip());
 			self.activeFlags = validFlags;
-		self._removeDuplicates();
+		self.removeDuplicates();
 	
 	def getActiveFlags(self):
 		return self.active;
@@ -201,7 +204,7 @@ class Debug:
 				if(not f in self.debugFlags):
 					raise Exception('Invalid debugflag given: %s' % f);
 
-	def _removeDuplicates(self):
+	def removeDuplicates(self):
 		uniqueFlags = [];
 		for f in self.debugFlags:
 			if(f not in uniqueFlags):

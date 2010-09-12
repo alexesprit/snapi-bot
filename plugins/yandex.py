@@ -29,6 +29,6 @@ def yandexSearch(msgType, conference, nick, param):
 		message = message.replace('...', '');
 		sendMsg(msgType, conference, nick, decode(message));	
 	else:
-		sendMsg(msgType, conference, nick, u'По вашему запросу ничего не найдено');
+		sendMsg(msgType, conference, nick, u'по вашему запросу ничего не найдено');
 
 registerCommand(yandexSearch, u'яндекс', 10, u'Поиск в Яндексе', u'яндекс <запрос>', (u'яндекс google', ), ANY | PARAM);

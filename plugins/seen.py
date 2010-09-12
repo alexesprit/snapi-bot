@@ -26,9 +26,9 @@ def showSeenTime(msgType, conference, nick, param):
 			seenDate = time.strftime('%H:%M, %d.%m.%Y', time.localtime(seenTime));
 			seenTime = time2str(time.time() - seenTime);
 			if(not param):
-				sendMsg(msgType, conference, nick, u'я видела тебя %s назад (в %s)' % (seenTime, seenDate));
+				sendMsg(msgType, conference, nick, u'последний раз я видела тебя %s назад (в %s)' % (seenTime, seenDate));
 			else:
-				sendMsg(msgType, conference, nick, u'я видела %s %s назад (в %s)' % (userNick, seenTime, seenDate));
+				sendMsg(msgType, conference, nick, u'последний раз я видела %s %s назад (в %s)' % (userNick, seenTime, seenDate));
 		else:
 			sendMsg(msgType, conference, nick, u'нет информации');
 	else:

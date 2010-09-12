@@ -49,7 +49,7 @@ class Node(object):
         replication (and using replication only to move upwards on the classes tree).
     """
     FORCE_NODE_RECREATION=0
-    def __init__(self, tag=None, attrs={}, payload=[], parent=None, nsp=None, node_built=False, node=None):
+    def __init__(self, tag=None, attrs=None, payload=None, parent=None, nsp=None, node_built=False, node=None):
         """ Takes "tag" argument as the name of node (prepended by namespace, if needed and separated from it
             by a space), attrs dictionary as the set of arguments, payload list as the set of textual strings
             and child nodes that this node carries within itself and "parent" argument that is another node
@@ -75,6 +75,8 @@ class Node(object):
         self.nsp_cache = {}
         if nsp:
             for k,v in nsp.items(): self.nsp_cache[k] = v
+        if(not attrs):
+            attrs = {}
         for attr,val in attrs.items():
             if attr == 'xmlns':
                 self.nsd[u''] = val
@@ -90,6 +92,8 @@ class Node(object):
                     self.namespace,self.name = tag.split()
                 else:
                     self.name = tag
+        if(not payload):
+            payload = []
         if isinstance(payload, basestring): payload=[payload]
         for i in payload:
             if isinstance(i, Node): self.addChild(node=i)

@@ -59,8 +59,8 @@ class PlugIn:
     def PlugIn(self,owner):
         """ Attach to main instance and register ourself and all our staff in it. """
         self._owner=owner
-        if self.DBG_LINE not in owner.debug_flags:
-            owner.debug_flags.append(self.DBG_LINE)
+        if self.DBG_LINE not in owner.debugFlags:
+            owner.debugFlags.append(self.DBG_LINE)
         self.DEBUG('Plugging %s into %s'%(self,self._owner),'start')
         if owner.__dict__.has_key(self.__class__.__name__):
             return self.DEBUG('Plugging ignored: another instance already plugged.','error')
@@ -77,7 +77,7 @@ class PlugIn:
         self.DEBUG('Plugging %s out of %s.'%(self,self._owner),'stop')
         ret = None
         if self.__class__.__dict__.has_key('plugout'): ret = self.plugout()
-        self._owner.debug_flags.remove(self.DBG_LINE)
+        self._owner.debugFlags.remove(self.DBG_LINE)
         for method in self._exported_methods: del self._owner.__dict__[method.__name__]
         for method in self._old_owners_methods: self._owner.__dict__[method.__name__]=method
         del self._owner.__dict__[self.__class__.__name__]
@@ -104,8 +104,8 @@ class CommonClient:
         self.Port=port
         self._DEBUG=Debug.Debug(debug, validateFlags = False, welcomeMsg = False, prefix = '', showFlags = False)
         self.DEBUG=self._DEBUG.show
-        self.debug_flags=self._DEBUG.debugFlags
-        self.debug_flags.append(self.DBG)
+        self.debugFlags=self._DEBUG.debugFlags
+        self.debugFlags.append(self.DBG)
         self._owner=self
         self._registered_name=None
         self.connected=''
