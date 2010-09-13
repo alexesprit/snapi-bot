@@ -182,7 +182,7 @@ def showLocalMacroAccess(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'нету такого макроса');
 
-registerCommand(showLocalMacroAccess, u'макродоступ', 20, u'Изменить или посмотреть доступ к макросу', u'макродоступ <название> [доступ]', (u'макродоступ глюк 10', u'макродоступ глюк'), CHAT);
+registerCommand(showLocalMacroAccess, u'макродоступ', 20, u'Изменить или посмотреть доступ к макросу', u'макродоступ <название> [доступ]', (u'макродоступ глюк 10', u'макродоступ глюк'), CHAT | PARAM);
 
 def showGlobalMacroAccess(msgType, conference, nick, param):
 	param = param.split();

@@ -64,16 +64,20 @@ def vote(msgType, conference, nick, param):
 registerCommand(vote, u'мнение', 10, u'Для подачи мнения в текущем голосовании', u'мнение <номер>', (u'мнение 1', ), CHAT | PARAM);
 
 def newVote(msgType, conference, nick, param):
-	if(gVotes[conference]):
-		if(not gVotes[conference]['finished']):
+	if(not param):
+		if(gVotes[conference]):
+			if(not gVotes[conference]['finished']):
+				sendMsg(msgType, conference, nick, getVoteText(conference));
+			else:
+				sendMsg(msgType, conference, nick, getResults(conference));	
+	elif(param):
+		if(gVotes[conference] and not gVotes[conference]['finished']):
 			sendMsg(msgType, conference, nick, getVoteText(conference));
 		else:
-			sendMsg(msgType, conference, nick, getResults(conference));	
-	elif(param):
-		trueJid = getTrueJid(conference, nick);
-		gVotes[conference] = {'started': False, 'finished': False, 'creator': nick, 'creatorjid': getTrueJid(conference, nick), 'question': param, 'voted': {}, 'opinions': []};
-		saveVotes(conference);
-		sendMsg(msgType, conference, nick, u'Голосование создано! Чтобы добавить пункты напиши "пункт+ твой_пункт", удалить - "пункт- номер пункта". Начать голосование - команда "голосование+". Посмотреть текущие результаты - команда "мнения". Окончить голосование - команда "итоги"', True);
+			trueJid = getTrueJid(conference, nick);
+			gVotes[conference] = {'started': False, 'finished': False, 'creator': nick, 'creatorjid': getTrueJid(conference, nick), 'question': param, 'voted': {}, 'opinions': []};
+			saveVotes(conference);
+			sendMsg(msgType, conference, nick, u'Голосование создано! Чтобы добавить пункты напиши "пункт+ твой_пункт", удалить - "пункт- номер пункта". Начать голосование - команда "голосование+". Посмотреть текущие результаты - команда "мнения". Окончить голосование - команда "итоги"', True);
 
 registerCommand(newVote, u'голосование', 11, u'Создает новое голосование или показывает текущее (если имеется)', u'голосование [текст]', (u'голосование винды - сакс!', u'голосование'), CHAT);
 
