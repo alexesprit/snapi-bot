@@ -24,7 +24,7 @@ def showOnlineTime(msgType, conference, nick, param):
 
 def _showOnlineTime(stanza, lastID, msgType, conference, nick):
 	if(lastID == stanza.getID()):
-		if(RESULT == stanza.getmsgType()):
+		if(RESULT == stanza.getType()):
 			for p in stanza.getPayload():
 				sec = p.getAttrs()['seconds'];
 				if(not sec == '0'):
