@@ -648,7 +648,6 @@ def messageHandler(session, stanza):
 				return;
 		if(not message):
 			return;
-	message = gMacros.expand(message, (conference, nick, ), conference);
 	rawBody = message.split(None, 1);
 	command = rawBody[0].lower();
 	if(isCommand(command)):
@@ -660,13 +659,13 @@ def messageHandler(session, stanza):
 			access = gMacros.getAccess(command, conference);
 		else:
 			return;
+		message = gMacros.expand(message, (conference, nick, ), conference);
+		rawBody = message.split(None, 1);
+		command = rawBody[0].lower();
 	if(isCommand(command) and isAvailableCommand(conference, command)):
 		if(isCommandType(command, cmdType)):
 			if(getAccess(conference, trueJid) >= access):
-				if(len(rawBody) > 1):
-					param = rawBody[1].strip();
-				else:
-					param = None;
+				param = (len(rawBody) == 2) and rawBody[1] or None;
 				if(param and isCommandType(command, NONPARAM)):
 					return;
 				if(not param and isCommandType(command, PARAM)):

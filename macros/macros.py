@@ -183,64 +183,35 @@ class Macros:
 				del(self.gMacrosList[macros]);
 				del(self.gAccessList[macros]);
 
-	def expand(self, cmd, context, conference = None):
-		exp = None;
-		cl = self.parseCommand(cmd);
-		command = cl[0].split()[0].lower();
-		param = cl[1:];
+	def expand(self, message, context, conference = None):
+		macros = None;
+		rawBody = message.split(None, 1);
+		command = rawBody[0].lower();
+		param = (len(rawBody) == 2) and rawBody[1] or None;
 		if(conference in self.macrosList):
 			if(command in self.macrosList[conference]):
-				exp = self.replace(self.macrosList[conference][command], param, context);
+				macros = self.macrosList[conference][command];
 		if(command in self.gMacrosList):
-			t = self.gMacrosList[command];
-			exp = self.replace(t, param, context);
-		if(not exp):
-			return(cmd);
-		rexp = self.expand(exp, context, conference);
-		return(rexp);
+			macros = self.gMacrosList[command];
+		if(not macros):
+			return(message);
+		message = self.replace(macros, param, context);
+		expanded = self.expand(message, context, conference);
+		return(expanded);
 
-	def replace(self, macros, param, context):
-		if(macros.count('$*')):
-			macros = macros.replace('$*', ' '.join(param));
-		else:
-			for i, n in enumerate(re.findall('\$[0-9]+', macros)):
-				if(len(param) <= i):
-					break;
-				macros = macros.replace(n, param[i]);
-		for i in self.macroCommands.parseCommand(macros):
-			cmd = [x.strip() for x in i.split(',')];
-			res = self.macroCommands.proccess(cmd, context);
-			if(res):
-				macros = macros.replace('%%(%s)' % i, res);
-		return(macros);
-
-	def charMap(self, x, i):
-		ret = i['level'];
-		if(i['esc']):
-			i['esc'] = False;
-		elif(x == '('):
-			i['context'] = True;
-		elif(x == ')'):
-			i['context'] = False;
-		elif(x == '\\'):
-			i['esc'] = True;
-			ret = 0;
-		elif(x == ' '):
-			if(not i['context']):
-				i['level'] += 1;
-				ret = 0;
-		return(ret);
-
-	def getMap(self, inp):
-		i = {'context': False, 'level': 1, 'esc': False};
-		return([self.charMap(x, i) for x in list(inp)]);
-
-	def parseCommand(self, cmd):
-		i = 0;
-		m = self.getMap(cmd);
-		args = [''] * max(m);
-		while(i < len(m)):
-			if(m[i]):
-				args[m[i]-1] += cmd[i];
-			i += 1;
-		return(args);
+	def replace(self, message, param, context):
+		if(param):
+			if(message.count('$*')):
+				message = message.replace('$*', param);
+			else:
+				param = param.split();
+				for i, n in enumerate(re.findall('\$[0-9]+', message)):
+					if(len(param) <= i):
+						break;
+					message = message.replace(n, param[i]);
+			for i in self.macroCommands.parseCommand(message):
+				cmd = [x.strip() for x in i.split(',')];
+				res = self.macroCommands.proccess(cmd, context);
+				if(res):
+					message = message.replace('%%(%s)' % i, res);
+		return(message);
