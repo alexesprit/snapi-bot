@@ -19,88 +19,17 @@ import __main__, xmpp;
 MACROS_FILE = 'macros.txt';
 MACCESS_FILE = 'macrosaccess.txt';
 
-def getRand(args, source):
-	try:
-		f = int(args[0]);
-		t = int(args[1]);
-		return(str(random.randrange(f, t)));
-	except:
-		return('');
-
-def getContext(args, context):
-	arg = args[0];
-	if(arg == 'conf'):
-		return(context[0]);
-	elif(arg == 'nick'):
-		return(context[1]);
-	else:
-		return('');
-
-class MacroCommands:
-	commands = {
-		'rand': getRand,
-		'context': getContext
-	};
-
-	def charMap(self, x, i):
-		st = i['state'];
-		if(i['esc']):
-			i['esc'] = False;
-			ret = i['level'];
-		elif(x == '\\'):
-			i['esc'] = True;
-			ret = 0;
-		elif(x == '%'):
-			i['state'] = 'cmd_p';
-			ret = 0;
-		elif(x == '('):
-			if(i['state'] == 'cmd_p'):
-				i['level'] += 1;
-				i['state'] = 'args';
-			ret=0
-		elif(x == ')'):
-			if(i['state'] == 'args'):
-				i['state'] = 'null';
-			ret = 0;
-		else:
-			if(i['state'] == 'args'):
-				ret = i['level'];
-			else:
-				i['state'] = 'null';
-				ret = 0;
-		return(ret);
-
-	def getMap(self, inp):
-		i = {'level': 0, 'state': 'null', 'esc': False};
-		return([self.charMap(x, i) for x in list(inp)]);
-
-	def parseCommand(self, me):
-		i = 0;
-		m = self.getMap(me);
-		args = [''] * max(m);
-		while(i < len(m)):
-			if(m[i]):
-				args[m[i]-1] += me[i];
-			i += 1;
-		return(args);
-		
-	def execCommand(self, cmd, args, source):
-		if(cmd in self.commands):
-			return(self.commands[cmd](args, source));
-		return('');
-
-	def proccess(self, cmd, source):
-		command = cmd[0];
-		args = cmd[1:];
-		return(self.execCommand(command, args, source));
-
 class Macros:
-	gMacrosList = {};
-	gAccessList = {};
+	def __init__(self):
+		self.commands = {
+			'rand': self.getRand,
+			'context': self.getContext
+		};
+		self.gMacrosList = {};
+		self.gAccessList = {};
 
-	macrosList = {};
-	accessList = {};
-	macroCommands = MacroCommands();
+		self.macrosList = {};
+		self.accessList = {};		
 
 	def loadMacroses(self, conference = None):
 		if(conference):
@@ -205,14 +134,84 @@ class Macros:
 				message = message.replace('$*', param);
 			else:
 				param = param.split();
+				paramLen = len(param);
 				for i, n in enumerate(re.findall('\$[0-9]+', message)):
-					if(len(param) <= i):
-						break;
 					message = message.replace(n, param[i]);
-		print(self.macroCommands.parseCommand(message));
-		for i in self.macroCommands.parseCommand(message):
+					if(i == (paramLen - 1)):
+						break;
+		print(self.parseCommand(message));
+		for i in self.parseCommand(message):
 			cmd = [x.strip() for x in i.split(',')];
-			res = self.macroCommands.proccess(cmd, context);
+			res = self.proccess(cmd, context);
 			if(res):
 				message = message.replace('%%(%s)' % i, res);
 		return(message);
+
+	def getRand(self, args, source):
+		try:
+			f = int(args[0]);
+			t = int(args[1]);
+			return(str(random.randrange(f, t)));
+		except:
+			return('');
+
+	def getContext(self, args, context):
+		arg = args[0];
+		if(arg == 'conf'):
+			return(context[0]);
+		elif(arg == 'nick'):
+			return(context[1]);
+		else:
+			return('');
+
+	def charMap(self, x, i):
+		st = i['state'];
+		if(i['esc']):
+			i['esc'] = False;
+			ret = i['level'];
+		elif(x == '\\'):
+			i['esc'] = True;
+			ret = 0;
+		elif(x == '%'):
+			i['state'] = 'cmd_p';
+			ret = 0;
+		elif(x == '('):
+			if(i['state'] == 'cmd_p'):
+				i['level'] += 1;
+				i['state'] = 'args';
+			ret=0
+		elif(x == ')'):
+			if(i['state'] == 'args'):
+				i['state'] = 'null';
+			ret = 0;
+		else:
+			if(i['state'] == 'args'):
+				ret = i['level'];
+			else:
+				i['state'] = 'null';
+				ret = 0;
+		return(ret);
+
+	def getMap(self, inp):
+		i = {'level': 0, 'state': 'null', 'esc': False};
+		return([self.charMap(x, i) for x in list(inp)]);
+
+	def parseCommand(self, me):
+		i = 0;
+		m = self.getMap(me);
+		args = [''] * max(m);
+		while(i < len(m)):
+			if(m[i]):
+				args[m[i]-1] += me[i];
+			i += 1;
+		return(args);
+		
+	def execCommand(self, cmd, args, source):
+		if(cmd in self.commands):
+			return(self.commands[cmd](args, source));
+		return('');
+
+	def proccess(self, cmd, source):
+		command = cmd[0];
+		args = cmd[1:];
+		return(self.execCommand(command, args, source));
