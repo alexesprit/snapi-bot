@@ -812,8 +812,8 @@ def start():
 	gClient.RegisterHandler('iq', iqHandler);
 	printf('Handlers Registered', FLAG_SUCCESS);
 
-	setRosterStatus(None, None, gPriority);
 	gRoster = gClient.getRoster();
+	setRosterStatus(None, None, gPriority);
 
 	printf('Now I am ready to work :)');
 

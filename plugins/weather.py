@@ -1,7 +1,7 @@
 # coding: utf-8;
 
 # weather.py
-# Initial Copyright (с) ???
+# Initial Copyright (с) -Esprit-
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,34 +13,53 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-from xml.dom import minidom;
+WCODES_FILE = 'weather.txt';
+PRECIPITATION = {'4': u'дождь', 
+				'5': u'ливень', 
+				'6': u'снег',
+				'7': u'снег',
+				'8': u'буря',
+				'9': u'нет данных',
+				'10': u'без осадков'
+};
+
+def getWCodeByName(city):
+	city = city.encode('utf-8');
+	fileName = getFilePath(RESOURCE_DIR, WCODES_FILE)
+	for line in open(fileName):
+		if(line.startswith(city)):
+			return(line.split('|')[1]);
+	return(None);
 
 def showWeather(msgType, conference, nick, param):
-	query = urllib.urlencode({'q' : param.encode('cp1251')});
-	text = urllib.urlopen(u'http://pda.rp5.ru/?lang=ru&%s' % (query)).read();
-	if(text.count('1. <a href="')):
-		idx = re.search('1. <a href="', text).end();
-		text = text[idx:]
-		idx = re.search('">', text).start();
-		code = text[:idx];
+	city = param.capitalize();
+	code = getWCodeByName(city);
+	if(code):
+		rawXml = urllib.urlopen('http://informer.gismeteo.ru/xml/%s.xml' % (code.strip())).read();
+		node = xmpp.simplexml.XML2Node(rawXml);
+		node = node.getTag('REPORT').getTag('TOWN');
+		message = u'Погода в городе %s:\n' % (city);
+		for forecast in node.getTags('FORECAST'):
+			attrs = forecast.getAttrs();
+			message += u'%(day)s.%(month)s, %(hour)s:00\n'% (attrs);
+			
+			temp = forecast.getTag('TEMPERATURE').getAttrs();
+			message += u'Температура: %(min)s-%(max)s°C\n' % (temp);
 
-		rawXml = minidom.parse(urllib.urlopen('http://rp5.ru/rss/%s' % (code)));
-		message, city = '', None;
-		for x in rawXml.getElementsByTagName('item'):
-			title = x.getElementsByTagName('title')[0].firstChild.data.strip().split(': ', 1);
-			desc = x.getElementsByTagName('description')[0].firstChild.data.strip();
-			city = title[0];
-			desc = desc.replace('%)', '%')
-			desc = desc.replace(' (', ', ');
-			desc = desc.replace(')', '');
-			message += u'[%s]\nТемпература: %s\n\n' % (title[1], desc);
-		if(message):
-			message = u'Погода в городе %s\n%s' % (city, message);
-			if(PUBLIC == msgType):
-				sendMsg(msgType, conference, nick, u'скинула в личку');
-			sendMsg(PRIVATE, conference, nick, message);
-		else:
-			sendMsg(msgType, conference, nick, u'не могу :(');
+			weather = forecast.getTag('PHENOMENA').getAttrs();
+			message += u'Осадки: %s\n' % (PRECIPITATION[weather['precipitation']]);
+			
+			pressure = forecast.getTag('PRESSURE').getAttrs();
+			message += u'Давление: %(min)s-%(max)s мм рт. ст.\n' % (pressure);
+			
+			hudmity = forecast.getTag('RELWET').getAttrs();
+			message += u'Влажность: %(min)s-%(max)s%%\n' % (hudmity);
+			
+			wind = forecast.getTag('WIND').getAttrs();
+			message += u'Ветер: %(min)s-%(max)s м/с\n\n' % (wind);
+		if(PUBLIC == msgType):
+			sendMsg(msgType, conference, nick, u'ушла в приват');
+		sendMsg(PRIVATE, conference, nick, message);
 	else:
 		sendMsg(msgType, conference, nick, u'не могу :(');
 

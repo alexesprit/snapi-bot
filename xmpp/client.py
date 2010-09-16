@@ -235,17 +235,6 @@ class Client(CommonClient):
             requesting roster from server if needed. """
         if not self.__dict__.has_key('Roster'): roster.Roster().PlugIn(self)
         return self.Roster.getRoster()
-		
-    def sendInitPresence(self,requestRoster=1):
-        """ Send roster request and initial <presence/>.
-            You can disable the first by setting requestRoster argument to 0. """
-        self.sendPresence(requestRoster=requestRoster)
-
-    def sendPresence(self,jid=None,typ=None,requestRoster=0):
-        """ Send some specific presence state.
-            Can also request roster from server if according agrument is set."""
-        if requestRoster: roster.Roster().PlugIn(self)
-        self.send(dispatcher.Presence(to=jid, typ=typ))
 
 class Component(CommonClient):
     """ Component class. The only difference from CommonClient is ability to perform component authentication. """

@@ -209,9 +209,10 @@ class Macros:
 					if(len(param) <= i):
 						break;
 					message = message.replace(n, param[i]);
-			for i in self.macroCommands.parseCommand(message):
-				cmd = [x.strip() for x in i.split(',')];
-				res = self.macroCommands.proccess(cmd, context);
-				if(res):
-					message = message.replace('%%(%s)' % i, res);
+		print(self.macroCommands.parseCommand(message));
+		for i in self.macroCommands.parseCommand(message):
+			cmd = [x.strip() for x in i.split(',')];
+			res = self.macroCommands.proccess(cmd, context);
+			if(res):
+				message = message.replace('%%(%s)' % i, res);
 		return(message);
