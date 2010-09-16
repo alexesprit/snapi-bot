@@ -52,17 +52,18 @@ registerCommand(showUserAccess, u'доступ', 0, u'Показывает ур�
 
 def setLocalAccess(msgType, conference, nick, param):
 	param = param.split();
-	access = 0;
-	if(len(param) > 1):
-		try:
-			access = int(param[1]);
-			if(100 > access or -100 < access):
-				sendMsg(msgType, conference, nick, u'ошибочный запрос');
-		except(ValueError):
-			sendMsg(msgType, conference, nick, u'ошибочный запрос');
-			return;			
 	userNick = param[0].strip();
 	if(nickInConference(conference, userNick)):
+		access = 0;
+		if(len(param) > 1):
+			try:
+				access = int(param[1]);
+				if(100 < access or access > -100):
+					sendMsg(msgType, conference, nick, u'ошибочный запрос');
+					return;
+			except(ValueError):
+				sendMsg(msgType, conference, nick, u'ошибочный запрос');
+				return;
 		myJid = getTrueJid(conference, nick);
 		myAccess = getAccess(conference, myJid);
 		userJid = getTrueJid(conference, userNick);
