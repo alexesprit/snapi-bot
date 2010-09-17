@@ -116,7 +116,7 @@ class Macros:
 		macros = None;
 		rawBody = message.split(None, 1);
 		command = rawBody[0].lower();
-		param = (len(rawBody) == 2) and rawBody[1] or None;
+		param = (len(rawBody) == 2) and rawBody[1] or '';
 		if(conference in self.macrosList):
 			if(command in self.macrosList[conference]):
 				macros = self.macrosList[conference][command];
@@ -129,22 +129,23 @@ class Macros:
 		return(expanded);
 
 	def replace(self, message, param, context):
-		if(param):
-			if(message.count('$*')):
-				message = message.replace('$*', param);
-			else:
-				param = param.split();
-				paramLen = len(param);
-				for i, n in enumerate(re.findall('\$[0-9]+', message)):
+		if(message.count('$*')):
+			message = message.replace('$*', param);
+		else:
+			param = param.split();
+			paramLen = len(param);
+			for i, n in enumerate(re.findall('\$[0-9]+', message)):
+				if(i < paramLen):
 					message = message.replace(n, param[i]);
-					if(i == (paramLen - 1)):
-						break;
-		print(self.parseCommand(message));
+				else:
+					message = message.replace(n, '');
 		for i in self.parseCommand(message):
 			cmd = [x.strip() for x in i.split(',')];
 			res = self.proccess(cmd, context);
 			if(res):
 				message = message.replace('%%(%s)' % i, res);
+		while(message.count('  ')):
+			message = message.replace('  ', ' ');
 		return(message);
 
 	def getRand(self, args, source):
