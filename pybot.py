@@ -603,26 +603,25 @@ def messageHandler(session, stanza):
 		return;
 	trueJid = getTrueJid(fullJid);
 	if(getAccess(conference, trueJid) == -100):
-		printf('ignoring %s' % (trueJid));
 		return;
 	message = stanza.getBody() or '';
 	message = message.strip();
+	if(ERROR == msgType):
+		errorCode = stanza.getErrorCode();
+		if(errorCode == u'500'):
+			time.sleep(1);
+			sendTo(PUBLIC, fullJid, message);
+		elif(errorCode == '406'):
+			joinConference(conference, gBotNick, getConfigKey(conference, 'password'));
+			time.sleep(0.5);
+			sendTo(PUBLIC, fullJid, message);
+		return;
 	if(not message):
 		return;
 	nick = fullJid.getResource();
 	if(msgType == PUBLIC):
 		if(nickInConference(conference, nick)):
 			setNickKey(conference, nick, NICK_IDLE, time.time());
-	elif(msgType == ERROR):
-		errorCode = stanza.getErrorCode();
-		if(errorCode == '500'):
-			time.sleep(0.5);
-			gClient.send(xmpp.Message(fullJid, message, PUBLIC));
-		elif(errorCode == '406'):
-			joinConference(conference, gBotNick, getConfigKey(conference, 'password'));
-			time.sleep(0.5);
-			gClient.send(xmpp.Message(fullJid, message, PUBLIC));
-		return;
 	else:
 		if(stanza.getTags('request')):
 			reportMsg = xmpp.Message(fullJid);

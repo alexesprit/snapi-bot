@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def showPrice(msgType, conference, nick, param):
-	rawHtml = urllib.urlopen('http://www.webvaluer.org/ru/www.%s' % (param)).read();
+	rawHtml = urllib.urlopen('http://www.webvaluer.org/ru/www.%s' % (urllib.quote(param.encode('utf-8')))).read();
 	items = re.search('<td class="value">(.+?)</td>', rawHtml, re.DOTALL);
 	if(items):
 		cost = unicode(decode(items.group(0)), 'utf-8');
