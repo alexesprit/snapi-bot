@@ -35,7 +35,10 @@ For samples of usage, see samples subdir in distro source, and selftest
 in this code
 '''
 
-import os, sys, time, traceback, types;
+import os;
+import sys;
+import time;
+import traceback;
 
 useColors = ('TERM' in os.environ);
 
@@ -71,14 +74,14 @@ and catch all undefined debug flags
 This gives us control over all used flags, and makes it easier to allow
 global debugging in your code, just do something like
 
-foo = Debug( debugFlags )
+foo = Debug(debugFlags)
 
 group flags, that is a flag in it self containing multiple flags should be
 defined without the debugFlags.append() sequence, since the parts are already
 in the list, also they must of course be defined after the flags they depend on ;)
 example:
 
-DBG_MULTI = [ DBG_INIT, DBG_CONNECTION ]
+DBG_MULTI = [DBG_INIT, DBG_CONNECTION]
 
 NoDebug
 -------
@@ -136,9 +139,8 @@ class Debug:
 				validateFlags = True,
 				welcomeMsg = True):
 		
-		if(activeFlags):
+		if(isinstance(activeFlags, tuple) or isinstance(activeFlags, list)):
 			self.debugFlags = activeFlags;
-			self.removeDuplicates();
 		else:
 			self.debugFlags = [];
 		if(welcomeMsg):
@@ -193,23 +195,10 @@ class Debug:
 			for flag in flags:
 				validFlags.append(flag.strip());
 			self.activeFlags = validFlags;
-		self.removeDuplicates();
+		self._removeDuplicates();
 	
 	def getActiveFlags(self):
 		return self.active;
-
-	def _validateFlag(self, flags):
-		if(flags):
-			for f in flags:
-				if(not f in self.debugFlags):
-					raise Exception('Invalid debugflag given: %s' % f);
-
-	def removeDuplicates(self):
-		uniqueFlags = [];
-		for f in self.debugFlags:
-			if(f not in uniqueFlags):
-				uniqueFlags.append(f);
-		self.debugFlags = uniqueFlags;
 
 	def show(self, msg, flag = None, prefix = ''):
 		if(flag and self.validateFlags):
@@ -248,5 +237,18 @@ class Debug:
 	def isActive(self, flag):
 		if(self.activeFlags): 
 			if(not flag or flag in self.activeFlags or DBG_ALWAYS in self.activeFlags):
-				return(1);
-		return(0);
+				return(True);
+		return(False);
+
+	def _validateFlag(self, flags):
+		if(flags):
+			for f in flags:
+				if(not f in self.debugFlags):
+					raise Exception('Invalid debugflag given: %s' % f);
+
+	def _removeDuplicates(self):
+		uniqueFlags = [];
+		for f in self.debugFlags:
+			if(f not in uniqueFlags):
+				uniqueFlags.append(f);
+		self.debugFlags = uniqueFlags;

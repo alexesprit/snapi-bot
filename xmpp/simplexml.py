@@ -1,16 +1,16 @@
-##   simplexml.py based on Mattew Allum's xmlstream.py
-##
-##   Copyright (C) 2003-2005 Alexey "Snake" Nezhdanov
-##
-##   This program is free software; you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation; either version 2, or (at your option)
-##   any later version.
-##
-##   This program is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
+# simplexml.py based on Mattew Allum's xmlstream.py
+
+# Copyright (C) 2003-2005 Alexey "Snake" Nezhdanov
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
 # $Id: simplexml.py,v 1.34 2009/03/03 10:24:02 normanr Exp $
 
@@ -318,7 +318,8 @@ class Node(object):
 
 class T:
     """ Auxiliary class used to quick access to node's child nodes. """
-    def __init__(self,node): self.__dict__['node']=node
+    def __init__(self,node):
+    	setattr(self, 'node', node)
     def __getattr__(self,attr): return self.node.getTag(attr)
     def __setattr__(self,attr,val):
         if isinstance(val,Node): Node.__init__(self.node.setTag(attr),node=val)

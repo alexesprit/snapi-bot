@@ -19,8 +19,22 @@
 # GNU General Public License for more details.
 
 from __future__ import with_statement;
-import codecs, math, os, random, re, sys, threading, time, traceback, types, urllib;
-import database, macros, simplejson, xmpp;
+
+import codecs;
+import math;
+import os;
+import random;
+import re;
+import sys;
+import threading;
+import time;
+import traceback;
+import urllib;
+
+import database;
+import macros;
+import simplejson;
+import xmpp;
 
 CONFIG_DIR = 'config';
 PLUGIN_DIR = 'plugins';
@@ -39,7 +53,6 @@ CRASH_FILE = '%Y.%m.%d_crash.txt';
 FLAG_INFO = 'info';
 FLAG_READ = 'read';
 FLAG_WRITE = 'write';
-FLAG_DEBUG = 'debug';
 FLAG_ERROR = 'error';
 FLAG_WARNING = 'warning';
 FLAG_SUCCESS = 'success';
@@ -124,9 +137,9 @@ os.chdir(os.path.dirname(sys.argv[0]));
 execfile(BOTCONFIG_FILE) in globals();
 
 gUserName, gServer = gJid.split('@');
-gClient = xmpp.Client(server = gServer, port = gPort, debug = gXmppDebug);
+gClient = xmpp.Client(server = gServer, port = gPort, debugFlags = gXmppDebug);
 gRoster = None;
-gDebug = xmpp.debug.Debug(gCoreDebug, validateFlags = False, prefix = '', showFlags = False, welcomeMsg = False);
+gDebug = xmpp.debug.Debug(gCoreDebug, validateFlags=False, prefix='', showFlags=False, welcomeMsg=False);
 gTagPattern = re.compile('<(.*?)>');
 
 gSemaphore = threading.BoundedSemaphore(30);
@@ -161,13 +174,12 @@ gJokes = [];
 gID = 0;
 
 gDebug.debugFlags = (FLAG_INFO, FLAG_READ, FLAG_WRITE, FLAG_WARNING, FLAG_SUCCESS);
-gDebug.colors[FLAG_INFO] = xmpp.Debug.colorWhite;
-gDebug.colors[FLAG_READ] = xmpp.Debug.colorBrightBlue;
-gDebug.colors[FLAG_WRITE] = xmpp.Debug.colorPurple;
-gDebug.colors[FLAG_DEBUG] = xmpp.Debug.colorBrown;
-gDebug.colors[FLAG_ERROR] = xmpp.Debug.colorBrightRed;
-gDebug.colors[FLAG_WARNING] = xmpp.Debug.colorYellow;
-gDebug.colors[FLAG_SUCCESS] = xmpp.Debug.colorBrightCyan;
+gDebug.colors[FLAG_INFO] = xmpp.debug.colorWhite;
+gDebug.colors[FLAG_READ] = xmpp.debug.colorBrightBlue;
+gDebug.colors[FLAG_WRITE] = xmpp.debug.colorPurple;
+gDebug.colors[FLAG_ERROR] = xmpp.debug.colorBrightRed;
+gDebug.colors[FLAG_WARNING] = xmpp.debug.colorYellow;
+gDebug.colors[FLAG_SUCCESS] = xmpp.debug.colorBrightCyan;
 
 def registerMessageHandler(function, msgType):
 	gMessageHandlers[msgType].append(function);
@@ -835,7 +847,7 @@ if(__name__ == '__main__'):
 			gInfo['start'] = time.time();
 			start();
 		else:
-			printf('Another function is running (pid: %s)' % (pid), FLAG_ERROR);
+			printf('Another instance is running (pid: %s)' % (pid), FLAG_ERROR);
 	except(KeyboardInterrupt):
 		if(gClient.isConnected()):
 			prs = xmpp.Presence(typ = UNAVAILABLE);

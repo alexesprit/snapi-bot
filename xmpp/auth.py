@@ -1,27 +1,33 @@
-##   auth.py
-##
-##   Copyright (C) 2003-2005 Alexey "Snake" Nezhdanov
-##
-##   This program is free software; you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation; either version 2, or (at your option)
-##   any later version.
-##
-##   This program is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
+# auth.py
+
+# Copyright (C) 2003-2005 Alexey "Snake" Nezhdanov
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
 # $Id: auth.py,v 1.41 2008/09/13 21:45:21 normanr Exp $
 
 """
-Provides library with all Non-SASL and SASL authentication mechanisms.
-Can be used both for client and transport authentication.
+	Provides library with all Non-SASL and SASL authentication mechanisms.
+	Can be used both for client and transport authentication.
 """
 
-from protocol import *
-from client import PlugIn
-import hashlib,base64,random,dispatcher,re
+import base64;
+import hashlib;
+import random;
+import re;
+
+import dispatcher;
+
+from protocol import *;
+from client import PlugIn;
 
 def HH(some): return hashlib.md5(some).hexdigest()
 def H(some): return hashlib.md5(some).digest()

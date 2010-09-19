@@ -13,8 +13,12 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import os, random, re;
-import __main__, xmpp;
+import os;
+import random;
+import re;
+
+import __main__;
+import xmpp;
 
 MACROS_FILE = 'macros.txt';
 MACCESS_FILE = 'macrosaccess.txt';
