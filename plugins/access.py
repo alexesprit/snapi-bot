@@ -58,7 +58,7 @@ def setLocalAccess(msgType, conference, nick, param):
 		if(len(param) > 1):
 			try:
 				access = int(param[1]);
-				if(100 < access or access > -100):
+				if(100 < access or access < -100):
 					sendMsg(msgType, conference, nick, u'ошибочный запрос');
 					return;
 			except(ValueError):
