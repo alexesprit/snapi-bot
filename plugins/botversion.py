@@ -27,8 +27,6 @@ def setBotVersion(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'читай справку по команде');
 
-registerCommand(setBotVersion, u'ботверсия', 100, u'Выставляет версию клиента у бота. Без параметра покажет текущее значение', u'ботверсия [клиент|версия|ось]', (u'ботверсия', u'ботверсия Jimm|0.6.4|Nokia 3310'), ROSTER);
-
 def loadBotVersion():
 	global gVersion;
 	fileName = getConfigPath(VER_FILE);
@@ -36,3 +34,5 @@ def loadBotVersion():
 	gVersion = eval(readFile(fileName));
 
 registerEvent(loadBotVersion, STARTUP);
+
+registerCommand(setBotVersion, u'ботверсия', 100, u'Выставляет версию клиента у бота. Без параметра покажет текущее значение', u'ботверсия [клиент|версия|ось]', (u'ботверсия', u'ботверсия Jimm|0.6.4|Nokia 3310'), ROSTER);

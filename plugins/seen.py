@@ -17,6 +17,11 @@ SEEN_FILE = 'seen.txt';
 
 gSeen = {};
 
+def updateSeenTime(conference, nick, trueJid, reason, code):
+	if('303' != code):
+		gSeen[conference].setKey(trueJid, time.time());
+		gSeen[conference].save();
+
 def showSeenTime(msgType, conference, nick, param):
 	userNick = param or nick;
 	if(nickInConference(conference, userNick)):
@@ -34,23 +39,17 @@ def showSeenTime(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'а это кто?');
 
-registerCommand(showSeenTime, u'когдабыл', 10, u'Показывает, сколько времени назад пользователь вышел из чата', u'когдабыл [ник]', (u'когдабыл Nick', ), CHAT);
-
-def updateSeenTime(conference, nick, trueJid, reason, code):
-	if('303' != code):
-		gSeen[conference].setKey(trueJid, time.time());
-		gSeen[conference].save();
-
-registerLeaveHandler(updateSeenTime);
-
 def loadSeenBase(conference):
 	fileName = getConfigPath(conference, SEEN_FILE);
 	createFile(fileName, '{}');
 	gSeen[conference] = database.DataBase(fileName);
 
-registerEvent(loadSeenBase, ADDCONF);
-
 def unloadSeenBase(conference):
 	del(gSeen[conference]);
 
+registerLeaveHandler(updateSeenTime);
+
+registerEvent(loadSeenBase, ADDCONF);
 registerEvent(unloadSeenBase, DELCONF);
+
+registerCommand(showSeenTime, u'когдабыл', 10, u'Показывает, сколько времени назад пользователь вышел из чата', u'когдабыл [ник]', (u'когдабыл Nick', ), CHAT);

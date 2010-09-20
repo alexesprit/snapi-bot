@@ -14,6 +14,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+TVCODES_FILE = "channels.txt";
+
 def getChannelCode(channelName):
 	if(channelName.isdigit()):
 		return(channelName);
@@ -23,33 +25,33 @@ def getChannelCode(channelName):
 			if(x.lower() in channelName):
 				return(gChannels[x]);
 
-def showTvProgramm(msgType, conference, nick, param):
-	channelCode = getChannelCode(param);
-	program = '';
-	if(channelCode):
-		lines = urllib.urlopen('http://tv.yandex.ru/?mode=print&channel=%s' % (channelCode)).readlines();
-		for x in lines:
-			if(x.startswith('<div>')):
-				program += decode(x);
-	if(program):
-		sendMsg(msgType, conference, nick, unicode(program, 'utf-8'));
-	else:
-		sendMsg(msgType, conference, nick, u'нету на сегодня программы');
-
-registerCommand(showTvProgramm, u'тв', 10, u'Показать телепрограму для определённого канала', u'тв <название>', (u'тв первый', ), ANY | PARAM);
-
-def showTvList(msgType, conference, nick, parameters):
-	printf(msgType);
-	if(PUBLIC == msgType):
-		sendMsg(msgType, conference, nick, u'скинула в приват');
-	tvList = [u'%s - %s' % (gChannels[x], x) for x in gChannels];
-	tvList.sort();
-	sendMsg(PRIVATE, conference, nick, u'список каналов:\n' + '\n'.join(tvList));
-	
-registerCommand(showTvList, u'твлист', 10, u'Просмотреть список каналов, доступных для просмотра программы', None, (u'твлист', ), ANY | NONPARAM);
-
 def loadChannels():
 	global gChannels;
-	gChannels = eval(readFile('resource/channels.txt', 'utf-8'));
+	fileName = getFilePath(RESOURCE_DIR, TVCODES_FILE);
+	gChannels = eval(readFile(fileName, "utf-8"));
+
+def showTvProgramm(msgType, conference, nick, param):
+	channelCode = getChannelCode(param);
+	program = "";
+	if(channelCode):
+		url = "http://tv.yandex.ru/?mode=print&channel=%s" % (channelCode);
+		lines = urllib.urlopen(url).readlines();
+		for x in lines:
+			if(x.startswith("<div>")):
+				program += decode(x);
+	if(program):
+		sendMsg(msgType, conference, nick, unicode(program, "utf-8"));
+	else:
+		sendMsg(msgType, conference, nick, u"нету на сегодня программы");
+
+def showTvList(msgType, conference, nick, parameters):
+	if(PUBLIC == msgType):
+		sendMsg(msgType, conference, nick, u"скинула в приват");
+	tvList = [u"%s - %s" % (gChannels[x], x) for x in gChannels];
+	tvList.sort();
+	sendMsg(PRIVATE, conference, nick, u"список каналов:\n%s" % ("\n".join(tvList)));
 
 registerEvent(loadChannels, STARTUP);
+
+registerCommand(showTvProgramm, u"тв", 10, u"Показать телепрограму для определённого канала", u"тв <название>", (u"тв первый", ), ANY | PARAM);
+registerCommand(showTvList, u"твлист", 10, u"Просмотреть список каналов, доступных для просмотра программы", None, (u"твлист", ), ANY | NONPARAM);

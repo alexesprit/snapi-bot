@@ -26,6 +26,14 @@ CFG_AUTH = 'auth';
 
 gAuthAnswer = {};
 
+def setAuthState(conference):
+	gAuthAnswer[conference] = {};
+	if(getConfigKey(conference, CFG_AUTH) is None):
+		setConfigKey(conference, CFG_AUTH, 0);
+
+def unloadAuthCache(conference):
+	del(gAuthAnswer[conference]);
+
 def askAuthQuestion(conference, nick, trueJid, aff, role):
 	if(getConfigKey(conference, 'auth')):
 		if(aff == AFF_NONE):
@@ -35,13 +43,9 @@ def askAuthQuestion(conference, nick, trueJid, aff, role):
 			sendMsg(PRIVATE, conference, nick, message);
 			gAuthAnswer[conference][trueJid] = question['answer'];
 
-registerJoinHandler(askAuthQuestion);
-
 def clearAuthCache(conference, nick, trueJid, reason, code):
 	if(trueJid in gAuthAnswer[conference]):
 		del(gAuthAnswer[conference][trueJid]);
-
-registerLeaveHandler(clearAuthCache);
 
 def authAnswerListener(stanza, msgType, conference, nick, trueJid, body):
 	if(PRIVATE == msgType):
@@ -52,8 +56,6 @@ def authAnswerListener(stanza, msgType, conference, nick, trueJid, body):
 				del(gAuthAnswer[conference][trueJid]);
 			else:
 				sendMsg(msgType, conference, nick, u'неправильный ответ. подумай или заюзай гугл');
-
-registerMessageHandler(authAnswerListener, CHAT);
 
 def authControl(msgType, conference, nick, param):
 	if(param):
@@ -71,16 +73,12 @@ def authControl(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_AUTH)));
 
-registerCommand(authControl, u'авторизация', 30, u'Отключает (0) или включает (1) проверку вошедшего пользователя на человечность. Без параметра покажет текущее значение', u'авторизация [0/1]', (u'авторизация', u'авторизация 0'), CHAT);
-
-def setAuthState(conference):
-	gAuthAnswer[conference] = {};
-	if(getConfigKey(conference, CFG_AUTH) is None):
-		setConfigKey(conference, CFG_AUTH, 0);
-
 registerEvent(setAuthState, ADDCONF);
-
-def unloadAuthCache(conference):
-	del(gAuthAnswer[conference]);
-
 registerEvent(unloadAuthCache, DELCONF);
+
+registerJoinHandler(askAuthQuestion);
+registerLeaveHandler(clearAuthCache);
+
+registerMessageHandler(authAnswerListener, CHAT);
+
+registerCommand(authControl, u'авторизация', 30, u'Отключает (0) или включает (1) проверку вошедшего пользователя на человечность. Без параметра покажет текущее значение', u'авторизация [0/1]', (u'авторизация', u'авторизация 0'), CHAT);

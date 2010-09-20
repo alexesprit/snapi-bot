@@ -28,6 +28,11 @@ def loadAutoModerators(conference):
 
 registerEvent(loadAutoModerators, ADDCONF);
 
+def unloadAutoModerators(conference):
+	del(gModerators[conference]);
+
+registerEvent(unloadAutoModerators, DELCONF);
+
 def setAutoModerator(conference, nick, trueJid, aff, role):
 	if(trueJid in gModerators[conference]):
 		setRole(conference, nick, ROLE_MODERATOR, u'автомодератор');

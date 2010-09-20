@@ -17,7 +17,7 @@ def showWhereIsBot(msgType, conference, nick, param):
 	confCount = len(getConferences());
 	if(confCount):
 		message = u'я сижу в %d конфах:\n' % (confCount);
-		infoList = [u'%s (%d чел.)' % (conf, len(getJidList(conf))) for conf in getConferences()];
+		infoList = [u'%s\n%d чел., %s' % (conf, len(getJidList(conf)), getBotNick(conf)) for conf in getConferences()];
 		message += '\n'.join(infoList);
 		sendMsg(msgType, conference, nick, message);
 	else:

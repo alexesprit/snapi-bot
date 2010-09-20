@@ -14,8 +14,10 @@
 # GNU General Public License for more details.
 
 def showPrice(msgType, conference, nick, param):
-	rawHtml = urllib.urlopen('http://www.webvaluer.org/ru/www.%s' % (urllib.quote(param.encode('utf-8')))).read();
-	items = re.search('<td class="value">(.+?)</td>', rawHtml, re.DOTALL);
+	query = urllib.quote(param.encode('utf-8'));
+	url = 'http://www.webvaluer.org/ru/www.%s' % (query);
+	rawHtml = urllib.urlopen(url).read();
+	items = re.search(r'<td class="value">(.+?)</td>', rawHtml, re.DOTALL);
 	if(items):
 		cost = unicode(decode(items.group(0)), 'utf-8');
 		cost = cost.split();
@@ -23,8 +25,8 @@ def showPrice(msgType, conference, nick, param):
 			cost = '%s %s' % (cost[1], cost[0]);
 		else:
 			cost = cost[0];
-		sendMsg(msgType, conference, nick, u'Оценочная стоимость домена %s составляет %s' %  (param, cost));
+		sendMsg(msgType, conference, nick, u'стоимость домена %s составляет %s' %  (param, cost));
 	else:
 		sendMsg(msgType, conference, nick, u'не получается :(');
 
-registerCommand(showPrice, u'домен', 10, u'Показывает оценочную стоимость домена', u'домен <запрос>', (u'домен microsoft.com', ), ANY | PARAM)
+registerCommand(showPrice, u'домен', 10, u'Показывает оценочную стоимость домена', u'домен <запрос>', (u'домен microsoft.com', ), ANY | PARAM);

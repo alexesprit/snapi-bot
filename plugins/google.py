@@ -32,6 +32,7 @@ def googleSearch(msgType, conference, nick, url):
 	req = urllib.urlopen(url);
 	answer = simplejson.load(req);
 	results = answer['responseData']['results'];
+	printf(results);
 	if(results):
 		if(msgType == PUBLIC):
 			msg = ['%(title)s\n%(content)s\n%(unescapedUrl)s' % (results[0])];

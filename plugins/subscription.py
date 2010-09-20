@@ -16,10 +16,10 @@
 def processSubscriptions(stanza, conference, nick, trueJid):
 	jid = stanza.getFrom().getStripped();
 	prsType =  stanza.getType();
-	if(prsType == 'subscribe'):
+	if(prsType == "subscribe"):
 		gRoster.authorize(jid);
 		gRoster.subscribe(jid);
-	elif(prsType == 'unsubscribe'):
+	elif(prsType == "unsubscribe"):
 		gRoster.unauthorize(jid);
 		gRoster.delItem(jid);
 

@@ -28,6 +28,11 @@ def loadAutoVisitors(conference):
 
 registerEvent(loadAutoVisitors, ADDCONF);
 
+def unloadAutoVisitors(conference):
+	del(gVisitors[conference]);
+
+registerEvent(unloadAutoVisitors, DELCONF);
+
 def setAutoVisitor(conference, nick, trueJid, aff, role):
 	if(trueJid in gVisitors[conference]):
 		setRole(conference, nick, ROLE_VISITOR, u'автовизитор');

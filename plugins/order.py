@@ -17,7 +17,7 @@ def setUserRole(msgType, conference, nick, param, role):
 	param = param.split();
 	user = param[0];	
 	if(user.count('@') or nickInConference(conference, user)):
-		reason = (len(param) > 1) and ' '.join(param[1:]) or '';
+		reason = (len(param) > 1) and ' '.join(param[1:]) or None;
 		setRole(conference, user, role, reason);
 		sendMsg(msgType, conference, nick, u'сделала');
 	else:
@@ -27,7 +27,7 @@ def setUserAffiliation(msgType, conference, nick, param, aff):
 	param = param.split();
 	user = param[0];	
 	if(user.count('@') or nickInConference(conference, user)):
-		reason = (len(param) > 1) and ' '.join(param[1:]) or '';
+		reason = (len(param) > 1) and ' '.join(param[1:]) or None;
 		setAffiliation(conference, user, aff, reason);
 		sendMsg(msgType, conference, nick, u'сделала');
 	else:

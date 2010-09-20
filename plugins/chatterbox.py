@@ -15,8 +15,8 @@
 
 MAX_MSG_COUNT = 50;
 MSG_COUNT_TO_SAVE = 20;
-SAVE_CHANCE = 35; # chance 1 of SAVE_CHANCE
-REPLY_CHANCE = 25; # it's the same.
+SAVE_CHANCE = 25; # chance 1 of SAVE_CHANCE
+REPLY_CHANCE = 35; # it's the same.
 
 CHATTERBOX_FILE = 'chatterbox.txt';
 
@@ -46,7 +46,7 @@ def messageChatTalker(stanza, msgType, conference, nick, trueJid, message):
 
 		isHiglight = message.startswith(botNick);
 
-		if(not random.randrange(0, REPLY_CHANCE) or isHiglight):
+		if(isHiglight or not random.randrange(0, REPLY_CHANCE)):
 			message = removeNicks(message, getNicks(conference)).strip();
 			if(message):
 				command = message.split()[0].lower();
@@ -54,12 +54,12 @@ def messageChatTalker(stanza, msgType, conference, nick, trueJid, message):
 					return;
 				if(gChatterCache[conference]):
 					text = random.choice(gChatterCache[conference])
-					time.sleep(len(text) / 5);
+					time.sleep(len(text) / 4 + random.randrange(1, 5));
 					if(isHiglight or not random.randrange(0, 2)):
 						sendMsg(msgType, conference, nick, text);
 					else:
 						sendToConference(conference, text);
-		if(not random.randrange(0, SAVE_CHANCE) or isHiglight):
+		if(isHiglight or not random.randrange(0, SAVE_CHANCE)):
 			message = removeNicks(message, getNicks(conference)).strip();
 			if(message):
 				command = message.split()[0];
@@ -74,6 +74,21 @@ def messageChatTalker(stanza, msgType, conference, nick, trueJid, message):
 					fileName = getConfigPath(conference, CHATTERBOX_FILE);
 					writeFile(fileName, str(gChatterCache[conference]));
 					gUpdateCount[conference] = 0;
+
+registerMessageHandler(messageChatTalker, CHAT);
+
+def loadMsgBase(conference):
+	fileName = getConfigPath(conference, CHATTERBOX_FILE);
+	createFile(fileName, '[]');
+	gChatterCache[conference] = eval(readFile(fileName));
+	gUpdateCount[conference] = 0;
+
+def unloadMsgBase(conference):
+	del(gChatterCache[conference]);
+
+def setChatterboxState(conference):
+	if(getConfigKey(conference, 'chatterbox') is None):
+		setConfigKey(conference, 'chatterbox', 0);
 
 def chatterboxControl(msgType, conference, nick, param):
 	if(param):
@@ -91,17 +106,8 @@ def chatterboxControl(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, 'chatterbox')));
 
-def loadMsgBase(conference):
-	fileName = getConfigPath(conference, CHATTERBOX_FILE);
-	createFile(fileName, '[]');
-	gChatterCache[conference] = eval(readFile(fileName));
-	gUpdateCount[conference] = 0;
-	
-def setChatterboxState(conference):
-	if(getConfigKey(conference, 'chatterbox') is None):
-		setConfigKey(conference, 'chatterbox', 0);
-
 registerEvent(loadMsgBase, ADDCONF);
+registerEvent(unloadMsgBase, DELCONF);
 registerEvent(setChatterboxState, ADDCONF);
-registerMessageHandler(messageChatTalker, CHAT);
+
 registerCommand(chatterboxControl, u'болталка', 30, u'Отключает (0) или включает (1) болталку. Без параметра покажет текущее значение', u'болталка [0/1]', (u'болталка', u'болталка 0'), CHAT);
