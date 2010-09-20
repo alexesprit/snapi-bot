@@ -20,7 +20,7 @@ def showHoroscope(msgType, conference, nick, param):
 	param = param.lower();
 	if(param in SIGNS):
 		text = urllib.urlopen('http://horo.gala.net/?lang=ru&sign=%d' % (SIGNS[param])).read();
-		items = re.search('<td class=stext>(.+?)</td>', text, re.DOTALL);
+		items = re.search(r'<td class=stext>(.+?)</td>', text, re.DOTALL);
 		if(items):
 			text = decode(items.group(0));
 			if(PUBLIC == msgType):

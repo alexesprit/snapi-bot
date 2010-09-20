@@ -13,7 +13,14 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+POKES_FILE = "pokes.txt";
+
 gPokes = [];
+
+def loadPokes():
+	global gPokes;
+	fileName = getFilePath(RESOURCE_DIR, POKES_FILE);
+	gPokes = eval(readFile(fileName, "utf-8"));
 
 def pokeUser(msgType, conference, nick, param):
 	if(msgType == PUBLIC):
@@ -37,10 +44,6 @@ def pokeUser(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u':-P');
 
-registerCommand(pokeUser, u'тык', 10, u'Тыкает пользователя. Заставляет его обратить внимание на вас', u'тык <ник>', (u'тык Nick', ), CHAT);
-
-def loadPokes():
-	global gPokes;
-	gPokes = eval(readFile('resource/pokes.txt', 'utf-8'));
-
 registerEvent(loadPokes, STARTUP);
+
+registerCommand(pokeUser, u'тык', 10, u'Тыкает пользователя. Заставляет его обратить внимание на вас', u'тык <ник>', (u'тык Nick', ), CHAT);

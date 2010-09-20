@@ -18,6 +18,13 @@ CLIENTS_ID = 'clients_id';
 
 gClients = {};
 
+def loadClientsCache(conference):
+	fileName = getConfigPath(conference, CLIENTS_FILE);
+	gClients[conference] = database.DataBase(fileName);
+
+def unloadClientsCache(conference):
+	del(gClients[conference]);
+
 def showClients(msgType, conference, nick, param):
 	userNick = param or nick;
 	if(nickIsOnline(conference, userNick)):
@@ -36,8 +43,6 @@ def showClients(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'а это кто?');
 
-registerCommand(showClients, u'клиенты', 10, u'Показывает, с каких клиентов заходил пользователь', u'клиенты [ник]', (u'клиенты', u'клиенты Niсk'), CHAT);
-
 def clientsChecking(conference, nick, trueJid, aff, role):
 	base = gClients[conference];
 	if(trueJid not in base):
@@ -48,8 +53,6 @@ def clientsChecking(conference, nick, trueJid, aff, role):
 	cliID = getUniqueID(CLIENTS_ID);
 	iq.setID(cliID);
 	gClient.SendAndCallForResponse(iq, _clientsChecking, (cliID, conference, trueJid, ));
-
-registerJoinHandler(clientsChecking);
 
 def _clientsChecking(stanza, cliID, conference, trueJid):
 	if(cliID == stanza.getID()):
@@ -64,13 +67,9 @@ def _clientsChecking(stanza, cliID, conference, trueJid):
 						base.setKey(trueJid, clients);
 						base.save();
 
-def loadClientsCache(conference):
-	fileName = getConfigPath(conference, CLIENTS_FILE);
-	gClients[conference] = database.DataBase(fileName);
-
 registerEvent(loadClientsCache, ADDCONF);
-
-def unloadClientsCache(conference):
-	del(gClients[conference]);
-
 registerEvent(unloadClientsCache, DELCONF);
+
+registerJoinHandler(clientsChecking);
+
+registerCommand(showClients, u'клиенты', 10, u'Показывает, с каких клиентов заходил пользователь', u'клиенты [ник]', (u'клиенты', u'клиенты Niсk'), CHAT);

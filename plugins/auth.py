@@ -22,14 +22,12 @@ AE = {'question': u'2 + шесть', 'answer': '8'};
 AF = {'question': u'2 + два', 'answer': '4'};
 AG = {'question': u'один + один', 'answer': '2'};
 
-CFG_AUTH = 'auth';
-
 gAuthAnswer = {};
 
 def setAuthState(conference):
 	gAuthAnswer[conference] = {};
-	if(getConfigKey(conference, CFG_AUTH) is None):
-		setConfigKey(conference, CFG_AUTH, 0);
+	if(getConfigKey(conference, 'auth') is None):
+		setConfigKey(conference, 'auth', 0);
 
 def unloadAuthCache(conference):
 	del(gAuthAnswer[conference]);
@@ -62,16 +60,16 @@ def authControl(msgType, conference, nick, param):
 		if(param.isdigit()):
 			param = int(param);
 			if(param == 1):
-				setConfigKey(conference, CFG_AUTH, 1);
+				setConfigKey(conference, 'auth', 1);
 				sendMsg(msgType, conference, nick, u'авторизация включена');
 			else:
-				setConfigKey(conference, CFG_AUTH, 0);
+				setConfigKey(conference, 'auth', 0);
 				sendMsg(msgType, conference, nick, u'авторизация отключена');
 			saveChatConfig(conference);
 		else:
 			sendMsg(msgType, conference, nick, u'прочитай помощь по команде');
 	else:
-		sendMsg(msgType, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_AUTH)));
+		sendMsg(msgType, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, 'auth')));
 
 registerEvent(setAuthState, ADDCONF);
 registerEvent(unloadAuthCache, DELCONF);

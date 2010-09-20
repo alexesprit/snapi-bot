@@ -22,7 +22,7 @@ def sendToConferences(msgType, conference, nick, param):
 	conferences = getConferences();
 	count = 0;
 	for conf in conferences:
-		if(isPopupEnabled(conf)):
+		if(getConfigKey(conf, 'popups')):
 			sendToConference(conf, u'Новости от администрации:\n%s' % param);
 			count += 1;
 	sendMsg(msgType, conference, nick, 'мессага ушла в %d конференций из %d' % (count, len(conferences)));

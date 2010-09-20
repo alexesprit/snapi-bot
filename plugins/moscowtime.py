@@ -17,7 +17,7 @@ WEEKDAYS = (u'понедельник', u'вторник', u'среда', u'че�
 
 def showMoscowTime(msgType, conference, nick, param):
 	text = urllib.urlopen('http://www.zln.ru/time/').read();
-	items = re.search('<div id="servertime"(.+?)</div>', text, re.DOTALL);
+	items = re.search(r'<div id="servertime"(.+?)</div>', text, re.DOTALL);
 	if(items):
 		mskTime = unicode(decode(items.group(0)), 'windows-1251').strip();
 		message = u'московское время: %s (%s, %s)' % (mskTime, time.strftime('%d.%m.%y'), WEEKDAYS[time.localtime()[6]]);

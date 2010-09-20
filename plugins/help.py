@@ -34,7 +34,7 @@ def showHelp(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, message);
 	else:
 		if(conferenceInList(conference)):
-			prefix = getConfigKey(conference, 'prefix') or '';
+			prefix = getConfigKey(conference, 'prefix');
 		else:
 			prefix = '';
 		sendMsg(msgType, conference, nick, u'напишите "%sкоманды", чтобы узнать список всех команд, "%sпомощь <команда>" для получения справки по использованию команды' % (prefix, prefix));

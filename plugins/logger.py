@@ -13,12 +13,11 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-LOGCSS_FILE = 'css/logger.css';
-CFG_LOG = 'log';
+LOGCSS_FILE = "logger.css";
 
 def writeHeader(fp, jid, (year, month, day)):
 	date = u'%.2i.%.2i.%.2i' % (day, month, year);
-	cssData = readFile(LOGCSS_FILE);
+	cssData = readFile(getFilePath(CSS_DIR, LOGCSS_FILE));
 	fp.write(u'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dt">
 <head>
@@ -77,7 +76,7 @@ def writeLog(msgType, jid, nick, body, aff = 0):
 	fp.close();
 
 def writeMessage(stanza, msgType, conference, nick, trueJid, text):
-	if(PUBLIC == msgType and getConfigKey(conference, CFG_LOG)):
+	if(PUBLIC == msgType and getConfigKey(conference, "log")):
 		aff = 0;
 		if(nick and getNickKey(conference, nick, NICK_MODER)):
 			level = getAccess(conference, trueJid);
@@ -85,11 +84,11 @@ def writeMessage(stanza, msgType, conference, nick, trueJid, text):
 		writeLog(msgType, conference, nick, text, aff);
 
 def writeUserJoin(conference, nick, trueJid, aff, role):
-	if(getConfigKey(conference, CFG_LOG)):
+	if(getConfigKey(conference, "log")):
 		writeLog(PUBLIC, conference, '@$$join$$@', u'%s зашёл в комнату как %s и %s' % (nick, role, aff));
 
 def writeUserLeave(conference, nick, trueJid, reason, code):
-	if(getConfigKey(conference, CFG_LOG)):
+	if(getConfigKey(conference, "log")):
 		if('307' == code):
 			if(reason):
 				writeLog(PUBLIC, conference, '@$$kick$$@', u'%s выгнали из комнаты (%s)' % (nick, reason));
@@ -107,7 +106,7 @@ def writeUserLeave(conference, nick, trueJid, reason, code):
 				writeLog(PUBLIC, conference, '@$$leave$$@', u'%s вышел из комнаты' % (nick));
 
 def writePresence(stanza, conference, nick, trueJid):
-	if(getConfigKey(conference, CFG_LOG)):
+	if(getConfigKey(conference, "log")):
 		code = stanza.getStatusCode();
 		prsType = stanza.getType();
 		if(code == '303'):
@@ -119,20 +118,21 @@ def loggingControl(msgType, conference, nick, param):
 		if(param.isdigit()):
 			param = int(param);
 			if(param == 1):
-				setConfigKey(conference, CFG_LOG, 1);
+				setConfigKey(conference, "log", 1);
 				sendMsg(msgType, conference, nick, u'логирование включено');
 			else:
-				setConfigKey(conference, CFG_LOG, 0);
+				setConfigKey(conference, "log", 0);
 				sendMsg(msgType, conference, nick, u'логирование отключено');
 			saveChatConfig(conference);
 		else:
 			sendMsg(msgType, conference, nick, u'прочитай помощь по команде');
 	else:
-		sendMsg(msgType, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, CFG_LOG)));
+		loggerValue = getConfigKey(conference, "log");
+		sendMsg(msgType, conference, nick, u'текущее значение: %d' % (loggerValue));
 
 def setLoggingState(conference):
-	if(getConfigKey(conference, CFG_LOG) is None):
-		setConfigKey(conference, CFG_LOG, 1);
+	if(getConfigKey(conference, "log") is None):
+		setConfigKey(conference, "log", 1);
 
 if(gLogDir):
 	registerJoinHandler(writeUserJoin);

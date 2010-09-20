@@ -36,6 +36,7 @@ import macros;
 import simplejson;
 import xmpp;
 
+CSS_DIR = 'css';
 CONFIG_DIR = 'config';
 PLUGIN_DIR = 'plugins';
 SYSLOG_DIR = 'syslogs';
@@ -651,7 +652,7 @@ def messageHandler(session, stanza):
 				if(message.startswith(x)):
 					message = message.replace(x, '').strip();
 					break;
-		prefix = getConfigKey(conference, CFG_PREFIX);
+		prefix = getConfigKey(conference, 'prefix');
 		if(prefix):
 			if(message.startswith(prefix)):
 				message = message[len(prefix):].strip();

@@ -12,6 +12,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+
 def sendStanza(source, conference, nick, param):
 	stanza = xmpp.simplexml.XML2Node(param);
 	gClient.send(stanza);
