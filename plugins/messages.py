@@ -15,7 +15,7 @@
 
 def sendToAdmins(msgType, conference, nick, param):
 	for admin in gAdmins:
-		msg(admin, u'Сообщение от %s из %s:\n%s' % (conference, nick, param));
+		sendTo(PRIVATE, admin, u'Сообщение от %s/%s:\n%s' % (conference, nick, param));
 	sendMsg(msgType, conference, nick, u'ваше сообщение отправлено');
 
 def sendToConferences(msgType, conference, nick, param):
