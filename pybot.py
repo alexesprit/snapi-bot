@@ -140,7 +140,8 @@ execfile(BOTCONFIG_FILE) in globals();
 gUserName, gServer = gJid.split('@');
 gClient = xmpp.Client(server = gServer, port = gPort, debugFlags = gXmppDebug);
 gRoster = None;
-gDebug = xmpp.debug.Debug(gCoreDebug, validateFlags=False, prefix='', showFlags=False, welcomeMsg=False);
+gDebug = xmpp.debug.Debug(gCoreDebug, timeStamp=0, validateFlags=False, \
+							showFlags=False, prefix='', welcomeMsg=False);
 gTagPattern = re.compile('<(.*?)>');
 
 gSemaphore = threading.BoundedSemaphore(30);
@@ -589,11 +590,11 @@ def sendToConference(conference, text):
 	sendTo(PUBLIC, conference, text);
 		
 def sendMsg(msgType, conference, nick, text, force = False):
-	if(msgType == PUBLIC):
+	if(msgType == PUBLIC and not force):
 		fools = getConfigKey(conference, 'fools');
 		if(fools and not random.randrange(0, 30)):
 			text = random.choice(gJokes);
-		elif(not force):
+		else:
 			msgLimit = getConfigKey(conference, 'msg');
 			if(msgLimit and len(text) > msgLimit):
 				sendMsg(msgType, conference, nick, u'смотри в привате (лимит %d символов)' % (msgLimit), True);

@@ -53,10 +53,11 @@ def messageChatTalker(stanza, msgType, conference, nick, trueJid, message):
 				if(isCommand(command) or gMacros.hasMacros(command, conference) or gMacros.hasMacros(command)):
 					return;
 				if(gChatterCache[conference]):
-					text = random.choice(gChatterCache[conference])
+					text = random.choice(gChatterCache[conference]);
+					isMe = text.startswith('/me');
 					time.sleep(len(text) / 4 + random.randrange(1, 5));
-					if(isHiglight or not random.randrange(0, 2)):
-						sendMsg(msgType, conference, nick, text);
+					if(not isMe and (isHiglight or not random.randrange(0, 2))):
+						sendMsg(msgType, conference, nick, text, True);
 					else:
 						sendToConference(conference, text);
 		if(isHiglight or not random.randrange(0, SAVE_CHANCE)):
