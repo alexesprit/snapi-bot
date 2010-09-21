@@ -29,11 +29,11 @@ def pythonExec(msgType, conference, nick, param):
 
 def pythonShell(msgType, conference, nick, param):
 	if(os.name == 'posix'):
-		pipe = os.popen('sh -c "%s" 2>&1' % (param.encode('utf8')));
-		sendMsg(msgType, conference, nick, pipe.read());
+		pipe = os.popen('sh -c "%s" 2>&1' % (param.encode('utf-8')));
+		sendMsg(msgType, conference, nick, unicode(pipe.read(), 'utf-8'));
 	elif(os.name == 'nt'):
-		pipe = os.popen('%s' % (param.encode('utf8')));
-		sendMsg(msgType, conference, nick, pipe.read().decode('cp866'));
+		pipe = os.popen('%s' % (param.encode('utf-8')));
+		sendMsg(msgType, conference, nick, unicode(pipe.read(), 'cp866'));
 	pipe.close;
 
 def pythonCalc(msgType, conference, nick, param):
