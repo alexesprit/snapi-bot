@@ -24,6 +24,10 @@ from client import PlugIn;
 
 ROSTER_DBG_LINE = 'roster';
 
+ROSTER_EMPTY = 0x0;
+ROSTER_REQUESTING = 0x1;
+ROSTER_LOADED = 0x2;
+
 class Roster(PlugIn):
 	""" Defines a plenty of methods that will allow you to manage roster.
 		Also automatically track presences from remote JIDs taking into 
@@ -36,34 +40,31 @@ class Roster(PlugIn):
 		PlugIn.__init__(self);
 		self.ROSTER_DBG_LINE = 'roster';
 		self.rosterData = {};
-		self.set = None;
+		self.state = ROSTER_EMPTY;
 		self._exported_methods = [self.getRoster];
 
-	def plugin(self, owner, request = True):
+	def plugin(self, owner):
 		""" Register presence and subscription trackers in the owner's dispatcher.
 			Also request roster from server if the 'request' argument is set.
 			Used internally. """
 		self._owner.RegisterHandler('iq', self.rosterIqHandler, 'result', NS_ROSTER);
 		self._owner.RegisterHandler('iq', self.rosterIqHandler, 'set', NS_ROSTER);
 		self._owner.RegisterHandler('presence', self.presenceHandler);
-		if(request):
-			self.requestRoster();
 
-	def requestRoster(self, force = False):
+	def requestRoster(self):
 		""" Request roster from server if it were not yet requested 
 			(or if the 'force' argument is set). """
-		if(self.set is None):
-			self.set = 0;
-		elif(not force):
+		if(self.state == ROSTER_LOADED):
 			return;
+		self.state = ROSTER_REQUESTING;
 		self._owner.send(Iq('get', NS_ROSTER));
-		self.DEBUG('Roster requested from server', 'start');
+		self.printf('Roster requested from server', 'start');
 
 	def getRoster(self):
 		""" Requests roster from server if neccessary and returns self. """
-		if(not self.set):
-			self.requestRoster()
-		while(not self.set):
+		if(self.state == ROSTER_EMPTY):
+			self.requestRoster();
+		while(not self.state == ROSTER_LOADED):
 			self._owner.Process(10);
 		return(self);
 
@@ -75,8 +76,8 @@ class Roster(PlugIn):
 			if(item.getAttr('subscription') == 'remove'):
 				if(jid in self.rosterData):
 					del(self.rosterData[jid]);
-				raise(NodeProcessed);
-			self.DEBUG('Setting roster item %s' % (jid), 'ok');
+					return;
+			self.printf('Setting roster item %s' % (jid), 'ok');
 			if(not jid in self.rosterData):
 				self.rosterData[jid] = {};
 			self.rosterData[jid]['name'] = item.getAttr('name');
@@ -87,8 +88,7 @@ class Roster(PlugIn):
 				self.rosterData[jid]['resources'] = {};
 			for group in item.getTags('group'):
 				self.rosterData[jid]['groups'].append(group.getData());
-		self.set = 1;
-		raise(NodeProcessed);
+		self.state = ROSTER_LOADED;
 
 	def presenceHandler(self, dis, stanza):
 		""" Presence tracker. Used internally for setting items' resources state in
@@ -100,7 +100,7 @@ class Roster(PlugIn):
 			resource = fullJid.getResource();
 			item = self.rosterData[bareJid];
 			if(not prsType):
-				self.DEBUG('Setting roster item %s for resource %s' % (bareJid, resource), 'ok');
+				self.printf('Setting roster item %s for resource %s' % (bareJid, resource), 'ok');
 				show = stanza.getShow();
 				status = stanza.getStatus();
 				priority = stanza.getPriority() or '0';

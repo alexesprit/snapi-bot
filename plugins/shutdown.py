@@ -25,7 +25,7 @@ def botRestart(msgType, conference, nick, param):
 	prs = xmpp.Presence(typ = 'unavailable');
 	prs.setStatus(message);
 	gClient.send(prs);
-	restart();
+	shutdown(True);
 
 def botShutdown(msgType, conference, nick, param):
 	nick = (conferenceInList(conference)) and nick or conference.split('@')[0];
@@ -39,7 +39,7 @@ def botShutdown(msgType, conference, nick, param):
 	prs = xmpp.Presence(typ = 'unavailable');
 	prs.setStatus(message);
 	gClient.send(prs);
-	os.abort();
+	shutdown();
 
 registerCommand(botRestart, u'рестарт', 100, u'Перезапускает бота', u'рестарт [причина]', (u'рестарт', u'рестарт ы!'), ANY | FROZEN);
 registerCommand(botShutdown, u'идиспать', 100, u'Остановка и полный выход бота', u'идиспать [причина]', (u'идиспать', u'идиспать обновления!11'), ANY | FROZEN);

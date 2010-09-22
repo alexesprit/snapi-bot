@@ -58,7 +58,6 @@ class Dispatcher(PlugIn):
 
 	def _init(self):
 		""" Registers default namespaces/protocols/handlers. Used internally.  """
-		self.RegisterNamespace('unknown')
 		self.RegisterNamespace(NS_STREAMS)
 		self.RegisterNamespace(self._owner.defaultNamespace)
 		self.RegisterProtocol('iq', Iq)
@@ -79,7 +78,7 @@ class Dispatcher(PlugIn):
 	def plugout(self):
 		""" Prepares instance to be destructed. """
 		self.Stream.dispatch = None
-		self.Stream.DEBUG = None
+		self.Stream.printf = None
 		self.Stream.features = None
 		self.Stream.destroy()
 
@@ -90,7 +89,7 @@ class Dispatcher(PlugIn):
 		self.Stream.dispatch = self.dispatch
 		self.Stream.stream_header_received = self._check_stream_start
 		self._owner.debugFlags.append(simplexml.DBG_NODEBUILDER)
-		self.Stream.DEBUG = self._owner.DEBUG
+		self.Stream.printf = self._owner.printf
 		self.Stream.features = None
 		self._metastream = Node('stream:stream')
 		self._metastream.setNamespace(self._owner.Namespace)
@@ -103,7 +102,7 @@ class Dispatcher(PlugIn):
 		if ns != NS_STREAMS or tag != 'stream':
 			raise ValueError('Incorrect stream start: (%s, %s). Terminating.' % (tag, ns))
 
-	def Process(self, timeout = 0):
+	def Process(self, timeout=0):
 		""" Check incoming stream for data waiting. If "timeout" is positive - block for as max. this time.
 			Returns:
 			1) length of processed data if some data were processed;
@@ -130,24 +129,23 @@ class Dispatcher(PlugIn):
 		""" Creates internal structures for newly registered namespace.
 			You can register handlers for this namespace afterwards. By default one namespace
 			already registered (jabber:client or jabber:component:accept depending on context. """
-		self.DEBUG('Registering namespace "%s"'%xmlns, order)
+		self.printf('Registering namespace "%s"' % (xmlns), order)
 		self.handlers[xmlns] = {}
-		self.RegisterProtocol('unknown', Protocol, xmlns = xmlns)
-		self.RegisterProtocol('default', Protocol, xmlns = xmlns)
+		self.RegisterProtocol('default', Protocol, xmlns=xmlns)
 
-	def RegisterProtocol(self, tag_name, Proto, xmlns = None, order = 'info'):
+	def RegisterProtocol(self, tagName, Proto, xmlns = None, order = 'info'):
 		""" Used to declare some top-level stanza name to dispatcher.
 		   Needed to start registering handlers for such stanzas.
 		   Iq, message and presence protocols are registered by default. """
 		if not xmlns: xmlns = self._owner.defaultNamespace
-		self.DEBUG('Registering protocol "%s" as %s(%s)'%(tag_name, Proto, xmlns), order)
-		self.handlers[xmlns][tag_name] = {type:Proto, 'default':[]}
+		self.printf('Registering protocol "%s" as %s (%s)' % (tagName, Proto, xmlns), order)
+		self.handlers[xmlns][tagName] = {'type': Proto, 'default': []}
 
 	def RegisterNamespaceHandler(self, xmlns, handler, typ = '', ns = '', makefirst = 0, system = 0):
 		""" Register handler for processing all stanzas for specified namespace. """
 		self.RegisterHandler('default', handler, typ, ns, xmlns, makefirst, system)
 
-	def RegisterHandler(self, name, handler, typ = '', ns = '', xmlns = None, makefirst = 0, system = 0):
+	def RegisterHandler(self, name, handler, hType=None, nameSpace='', xmlns=None):
 		"""Register user callback as stanzas handler of declared type. Callback must take
 		   (if chained, see later) arguments: dispatcher instance (for replying), incomed
 		   return of previous handlers.
@@ -165,30 +163,38 @@ class Dispatcher(PlugIn):
 				will be called first nevertheless.
 			  "system" - call handler even if NodeProcessed Exception were raised already.
 			"""
-		if not xmlns: xmlns = self._owner.defaultNamespace
-		self.DEBUG('Registering handler %s for "%s" type->%s ns->%s(%s)'%(handler, name, typ, ns, xmlns), 'info')
-		if not typ and not ns: typ = 'default'
-		if not self.handlers.has_key(xmlns): self.RegisterNamespace(xmlns, 'warn')
-		if not self.handlers[xmlns].has_key(name): self.RegisterProtocol(name, Protocol, xmlns, 'warn')
-		if not self.handlers[xmlns][name].has_key(typ+ns): self.handlers[xmlns][name][typ+ns] = []
-		if makefirst: self.handlers[xmlns][name][typ+ns].insert(0, {'func':handler, 'system':system})
-		else: self.handlers[xmlns][name][typ+ns].append({'func':handler, 'system':system})
+		if not xmlns:
+			xmlns = self._owner.defaultNamespace
+		self.printf('Registering handler %s for "%s" type: %s, nameSpace: %s (%s)' % (handler, name, hType, nameSpace, xmlns), 'info')
+		if not hType and not nameSpace:
+			hType = 'default'
+		if xmlns not in self.handlers:
+			self.RegisterNamespace(xmlns, 'warn')
+		if name not in self.handlers[xmlns]:
+			self.RegisterProtocol(name, Protocol, xmlns, 'warn')
+		key = hType + nameSpace;
+		if key not in self.handlers[xmlns][name]:
+			self.handlers[xmlns][name][key] = []
+		self.handlers[xmlns][name][key].append(handler)
 
-	def RegisterHandlerOnce(self, name, handler, typ = '', ns = '', xmlns = None, makefirst = 0, system = 0):
+	def RegisterHandlerOnce(self, name, handler, hType='', nameSpace='', xmlns=None):
 		""" Unregister handler after first call (not implemented yet). """
-		if not xmlns: xmlns = self._owner.defaultNamespace
-		self.RegisterHandler(name, handler, typ, ns, xmlns, makefirst, system)
+		if not xmlns:
+			xmlns = self._owner.defaultNamespace
+		self.RegisterHandler(name, handler, hType, nameSpace, xmlns)
 
-	def UnregisterHandler(self, name, handler, typ = '', ns = '', xmlns = None):
+	def UnregisterHandler(self, name, handler, hType='', nameSpace='', xmlns=None):
 		""" Unregister handler. "typ" and "ns" must be specified exactly the same as with registering."""
-		if not xmlns: xmlns = self._owner.defaultNamespace
-		if not self.handlers.has_key(xmlns): return
-		if not typ and not ns: typ = 'default'
-		for pack in self.handlers[xmlns][name][typ+ns]:
-			if handler == pack['func']: break
-		else: pack = None
-		try: self.handlers[xmlns][name][typ+ns].remove(pack)
-		except ValueError: pass
+		if not xmlns:
+			xmlns = self._owner.defaultNamespace
+		self.printf('Unregistering handler %s for "%s" type: %s, nameSpace: %s (%s)' % (handler, name, hType, nameSpace, xmlns), 'stop')
+		if xmlns not in self.handlers:
+			return
+		if not hType and not nameSpace:
+			hType = 'default'
+		key = hType+nameSpace
+		if(handler in self.handlers[xmlns][name][key]):
+			self.handlers[xmlns][name][key].remove(handler)		
 
 	def returnStanzaHandler(self, conn, stanza):
 		""" Return stanza back to the sender with <feature-not-implemennted/> error set. """
@@ -231,42 +237,42 @@ class Dispatcher(PlugIn):
 						for each in stanza.getChildren():
 							self.dispatch(each, session, direct=True);
 						return;
-			elif(name ==  'presence'):
+			elif(name == 'presence'):
 				return;
 			elif(name in ('features', 'bind')):
 				pass;
 			else:
 				raise(UnsupportedStanzaType(name));
 
-		if(name ==  'features'):
+		if(name == 'features'):
 			session.Stream.features = stanza;
 
 		xmlns = stanza.getNamespace();
 		if(xmlns not in self.handlers):
-			self.DEBUG("Unknown namespace: %s" % (xmlns), 'warn');
-			xmlns = 'unknown';
+			self.printf("Unknown namespace: %s" % (xmlns), 'warn');
+			xmlns = 'default';
 		if(name not in self.handlers[xmlns]):
-			self.DEBUG("Unknown stanza: %s" % (name), 'warn');
-			name = 'unknown';
+			self.printf("Unknown stanza: %s" % (name), 'warn');
+			name = 'default';
 		else:
-			self.DEBUG("Got %s/%s stanza" % (xmlns, name), 'ok');
+			self.printf("Got %s/%s stanza" % (xmlns, name), 'ok');
 
 		if(isinstance(stanza, Node)):
-			stanza = self.handlers[xmlns][name][type](node = stanza);
+			stanza = self.handlers[xmlns][name]['type'](node = stanza);
 
 		stanzaType = stanza.getType();
 		stanzaID = stanza.getID();
 		if(not stanzaType): 
 			stanzaType = '';
-		stanza.props = stanza.getProperties();
+		stanzaProps = stanza.getProperties();
 
-		session.DEBUG("Dispatching %s stanza with type->%s props->%s id->%s" % (name, stanzaType, stanza.props, stanzaID), 'ok');
+		session.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID), 'ok');
 
 		excType = None;
 		if(stanzaID in session._expected):
 			if(isinstance(session._expected[stanzaID], tuple)):
 				function, args = session._expected[stanzaID];
-				session.DEBUG("Expected stanza arrived. Callback %s (%s) found!" % (function, args), 'ok');
+				session.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), 'ok');
 				try:
 					function(stanza, *args)
 				except(Exception, excType):
@@ -274,13 +280,13 @@ class Dispatcher(PlugIn):
 						raise;
 				del(self._expected[stanzaID]);
 			else:
-				session.DEBUG("Expected stanza arrived!", 'ok')
+				session.printf("Expected stanza arrived!", 'ok')
 				session._expected[stanzaID] = stanza;
 		else:
 			handlerList = ['default'];
 			if(stanzaType in self.handlers[xmlns][name]):
 				handlerList.append(stanzaType)
-			for prop in stanza.props:
+			for prop in stanzaProps:
 				if(prop in self.handlers[xmlns][name]):
 					handlerList.append(prop);
 				if(stanzaType and (stanzaType + prop) in self.handlers[xmlns][name]):
@@ -290,15 +296,10 @@ class Dispatcher(PlugIn):
 			for key in handlerList:
 				if(key):
 					chain = chain + self.handlers[xmlns][name][key];
+			self.printf(chain);
 			for handler in chain:
-				try:
-					handler['func'](session, stanza);
-				except(Exception, excType):
-					if(isinstance(excType, NodeProcessed)):
-						self._pendingExceptions.insert(0, sys.exc_info());
-						return;
-					if(not handler['system']):
-						break;
+				self.printf("Executin' %s" % (str(handler)))
+				handler(session, stanza);
 
 	def WaitForResponse(self, ID, timeout=DEFAULT_TIMEOUT):
 		""" Block and wait until stanza with specific "id" attribute will come.
@@ -308,7 +309,7 @@ class Dispatcher(PlugIn):
 		self._expected[ID] = None;
 		timedOut = 0;
 		abortTime = time.time() + timeout;
-		self.DEBUG("Waiting for ID %s with timeout %s..." % (ID, timeout), 'wait')
+		self.printf("Waiting for ID %s with timeout %s..." % (ID, timeout), 'wait')
 		while(not self._expected[ID]):
 			if(not self.Process(0.04)):
 				self._owner.lastErr = "Disconnect";
@@ -349,8 +350,8 @@ class Dispatcher(PlugIn):
 			stanza.setID(stanzaID);
 		else:
 			stanzaID = stanza.getID();
-		if(self._owner._registered_name and not stanza.getAttr('from')):
-			stanza.setAttr('from', self._owner._registered_name);
+		if(self._owner._registeredName and not stanza.getAttr('from')):
+			stanza.setAttr('from', self._owner._registeredName);
 		if(self._owner._route and stanza.getName() !=  'bind'):
 			to = self._owner.Server;
 			if(stanza.getTo() and stanza.getTo().getDomain()):

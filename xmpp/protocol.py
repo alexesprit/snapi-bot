@@ -221,6 +221,7 @@ def isErrorNode(node):
 
 class NodeProcessed(Exception):
     """ Exception that should be raised by handler when the handling should be stopped. """
+    pass
 class StreamError(Exception):
     """ Base exception class for stream errors."""
 class BadFormat(StreamError): pass

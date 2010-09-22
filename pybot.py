@@ -789,12 +789,17 @@ def detectMultiLaunch():
 			writeFile(PID_FILE, str(os.getpid()));
 	return(None);
 
-def restart():
-	printf('Restarting...');
-	time.sleep(RECONNECT_DELAY);
-	if(os.path.exists(PID_FILE)):
-		os.remove(PID_FILE);
-	os.execl(sys.executable, sys.executable, sys.argv[0]);
+def shutdown(restart=False):
+	gClient.disconnected();
+	if(restart):
+		printf('Restarting...');
+		time.sleep(RECONNECT_DELAY);
+		if(os.path.exists(PID_FILE)):
+			os.remove(PID_FILE);
+		os.execl(sys.executable, sys.executable, sys.argv[0]);
+	else:
+		printf('Terminating...');
+		os.abort();
 
 def start():
 	global gRoster;
@@ -808,22 +813,23 @@ def start():
 		if(gRestart):
 			printf('Sleeping for %d seconds...' % RETRY_TIMEOUT);
 			time.sleep(RETRY_TIMEOUT);
-			restart();
+			shutdown(True);
 		else:
-			os.abort();
+			shutdown();
 
-	printf('Waiting For Authentication...');
+	printf('Waiting for authentication...');
 	if(gClient.auth(gUserName, gPassword, gResource)):
 		printf('Connected', FLAG_SUCCESS);
 	else:
 		printf('Incorrect login/password', FLAG_ERROR);
-		os.abort();
+		shutdown();
 
-	callEventHandlers(STARTUP);		
+	callEventHandlers(STARTUP);
+
 	gClient.RegisterHandler('message', messageHandler);
 	gClient.RegisterHandler('presence', presenceHandler);
 	gClient.RegisterHandler('iq', iqHandler);
-	printf('Handlers Registered', FLAG_SUCCESS);
+	printf('Handlers registered', FLAG_SUCCESS);
 
 	gRoster = gClient.getRoster();
 	setRosterStatus(None, None, gPriority);
@@ -855,7 +861,7 @@ if(__name__ == '__main__'):
 			prs = xmpp.Presence(typ = UNAVAILABLE);
 			prs.setStatus(u'выключаюсь (CTRL+C)');
 			gClient.send(prs);
-		os.abort();
+		shutdown();
 	except(Exception):
 		printf('Exception in main thread', FLAG_ERROR);
 		fileName = getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE));
@@ -864,7 +870,4 @@ if(__name__ == '__main__'):
 			prs = xmpp.Presence(typ = UNAVAILABLE);
 			prs.setStatus(u'что-то сломалось...');
 			gClient.send(prs);
-		if(gRestart):
-			restart();
-		else:
-			os.abort();
+		shutdown(gRestart);

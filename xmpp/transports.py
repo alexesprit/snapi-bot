@@ -104,10 +104,10 @@ class TCPSocket(PlugIn):
 						port = int(port)
 						break
 				#except:
-				#	self.DEBUG('An error occurred while looking up %s' % query, 'warn')
+				#	self.printf('An error occurred while looking up %s' % query, 'warn')
 			server = (host, port)
 		else:
-			self.DEBUG("Could not load one of the supported DNS libraries (dnspython or pydns). SRV records will not be queried and you may need to set custom hostname/port for some servers to be accessible.\n", 'warn')
+			self.printf("Could not load one of the supported DNS libraries (dnspython or pydns). SRV records will not be queried and you may need to set custom hostname/port for some servers to be accessible.\n", 'warn')
 		# end of SRV resolver
 		return server
 
@@ -124,7 +124,6 @@ class TCPSocket(PlugIn):
 		if not self.connect(server):
 			return
 		self._owner.Connection = self
-		self._owner.RegisterDisconnectHandler(self.disconnected)
 		return 'ok'
 
 	def getHost(self):
@@ -144,10 +143,10 @@ class TCPSocket(PlugIn):
 			self._sock.connect((server[0], int(server[1])))
 			self._send = self._sock.sendall
 			self._recv = self._sock.recv
-			self.DEBUG("Successfully connected to remote host %s:%s" % (server[0], server[1]), 'start')
+			self.printf("Successfully connected to remote host %s:%s" % (server[0], server[1]), 'start')
 			return 'ok'
 		except socket.error, (errno, strerror): 
-			self.DEBUG("Failed to connect to remote host %s: %s (%s)" % (server, strerror, errno), 'error')
+			self.printf("Failed to connect to remote host %s: %s (%s)" % (server, strerror, errno), 'error')
 		except: pass
 
 	def plugout(self):
@@ -156,7 +155,6 @@ class TCPSocket(PlugIn):
 		self._sock.close()
 		if hasattr(self._owner, 'Connection'):
 			del self._owner.Connection
-			self._owner.UnregisterDisconnectHandler(self.disconnected)
 
 	def receive(self):
 		""" Reads all pending incoming data.
@@ -169,7 +167,7 @@ class TCPSocket(PlugIn):
 				return ''
 			if e[0] == socket.SSL_ERROR_WANT_WRITE:
 				return ''
-			self.DEBUG('Socket error while receiving data', 'error')
+			self.printf('Socket error while receiving data', 'error')
 			sys.exc_clear()
 			self._owner.disconnected()
 			raise IOError("Disconnected from server")
@@ -187,9 +185,9 @@ class TCPSocket(PlugIn):
 
 		if len(received): # length of 0 means disconnect
 			self._seen_data = 1
-			self.DEBUG(received, 'got')
+			self.printf(received, 'got')
 		else:
-			self.DEBUG('Socket error while receiving data', 'error')
+			self.printf('Socket error while receiving data', 'error')
 			self._owner.disconnected()
 			raise IOError("Disconnected from server")
 		return received
@@ -205,9 +203,9 @@ class TCPSocket(PlugIn):
 			self._send(rawData)
 			# Avoid printing messages that are empty keepalive packets.
 			if rawData.strip():
-				self.DEBUG(rawData, 'sent')
+				self.printf(rawData, 'sent')
 		except:
-			self.DEBUG("Socket error while sending data", 'error')
+			self.printf("Socket error while sending data", 'error')
 			self._owner.disconnected()
 
 	def pending_data(self, timeout = 0):
@@ -216,13 +214,8 @@ class TCPSocket(PlugIn):
 
 	def disconnect(self):
 		""" Closes the socket. """
-		self.DEBUG("Closing socket", 'stop')
+		self.printf("Closing socket", 'stop')
 		self._sock.close()
-
-	def disconnected(self):
-		""" Called when a Network Error or disconnection occurs.
-			Designed to be overidden. """
-		self.DEBUG("Socket operation failed", 'error')
 
 DBG_CONNECT_PROXY = 'CONNECTproxy'
 class HTTPPROXYSocket(TCPSocket):
@@ -240,7 +233,7 @@ class HTTPPROXYSocket(TCPSocket):
 
 	def plugin(self, owner):
 		""" Starts connection. Used interally. Returns non-empty string on success."""
-		owner.debugFlags.append(DBG_CONNECT_PROXY)
+		owner.printfFlags.append(DBG_CONNECT_PROXY)
 		return TCPSocket.plugin(self, owner)
 
 	def connect(self):
@@ -249,7 +242,7 @@ class HTTPPROXYSocket(TCPSocket):
 			connection to the target server. Returns non-empty sting on success. """
 		if not TCPSocket.connect(self, (self._proxy['host'], self._proxy['port'])):
 			return
-		self.DEBUG("Proxy server contacted, performing authentification", 'start')
+		self.printf("Proxy server contacted, performing authentification", 'start')
 		connector = ['CONNECT %s:%s HTTP/1.0' % (self._server), 
 			'Proxy-Connection: Keep-Alive', 
 			'Pragma: no-cache', 
@@ -264,63 +257,66 @@ class HTTPPROXYSocket(TCPSocket):
 		try:
 			reply = self.receive().replace('\r', '')
 		except IOError:
-			self.DEBUG('Proxy suddenly disconnected', 'error')
+			self.printf('Proxy suddenly disconnected', 'error')
 			self._owner.disconnected()
 			return
 		try:
 			proto, code, desc = reply.split('\n')[0].split(' ', 2)
 		except: raise error('Invalid proxy reply')
 		if code != '200':
-			self.DEBUG('Invalid proxy reply: %s %s %s'%(proto, code, desc), 'error')
+			self.printf('Invalid proxy reply: %s %s %s'%(proto, code, desc), 'error')
 			self._owner.disconnected()
 			return
 		while reply.find('\n\n') ==  -1:
 			try:
 				reply +=  self.receive().replace('\r', '')
 			except IOError:
-				self.DEBUG('Proxy suddenly disconnected', 'error')
+				self.printf('Proxy suddenly disconnected', 'error')
 				self._owner.disconnected()
 				return
-		self.DEBUG("Authentification successfull. Jabber server contacted.", 'ok')
+		self.printf("Authentification successfull. Jabber server contacted.", 'ok')
 		return 'ok'
 
-	def DEBUG(self, text, severity):
-		"""Overwrites DEBUG tag to allow debug output be presented as "CONNECTproxy"."""
-		return self._owner.DEBUG(DBG_CONNECT_PROXY, text, severity)
+	def printf(self, text, severity):
+		"""Overwrites printf tag to allow printf output be presented as "CONNECTproxy"."""
+		return self._owner.printf(DBG_CONNECT_PROXY, text, severity)
 
 class TLS(PlugIn):
 	""" TLS connection used to encrypts already estabilished tcp connection."""
-	def PlugIn(self, owner, now=False):
-		""" If the 'now' argument is true then starts using encryption immidiatedly.
-			If 'now' in false then starts encryption as soon as TLS feature is
+	def PlugIn(self, owner, startSSL=False):
+		""" If the 'startSSL' argument is true then starts using encryption immidiatedly.
+			If 'startSSL' is false then starts encryption as soon as TLS feature is
 			declared by the server (if it were already declared - it is ok).
 		"""
 		if hasattr(owner, 'TLS'):
 			return  # Already enabled.
-		PlugIn.PlugIn(self, owner)
 		self.DBG_LINE = 'TLS'
-		if now:
+		PlugIn.PlugIn(self, owner)
+		if startSSL:
 			return self._startSSL()
 		if self._owner.Dispatcher.Stream.features:
-			try: self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
-			except NodeProcessed: pass
-		else: self._owner.RegisterHandlerOnce('features', self.FeaturesHandler, xmlns=NS_STREAMS)
+			try:
+				self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
+			except NodeProcessed:
+				pass
+		else:
+			self._owner.RegisterHandlerOnce('features', self.FeaturesHandler, xmlns=NS_STREAMS)
 		self.starttls = None
 
 	def plugout(self):
-		""" Unregisters TLS handler's from owner's dispatcher. Take note that encription
-			can not be stopped once started. You can only break the connection and start over."""
-		self._owner.UnregisterHandler('features', self.FeaturesHandler, xmlns=NS_STREAMS)
-		self._owner.UnregisterHandler('proceed', self.StartTLSHandler, xmlns=NS_TLS)
-		self._owner.UnregisterHandler('failure', self.StartTLSHandler, xmlns=NS_TLS)
+		""" Unregisters TLS handler's from owner's dispatcher. """
+		if self._owner.Dispatcher.Stream.features:
+			self._owner.UnregisterHandler('features', self.FeaturesHandler, xmlns=NS_STREAMS)
+			self._owner.UnregisterHandler('proceed', self.StartTLSHandler, xmlns=NS_TLS)
+			self._owner.UnregisterHandler('failure', self.StartTLSHandler, xmlns=NS_TLS)
 
 	def FeaturesHandler(self, conn, feats):
 		""" Used to analyse server <features/> tag for TLS support.
 			If TLS is supported starts the encryption negotiation. Used internally"""
 		if not feats.getTag('starttls', namespace=NS_TLS):
-			self.DEBUG("TLS unsupported by remote server.", 'warn')
+			self.printf("TLS unsupported by remote server.", 'warn')
 			return
-		self.DEBUG("TLS supported by remote server. Requesting TLS start.", 'ok')
+		self.printf("TLS supported by remote server. Requesting TLS start.", 'ok')
 		self._owner.RegisterHandlerOnce('proceed', self.StartTLSHandler, xmlns=NS_TLS)
 		self._owner.RegisterHandlerOnce('failure', self.StartTLSHandler, xmlns=NS_TLS)
 		self._owner.Connection.send('<starttls xmlns="%s"/>' % (NS_TLS))
@@ -353,9 +349,9 @@ class TLS(PlugIn):
 		if starttls.getNamespace() != NS_TLS: return
 		self.starttls = starttls.getName()
 		if self.starttls == 'failure':
-			self.DEBUG("Got starttls response: %s" % (self.starttls), 'error')
+			self.printf("Got starttls response: %s" % (self.starttls), 'error')
 			return
-		self.DEBUG("Got starttls proceed response. Switching to TLS/SSL...", 'ok')
+		self.printf("Got starttls proceed response. Switching to TLS/SSL...", 'ok')
 		self._startSSL()
 		self._owner.Dispatcher.PlugOut()
 		dispatcher.Dispatcher().PlugIn(self._owner)
