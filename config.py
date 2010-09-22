@@ -8,6 +8,12 @@ gPassword = 'secret';
 gHost = 'server.tld';
 gPort = 5222;
 
+# xmpp.SSL_DISABLE - отключить SSL
+# xmpp.SSL_AUTO - автоопределение (порт 443 или 5223)
+# xmpp.SSL_FORCE - форсировать (нестандартный порт)
+gSSLMode = xmpp.SSL_DISABLE;
+gUseResolver = False;
+
 # ресурс и приоритет
 gResource = 'Snapi-Snup';
 gPriority = 0;
@@ -32,9 +38,9 @@ gRestart = True;
 # warning - предупреждения
 gCoreDebug = ['info', 'error', 'success', 'warning'];
 # always - все типы флагов
-# socket - содержимое передаваемых данных
 # dispatcher - информация о принятых станзах
-gXmppDebug = [];
+# socket - содержимое передаваемых данных
+gXMPPDebug = [];
 
 # папка для логов конференций
 gLogDir = '';

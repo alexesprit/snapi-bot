@@ -138,7 +138,7 @@ os.chdir(os.path.dirname(sys.argv[0]));
 execfile(BOTCONFIG_FILE) in globals();
 
 gUserName, gServer = gJid.split('@');
-gClient = xmpp.Client(server = gServer, port = gPort, debugFlags = gXmppDebug);
+gClient = xmpp.Client(server=gServer, port=gPort, debugFlags=gXMPPDebug);
 gRoster = None;
 gDebug = xmpp.debug.Debug(gCoreDebug, timeStamp=0, validateFlags=False, \
 							showFlags=False, prefix='', welcomeMsg=False);
@@ -248,7 +248,7 @@ def callCommandHandlers(command, cmdType, jid, resource, param):
 	if(command in gCmdHandlers):
 		startThread(gCmdHandlers[command], (cmdType, jid, resource, param));
 
-def startThread(func, param = None):
+def startThread(func, param=None):
 	gInfo['thr'] += 1;
 	if(param):
 		threading.Thread(None, execute, func.__name__, (func, param)).start();
@@ -266,7 +266,7 @@ def execute(function, param = None):
 	except(Exception):
 		saveException(function.__name__);
 		
-def startTimer(timeout, func, param = None):
+def startTimer(timeout, func, param=None):
 	gInfo['tmr'] += 1;
 	if(param):
 		timer = threading.Timer(timeout, func, param);
@@ -324,7 +324,7 @@ def createFile(path, data):
 		f.write(data);
 		f.close();
 
-def readFile(path, encoding = None):
+def readFile(path, encoding=None):
 	path = path.encode('utf-8');
 	printf('Read: %s' % (path), FLAG_READ);
 	f = file(path);
@@ -334,7 +334,7 @@ def readFile(path, encoding = None):
 		data = data.decode(encoding);
 	return(data);
 
-def writeFile(path, data, mode = 'w'):
+def writeFile(path, data, mode='w'):
 	path = path.encode('utf-8');
 	printf('Write: %s' % (path), FLAG_WRITE);
 	f = file(path, mode);
@@ -401,7 +401,7 @@ def joinConference(conference, nick, password):
 		mucTag.setTagData('password', password);
 	gClient.send(prs);
 
-def leaveConference(conference, status = None):
+def leaveConference(conference, status=None):
 	prs = xmpp.Presence(conference, UNAVAILABLE);
 	if(status):
 		prs.setStatus(status);
@@ -444,7 +444,7 @@ def setBotStatus(conference, status, show):
 	prs.addChild(node = getCapsNode());
 	gClient.send(prs);
 
-def setRole(conference, nick, role, reason = None):
+def setRole(conference, nick, role, reason=None):
 	iq = xmpp.Iq('set');
 	iq.setTo(conference);
 	query = xmpp.Node('query', {'xmlns': xmpp.NS_MUC_ADMIN});
@@ -457,7 +457,7 @@ def setRole(conference, nick, role, reason = None):
 	iq.addChild(node = query);
 	gClient.send(iq);
 
-def setAffiliation(conference, nick, aff, reason = None):
+def setAffiliation(conference, nick, aff, reason=None):
 	iq = xmpp.Iq('set');
 	iq.setTo(conference);
 	query = xmpp.Node('query', {'xmlns': xmpp.NS_MUC_ADMIN});
@@ -493,7 +493,7 @@ def getJidList(conference, offline = False):
 	jidList = tuple(set([getTrueJid(conference,  nick) for nick in nicks]));
 	return(jidList);
 	
-def getTrueJid(jid, resource = None):
+def getTrueJid(jid, resource=None):
 	if(isinstance(jid, xmpp.JID)):
 		jid = unicode(jid);
 	if(not resource):
@@ -529,14 +529,14 @@ def nickInConference(conference, nick):
 def nickIsOnline(conference, nick):
 	return(nickInConference(conference, nick) and getNickKey(conference, nick, NICK_HERE));
 
-def setTempAccess(conference, jid, level = 0):
+def setTempAccess(conference, jid, level=0):
 	gTempAccess[conference][jid] = None;	
 	if(level):
 		gTempAccess[conference][jid] = level;
 	else:
 		del(gTempAccess[conference][jid]);
 
-def setPermAccess(conference, jid, level = 0):
+def setPermAccess(conference, jid, level=0):
 	fileName = getConfigPath(conference, ACCESS_FILE);
 	gPermAccess[conference][jid] = None;
 	if(level):
@@ -545,7 +545,7 @@ def setPermAccess(conference, jid, level = 0):
 		del(gPermAccess[conference][jid]);
 	writeFile(fileName, str(gPermAccess[conference]));
 
-def setPermGlobalAccess(jid, level = 0):
+def setPermGlobalAccess(jid, level=0):
 	fileName = getConfigPath(ACCESS_FILE);
 	tempAccess = eval(readFile(fileName));
 	tempAccess[jid] = None;
@@ -589,7 +589,7 @@ def sendTo(msgType, jid, text):
 def sendToConference(conference, text):
 	sendTo(PUBLIC, conference, text);
 		
-def sendMsg(msgType, conference, nick, text, force = False):
+def sendMsg(msgType, conference, nick, text, force=False):
 	if(msgType == PUBLIC and not force):
 		fools = getConfigKey(conference, 'fools');
 		if(fools and not random.randrange(0, 30)):
@@ -801,8 +801,8 @@ def start():
 	loadPlugins();
 
 	printf('Connecting...');
-	if(gClient.connect(server = (gHost, gPort), secure = 0, use_srv = True)):
-		printf('Connection established (%s)' % gClient.isConnected().upper(), FLAG_SUCCESS);
+	if(gClient.connect(server=(gHost, gPort), SSLMode=gSSLMode, useResolver=gUseResolver)):
+		printf('Connection established (%s)' % gClient.isConnected(), FLAG_SUCCESS);
 	else:
 		printf('Unable to connect', FLAG_ERROR);
 		if(gRestart):
