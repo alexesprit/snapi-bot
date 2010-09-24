@@ -273,11 +273,7 @@ class Dispatcher(PlugIn):
 			if(isinstance(session._expected[stanzaID], tuple)):
 				function, args = session._expected[stanzaID];
 				session.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), 'ok');
-				try:
-					function(stanza, *args)
-				except(Exception, excType):
-					if(isinstance(excType, NodeProcessed)):
-						raise;
+				function(stanza, *args)
 				del(self._expected[stanzaID]);
 			else:
 				session.printf("Expected stanza arrived!", 'ok')

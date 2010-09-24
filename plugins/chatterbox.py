@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-MAX_MSG_COUNT = 50;
+MAX_MSG_COUNT = 100;
 MSG_COUNT_TO_SAVE = 20;
 SAVE_CHANCE = 25; # chance 1 of SAVE_CHANCE
 REPLY_CHANCE = 35; # it's the same.

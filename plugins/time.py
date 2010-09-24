@@ -41,29 +41,16 @@ def _showUserTime(stanza, timeID, msgType, conference, nick, param):
 				utc = p.getTagData('utc');
 			if(tzo and utc):
 				sign, tzHour, tzMin = re.match('(\+|-)?([0-9]+):([0-9]+)', tzo).groups();
-				year, month, day, hours, minutes, seconds = re.match('([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)', utc).groups();
-
-				tzHour, tzMin = int(tzHour), int(tzMin);
-				hours, minutes, seconds = int(hours), int(minutes), int(seconds);
-				year, month, day = int(year), int(month), int(day);
-
-				if(sign == '-'):
-					tzHour = -tzHour;
-					tzMin = -tzMin;
-				hours = hours + tzHour;
-				minutes = minutes + tzMin;
-				while(hours >= 24):
-					day += 1;
-					hours -= 24;
-				while(minutes >= 60):
-					minutes -= 60;
-
-				time = '%02d:%02d:%02d' % (hours, minutes, seconds);
-				date = '%02d.%02d.%02d' % (day, month, year);
+				offset = int(tzHour) * 3600 + int(tzMin) * 60;
+				if(sign == "-"):
+					offset = -offset;
+				rawTime = time.strptime(utc, "%Y-%m-%dT%H:%M:%SZ");
+				rawTime = time.mktime(rawTime) + offset;
+				userTime = time.strftime("%H:%M:%S (%d.%m.%y)", time.localtime(rawTime));
 				if(param):
-					sendMsg(msgType, conference, nick, u'у %s сейчас %s (%s)' % (param, time, date));
+					sendMsg(msgType, conference, nick, u'у %s сейчас %s' % (param, userTime));
 				else:
-					sendMsg(msgType, conference, nick, u'у тебя сейчас %s (%s)' % (time, date));
+					sendMsg(msgType, conference, nick, u'у тебя сейчас %s' % (userTime));
 			else:
 				sendMsg(msgType, conference, nick, u'клиент глюк, инфы не хватает');
 		elif(stanza.getType() == 'error'):
