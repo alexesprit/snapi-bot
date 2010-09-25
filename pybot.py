@@ -454,7 +454,7 @@ def setRole(conference, nick, role, reason=None):
 		role = query.addChild('item', {'nick': nick, 'role': role});
 	if(reason):
 		role.setTagData('reason', reason);
-	iq.addChild(node = query);
+	iq.addChild(node=query);
 	gClient.send(iq);
 
 def setAffiliation(conference, nick, aff, reason=None):
@@ -467,7 +467,7 @@ def setAffiliation(conference, nick, aff, reason=None):
 		aff = query.addChild('item', {'nick': nick, 'affiliation': aff});
 	if(reason):
 		aff.setTagData('reason', reason);
-	iq.addChild(node = query);
+	iq.addChild(node=query);
 	gClient.send(iq);
 
 def isAdmin(jid):

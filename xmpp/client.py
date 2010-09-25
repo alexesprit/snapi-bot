@@ -136,7 +136,7 @@ class CommonClient:
 		self.printf(self.DBG, 'Disconnect detected', 'stop')
 		for instance in self.disconnectHandlers:
 			instance()
-		if hasattr(self, 'TLS'):
+		if hasattr(self, C_TLS):
 			self.TLS.PlugOut()
 
 	def isConnected(self):
@@ -146,9 +146,12 @@ class CommonClient:
 	def connect(self, server=None, proxy=None, SSLMode=False, useResolver=True):
 		""" Make a tcp/ip connection, protect it with tls/ssl if possible and start XMPP stream.
 			Returns None or C_TCP or C_TLS, depending on the result."""
-		if not server: server = (self.Server, self.Port)
-		if proxy: sock = transports.HTTPPROXYSocket(proxy, server, useResolver)
-		else: sock = transports.TCPSocket(server, useResolver)
+		if not server:
+			server = (self.Server, self.Port)
+		if proxy:
+			sock = transports.HTTPProxySocket(proxy, server, useResolver)
+		else:
+			sock = transports.TCPSocket(server, useResolver)
 		connected = sock.PlugIn(self)
 		if not connected: 
 			sock.PlugOut()

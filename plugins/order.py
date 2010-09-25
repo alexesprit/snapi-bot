@@ -13,22 +13,16 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def setUserRole(msgType, conference, nick, param, role):
-	param = param.split();
-	user = param[0];	
+def setUserRole(msgType, conference, nick, user, role):
 	if(user.count('@') or nickInConference(conference, user)):
-		reason = (len(param) > 1) and ' '.join(param[1:]) or None;
-		setRole(conference, user, role, reason);
+		setRole(conference, user, role);
 		sendMsg(msgType, conference, nick, u'сделала');
 	else:
 		sendMsg(msgType, conference, nick, u'а это кто?');
 	
-def setUserAffiliation(msgType, conference, nick, param, aff):
-	param = param.split();
-	user = param[0];	
+def setUserAffiliation(msgType, conference, nick, user, aff):
 	if(user.count('@') or nickInConference(conference, user)):
-		reason = (len(param) > 1) and ' '.join(param[1:]) or None;
-		setAffiliation(conference, user, aff, reason);
+		setAffiliation(conference, user, aff);
 		sendMsg(msgType, conference, nick, u'сделала');
 	else:
 		sendMsg(msgType, conference, nick, u'а это кто?');

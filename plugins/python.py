@@ -34,7 +34,7 @@ def pythonShell(msgType, conference, nick, param):
 	elif(os.name == 'nt'):
 		pipe = os.popen('%s' % (param.encode('utf-8')));
 		sendMsg(msgType, conference, nick, unicode(pipe.read(), 'cp866'));
-	pipe.close;
+	pipe.close();
 
 def pythonCalc(msgType, conference, nick, param):
 	if(re.sub('([0-9]+|[\+\-\/\*\^\.()])', '', param).strip() == ''):

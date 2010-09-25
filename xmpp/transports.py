@@ -23,8 +23,6 @@ proxied TCP connect - HTTPPROXYsocket class (CONNECT proxies)
 TLS connection - TLS class. Can be used for SSL connections also.
 
 Transports are stackable so you - f.e. TLS use HTPPROXYsocket or TCPSocket as more low-level transport.
-
-Also exception 'error' is defined to allow capture of this module specific exceptions.
 """
 
 import base64;
@@ -38,35 +36,17 @@ if isPython26:
 	import ssl;
 
 import dispatcher;
+import dns;
+
 from simplexml import ustr;
 from client import PlugIn;
 from protocol import *;
 
-# determine which DNS resolution library is available
-HAVE_DNSPYTHON = False
-HAVE_PYDNS = False
-
-try:
-	import dns.resolver # http://dnspython.org/
-	HAVE_DNSPYTHON = True
-except ImportError:
-	try:
-		import dns # http://pydns.sf.net/
-		HAVE_PYDNS = True
-	except ImportError:
-		pass
-
-class error:
-	"""An exception to be raised in case of low-level errors in methods of 'transports' module."""
-	def __init__(self, comment):
-		"""Cache the descriptive string"""
-		self._comment = comment
-
-	def __str__(self):
-		"""Serialise exception into pre-cached descriptive string."""
-		return self._comment
-
 BUFLEN = 1024
+
+DBG_PROXY = 'proxy';
+DBG_SOCKET = 'socket';
+
 class TCPSocket(PlugIn):
 	""" This class defines direct TCP connection method. """
 	def __init__(self, server=None, useResolver=True):
@@ -76,39 +56,21 @@ class TCPSocket(PlugIn):
 			server instead
 		"""
 		PlugIn.__init__(self)
-		self.DBG_LINE = 'socket'
+		self.DBG_LINE = DBG_SOCKET
 		self._exported_methods = [self.send, self.disconnect]
 		self._server, self.useResolver = server, useResolver
 
 	def lookup(self, server):
 		" SRV resolver. Takes server=(host, port) as argument. Returns new (host, port) pair "
-		if HAVE_DNSPYTHON or HAVE_PYDNS:
-			host, port  =  server
-			possible_queries = ['_xmpp-client._tcp.' + host]
-
-			for query in possible_queries:
-				#try:
-				if HAVE_DNSPYTHON:
-					answers = [x for x in dns.resolver.query(query, 'SRV')]
-					if answers:
-						host = str(answers[0].target)
-						port = int(answers[0].port)
-						break
-				elif HAVE_PYDNS:
-					# ensure we haven't cached an old configuration
-					dns.DiscoverNameServers()
-					response = dns.Request().req(query, qtype='SRV')
-					answers = response.answers
-					if len(answers) > 0:
-						port, host = answers[0]['data'][2:4]
-						port = int(port)
-						break
-				#except:
-				#	self.printf('An error occurred while looking up %s' % query, 'warn')
+		host, port  =  server
+		query = '_xmpp-client._tcp.%s' % (host)
+		# ensure we haven't cached an old configuration
+		dns.DiscoverNameServers()
+		response = dns.Request().req(query, qtype='SRV')
+		if response.answers:
+			port, host = response.answers[0]['data'][2:4]
+			port = int(port)
 			server = (host, port)
-		else:
-			self.printf("Could not load one of the supported DNS libraries (dnspython or pydns). SRV records will not be queried and you may need to set custom hostname/port for some servers to be accessible.\n", 'warn')
-		# end of SRV resolver
 		return server
 
 	def plugin(self, owner):
@@ -217,8 +179,7 @@ class TCPSocket(PlugIn):
 		self.printf("Closing socket", 'stop')
 		self._sock.close()
 
-DBG_CONNECT_PROXY = 'CONNECTproxy'
-class HTTPPROXYSocket(TCPSocket):
+class HTTPProxySocket(TCPSocket):
 	""" HTTP (CONNECT) proxy connection class. Uses TCPSocket as the base class
 		redefines only connect method. Allows to use HTTP proxies like squid with
 		(optionally) simple authentication (using login and password). """
@@ -228,7 +189,7 @@ class HTTPPROXYSocket(TCPSocket):
 			and optional keys 'user' and 'password' to use for authentication.
 			'server' argument is a tuple of host and port - just like TCPSocket uses. """
 		TCPSocket.__init__(self, server, useResolver)
-		self.DBG_LINE = DBG_CONNECT_PROXY
+		self.DBG_LINE = DBG_PROXY
 		self._proxy = proxy
 
 	def plugin(self, owner):
@@ -247,7 +208,7 @@ class HTTPPROXYSocket(TCPSocket):
 			'Proxy-Connection: Keep-Alive', 
 			'Pragma: no-cache', 
 			'Host: %s:%s' % (self._server), 
-			'User-Agent: HTTPPROXYSocket/v0.1']
+			'User-Agent: HTTPProxySocket/v0.1']
 		if('name' in self._proxy and 'password' in self._proxy):
 			credentials = '%(user)s:%(password)s' % (self._proxy)
 			credentials = base64.encodestring(credentials).strip()
@@ -262,7 +223,8 @@ class HTTPPROXYSocket(TCPSocket):
 			return
 		try:
 			proto, code, desc = reply.split('\n')[0].split(' ', 2)
-		except: raise error('Invalid proxy reply')
+		except:
+			raise ValueError('Invalid proxy reply')
 		if code != '200':
 			self.printf('Invalid proxy reply: %s %s %s'%(proto, code, desc), 'error')
 			self._owner.disconnected()
