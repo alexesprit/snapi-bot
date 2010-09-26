@@ -23,7 +23,7 @@ def loadPokes():
 	gPokes = eval(readFile(fileName, "utf-8"));
 
 def pokeUser(msgType, conference, nick, param):
-	if(msgType == PUBLIC):
+	if(msgType == xmpp.TYPE_PUBLIC):
 		if(param):
 			botNick = getBotNick(conference);
 			if(param != botNick):

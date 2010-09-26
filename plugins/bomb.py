@@ -30,7 +30,7 @@ def bombMarked(conference, trueJid):
 	return(trueJid in gBombAnswer[conference]);
 
 def giveBomb(msgType, conference, nick, param):
-	if(PRIVATE == msgType):
+	if(xmpp.TYPE_PRIVATE == msgType):
 		sendMsg(msgType, conference, nick, u'ага, хочешь без палева кинуть??? ]:->')
 		return;
 	userNick = param or random.choice(getOnlineNicks(conference));
@@ -82,14 +82,14 @@ def detonate(msgType, conference, nick):
 	if(num < 1 or getNickKey(conference, nick, NICK_MODER)):
 		sendMsg(msgType, conference, nick, u'бомба глюкнула...');
 	elif(num < 7):
-		setRole(conference, nick, ROLE_NONE, u'бабах!!!');
+		setRole(conference, nick, xmpp.ROLE_NONE, u'бабах!!!');
 	else:
-		setRole(conference, nick, ROLE_VISITOR, u'бабах!!!');
+		setRole(conference, nick, xmpp.ROLE_VISITOR, u'бабах!!!');
 		timeout = random.randrange(100, 501);
 		startTimer(timeout, voiceUser, (msgType, conference, nick));
 
 def voiceUser(msgType, conference, nick):
-	setRole(conference, nick, ROLE_PARTICIPANT, u'none');
+	setRole(conference, nick, xmpp.ROLE_PARTICIPANT, u'none');
 
 def clearBombCache(conference):
 	del(gBombAnswer[conference]);

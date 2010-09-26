@@ -16,21 +16,19 @@
 LAST_ID = 'last_id';
 
 def showOnlineTime(msgType, conference, nick, param):
-	iq = xmpp.Iq('get', xmpp.NS_LAST);
+	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_LAST);
 	iq.setTo(conference);
-	lastID = getUniqueID(LAST_ID);
-	iq.setID(lastID);
-	gClient.SendAndCallForResponse(iq, _showOnlineTime, (lastID, msgType, conference, nick, ));
+	iq.setID(getUniqueID(LAST_ID));
+	gClient.SendAndCallForResponse(iq, _showOnlineTime, (msgType, conference, nick, ));
 
-def _showOnlineTime(stanza, lastID, msgType, conference, nick):
-	if(lastID == stanza.getID()):
-		if(RESULT == stanza.getType()):
-			for p in stanza.getPayload():
-				sec = p.getAttrs()['seconds'];
-				if(not sec == '0'):
-					sendMsg(msgType, conference, nick, u'ты в сети уже %s' % (time2str(int(sec))));
-					break;
-		else:
-			sendMsg(msgType, conference, nick, u'не получается :(');
+def _showOnlineTime(stanza, msgType, conference, nick):
+	if(xmpp.TYPE_RESULT == stanza.getType()):
+		for p in stanza.getPayload():
+			sec = p.getAttrs()['seconds'];
+			if(not sec == '0'):
+				sendMsg(msgType, conference, nick, u'ты в сети уже %s' % (time2str(int(sec))));
+				break;
+	else:
+		sendMsg(msgType, conference, nick, u'не получается :(');
 
 registerCommand(showOnlineTime, u'всети', 10, u'Показывает ваше время в сети', None, (u'всети', ), ROSTER | NONPARAM);

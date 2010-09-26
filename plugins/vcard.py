@@ -29,51 +29,48 @@ def showVCard(msgType, conference, nick, param):
 			return;
 	else:
 		userJid = conferenceInList(conference) and (conference + '/' + nick) or conference;
-	iq = xmpp.Iq('get');
+	iq = xmpp.Iq(xmpp.TYPE_GET);
 	iq.addChild('vCard', {}, [], xmpp.NS_VCARD);
 	iq.setTo(userJid);
-	vcardID = getUniqueID(VCARD_ID);
-	iq.setID(vcardID);
-	gClient.SendAndCallForResponse(iq, _showVCard, (vcardID, msgType, conference, nick, param, ));
+	iq.setID(getUniqueID(VCARD_ID));
+	gClient.SendAndCallForResponse(iq, _showVCard, (msgType, conference, nick, param, ));
 
-def _showVCard(stanza, vcardID, msgType, conference, nick, param):
-	if(vcardID == stanza.getID()):
-		if(RESULT == stanza.getType()):
-			queryNode = stanza.getChildren();
-			if(queryNode):
-				vcard = {};
-				for tag in queryNode[0].getChildren():
-					pName = tag.getName();
-					pData = tag.getData();
-					if(not pData):
-						for tag in tag.getChildren():
-							pName = tag.getName();
-							pData = tag.getData();
-							vcard[pName] = pData;
-					else:
+def _showVCard(stanza, msgType, conference, nick, param):
+	if(xmpp.TYPE_RESULT == stanza.getType()):
+		queryNode = stanza.getChildren();
+		if(queryNode):
+			vcard = {};
+			for tag in queryNode[0].getChildren():
+				pName = tag.getName();
+				pData = tag.getData();
+				if(not pData):
+					for tag in tag.getChildren():
+						pName = tag.getName();
+						pData = tag.getData();
 						vcard[pName] = pData;
-				message = fillVCard(vcard);
-				if(message):
-					if(not param):
-						sendMsg(msgType, conference, nick, u'про тебя я знаю следующее:\n%s' % (message));
-					else:
-						sendMsg(msgType, conference, nick, u'про %s я знаю следующее:\n%s' % (param, message));
 				else:
-					sendMsg(msgType, conference, nick, u'пустой вкард');
-			else:
+					vcard[pName] = pData;
+			message = fillVCard(vcard);
+			if(message):
 				if(not param):
-					sendMsg(msgType, conference, nick, u'вкард заполни сначала');
+					sendMsg(msgType, conference, nick, u'про тебя я знаю следующее:\n%s' % (message));
 				else:
-					sendMsg(msgType, conference, nick, u'пусть %s сначала вкард заполнит' % (param));
-		elif(ERROR == stanza.getType()):
-			if(not param):
-				sendMsg(msgType, conference, nick, u'хехе, твой клиент ничего не знает про вкарды');
+					sendMsg(msgType, conference, nick, u'про %s я знаю следующее:\n%s' % (param, message));
 			else:
-				sendMsg(msgType, conference, nick, u'хехе, клиент у %s ничего не знает про вкарды' % (param));
+				sendMsg(msgType, conference, nick, u'пустой вкард');
+		else:
+			if(not param):
+				sendMsg(msgType, conference, nick, u'вкард заполни сначала');
+			else:
+				sendMsg(msgType, conference, nick, u'пусть %s сначала вкард заполнит' % (param));
+	elif(ERROR == stanza.getType()):
+		if(not param):
+			sendMsg(msgType, conference, nick, u'хехе, твой клиент ничего не знает про вкарды');
+		else:
+			sendMsg(msgType, conference, nick, u'хехе, клиент у %s ничего не знает про вкарды' % (param));
 				
 def fillVCard(vcard):
 	name = '';
-	text = '';
 	for tag in ('GIVEN', 'MIDDLE', 'FAMILY'):
 		tagData = vcard.get(tag);
 		if(tagData):

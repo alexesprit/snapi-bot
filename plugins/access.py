@@ -18,10 +18,10 @@
 ACCESS_DESC = {-100: u'(игнор)', 0: u'(никто)', 10: u'(юзер)', 11: u'(мембер)', 15: u'(модер)', 16: u'(модер)', 20: u'(админ)', 30: u'(овнер)', 100: u'(админ бота)'};
 
 def login(msgType, conference, nick, param):
-	if(msgType == PRIVATE and param == gAdminPass):
+	if(msgType == xmpp.TYPE_PRIVATE and param == gAdminPass):
 		trueJid = getTrueJid(conference, nick);
 		setTempGlobalAccess(trueJid, 100);
-		sendMsg(PRIVATE, conference, nick, u'пароль принят, полный доступ выдан');
+		sendMsg(xmpp.TYPE_PRIVATE, conference, nick, u'пароль принят, полный доступ выдан');
 
 registerCommand(login, u'логин', 0, u'Авторизоваться как админиcтратор бота', u'логин <пароль>', (u'логин мой_пароль', ), ANY | FROZEN | PARAM);
 
@@ -123,10 +123,10 @@ def showGlobalAccesses(msgType, conference, nick, param):
 	if(not gGlobalAccess):
 		sendMsg(msgType, conference, nick, u'нет глобальных доступов');
 	else:
-		if(PUBLIC == msgType):
+		if(xmpp.TYPE_PUBLIC == msgType):
 			sendMsg(msgType, conference, nick, u'ушли');
 		items = [u'%s [%d]' % (jid, gGlobalAccess[jid]) for jid in gGlobalAccess];
-		sendMsg(PRIVATE, conference, nick, u'вот, что я нашла\n' + '\n'.join(items));
+		sendMsg(xmpp.TYPE_PRIVATE, conference, nick, u'вот, что я нашла\n' + '\n'.join(items));
 
 registerCommand(showGlobalAccesses, u'доступы', 100, u'Показывает все глобальные доступы', None, (u'доступы', ), ANY | NONPARAM);
 
@@ -134,10 +134,10 @@ def showLocalAccesses(msgType, conference, nick, param):
 	if(not gPermAccess[conference]):
 		sendMsg(msgType, conference, nick, u'нет локальных доступов');
 	else:
-		if(PUBLIC == msgType):
+		if(xmpp.TYPE_PUBLIC == msgType):
 			sendMsg(msgType, conference, nick, u'ушли');
 		items = [u'\n%s [%d]' % (jid, gPermAccess[conference][jid]) for jid in gPermAccess[conference]];
-		sendMsg(PRIVATE, conference, nick, u'вот, что я нашла\n' + '\n'.join(items));
+		sendMsg(xmpp.TYPE_PRIVATE, conference, nick, u'вот, что я нашла\n' + '\n'.join(items));
 
 registerCommand(showLocalAccesses, u'локалдоступы', 20, u'Показывает все локальные доступы', None, (u'локалдоступы', ), CHAT | NONPARAM);
 

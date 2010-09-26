@@ -15,11 +15,11 @@
 		
 def processSubscriptions(stanza, conference, nick, trueJid):
 	jid = stanza.getFrom().getStripped();
-	prsType =  stanza.getType();
-	if(prsType == "subscribe"):
+	prsType = stanza.getType();
+	if(xmpp.PRS_SUBSCRIBE == prsType):
 		gRoster.authorize(jid);
 		gRoster.subscribe(jid);
-	elif(prsType == "unsubscribe"):
+	elif(xmpp.PRS_UBSUBSCRIBE == prsType):
 		gRoster.unauthorize(jid);
 		gRoster.delItem(jid);
 

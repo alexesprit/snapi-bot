@@ -13,10 +13,17 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+STATUSES = (
+	xmpp.PRS_AWAY, 
+	xmpp.PRS_NA, 
+	xmpp.PRS_DND, 
+	xmpp.PRS_CHAT
+);
+
 def changeStatus(msgType, conference, nick, param):
-	args = param.split(' ', 1);
+	args = param.split(None, 1);
 	show, status = '', '';
-	if(args[0] in ('away', 'xa', 'dnd', 'chat')):
+	if(args[0] in (STATUSES)):
 		show = args[0];
 		if(len(args) > 1):
 			status = args[1];

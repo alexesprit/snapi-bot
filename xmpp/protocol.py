@@ -1,16 +1,16 @@
-##   protocol.py 
-##
-##   Copyright (C) 2003-2005 Alexey "Snake" Nezhdanov
-##
-##   This program is free software; you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation; either version 2, or (at your option)
-##   any later version.
-##
-##   This program is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
+# protocol.py 
+
+# Copyright (C) 2003-2005 Alexey "Snake" Nezhdanov
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
 # $Id: protocol.py,v 1.60 2009/04/07 11:14:28 snakeru Exp $
 
@@ -19,8 +19,10 @@ Protocol module contains tools that is needed for processing of
 xmpp-related data structures.
 """
 
-from simplexml import Node,ustr
 import time
+
+from simplexml import Node, ustr
+
 NS_DATA							= 'jabber:x:data'										# XEP-0004
 NS_AVATAR						= 'jabber:iq:avatar'									# XEP-0008 (historical)
 NS_RPC							= 'jabber:iq:rpc'										# XEP-0009
@@ -143,74 +145,51 @@ NS_MESSAGE						= 'message'												# Jabberd2
 NS_PRESENCE						= 'presence'											# Jabberd2
 NS_STATS						= 'http://jabber.org/protocol/stats'					# ??? ????
 
-xmpp_stream_error_conditions="""
-bad-format --  --  -- The entity has sent XML that cannot be processed.
-bad-namespace-prefix --  --  -- The entity has sent a namespace prefix that is unsupported, or has sent no namespace prefix on an element that requires such a prefix.
-conflict --  --  -- The server is closing the active stream for this entity because a new stream has been initiated that conflicts with the existing stream.
-connection-timeout --  --  -- The entity has not generated any traffic over the stream for some period of time.
-host-gone --  --  -- The value of the 'to' attribute provided by the initiating entity in the stream header corresponds to a hostname that is no longer hosted by the server.
-host-unknown --  --  -- The value of the 'to' attribute provided by the initiating entity in the stream header does not correspond to a hostname that is hosted by the server.
-improper-addressing --  --  -- A stanza sent between two servers lacks a 'to' or 'from' attribute (or the attribute has no value).
-internal-server-error --  --  -- The server has experienced a misconfiguration or an otherwise-undefined internal error that prevents it from servicing the stream.
-invalid-from -- cancel --  -- The JID or hostname provided in a 'from' address does not match an authorized JID or validated domain negotiated between servers via SASL or dialback, or between a client and a server via authentication and resource authorization.
-invalid-id --  --  -- The stream ID or dialback ID is invalid or does not match an ID previously provided.
-invalid-namespace --  --  -- The streams namespace name is something other than "http://etherx.jabber.org/streams" or the dialback namespace name is something other than "jabber:server:dialback".
-invalid-xml --  --  -- The entity has sent invalid XML over the stream to a server that performs validation.
-not-authorized --  --  -- The entity has attempted to send data before the stream has been authenticated, or otherwise is not authorized to perform an action related to stream negotiation.
-policy-violation --  --  -- The entity has violated some local service policy.
-remote-connection-failed --  --  -- The server is unable to properly connect to a remote resource that is required for authentication or authorization.
-resource-constraint --  --  -- The server lacks the system resources necessary to service the stream.
-restricted-xml --  --  -- The entity has attempted to send restricted XML features such as a comment, processing instruction, DTD, entity reference, or unescaped character.
-see-other-host --  --  -- The server will not provide service to the initiating entity but is redirecting traffic to another host.
-system-shutdown --  --  -- The server is being shut down and all active streams are being closed.
-undefined-condition --  --  -- The error condition is not one of those defined by the other conditions in this list.
-unsupported-encoding --  --  -- The initiating entity has encoded the stream in an encoding that is not supported by the server.
-unsupported-stanza-type --  --  -- The initiating entity has sent a first-level child of the stream that is not supported by the server.
-unsupported-version --  --  -- The value of the 'version' attribute provided by the initiating entity in the stream header specifies a version of XMPP that is not supported by the server.
-xml-not-well-formed --  --  -- The initiating entity has sent XML that is not well-formed."""
-xmpp_stanza_error_conditions="""
-bad-request -- 400 -- modify -- The sender has sent XML that is malformed or that cannot be processed.
-conflict -- 409 -- cancel -- Access cannot be granted because an existing resource or session exists with the same name or address.
-feature-not-implemented -- 501 -- cancel -- The feature requested is not implemented by the recipient or server and therefore cannot be processed.
-forbidden -- 403 -- auth -- The requesting entity does not possess the required permissions to perform the action.
-gone -- 302 -- modify -- The recipient or server can no longer be contacted at this address.
-internal-server-error -- 500 -- wait -- The server could not process the stanza because of a misconfiguration or an otherwise-undefined internal server error.
-item-not-found -- 404 -- cancel -- The addressed JID or item requested cannot be found.
-jid-malformed -- 400 -- modify -- The value of the 'to' attribute in the sender's stanza does not adhere to the syntax defined in Addressing Scheme.
-not-acceptable -- 406 -- cancel -- The recipient or server understands the request but is refusing to process it because it does not meet criteria defined by the recipient or server.
-not-allowed -- 405 -- cancel -- The recipient or server does not allow any entity to perform the action.
-not-authorized -- 401 -- auth -- The sender must provide proper credentials before being allowed to perform the action, or has provided improper credentials.
-payment-required -- 402 -- auth -- The requesting entity is not authorized to access the requested service because payment is required.
-recipient-unavailable -- 404 -- wait -- The intended recipient is temporarily unavailable.
-redirect -- 302 -- modify -- The recipient or server is redirecting requests for this information to another entity.
-registration-required -- 407 -- auth -- The requesting entity is not authorized to access the requested service because registration is required.
-remote-server-not-found -- 404 -- cancel -- A remote server or service specified as part or all of the JID of the intended recipient does not exist.
-remote-server-timeout -- 504 -- wait -- A remote server or service specified as part or all of the JID of the intended recipient could not be contacted within a reasonable amount of time.
-resource-constraint -- 500 -- wait -- The server or recipient lacks the system resources necessary to service the request.
-service-unavailable -- 503 -- cancel -- The server or recipient does not currently provide the requested service.
-subscription-required -- 407 -- auth -- The requesting entity is not authorized to access the requested service because a subscription is required.
-undefined-condition -- 500 --  -- 
-unexpected-request -- 400 -- wait -- The recipient or server understood the request but was not expecting it at this time (e.g., the request was out of order)."""
-sasl_error_conditions="""
-aborted --  --  -- The receiving entity acknowledges an <abort/> element sent by the initiating entity; sent in reply to the <abort/> element.
-incorrect-encoding --  --  -- The data provided by the initiating entity could not be processed because the [BASE64]Josefsson, S., The Base16, Base32, and Base64 Data Encodings, July 2003. encoding is incorrect (e.g., because the encoding does not adhere to the definition in Section 3 of [BASE64]Josefsson, S., The Base16, Base32, and Base64 Data Encodings, July 2003.); sent in reply to a <response/> element or an <auth/> element with initial response data.
-invalid-authzid --  --  -- The authzid provided by the initiating entity is invalid, either because it is incorrectly formatted or because the initiating entity does not have permissions to authorize that ID; sent in reply to a <response/> element or an <auth/> element with initial response data.
-invalid-mechanism --  --  -- The initiating entity did not provide a mechanism or requested a mechanism that is not supported by the receiving entity; sent in reply to an <auth/> element.
-mechanism-too-weak --  --  -- The mechanism requested by the initiating entity is weaker than server policy permits for that initiating entity; sent in reply to a <response/> element or an <auth/> element with initial response data.
-not-authorized --  --  -- The authentication failed because the initiating entity did not provide valid credentials (this includes but is not limited to the case of an unknown username); sent in reply to a <response/> element or an <auth/> element with initial response data.
-temporary-auth-failure --  --  -- The authentication failed because of a temporary error condition within the receiving entity; sent in reply to an <auth/> element or <response/> element."""
+_errorCodes = {
+				"400": "bad-request",
+				"401": "not-authorized",
+				"402": "payment-required",
+				"403": "forbidden",
+				"404": "item-not-found",
+				"405": "not-allowed",
+				"406": "not-acceptable",
+				"407": "registration-required",
+				"409": "conflict",
+				"500": "resource-constraint",
+				"501": "feature-not-implemented",
+				"503": "service-unavailable",
+				"504": "remote-server-timeout",
+}
 
-ERRORS,_errorcodes={},{}
-for ns,errname,errpool in [(NS_XMPP_STREAMS,'STREAM',xmpp_stream_error_conditions),
-                           (NS_STANZAS     ,'ERR'   ,xmpp_stanza_error_conditions),
-                           (NS_SASL        ,'SASL'  ,sasl_error_conditions)]:
-    for err in errpool.split('\n')[1:]:
-        cond,code,typ,text=err.split(' -- ')
-        name=errname+'_'+cond.upper().replace('-','_')
-        locals()[name]=ns+' '+cond
-        ERRORS[ns+' '+cond]=[code,typ,text]
-        if code: _errorcodes[code]=cond
-del ns,errname,errpool,err,cond,code,typ,text
+TYPE_PRIVATE = "chat";
+TYPE_PUBLIC = "groupchat";
+TYPE_ERROR = "error";
+TYPE_HEADLINE = "headline";
+TYPE_NORMAL = "normal";
+TYPE_RESULT = "result";
+TYPE_GET = "get";
+TYPE_SET = "set";
+
+PRS_OFFLINE = "unavailable";
+PRS_ONLINE = "online"
+PRS_CHAT = "chat"
+PRS_AWAY = "away"
+PRS_DND = "dnd"
+PRS_NA = "xa"
+
+PRS_SUBSCRIBE = "subscribe"
+PRS_UBSUBSCRIBE = "unsubscribe"
+
+ROLE_NONE = "none";
+ROLE_VISITOR = "visitor";
+ROLE_PARTICIPANT = "participant";
+ROLE_MODERATOR = "moderator";
+
+AFF_OUTCAST = "outcast";
+AFF_NONE = "none";
+AFF_MEMBER = "member";
+AFF_ADMIN = "admin";
+AFF_OWNER = "owner";
 
 def isResultNode(node):
     """ Returns true if the node is a positive reply. """
@@ -249,7 +228,7 @@ class UnsupportedStanzaType(StreamError): pass
 class UnsupportedVersion(StreamError): pass
 class XMLNotWellFormed(StreamError): pass
 
-stream_exceptions = {'bad-format': BadFormat,
+streamExceptions = {'bad-format': BadFormat,
                      'bad-namespace-prefix': BadNamespacePrefix,
                      'conflict': Conflict,
                      'connection-timeout': ConnectionTimeout,
@@ -556,315 +535,3 @@ class Iq(Protocol):
         iq=Iq(typ,to=self.getFrom(),frm=self.getTo(),attrs={'id':self.getID()})
         if self.getTag('query'): iq.setQueryNS(self.getQueryNS())
         return iq
-
-class ErrorNode(Node):
-    """ XMPP-style error element.
-        In the case of stanza error should be attached to XMPP stanza.
-        In the case of stream-level errors should be used separately. """
-    def __init__(self,name,code=None,typ=None,text=None):
-        """ Create new error node object.
-            Mandatory parameter: name - name of error condition.
-            Optional parameters: code, typ, text. Used for backwards compartibility with older jabber protocol."""
-        if ERRORS.has_key(name):
-            cod,type,txt=ERRORS[name]
-            ns=name.split()[0]
-        else: cod,ns,type,txt='500',NS_STANZAS,'cancel',''
-        if typ: type=typ
-        if code: cod=code
-        if text: txt=text
-        Node.__init__(self,'error',{},[Node(name)])
-        if type: self.setAttr('type',type)
-        if not cod: self.setName('stream:error')
-        if txt: self.addChild(node=Node(ns+' text',{},[txt]))
-        if cod: self.setAttr('code',cod)
-
-class Error(Protocol):
-    """ Used to quickly transform received stanza into error reply."""
-    def __init__(self,node,error,reply=1):
-        """ Create error reply basing on the received 'node' stanza and the 'error' error condition.
-            If the 'node' is not the received stanza but locally created ('to' and 'from' fields needs not swapping)
-            specify the 'reply' argument as false."""
-        if reply: Protocol.__init__(self,to=node.getFrom(),frm=node.getTo(),node=node)
-        else: Protocol.__init__(self,node=node)
-        self.setError(error)
-        if node.getType()=='error': self.__str__=self.__dupstr__
-    def __dupstr__(self,dup1=None,dup2=None):
-        """ Dummy function used as preventor of creating error node in reply to error node.
-            I.e. you will not be able to serialise "double" error into string.
-        """
-        return ''
-
-class DataField(Node):
-    """ This class is used in the DataForm class to describe the single data item.
-        If you are working with jabber:x:data (XEP-0004, XEP-0068, XEP-0122) 
-        then you will need to work with instances of this class. """
-    def __init__(self,name=None,value=None,typ=None,required=0,label=None,desc=None,options=None,node=None):
-        """ Create new data field of specified name,value and type.
-            Also 'required','desc' and 'options' fields can be set.
-            Alternatively other XML object can be passed in as the 'node' parameted to replicate it as a new datafiled.
-            """
-        Node.__init__(self,'field',node=node)
-        if name: self.setVar(name)
-        if type(value) in [list,tuple]: self.setValues(value)
-        elif value: self.setValue(value)
-        if typ: self.setType(typ)
-        elif not typ and not node: self.setType('text-single')
-        if required: self.setRequired(required)
-        if label: self.setLabel(label)
-        if desc: self.setDesc(desc)
-        if options: self.setOptions(options)
-    def setRequired(self,req=1):
-        """ Change the state of the 'required' flag. """
-        if req: self.setTag('required')
-        else:
-            try: self.delChild('required')
-            except ValueError: return
-    def isRequired(self):
-        """ Returns in this field a required one. """
-        return self.getTag('required')
-    def setLabel(self,label):
-        """ Set the label of this field. """
-        self.setAttr('label',label)
-    def getLabel(self):
-        """ Return the label of this field. """
-        return self.getAttr('label')
-    def setDesc(self,desc):
-        """ Set the description of this field. """
-        self.setTagData('desc',desc)
-    def getDesc(self):
-        """ Return the description of this field. """
-        return self.getTagData('desc')
-    def setValue(self,val):
-        """ Set the value of this field. """
-        self.setTagData('value',val)
-    def getValue(self):
-        return self.getTagData('value')
-    def setValues(self,lst):
-        """ Set the values of this field as values-list.
-            Replaces all previous filed values! If you need to just add a value - use addValue method."""
-        while self.getTag('value'): self.delChild('value')
-        for val in lst: self.addValue(val)
-    def addValue(self,val):
-        """ Add one more value to this field. Used in 'get' iq's or such."""
-        self.addChild('value',{},[val])
-    def getValues(self):
-        """ Return the list of values associated with this field."""
-        ret=[]
-        for tag in self.getTags('value'): ret.append(tag.getData())
-        return ret
-    def getOptions(self):
-        """ Return label-option pairs list associated with this field."""
-        ret=[]
-        for tag in self.getTags('option'): ret.append([tag.getAttr('label'),tag.getTagData('value')])
-        return ret
-    def setOptions(self,lst):
-        """ Set label-option pairs list associated with this field."""
-        while self.getTag('option'): self.delChild('option')
-        for opt in lst: self.addOption(opt)
-    def addOption(self,opt):
-        """ Add one more label-option pair to this field."""
-        if type(opt) in [str,unicode]: self.addChild('option').setTagData('value',opt)
-        else: self.addChild('option',{'label':opt[0]}).setTagData('value',opt[1])
-    def getType(self):
-        """ Get type of this field. """
-        return self.getAttr('type')
-    def setType(self,val):
-        """ Set type of this field. """
-        return self.setAttr('type',val)
-    def getVar(self):
-        """ Get 'var' attribute value of this field. """
-        return self.getAttr('var')
-    def setVar(self,val):
-        """ Set 'var' attribute value of this field. """
-        return self.setAttr('var',val)
-
-class DataReported(Node):
-    """ This class is used in the DataForm class to describe the 'reported data field' data items which are used in
-        'multiple item form results' (as described in XEP-0004).
-        Represents the fields that will be returned from a search. This information is useful when
-        you try to use the jabber:iq:search namespace to return dynamic form information.
-        """
-    def __init__(self,node=None):
-        """ Create new empty 'reported data' field. However, note that, according XEP-0004:
-            * It MUST contain one or more DataFields.
-            * Contained DataFields SHOULD possess a 'type' and 'label' attribute in addition to 'var' attribute
-            * Contained DataFields SHOULD NOT contain a <value/> element.
-            Alternatively other XML object can be passed in as the 'node' parameted to replicate it as a new
-            dataitem.
-        """
-        Node.__init__(self,'reported',node=node)
-        if node:
-            newkids=[]
-            for n in self.getChildren():
-                if    n.getName()=='field': newkids.append(DataField(node=n))
-                else: newkids.append(n)
-            self.kids=newkids
-    def getField(self,name):
-        """ Return the datafield object with name 'name' (if exists). """
-        return self.getTag('field',attrs={'var':name})
-    def setField(self,name,typ=None,label=None):
-        """ Create if nessessary or get the existing datafield object with name 'name' and return it.
-            If created, attributes 'type' and 'label' are applied to new datafield."""
-        f=self.getField(name)
-        if f: return f
-        return self.addChild(node=DataField(name,None,typ,0,label))
-    def asDict(self):
-        """ Represent dataitem as simple dictionary mapping of datafield names to their values."""
-        ret={}
-        for field in self.getTags('field'):
-            name=field.getAttr('var')
-            typ=field.getType()
-            if isinstance(typ,(str,unicode)) and typ[-6:]=='-multi':
-                val=[]
-                for i in field.getTags('value'): val.append(i.getData())
-            else: val=field.getTagData('value')
-            ret[name]=val
-        if self.getTag('instructions'): ret['instructions']=self.getInstructions()
-        return ret
-    def __getitem__(self,name):
-        """ Simple dictionary interface for getting datafields values by their names."""
-        item=self.getField(name)
-        if item: return item.getValue()
-        raise IndexError('No such field')
-    def __setitem__(self,name,val):
-        """ Simple dictionary interface for setting datafields values by their names."""
-        return self.setField(name).setValue(val)
-
-class DataItem(Node):
-    """ This class is used in the DataForm class to describe data items which are used in 'multiple
-        item form results' (as described in XEP-0004).
-        """
-    def __init__(self,node=None):
-        """ Create new empty data item. However, note that, according XEP-0004, DataItem MUST contain ALL
-            DataFields described in DataReported.
-            Alternatively other XML object can be passed in as the 'node' parameted to replicate it as a new
-            dataitem.
-            """
-        Node.__init__(self,'item',node=node)
-        if node:
-            newkids=[]
-            for n in self.getChildren():
-                if    n.getName()=='field': newkids.append(DataField(node=n))
-                else: newkids.append(n)
-            self.kids=newkids
-    def getField(self,name):
-        """ Return the datafield object with name 'name' (if exists). """
-        return self.getTag('field',attrs={'var':name})
-    def setField(self,name):
-        """ Create if nessessary or get the existing datafield object with name 'name' and return it. """
-        f=self.getField(name)
-        if f: return f
-        return self.addChild(node=DataField(name))
-    def asDict(self):
-        """ Represent dataitem as simple dictionary mapping of datafield names to their values."""
-        ret={}
-        for field in self.getTags('field'):
-            name=field.getAttr('var')
-            typ=field.getType()
-            if isinstance(typ,(str,unicode)) and typ[-6:]=='-multi':
-                val=[]
-                for i in field.getTags('value'): val.append(i.getData())
-            else: val=field.getTagData('value')
-            ret[name]=val
-        if self.getTag('instructions'): ret['instructions']=self.getInstructions()
-        return ret
-    def __getitem__(self,name):
-        """ Simple dictionary interface for getting datafields values by their names."""
-        item=self.getField(name)
-        if item: return item.getValue()
-        raise IndexError('No such field')
-    def __setitem__(self,name,val):
-        """ Simple dictionary interface for setting datafields values by their names."""
-        return self.setField(name).setValue(val)
-
-class DataForm(Node):
-    """ DataForm class. Used for manipulating dataforms in XMPP.
-        Relevant XEPs: 0004, 0068, 0122.
-        Can be used in disco, pub-sub and many other applications."""
-    def __init__(self, typ=None, data=[], title=None, node=None):
-        """
-            Create new dataform of type 'typ'; 'data' is the list of DataReported,
-            DataItem and DataField instances that this dataform contains; 'title'
-            is the title string.
-            You can specify the 'node' argument as the other node to be used as
-            base for constructing this dataform.
-
-            title and instructions is optional and SHOULD NOT contain newlines.
-            Several instructions MAY be present.
-            'typ' can be one of ('form' | 'submit' | 'cancel' | 'result' )
-            'typ' of reply iq can be ( 'result' | 'set' | 'set' | 'result' ) respectively.
-            'cancel' form can not contain any fields. All other forms contains AT LEAST one field.
-            'title' MAY be included in forms of type "form" and "result"
-        """
-        Node.__init__(self,'x',node=node)
-        if node:
-            newkids=[]
-            for n in self.getChildren():
-                if   n.getName()=='field': newkids.append(DataField(node=n))
-                elif n.getName()=='item': newkids.append(DataItem(node=n))
-                elif n.getName()=='reported': newkids.append(DataReported(node=n))
-                else: newkids.append(n)
-            self.kids=newkids
-        if typ: self.setType(typ)
-        self.setNamespace(NS_DATA)
-        if title: self.setTitle(title)
-        if type(data)==type({}):
-            newdata=[]
-            for name in data.keys(): newdata.append(DataField(name,data[name]))
-            data=newdata
-        for child in data:
-            if type(child) in [type(''),type(u'')]: self.addInstructions(child)
-            elif child.__class__.__name__=='DataField': self.kids.append(child)
-            elif child.__class__.__name__=='DataItem': self.kids.append(child)
-            elif child.__class__.__name__=='DataReported': self.kids.append(child)
-            else: self.kids.append(DataField(node=child))
-    def getType(self):
-        """ Return the type of dataform. """
-        return self.getAttr('type')
-    def setType(self,typ):
-        """ Set the type of dataform. """
-        self.setAttr('type',typ)
-    def getTitle(self):
-        """ Return the title of dataform. """
-        return self.getTagData('title')
-    def setTitle(self,text):
-        """ Set the title of dataform. """
-        self.setTagData('title',text)
-    def getInstructions(self):
-        """ Return the instructions of dataform. """
-        return self.getTagData('instructions')
-    def setInstructions(self,text):
-        """ Set the instructions of dataform. """
-        self.setTagData('instructions',text)
-    def addInstructions(self,text):
-        """ Add one more instruction to the dataform. """
-        self.addChild('instructions',{},[text])
-    def getField(self,name):
-        """ Return the datafield object with name 'name' (if exists). """
-        return self.getTag('field',attrs={'var':name})
-    def setField(self,name):
-        """ Create if nessessary or get the existing datafield object with name 'name' and return it. """
-        f=self.getField(name)
-        if f: return f
-        return self.addChild(node=DataField(name))
-    def asDict(self):
-        """ Represent dataform as simple dictionary mapping of datafield names to their values."""
-        ret={}
-        for field in self.getTags('field'):
-            name=field.getAttr('var')
-            typ=field.getType()
-            if isinstance(typ,(str,unicode)) and typ[-6:]=='-multi':
-                val=[]
-                for i in field.getTags('value'): val.append(i.getData())
-            else: val=field.getTagData('value')
-            ret[name]=val
-        if self.getTag('instructions'): ret['instructions']=self.getInstructions()
-        return ret
-    def __getitem__(self,name):
-        """ Simple dictionary interface for getting datafields values by their names."""
-        item=self.getField(name)
-        if item: return item.getValue()
-        raise IndexError('No such field')
-    def __setitem__(self,name,val):
-        """ Simple dictionary interface for setting datafields values by their names."""
-        return self.setField(name).setValue(val)

@@ -24,7 +24,7 @@ def addMessageToQueue(msgType, conference, nick, param):
 		userNick = param[0];
 		message = u'%s попросил меня передать тебе следующее:\n%s' % (nick, ' '.join(param[1:]));
 		if(nickIsOnline(conference, userNick)):
-			sendMsg(PRIVATE, conference, userNick, message);
+			sendMsg(xmpp.TYPE_PRIVATE, conference, userNick, message);
 			sendMsg(msgType, conference, nick, u'передала');
 		elif(nickInConference(conference, userNick)):
 			trueJid = getTrueJid(conference, userNick);
@@ -46,7 +46,7 @@ def checkQueue(conference, nick, trueJid, aff, role):
 	messages = base.getKey(trueJid);
 	if(messages):
 		for message in messages:
-			sendMsg(PRIVATE, conference, nick, message);
+			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message);
 			time.sleep(0.5);
 		base.delKey(trueJid);
 		base.save();

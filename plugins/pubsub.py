@@ -21,6 +21,7 @@
 def setMood(msgType, jid, resource, param):
 	if(param == u'сброс' or param.count('|')):
 		iq = xmpp.Iq('set');
+		iq.setType(xmpp.TYPE_HEADLINE);
 		pubsub = iq.addChild('pubsub', {}, [], xmpp.NS_PUBSUB);
 		pubNode = xmpp.Node('publish', {'node': xmpp.NS_MOOD});
 		moodNode = xmpp.Node('mood', {'xmlns': xmpp.NS_MOOD});
@@ -41,6 +42,7 @@ def setMood(msgType, jid, resource, param):
 def setActivity(msgType, jid, resource, param):
 	if(param == u'сброс' or param.count('|')):
 		iq = xmpp.Iq('set');
+		iq.setType(xmpp.TYPE_HEADLINE);
 		pubsub = iq.addChild('pubsub', {}, [], xmpp.NS_PUBSUB);
 		pubNode = xmpp.Node('publish', {'node': xmpp.NS_ACTIVITY});
 		actNode = xmpp.Node('activity', {'xmlns': xmpp.NS_ACTIVITY});

@@ -97,9 +97,9 @@ def showWeather(msgType, conference, nick, param):
 			if(windValue):
 				message += u'Ветер: %d м/с (%s)\n' % (windValue, WINDDIRECTION[wind['direction']]);
 			message += '\n';
-		if(PUBLIC == msgType):
+		if(xmpp.TYPE_PUBLIC == msgType):
 			sendMsg(msgType, conference, nick, u'ушла в приват');
-		sendMsg(PRIVATE, conference, nick, message);
+		sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message);
 	else:
 		sendMsg(msgType, conference, nick, u'не могу :(');
 

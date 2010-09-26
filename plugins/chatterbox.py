@@ -37,7 +37,7 @@ def removeNicks(message, nickList):
 	return(message);
 
 def messageChatTalker(stanza, msgType, conference, nick, trueJid, message):
-	if(PUBLIC == msgType and getConfigKey(conference, 'chatterbox')):
+	if(xmpp.TYPE_PUBLIC == msgType and getConfigKey(conference, 'chatterbox')):
 		if(not nick): # topic
 			return;
 		botNick = getBotNick(conference);

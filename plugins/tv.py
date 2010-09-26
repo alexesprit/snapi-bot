@@ -45,11 +45,11 @@ def showTvProgramm(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"нету на сегодня программы");
 
 def showTvList(msgType, conference, nick, parameters):
-	if(PUBLIC == msgType):
+	if(xmpp.TYPE_PUBLIC == msgType):
 		sendMsg(msgType, conference, nick, u"скинула в приват");
 	tvList = [u"%s - %s" % (gChannels[x], x) for x in gChannels];
 	tvList.sort();
-	sendMsg(PRIVATE, conference, nick, u"список каналов:\n%s" % ("\n".join(tvList)));
+	sendMsg(xmpp.TYPE_PRIVATE, conference, nick, u"список каналов:\n%s" % ("\n".join(tvList)));
 
 registerEvent(loadChannels, STARTUP);
 

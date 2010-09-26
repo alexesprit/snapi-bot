@@ -25,38 +25,37 @@ def showUserTime(msgType, conference, nick, param):
 			return;
 	else:
 		userJid = conference + '/' + nick;
-	iq = xmpp.Iq('get');
+	iq = xmpp.Iq(xmpp.TYPE_GET);
 	iq.addChild('time', {}, [], xmpp.NS_ENTITY_TIME);
 	iq.setTo(userJid);
-	timeID = getUniqueID(TIME_ID);
-	iq.setID(timeID);
-	gClient.SendAndCallForResponse(iq, _showUserTime, (timeID, msgType, conference, nick, param));
+	iq.setID(getUniqueID(TIME_ID));
+	gClient.SendAndCallForResponse(iq, _showUserTime, (msgType, conference, nick, param));
 
-def _showUserTime(stanza, timeID, msgType, conference, nick, param):
-	if(timeID == stanza.getID()):
-		if(stanza.getType() == 'result'):
-			tzo, utc = '', '' ;
-			for p in stanza.getChildren():
-				tzo = p.getTagData('tzo');
-				utc = p.getTagData('utc');
-			if(tzo and utc):
-				sign, tzHour, tzMin = re.match('(\+|-)?([0-9]+):([0-9]+)', tzo).groups();
-				offset = int(tzHour) * 3600 + int(tzMin) * 60;
-				if(sign == "-"):
-					offset = -offset;
-				rawTime = time.strptime(utc, "%Y-%m-%dT%H:%M:%SZ");
-				rawTime = time.mktime(rawTime) + offset;
-				userTime = time.strftime("%H:%M:%S (%d.%m.%y)", time.localtime(rawTime));
-				if(param):
-					sendMsg(msgType, conference, nick, u'у %s сейчас %s' % (param, userTime));
-				else:
-					sendMsg(msgType, conference, nick, u'у тебя сейчас %s' % (userTime));
+def _showUserTime(stanza, msgType, conference, nick, param):
+	if(xmpp.TYPE_RESULT == stanza.getType()):
+		tzo, utc = None, None;
+		printf(stanza);
+		for p in stanza.getChildren():
+			tzo = p.getTagData('tzo');
+			utc = p.getTagData('utc');
+		if(tzo and utc):
+			sign, tzHour, tzMin = re.match('(\+|-)?([0-9]+):([0-9]+)', tzo).groups();
+			offset = int(tzHour) * 3600 + int(tzMin) * 60;
+			if(sign == "-"):
+				offset = -offset;
+			rawTime = time.strptime(utc, "%Y-%m-%dT%H:%M:%SZ");
+			rawTime = time.mktime(rawTime) + offset;
+			userTime = time.strftime("%H:%M:%S (%d.%m.%y)", time.localtime(rawTime));
+			if(param):
+				sendMsg(msgType, conference, nick, u'у %s сейчас %s' % (param, userTime));
 			else:
-				sendMsg(msgType, conference, nick, u'клиент глюк, инфы не хватает');
-		elif(stanza.getType() == 'error'):
-			if(not param):
-				sendMsg(msgType, conference, nick, u'хехе, твой клиент не дружит с этим');
-			else:
-				sendMsg(msgType, conference, nick, u'хехе, клиент у %s не дружит с этим' % (param));
+				sendMsg(msgType, conference, nick, u'у тебя сейчас %s' % (userTime));
+		else:
+			sendMsg(msgType, conference, nick, u'клиент глюк, инфы не хватает');
+	else:
+		if(not param):
+			sendMsg(msgType, conference, nick, u'хехе, твой клиент не дружит с этим');
+		else:
+			sendMsg(msgType, conference, nick, u'хехе, клиент у %s не дружит с этим' % (param));
 
 registerCommand(showUserTime, u'часики', 10, u'Показывает время указанного пользователя', u'часики [ник]', (u'часики', u'часики Nick'));

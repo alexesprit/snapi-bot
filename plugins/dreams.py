@@ -18,8 +18,8 @@ def showDreamInfo(msgType, conference, nick, param):
 	text = unicode(urllib.urlopen('http://www.sonnik.ru/search.php?%s' % (query)).read(), 'windows-1251');
 	items = re.search(r'<div id="mntxt">(.+?)</p>', text, re.DOTALL);
 	text = decode(items.group(0));
-	if(PUBLIC == msgType):
+	if(xmpp.TYPE_PUBLIC == msgType):
 		sendMsg(msgType, conference, nick, u'ушло в приват');
-	sendMsg(PRIVATE, conference, nick, text);
+	sendMsg(xmpp.TYPE_PRIVATE, conference, nick, text);
 
 registerCommand(showDreamInfo, u'сонник', 10, u'Толкователь снов', u'сонник <что-то>', (u'сонник деньги', ), ANY | PARAM);

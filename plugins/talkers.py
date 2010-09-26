@@ -32,9 +32,9 @@ def showTopTalkers(msgType, conference, nick):
 		for jid in base.items():
 			statistic = base.getKey(jid);
 			words = statistic['words'];
+			userNick = statistic['nick'];
 			messages = statistic['messages'];
 			meMessages = statistic['mes'];
-			userNick = statistic['nick'];
 			wordsPerMsg = (float(words)) / (messages + meMessages);
 			topList.append([messages, meMessages, words, wordsPerMsg, userNick]);
 		topList.sort();
@@ -70,10 +70,10 @@ def showTalkerInfo(msgType, conference, nick, param):
 		statistic = base.getKey(trueJid);
 		if(statistic):
 			statisticLine = u'Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f';
+			nick = statistic['nick'];
 			words = statistic['words'];
 			messages = statistic['messages'];
 			meMessages = statistic['mes'];
-			nick = statistic['nick'];
 			wordsPerMsg = (float(words)) / (messages + meMessages)
 			message = statisticLine % (nick, messages, meMessages, words, wordsPerMsg);
 			sendMsg(msgType, conference, nick, message);
@@ -81,7 +81,7 @@ def showTalkerInfo(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u'твоя статистика отсутствует');
 
 def updateStatistic(stanza, msgType, conference, nick, trueJid, body):
-	if(trueJid != gJid and msgType == PUBLIC and nick):
+	if(trueJid != gJid and msgType == xmpp.TYPE_PUBLIC and nick):
 		base = gTalkers[conference];
 		statistic = base.getKey(trueJid);
 		if(statistic):

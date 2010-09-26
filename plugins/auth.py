@@ -34,11 +34,11 @@ def unloadAuthCache(conference):
 
 def askAuthQuestion(conference, nick, trueJid, aff, role):
 	if(getConfigKey(conference, 'auth')):
-		if(aff == AFF_NONE):
+		if(aff == xmpp.AFF_NONE):
 			question = random.choice((AA, AB, AC, AD, AE, AF, AG, ));
-			setRole(conference, nick, ROLE_VISITOR, u'неавторизованый участник');
+			setRole(conference, nick, xmpp.ROLE_VISITOR, u'неавторизованый участник');
 			message = u'Чтобы получить голос, реши пример: %(question)s. Как решишь, напиши мне ответ' % (question);
-			sendMsg(PRIVATE, conference, nick, message);
+			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message);
 			gAuthAnswer[conference][trueJid] = question['answer'];
 
 def clearAuthCache(conference, nick, trueJid, reason, code):
@@ -46,11 +46,11 @@ def clearAuthCache(conference, nick, trueJid, reason, code):
 		del(gAuthAnswer[conference][trueJid]);
 
 def authAnswerListener(stanza, msgType, conference, nick, trueJid, body):
-	if(PRIVATE == msgType):
+	if(xmpp.TYPE_PRIVATE == msgType):
 		if(trueJid in gAuthAnswer[conference]):
 			if(gAuthAnswer[conference][trueJid] == body):
 				sendMsg(msgType, conference, nick, u'ок, признаю - ты не бот =)');
-				setRole(conference, nick, ROLE_PARTICIPANT, u'авторизация пройдена');
+				setRole(conference, nick, xmpp.ROLE_PARTICIPANT, u'авторизация пройдена');
 				del(gAuthAnswer[conference][trueJid]);
 			else:
 				sendMsg(msgType, conference, nick, u'неправильный ответ. подумай или заюзай гугл');

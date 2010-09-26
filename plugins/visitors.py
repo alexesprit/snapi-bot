@@ -35,7 +35,7 @@ registerEvent(unloadAutoVisitors, DELCONF);
 
 def setAutoVisitor(conference, nick, trueJid, aff, role):
 	if(trueJid in gVisitors[conference]):
-		setRole(conference, nick, ROLE_VISITOR, u'автовизитор');
+		setRole(conference, nick, xmpp.ROLE_VISITOR, u'автовизитор');
 
 registerJoinHandler(setAutoVisitor);
 
@@ -59,7 +59,7 @@ def addAutoVisitor(msgType, conference, nick, param):
 		saveAutoVisitors(conference);
 		sendMsg(msgType, conference, nick, u'добавила');
 		if(setVisitorRole):
-			setRole(conference, user, ROLE_VISITOR);
+			setRole(conference, user, xmpp.ROLE_VISITOR);
 	else:
 		sendMsg(msgType, conference, nick, u'%s уже есть в списке' % (param));
 
@@ -85,7 +85,7 @@ def delAutoVisitort(msgType, conference, nick, param):
 		saveAutoVisitors(conference);
 		sendMsg(msgType, conference, nick, u'удалила');
 		if(setParticipantRole):
-			setRole(conference, user, ROLE_PARTICIPANT);
+			setRole(conference, user, xmpp.ROLE_PARTICIPANT);
 	else:
 		sendMsg(msgType, conference, nick, u'а %s итак нет в списке' % (param));
 

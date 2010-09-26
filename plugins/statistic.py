@@ -29,7 +29,7 @@ def showStatistic(msgType, conference, nick, param):
 registerCommand(showStatistic, u'статистика', 10, u'Статистика текущей конференции', None, (u'статистика', ), CHAT | NONPARAM);
 
 def botMessageUpdate(msgType, jid, text):
-	if(PUBLIC == msgType and text):
+	if(xmpp.TYPE_PUBLIC == msgType and text):
 		gStats[jid]['mymsg'] += 1;
 
 registerBotMessageHandler(botMessageUpdate);
@@ -74,7 +74,7 @@ def presenceUpdate(stanza, conference, nick, trueJid):
 registerPresenceHandler(presenceUpdate, CHAT);
 	
 def createStatistic(conference):
-	gStats[conference] = {'nick': 0, 'status': 0, 'kick': 0, 'ban': 0, PRIVATE: 0, PUBLIC: 0, 'join': 0, 'leave': 0, 'mymsg': 0, ROLE_MODERATOR: 0, ROLE_PARTICIPANT: 0, ROLE_VISITOR: 0};
+	gStats[conference] = {'nick': 0, 'status': 0, 'kick': 0, 'ban': 0, xmpp.TYPE_PRIVATE: 0, xmpp.TYPE_PUBLIC: 0, 'join': 0, 'leave': 0, 'mymsg': 0, xmpp.ROLE_MODERATOR: 0, xmpp.ROLE_PARTICIPANT: 0, xmpp.ROLE_VISITOR: 0};
 	gJoined[conference] = [];
 	gLeaved[conference] = [];
 	gKicked[conference] = [];

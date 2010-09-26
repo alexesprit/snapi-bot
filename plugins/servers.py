@@ -19,50 +19,47 @@ STATS_ID = 'stats_id';
 UPTIME_ID = 'uptime_id';
 
 def _showServerStats(stanza, msgType, conference, nick, param):
-	if(STATS_ID == stanza.getID()):
-		if(RESULT == stanza.getType()):
-			message = u'Инфа о %s:' % param;
-			for stat in stanza.getQueryPayload():
-				attr = stat.getAttrs();
-				message += u'\n%s: %s %s' % (attr['name'], attr['value'], attr['units']);
-			sendMsg(msgType, conference, nick, message);
-		else:
-			sendMsg(msgType, conference, nick, u'не получается :(');
+	if(xmpp.TYPE_RESULT == stanza.getType()):
+		message = u'Инфа о %s:' % param;
+		for stat in stanza.getQueryPayload():
+			attr = stat.getAttrs();
+			message += u'\n%s: %s %s' % (attr['name'], attr['value'], attr['units']);
+		sendMsg(msgType, conference, nick, message);
+	else:
+		sendMsg(msgType, conference, nick, u'не получается :(');
 
 def _showServerInfo(stanza, msgType, conference, nick, param):
-	if(INFO_ID == stanza.getID()):
-		if(RESULT == stanza.getType()):
-			iq = xmpp.Iq('get', xmpp.NS_STATS);
-			iq.setQueryPayload(stanza.getQueryChildren());
-			iq.setTo(param);
-			iq.setID(STATS_ID);
-			gClient.SendAndCallForResponse(iq, _showServerStats, (msgType, conference, nick, param, ));
-		else:
-			sendMsg(msgType, conference, nick, u'не получается :(');
+	if(xmpp.TYPE_RESULT == stanza.getType()):
+		iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_STATS);
+		iq.setQueryPayload(stanza.getQueryChildren());
+		iq.setTo(param);
+		iq.setID(getUniqueID(STATS_ID));
+		gClient.SendAndCallForResponse(iq, _showServerStats, (msgType, conference, nick, param, ));
+	else:
+		sendMsg(msgType, conference, nick, u'не получается :(');
 
 def showServerInfo(msgType, conference, nick, param):
 	param = param or gHost;
-	iq = xmpp.Iq('get', xmpp.NS_STATS);
+	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_STATS);
 	iq.setTo(param);
-	iq.setID(INFO_ID);
+	iq.setID(geUniqueID(INFO_ID));
 	gClient.SendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, param, ));
 
 def _showServerUptime(stanza, msgType, conference, nick, param):
-	if(UPTIME_ID == stanza.getID()):
-		if(RESULT == stanza.getType()):
-			for p in stanza.getPayload():
-				sec = p.getAttrs()['seconds'];
-				if(not sec == '0'):
-					sendMsg(msgType, conference, nick, u'%s работает уже %s' % (param, time2str(int(sec))));
-					break;
-		elif(stanza.getType() == 'error'):
-			sendMsg(msgType, conference, nick, u'не получается :(');
+	if(xmpp.TYPE_RESULT == stanza.getType()):
+		for p in stanza.getPayload():
+			sec = p.getAttrs()['seconds'];
+			if(not sec == '0'):
+				sendMsg(msgType, conference, nick, u'%s работает уже %s' % (param, time2str(int(sec))));
+				break;
+	else:
+		sendMsg(msgType, conference, nick, u'не получается :(');
 
 def showServerUptime(msgType, conference, nick, param):
 	param = param or gHost;
-	iq = xmpp.Iq('get', xmpp.NS_LAST);
+	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_LAST);
 	iq.setTo(param);
-	iq.setID(UPTIME_ID);
+	iq.setID(getUniqueID(UPTIME_ID));
 	gClient.SendAndCallForResponse(iq, _showServerUptime, (msgType, conference, nick, param, ));
 
 registerCommand(showServerInfo, u'инфа', 10, u'Возвращает статистику о сервере', u'инфа [сервер]', (u'инфа jabber.aq', ));

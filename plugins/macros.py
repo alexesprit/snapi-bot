@@ -245,9 +245,9 @@ def showMacrosList(msgType, conference, nick, parameters):
 			disMacroses.sort();
 			message += u'\nОтключённые глобальные макросы:\n' + ', '.join(disMacroses);
 	if(message):
-		if(msgType == PUBLIC):
+		if(msgType == xmpp.TYPE_PUBLIC):
 			sendMsg(msgType, conference, nick, u'ушёл');
-		sendMsg(PRIVATE, conference, nick, message);
+		sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message);
 	else:
 		sendMsg(msgType, conference, nick, u'нету макросов :(');
 

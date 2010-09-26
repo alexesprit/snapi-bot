@@ -28,38 +28,36 @@ def showVersion(msgType, conference, nick, param):
 				return;
 		else:
 			jid = conference + '/' + nick;
-		iq = xmpp.Iq('get', xmpp.NS_VERSION);
+		iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_VERSION);
 		iq.setTo(jid);
-		verID = getUniqueID(VER_ID);
-		iq.setID(verID);
-		gClient.SendAndCallForResponse(iq, _showVersion, (verID, msgType, conference, nick, param, ));
+		iq.setID(getUniqueID(VER_ID));
+		gClient.SendAndCallForResponse(iq, _showVersion, (msgType, conference, nick, param, ));
 
-def _showVersion(stanza, verID, msgType, conference, nick, param):
-	if(verID == stanza.getID()):
-		if(RESULT == stanza.getType()):
-			name, ver, os = '', '', '';
-			for p in stanza.getQueryChildren():
-				if(p.getName() == 'name'):
-					name = p.getData();
-				elif(p.getName() == 'version'):
-					ver = p.getData();
-				elif(p.getName() == 'os'):
-					os = p.getData();
-			version = u'';
-			if(name):
-				version += name;
-			if(ver):
-				version += u' ' + ver;
-			if(os):
-				version += u' в ' + os;
-			if(version):
-				if(not param):
-					sendMsg(msgType, conference, nick, u'ты юзаешь %s' % (version));
-				else:
-					sendMsg(msgType, conference, nick, u'%s юзает %s' % (param, version));
+def _showVersion(stanza, msgType, conference, nick, param):
+	if(xmpp.TYPE_RESULT == stanza.getType()):
+		name, ver, os = '', '', '';
+		for p in stanza.getQueryChildren():
+			if(p.getName() == 'name'):
+				name = p.getData();
+			elif(p.getName() == 'version'):
+				ver = p.getData();
+			elif(p.getName() == 'os'):
+				os = p.getData();
+		version = u'';
+		if(name):
+			version += name;
+		if(ver):
+			version += u' ' + ver;
+		if(os):
+			version += u' в ' + os;
+		if(version):
+			if(not param):
+				sendMsg(msgType, conference, nick, u'ты юзаешь %s' % (version));
 			else:
-				sendMsg(msgType, conference, nick, u'клиент глюк, инфы не хватает');
+				sendMsg(msgType, conference, nick, u'%s юзает %s' % (param, version));
 		else:
-			sendMsg(msgType, conference, nick, u'глючит клиент');
+			sendMsg(msgType, conference, nick, u'клиент глюк, инфы не хватает');
+	else:
+		sendMsg(msgType, conference, nick, u'глючит клиент');
 
 registerCommand(showVersion, u'версия', 10, u'Показывает информацию о клиенте указанного пользователя', u'версия [ник]', (u'версия', u'версия Nick'));

@@ -23,9 +23,9 @@ def showHoroscope(msgType, conference, nick, param):
 		items = re.search(r'<td class=stext>(.+?)</td>', text, re.DOTALL);
 		if(items):
 			text = decode(items.group(0));
-			if(PUBLIC == msgType):
+			if(xmpp.TYPE_PUBLIC == msgType):
 				sendMsg(msgType, conference, nick, u'ушёл в приват');
-			sendMsg(PRIVATE, conference, nick, unicode(text, 'windows-1251'));
+			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, unicode(text, 'windows-1251'));
 		else:
 			sendMsg(msgType, conference, nick, u'не могу :(');
 

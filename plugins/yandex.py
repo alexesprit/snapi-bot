@@ -19,7 +19,7 @@ def yandexSearch(msgType, conference, nick, param):
 	rawHtml = unicode(rawHtml, 'utf-8');
 	items = re.findall('<li>(.+?)<div class="www">(.+?)</li>', rawHtml, re.DOTALL);
 	if(items):
-		if(PUBLIC == msgType):
+		if(xmpp.TYPE_PUBLIC == msgType):
 			text = items[0][0].strip();
 			url = items[0][1];
 			message = u'%shttp://%s' % (text, url);

@@ -177,9 +177,9 @@ def showOpinions(msgType, conference, nick, param):
 		if(gVotes[conference]['finished']):
 			sendMsg(msgType, conference, nick, getResults(conference));
 		elif(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
-			if(PUBLIC == msgType):
+			if(xmpp.TYPE_PUBLIC == msgType):
 				sendMsg(msgType, conference, nick, u'ушли в приват');
-			sendMsg(PRIVATE, conference, nick, getResults(conference));
+			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, getResults(conference));
 		else:
 			sendMsg(msgType, conference, nick, u'жди окончания голосования :-p');
 	else:
@@ -213,7 +213,7 @@ def showVote(conference, nick, trueJid, aff, role):
 			if(not trueJid in gVotes[conference]['voted']):
 				gVotes[conference]['voted'][trueJid] = False;
 				saveVotes(conference);
-				sendMsg(PRIVATE, conference, nick, getVoteText(conference));
+				sendMsg(xmpp.TYPE_PRIVATE, conference, nick, getVoteText(conference));
 
 registerJoinHandler(showVote);
 

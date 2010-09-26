@@ -40,7 +40,7 @@ def turnMessage(text):
 	return(text);
 
 def turnLastMessage(msgType, conference, nick, param):
-	if(not msgType == PUBLIC):
+	if(not msgType == xmpp.TYPE_PUBLIC):
 		sendMsg(msgType, conference, nick, u'тока в чате');
 		return;
 	if(param):
@@ -70,7 +70,7 @@ def turnLastMessage(msgType, conference, nick, param):
 registerCommand(turnLastMessage, u'turn', 10, u'Переключает раскладку для последнего сообщения пользователя, вызвавшего команду', u'turn [текст]', (u'turn', u'turn jkjkj'), CHAT);
 
 def saveMessage(stanza, msgType, conference, nick, trueJid, body):
-	if(msgType == PUBLIC):
+	if(msgType == xmpp.TYPE_PUBLIC):
 		if(trueJid != gJid and trueJid != conference):
 			time.sleep(TURN_TIMEOUT);
 			gTurnMsgCache[conference][trueJid] = body;

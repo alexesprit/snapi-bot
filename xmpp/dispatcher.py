@@ -39,10 +39,7 @@ class Dispatcher(PlugIn):
 		self.DBG_LINE = 'dispatcher'
 		self.handlers = {}
 		self._expected = {}
-		self._pendingExceptions = []
-		self._cycleHandlers = []
 		self._exported_methods = [self.Process, self.RegisterHandler, \
-		self.UnregisterCycleHandler, self.RegisterCycleHandler, \
 		self.RegisterHandlerOnce, self.UnregisterHandler, self.RegisterProtocol, \
 		self.WaitForResponse, self.SendAndWaitForResponse, self.send, self.disconnect, \
 		self.SendAndCallForResponse, ]
@@ -111,18 +108,14 @@ class Dispatcher(PlugIn):
 			Take note that in case of disconnection detect during Process() call
 			disconnect handlers are called automatically.
 		"""
-		for handler in self._cycleHandlers: handler(self)
-		if len(self._pendingExceptions) > 0:
-			_pendingException = self._pendingExceptions.pop()
-			raise _pendingException[0], _pendingException[1], _pendingException[2]
 		if self._owner.Connection.pending_data(timeout):
-			try: data = self._owner.Connection.receive()
-			except IOError: return
+			try:
+				data = self._owner.Connection.receive()
+			except IOError:
+				return
 			self.Stream.Parse(data)
-			if len(self._pendingExceptions) > 0:
-				_pendingException = self._pendingExceptions.pop()
-				raise _pendingException[0], _pendingException[1], _pendingException[2]
-			if data: return len(data)
+			if data:
+				return len(data)
 		return '0'	  # It means that nothing is received but link is alive.
 		
 	def RegisterNamespace(self, xmlns, order = 'info'):
@@ -196,28 +189,19 @@ class Dispatcher(PlugIn):
 		if(handler in self.handlers[xmlns][name][key]):
 			self.handlers[xmlns][name][key].remove(handler)		
 
-	def returnStanzaHandler(self, conn, stanza):
-		""" Return stanza back to the sender with <feature-not-implemennted/> error set. """
-		if stanza.getType() in ['get', 'set']:
-			conn.send(Error(stanza, ERR_FEATURE_NOT_IMPLEMENTED))
-
 	def streamErrorHandler(self, conn, error):
 		name, text = 'error', error.getData()
 		for tag in error.getChildren():
 			if tag.getNamespace() == NS_XMPP_STREAMS:
-				if tag.getName() == 'text': text = tag.getData()
-				else: name = tag.getName()
-		if name in stream_exceptions.keys(): exc = stream_exceptions[name]
-		else: exc = StreamError
+				if tag.getName() == 'text':
+					text = tag.getData()
+				else:
+					name = tag.getName()
+		if name in streamExceptions:
+			exc = stream_exceptions[name]
+		else:
+			exc = StreamError
 		raise exc((name, text))
-
-	def RegisterCycleHandler(self, handler):
-		""" Register handler that will be called on every Dispatcher.Process() call. """
-		if handler not in self._cycleHandlers: self._cycleHandlers.append(handler)
-
-	def UnregisterCycleHandler(self, handler):
-		""" Unregister handler that will is called on every Dispatcher.Process() call."""
-		if handler in self._cycleHandlers: self._cycleHandlers.remove(handler)
 
 	def dispatch(self, stanza, session=None, direct=False):
 		""" Main procedure that performs XMPP stanza recognition and calling apppropriate handlers for it.
@@ -273,7 +257,10 @@ class Dispatcher(PlugIn):
 			if(isinstance(session._expected[stanzaID], tuple)):
 				function, args = session._expected[stanzaID];
 				session.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), 'ok');
-				function(stanza, *args)
+				try:
+					function(stanza, *args);
+				except(NodeProcessed):
+					pass;
 				del(self._expected[stanzaID]);
 			else:
 				session.printf("Expected stanza arrived!", 'ok')
@@ -294,8 +281,10 @@ class Dispatcher(PlugIn):
 					chain = chain + self.handlers[xmlns][name][key];
 			self.printf(chain);
 			for handler in chain:
-				self.printf("Executin' %s" % (str(handler)))
-				handler(session, stanza);
+				try:
+					handler(session, stanza);
+				except(NodeProcessed):
+					return;
 
 	def WaitForResponse(self, ID, timeout=DEFAULT_TIMEOUT):
 		""" Block and wait until stanza with specific "id" attribute will come.

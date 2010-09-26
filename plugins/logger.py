@@ -18,7 +18,7 @@ LOGCSS_FILE = "logger.css";
 def writeHeader(fp, jid, (year, month, day)):
 	date = u'%.2i.%.2i.%.2i' % (day, month, year);
 	cssData = readFile(getFilePath(CSS_DIR, LOGCSS_FILE));
-	fp.write(u'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	fp.write(u'''<!DOCTYPE html xmpp.TYPE_PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dt">
 <head>
 <title>%s</title>
@@ -76,7 +76,7 @@ def writeLog(msgType, jid, nick, body, aff = 0):
 	fp.close();
 
 def writeMessage(stanza, msgType, conference, nick, trueJid, text):
-	if(PUBLIC == msgType and getConfigKey(conference, "log")):
+	if(xmpp.TYPE_PUBLIC == msgType and getConfigKey(conference, "log")):
 		aff = 0;
 		if(nick and getNickKey(conference, nick, NICK_MODER)):
 			level = getAccess(conference, trueJid);
@@ -85,25 +85,25 @@ def writeMessage(stanza, msgType, conference, nick, trueJid, text):
 
 def writeUserJoin(conference, nick, trueJid, aff, role):
 	if(getConfigKey(conference, "log")):
-		writeLog(PUBLIC, conference, '@$$join$$@', u'%s зашёл в комнату как %s и %s' % (nick, role, aff));
+		writeLog(xmpp.TYPE_PUBLIC, conference, '@$$join$$@', u'%s зашёл в комнату как %s и %s' % (nick, role, aff));
 
 def writeUserLeave(conference, nick, trueJid, reason, code):
 	if(getConfigKey(conference, "log")):
 		if('307' == code):
 			if(reason):
-				writeLog(PUBLIC, conference, '@$$kick$$@', u'%s выгнали из комнаты (%s)' % (nick, reason));
+				writeLog(xmpp.TYPE_PUBLIC, conference, '@$$kick$$@', u'%s выгнали из комнаты (%s)' % (nick, reason));
 			else:
-				writeLog(PUBLIC, conference, '@$$kick$$@', u'%s выгнали из комнаты' % (nick));		
+				writeLog(xmpp.TYPE_PUBLIC, conference, '@$$kick$$@', u'%s выгнали из комнаты' % (nick));		
 		elif('301' == code ):
 			if(reason):
-				writeLog(PUBLIC, conference, '@$$ban$$@', u'%s забанили (%s)' % (nick, reason));
+				writeLog(xmpp.TYPE_PUBLIC, conference, '@$$ban$$@', u'%s забанили (%s)' % (nick, reason));
 			else:
-				writeLog(PUBLIC, conference, '@$$ban$$@', '@$$userban$$@');	
+				writeLog(xmpp.TYPE_PUBLIC, conference, '@$$ban$$@', '@$$userban$$@');	
 		elif('303' != code):
 			if(reason):
-				writeLog(PUBLIC, conference, '@$$leave$$@', u'%s вышел из комнаты (%s)' % (nick, reason));
+				writeLog(xmpp.TYPE_PUBLIC, conference, '@$$leave$$@', u'%s вышел из комнаты (%s)' % (nick, reason));
 			else:
-				writeLog(PUBLIC, conference, '@$$leave$$@', u'%s вышел из комнаты' % (nick));
+				writeLog(xmpp.TYPE_PUBLIC, conference, '@$$leave$$@', u'%s вышел из комнаты' % (nick));
 
 def writePresence(stanza, conference, nick, trueJid):
 	if(getConfigKey(conference, "log")):
@@ -111,7 +111,7 @@ def writePresence(stanza, conference, nick, trueJid):
 		prsType = stanza.getType();
 		if(code == '303'):
 			newnick = stanza.getNick();
-			writeLog(PUBLIC, conference, '@$$nick$$@', u'%s сменил ник на %s' % (nick, newnick));
+			writeLog(xmpp.TYPE_PUBLIC, conference, '@$$nick$$@', u'%s сменил ник на %s' % (nick, newnick));
 
 def loggingControl(msgType, conference, nick, param):
 	if(param):

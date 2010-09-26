@@ -47,25 +47,23 @@ def clientsChecking(conference, nick, trueJid, aff, role):
 	base = gClients[conference];
 	if(trueJid not in base):
 		base.setKey(trueJid, []);
-	iq = xmpp.Iq('get');
+	iq = xmpp.Iq(xmpp.TYPE_GET);
 	iq.addChild('query', {}, [], xmpp.NS_VERSION);
 	iq.setTo(conference + '/' + nick);
-	cliID = getUniqueID(CLIENTS_ID);
-	iq.setID(cliID);
-	gClient.SendAndCallForResponse(iq, _clientsChecking, (cliID, conference, trueJid, ));
+	iq.setID(getUniqueID(CLIENTS_ID));
+	gClient.SendAndCallForResponse(iq, _clientsChecking, (conference, trueJid, ));
 
-def _clientsChecking(stanza, cliID, conference, trueJid):
-	if(cliID == stanza.getID()):
-		if(stanza.getType() == 'result'):
-			base = gClients[conference];
-			clients = base.getKey(trueJid);
-			for p in stanza.getQueryChildren():
-				if(p.getName() == 'name'):
-					client = p.getData();
-					if(not client in clients):
-						clients.append(client);
-						base.setKey(trueJid, clients);
-						base.save();
+def _clientsChecking(stanza, conference, trueJid):
+	if(xmpp.TYPE_RESULT == stanza.getType()):
+		base = gClients[conference];
+		clients = base.getKey(trueJid);
+		for p in stanza.getQueryChildren():
+			if(p.getName() == 'name'):
+				client = p.getData();
+				if(not client in clients):
+					clients.append(client);
+					base.setKey(trueJid, clients);
+					base.save();
 
 registerEvent(loadClientsCache, ADDCONF);
 registerEvent(unloadClientsCache, DELCONF);

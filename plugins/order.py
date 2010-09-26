@@ -28,31 +28,31 @@ def setUserAffiliation(msgType, conference, nick, user, aff):
 		sendMsg(msgType, conference, nick, u'а это кто?');
 
 def setOutcast(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, AFF_OUTCAST);
+	setUserAffiliation(msgType, conference, nick, param, xmpp.AFF_OUTCAST);
 
 def setNone(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, AFF_NONE);
+	setUserAffiliation(msgType, conference, nick, param, xmpp.AFF_NONE);
 
 def setMember(msgType, conference, nick, param): 
-	setUserAffiliation(msgType, conference, nick, param, AFF_MEMBER);
+	setUserAffiliation(msgType, conference, nick, param, xmpp.AFF_MEMBER);
 
 def setAdmin(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, AFF_ADMIN);
+	setUserAffiliation(msgType, conference, nick, param, xmpp.AFF_ADMIN);
 
 def setOwner(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, AFF_OWNER);
+	setUserAffiliation(msgType, conference, nick, param, xmpp.AFF_OWNER);
 	
 def setKick(msgType, conference, nick, param):
-	setUserRole(msgType, conference, nick, param, ROLE_NONE);
+	setUserRole(msgType, conference, nick, param, xmpp.ROLE_NONE);
 		
 def setVisitor(msgType, conference, nick, param):
-	setUserRole(msgType, conference, nick, param, ROLE_VISITOR);
+	setUserRole(msgType, conference, nick, param, xmpp.ROLE_VISITOR);
 
 def setParticipant(msgType, conference, nick, param):
-	setUserRole(msgType, conference, nick, param, ROLE_PARTICIPANT);
+	setUserRole(msgType, conference, nick, param, xmpp.ROLE_PARTICIPANT);
 
 def setModerator(msgType, conference, nick, param):
-	setUserRole(msgType, conference, nick, param, ROLE_MODERATOR);
+	setUserRole(msgType, conference, nick, param, xmpp.ROLE_MODERATOR);
 
 registerCommand(setOutcast, u'бан', 20, u'Банит пользователя', u'бан <ник/жид>', (u'бан bot@freize.org', u'бан Nick'), CHAT | PARAM);
 registerCommand(setNone, u'избани', 20, u'Разбанивает пользователя', u'избани <ник/жид>', (u'избани bot@freize.org', u'избани Nick'), CHAT | PARAM);

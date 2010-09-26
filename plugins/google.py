@@ -33,7 +33,7 @@ def googleSearch(msgType, conference, nick, url):
 	answer = simplejson.load(req);
 	results = answer['responseData']['results'];
 	if(results):
-		if(msgType == PUBLIC):
+		if(msgType == xmpp.TYPE_PUBLIC):
 			msg = ['%(title)s\n%(content)s\n%(unescapedUrl)s' % (results[0])];
 		else:
 			msg = ['%(title)s\n%(content)s\n%(unescapedUrl)s' % (result) for result in results];

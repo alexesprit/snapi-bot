@@ -70,14 +70,6 @@ NONPARAM = 1 << 4;
 PARAM = 1 << 5;
 ANY = CHAT | ROSTER;
 
-PRIVATE = 'chat';
-PUBLIC = 'groupchat';
-ERROR = 'error';
-HEADLINE = 'headline';
-NORMAL = 'normal';
-RESULT = 'result';
-UNAVAILABLE = 'unavailable';
-
 NICK_JID = 'jid';
 NICK_IDLE = 'idle';
 NICK_HERE = 'here';
@@ -86,31 +78,25 @@ NICK_JOINED = 'joined';
 NICK_SHOW = 'show';
 NICK_STATUS = 'status';
 
-ROLE_NONE = 'none';
-ROLE_VISITOR = 'visitor';
-ROLE_PARTICIPANT = 'participant';
-ROLE_MODERATOR = 'moderator';
-
-AFF_OUTCAST = 'outcast';
-AFF_NONE = 'none';
-AFF_MEMBER = 'member';
-AFF_ADMIN = 'admin';
-AFF_OWNER = 'owner';
-
 ROLES = {
-	ROLE_NONE: 0, 
-	ROLE_VISITOR: 0, 
-	ROLE_PARTICIPANT: 10, 
-	ROLE_MODERATOR: 15
+	xmpp.ROLE_NONE: 0, 
+	xmpp.ROLE_VISITOR: 0, 
+	xmpp.ROLE_PARTICIPANT: 10, 
+	xmpp.ROLE_MODERATOR: 15
 };
 
 AFFILIATIONS = {
-	AFF_OUTCAST: 0, 
-	AFF_NONE: 0, 
-	AFF_MEMBER: 1, 
-	AFF_ADMIN: 5, 
-	AFF_OWNER: 15
+	xmpp.AFF_OUTCAST: 0, 
+	xmpp.AFF_NONE: 0, 
+	xmpp.AFF_MEMBER: 1, 
+	xmpp.AFF_ADMIN: 5, 
+	xmpp.AFF_OWNER: 15
 };
+
+FORBIDDEN_TYPES = (
+		xmpp.TYPE_NORMAL,
+		xmpp.TYPE_HEADLINE
+);
 
 ESCAPE_MAP = {
 	'&apos;': '\'',
@@ -402,7 +388,7 @@ def joinConference(conference, nick, password):
 	gClient.send(prs);
 
 def leaveConference(conference, status=None):
-	prs = xmpp.Presence(conference, UNAVAILABLE);
+	prs = xmpp.Presence(conference, xmpp.PRS_OFFLINE);
 	if(status):
 		prs.setStatus(status);
 	gClient.send(prs);
@@ -436,7 +422,7 @@ def setRosterStatus(status, show, priority):
 	gClient.send(prs);
 
 def setBotStatus(conference, status, show):
-	prs = xmpp.Presence(conference, priority = gPriority);
+	prs = xmpp.Presence(conference, priority=gPriority);
 	if(status):
 		prs.setStatus(status);
 	if(show):
@@ -587,10 +573,10 @@ def sendTo(msgType, jid, text):
 	callBotMessageHandlers(msgType, jid, text);
 
 def sendToConference(conference, text):
-	sendTo(PUBLIC, conference, text);
+	sendTo(xmpp.TYPE_PUBLIC, conference, text);
 		
 def sendMsg(msgType, conference, nick, text, force=False):
-	if(msgType == PUBLIC and not force):
+	if(xmpp.TYPE_PUBLIC == msgType and not force):
 		fools = getConfigKey(conference, 'fools');
 		if(fools and not random.randrange(0, 30)):
 			text = random.choice(gJokes);
@@ -598,8 +584,8 @@ def sendMsg(msgType, conference, nick, text, force=False):
 			msgLimit = getConfigKey(conference, 'msg');
 			if(msgLimit and len(text) > msgLimit):
 				sendMsg(msgType, conference, nick, u'смотри в привате (лимит %d символов)' % (msgLimit), True);
-				msgType = PRIVATE;
-	if(msgType == PUBLIC):
+				msgType = xmpp.TYPE_PRIVATE;
+	if(xmpp.TYPE_PUBLIC == msgType):
 		text = u'%s: %s' % (nick, text);
 		jid = conference;
 	else:
@@ -608,32 +594,33 @@ def sendMsg(msgType, conference, nick, text, force=False):
 
 def messageHandler(session, stanza):
 	msgType = stanza.getType();
-	if(stanza.timestamp or HEADLINE == msgType or NORMAL == msgType):
+	if(stanza.timestamp or msgType in FORBIDDEN_TYPES):
 		return;
 	fullJid = stanza.getFrom();
 	conference = fullJid.getStripped();
 	isConference = conferenceInList(conference);
-	if(PUBLIC == msgType and not isConference):
+	if(xmpp.TYPE_PUBLIC == msgType and not isConference):
 		return;
 	trueJid = getTrueJid(fullJid);
 	if(getAccess(conference, trueJid) == -100):
 		return;
 	message = stanza.getBody() or '';
 	message = message.strip();
-	if(ERROR == msgType):
+	if(xmpp.TYPE_ERROR == msgType):
 		errorCode = stanza.getErrorCode();
 		if(errorCode == u'500'):
 			time.sleep(1);
-			sendTo(PUBLIC, fullJid, message);
+			sendTo(xmpp.TYPE_PUBLIC, fullJid, message);
 		elif(errorCode == '406'):
+			addConference(conference);
 			joinConference(conference, gBotNick, getConfigKey(conference, 'password'));
 			time.sleep(0.5);
-			sendTo(PUBLIC, fullJid, message);
+			sendTo(xmpp.TYPE_PUBLIC, fullJid, message);
 		return;
 	if(not message):
 		return;
 	nick = fullJid.getResource();
-	if(msgType == PUBLIC):
+	if(xmpp.TYPE_PUBLIC == msgType):
 		if(nickInConference(conference, nick)):
 			setNickKey(conference, nick, NICK_IDLE, time.time());
 	else:
@@ -657,7 +644,7 @@ def messageHandler(session, stanza):
 		if(prefix):
 			if(message.startswith(prefix)):
 				message = message[len(prefix):].strip();
-			elif(msgType == PUBLIC):
+			elif(xmpp.TYPE_PUBLIC == msgType):
 				return;
 		if(not message):
 			return;
@@ -719,8 +706,8 @@ def presenceHandler(session, stanza):
 			roleAccess = ROLES[role];
 			affAccess = AFFILIATIONS[aff];
 			setTempAccess(conference, trueJid, roleAccess + affAccess);
-			setNickKey(conference, nick, NICK_MODER, role == ROLE_MODERATOR);
-		elif(prsType == UNAVAILABLE):
+			setNickKey(conference, nick, NICK_MODER, role == xmpp.ROLE_MODERATOR);
+		elif(xmpp.PRS_OFFLINE == prsType):
 			code = stanza.getStatusCode();
 			reason = stanza.getReason() or stanza.getStatus();
 			setNickKey(conference, nick, NICK_HERE, False);
@@ -858,7 +845,7 @@ if(__name__ == '__main__'):
 			printf('Another instance is running (pid: %s)' % (pid), FLAG_ERROR);
 	except(KeyboardInterrupt):
 		if(gClient.isConnected()):
-			prs = xmpp.Presence(typ = UNAVAILABLE);
+			prs = xmpp.Presence(typ=xmpp.PRS_OFFLINE);
 			prs.setStatus(u'выключаюсь (CTRL+C)');
 			gClient.send(prs);
 		shutdown();
@@ -867,7 +854,7 @@ if(__name__ == '__main__'):
 		fileName = getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE));
 		writeFile(fileName, traceback.format_exc() + '\n', 'a');		
 		if(gClient.isConnected()):
-			prs = xmpp.Presence(typ = UNAVAILABLE);
+			prs = xmpp.Presence(typ=xmpp.PRS_OFFLINE);
 			prs.setStatus(u'что-то сломалось...');
 			gClient.send(prs);
 		shutdown(gRestart);

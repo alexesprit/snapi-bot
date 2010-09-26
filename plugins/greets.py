@@ -42,7 +42,7 @@ registerCommand(setGreet, u'приветствие', 30, u'Добавляет п
 
 def sendGreeting(conference, nick, trueJid, aff, role):
 	if(trueJid in gGreets[conference]):
-		sendMsg(PUBLIC, conference, nick, gGreets[conference][trueJid]);
+		sendMsg(xmpp.TYPE_PUBLIC, conference, nick, gGreets[conference][trueJid]);
 
 registerJoinHandler(sendGreeting);
 

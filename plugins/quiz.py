@@ -89,7 +89,7 @@ def quizStop(conference):
 	if(isTimerEnabled(conference)):
 		gQuizTimer[conference].cancel();
 		del(gQuizTimer[conference]);
-	showScoreList(PUBLIC, conference);
+	showScoreList(xmpp.TYPE_PUBLIC, conference);
 
 def checkAnswer(conference, nick, trueJid, answer):
 	rightAnswer = gQuizAnswer[conference].lower();

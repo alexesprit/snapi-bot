@@ -81,37 +81,35 @@ def showFeatures(msgType, conference, nick, param):
 			return;
 	else:
 		jid = conference + '/' + nick;
-	iq = xmpp.Iq('get');
+	iq = xmpp.Iq(xmpp.TYPE_GET);
 	iq.setTo(jid);
 	iq.addChild('query', {}, [], 'http://jabber.org/protocol/disco#info');
-	featID = getUniqueID(FEAT_ID);
-	iq.setID(featID);
-	gClient.SendAndCallForResponse(iq, _showFeatures, (featID, msgType, conference, nick, param, ));
+	iq.setID(getUniqueID(FEAT_ID));
+	gClient.SendAndCallForResponse(iq, _showFeatures, (msgType, conference, nick, param, ));
 
-def _showFeatures(stanza, featID, msgType, conference, nick, param):
-	if(featID == stanza.getID()):
-		if(stanza.getType() == 'result'):
-			featList = set();
-			for p in stanza.getQueryChildren():
-				attr = p.getAttrs();
-				if('var' in attr):
-					for feat in attr['var'].split():
-						for y in FEATURES:
-							if(feat.count(y)):
-								featList.add(FEATURES[y]);
-			if(featList):
-				featList = list(featList);
-				featList.sort();
-				if(param):
-					answer = u'клиент %s поддерживает следующие стандарты:\n%s' % (param, '\n'.join(featList));
-				else:
-					answer = u'твой клиент поддерживает следующие стандарты:\n%s' % ('\n'.join(featList));
-				if(PUBLIC == msgType):
-					sendMsg(msgType, conference, nick, u'ушли');
-				sendMsg(PRIVATE, conference, nick, answer);
+def _showFeatures(stanza, msgType, conference, nick, param):
+	if(xmpp.TYPE_RESULT == stanza.getType()):
+		featList = set();
+		for p in stanza.getQueryChildren():
+			attr = p.getAttrs();
+			if('var' in attr):
+				for feat in attr['var'].split():
+					for y in FEATURES:
+						if(feat.count(y)):
+							featList.add(FEATURES[y]);
+		if(featList):
+			featList = list(featList);
+			featList.sort();
+			if(param):
+				answer = u'клиент %s поддерживает следующие стандарты:\n%s' % (param, '\n'.join(featList));
 			else:
-				sendMsg(msgType, conference, nick, u'нет инфы');
+				answer = u'твой клиент поддерживает следующие стандарты:\n%s' % ('\n'.join(featList));
+			if(xmpp.TYPE_PUBLIC == msgType):
+				sendMsg(msgType, conference, nick, u'ушли');
+			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, answer);
 		else:
-			sendMsg(msgType, conference, nick, u'не могу :(');
+			sendMsg(msgType, conference, nick, u'нет инфы');
+	else:
+		sendMsg(msgType, conference, nick, u'не могу :(');
 		
 registerCommand(showFeatures, u'фичи', 10, u'Показывает, какие XEP-ы подерживает клиент указанного пользователя', u'фичи [ник]', (u'фичи', u'фичи Nick'));

@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def setTopic(msgType, conference, nick, param):
-	message = xmpp.Message(to = conference, typ = PUBLIC, subject = param);
+	message = xmpp.Message(to=conference, typ=xmpp.TYPE_PUBLIC, subject=param);
 	gClient.send(message);
 	sendMsg(msgType, conference, nick, u'поставила');
 

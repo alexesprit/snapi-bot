@@ -25,6 +25,5 @@ session-related info. Though if you are not accessing instances variables direct
 and use only methods for access all values you should not have any problems.
 '''
 
-import auth, dispatcher, debug, protocol, roster, simplexml, transports;
 from client import *;
 from protocol import *;

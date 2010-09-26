@@ -38,9 +38,9 @@ def getKeyToPrivate(msgType, conference, nick, param):
 		key = param[0].lower();
 	if(confJid):
 		if(key in gLocalBase[conference]):
-			if(PUBLIC == msgType):
+			if(xmpp.TYPE_PUBLIC == msgType):
 				sendMsg(msgType, conference, nick, u'ушло');
-			sendTo(PRIVATE, confJid, u'про %s я знаю следующее:\n%s' % (key, gLocalBase[conference][key]))
+			sendTo(xmpp.TYPE_PRIVATE, confJid, u'про %s я знаю следующее:\n%s' % (key, gLocalBase[conference][key]))
 		else:
 			sendMsg(msgType, conference, nick, u'я хз что такое %s :(' % key);
 	else:

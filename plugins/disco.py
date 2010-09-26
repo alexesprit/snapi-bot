@@ -21,12 +21,12 @@ def serviceDiscovery(msgType, conference, nick, param):
 	param = param or gHost;
 	args = param.split(' ', 2);
 	searchKey, jid = None, args[0];
-	maxCount = (PUBLIC == msgType) and 10 or 50;
+	maxCount = (xmpp.TYPE_PUBLIC == msgType) and 10 or 50;
 	if(len(args) > 1):
 		count = args[1];
 		if(count.isdigit()):
 			count = int(count);
-			if(PUBLIC == msgType):
+			if(xmpp.TYPE_PUBLIC == msgType):
 				maxCount = min(50, count);
 			else:
 				maxCount = min(250, count);	
@@ -34,61 +34,59 @@ def serviceDiscovery(msgType, conference, nick, param):
 				searchKey = args[2];
 		else:		
 			searchKey = args[1];
-	iq = xmpp.Iq('get');
+	iq = xmpp.Iq(xmpp.TYPE_GET);
 	query = iq.addChild('query', {}, [], xmpp.NS_DISCO_ITEMS);
 	if(jid.count('#')):
 		query.setAttr('node', jid.split('#')[1]);
 		iq.setTo(jid.split('#')[0]);
 	else:
 		iq.setTo(jid);
-	discoID = getUniqueID(DISCO_ID);
-	iq.setID(discoID);
-	gClient.SendAndCallForResponse(iq, _serviceDiscovery, (discoID, msgType, conference, nick, maxCount, searchKey, jid, ));
+	iq.setID(getUniqueID(DISCO_ID));
+	gClient.SendAndCallForResponse(iq, _serviceDiscovery, (msgType, conference, nick, maxCount, searchKey, jid, ));
 
-def _serviceDiscovery(stanza, discoID, msgType, conference, nick, maxCount, searchKey, jid):
-	if(discoID == stanza.getID()):
-		if(stanza.getType() == 'result'):
-			discoList = [];
-			itemCount = 0;
-			for x in stanza.getQueryChildren():
-				itemCount += 1;
-				attr = x.getAttrs();
-				item = [];
-				if('name' in attr):
-					item.append(attr['name']);
-				if(not jid.count('@') and 'jid' in attr):
-					item.append(attr['jid']);
-				if('node' in attr):
-					item.append(attr['node']);
-				if(len(item) == 2):
-					if(searchKey):
-						if(searchKey.endswith('@')):
-							if(not item[1].startswith(searchKey)):
-								continue;
-							discoList.append(u'%d) %s [%s]' % (itemCount, item[0], item[1]));
-							break;
-						else:
-							if(not item[0].count(searchKey)):
-								continue;
-							discoList.append(u'%d) %s [%s]' % (itemCount, item[0], item[1]));
-					else:
+def _serviceDiscovery(stanza, msgType, conference, nick, maxCount, searchKey, jid):
+	if(xmpp.TYPE_RESULT == stanza.getType()):
+		discoList = [];
+		itemCount = 0;
+		for x in stanza.getQueryChildren():
+			itemCount += 1;
+			attr = x.getAttrs();
+			item = [];
+			if('name' in attr):
+				item.append(attr['name']);
+			if(not jid.count('@') and 'jid' in attr):
+				item.append(attr['jid']);
+			if('node' in attr):
+				item.append(attr['node']);
+			if(len(item) == 2):
+				if(searchKey):
+					if(searchKey.endswith('@')):
+						if(not item[1].startswith(searchKey)):
+							continue;
 						discoList.append(u'%d) %s [%s]' % (itemCount, item[0], item[1]));
-				else:
-					if(searchKey):
+						break;
+					else:
 						if(not item[0].count(searchKey)):
 							continue;
-					discoList.append(u'%d) %s' % (itemCount, item[0]));
-			if(discoList):
-				if(0 == maxCount):
-					sendMsg(msgType, conference, nick, u'всего %d пунктов' % (itemCount));
+						discoList.append(u'%d) %s [%s]' % (itemCount, item[0], item[1]));
 				else:
-					if(itemCount > maxCount):
-						discoList = discoList[:maxCount];
-						discoList.append(u'всего %d пунктов' % (itemCount));
-					sendMsg(msgType, conference, nick, u'надискаверила:\n' + u'\n'.join(discoList));
+					discoList.append(u'%d) %s [%s]' % (itemCount, item[0], item[1]));
 			else:
-				sendMsg(msgType, conference, nick, u'пустое диско');
+				if(searchKey):
+					if(not item[0].count(searchKey)):
+						continue;
+				discoList.append(u'%d) %s' % (itemCount, item[0]));
+		if(discoList):
+			if(0 == maxCount):
+				sendMsg(msgType, conference, nick, u'всего %d пунктов' % (itemCount));
+			else:
+				if(itemCount > maxCount):
+					discoList = discoList[:maxCount];
+					discoList.append(u'всего %d пунктов' % (itemCount));
+				sendMsg(msgType, conference, nick, u'надискаверила:\n' + u'\n'.join(discoList));
 		else:
-			sendMsg(msgType, conference, nick, u'не могу');
+			sendMsg(msgType, conference, nick, u'пустое диско');
+	else:
+		sendMsg(msgType, conference, nick, u'не могу');
 
 registerCommand(serviceDiscovery, u'диско', 10, u'Показывает результаты обзора сервисов для указанного жида. Также можно запросить обзор по узлу (формат запроса jid#node). Второй или третий (если даётся ограничитель кол-ва) параметр - поиск (ищет заданное слово в жиде и описании элемента диско). Если поисковым словом задать имя конференции до названия сервера (например qwerty@), то покажет место этой конференции в общем рейтинге. В общий чат может дать до 50 результатов, без указания кол-ва - 10. В приват может дать до 250, без указания кол-ва 50.', u'диско <сервер> [кол-во результатов] [поисковая строка]', (u'диско jabber.aq', u'диско conference.jabber.aq 5', u'диско conference.jabber.aq qwerty', u'диско conference.jabber.aq 5 qwerty', u'диско conference.jabber.aq qwerty@', u'диско jabber.aq#services'));

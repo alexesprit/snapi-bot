@@ -16,20 +16,18 @@
 KEEP_ID = 'keep_id';
 KEEPALIVE_TIMEOUT = 300;
 
-def _sendKeepAlivePacket(stanza, keepID, conference):
-	if(keepID == stanza.getID()):
-		if(ERROR == stanza.getType()):
-			if(stanza.getErrorCode() == '503'):
-				startTimer(REJOIN_TIMEOUT, joinConference, (conference, getBotNick(conference), getChatKey(conference, 'password')));
+def _sendKeepAlivePacket(stanza, conference):
+	if(xmpp.TYPE_ERROR == stanza.getType()):
+		if(stanza.getErrorCode() == '503'):
+			startTimer(REJOIN_TIMEOUT, joinConference, (conference, getBotNick(conference), getChatKey(conference, 'password')));
 	
 def sendKeepAlivePacket():
 	for conference in getConferences():
-		iq = xmpp.Iq('get');
-		keepID = getUniqueID(KEEP_ID);
-		iq.setID(keepID);
+		iq = xmpp.Iq(xmpp.TYPE_GET);
+		iq.setID(getUniqueID(KEEP_ID));
 		iq.addChild('ping', {}, [], xmpp.NS_PING);
 		iq.setTo(conference + '/' + getBotNick(conference));
-		gClient.SendAndCallForResponse(iq, _sendKeepAlivePacket, (keepID, conference, ));
+		gClient.SendAndCallForResponse(iq, _sendKeepAlivePacket, (conference, ));
 	startKeepAliveTimer();
 
 def startKeepAliveTimer():

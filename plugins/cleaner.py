@@ -26,18 +26,18 @@ CHAT_BASES = ('gClients', 'gTalkers', 'gQuizScores', 'gHereTime', 'gSend', 'gSee
 SINGLE_BASES = ('gNotes', );
 
 def cleanBase(base, keepTime):
-	_getUpdateTime = base.getUpdateTime;
-	_delKey = base.delKey;
+	bGetUpdateTime = base.getUpdateTime;
+	bDelKey = base.delKey;
 	cleanedKeys = 0;
 	for key in base.items():
-		updateTime = _getUpdateTime(key);
+		updateTime = bGetUpdateTime(key);
 		if(time.time() - updateTime >= keepTime):
-			_delKey(key);
+			bDelKey(key);
 			cleanedKeys += 1;
 	if(cleanedKeys):
 		base.save();
 
-def startCleaning():
+def cleanBases():
 	_cleanBase = cleanBase;
 	for conference in getConferences():
 		for item in CHAT_BASES:
@@ -54,6 +54,6 @@ def startCleaning():
 	startCleanTimer();
 
 def startCleanTimer():
-	startTimer(CLEAN_TIMEOUT, startCleaning);
+	startTimer(CLEAN_TIMEOUT, cleanBases);
 
 registerEvent(startCleanTimer, INIT_2);

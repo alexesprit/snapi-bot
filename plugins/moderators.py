@@ -35,7 +35,7 @@ registerEvent(unloadAutoModerators, DELCONF);
 
 def setAutoModerator(conference, nick, trueJid, aff, role):
 	if(trueJid in gModerators[conference]):
-		setRole(conference, nick, ROLE_MODERATOR, u'автомодератор');
+		setRole(conference, nick, xmpp.ROLE_MODERATOR, u'автомодератор');
 
 registerJoinHandler(setAutoModerator);
 
@@ -59,7 +59,7 @@ def addAutoModerator(msgType, conference, nick, param):
 		saveAutoModerators(conference);
 		sendMsg(msgType, conference, nick, u'добавила');
 		if(setModeratorRole):
-			setRole(conference, user, ROLE_MODERATOR);
+			setRole(conference, user, xmpp.ROLE_MODERATOR);
 	else:
 		sendMsg(msgType, conference, nick, u'%s уже есть в списке' % (param));
 
@@ -85,7 +85,7 @@ def delAutoModerator(msgType, conference, nick, param):
 		saveAutoModerators(conference);
 		sendMsg(msgType, conference, nick, u'удалила');
 		if(setParticipantRole):
-			setRole(conference, user, ROLE_PARTICIPANT);
+			setRole(conference, user, xmpp.ROLE_PARTICIPANT);
 	else:
 		sendMsg(msgType, conference, nick, u'а %s итак нет в списке' % (param));
 

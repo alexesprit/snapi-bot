@@ -60,9 +60,9 @@ def showCommands(msgType, conference, nick, param):
 	if(disabledCmds):
 		disabledCmds.sort();
 		message += u'\n\nОтключенные команды:\n%s' % (', '.join(disabledCmds));
-	if(PUBLIC == msgType):
+	if(xmpp.TYPE_PUBLIC == msgType):
 		sendMsg(msgType, conference, nick, u'ушли');
-	sendMsg(PRIVATE, conference, nick, message);	
+	sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message);	
 
 registerCommand(showHelp, u'помощь', 0, u'Даёт справку об определённой команде или выводит общую справку', u'помощь [команда]', (u'помощь', u'помощь пинг'), ANY | FROZEN);
 registerCommand(showCommands, u'команды', 0, u'Показывает список всех команд', None, (u'команды', ), ANY | FROZEN | NONPARAM);

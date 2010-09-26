@@ -52,7 +52,7 @@ class NonSASL(PlugIn):
 		if not self.resource: return self.authComponent(owner)
 		self.printf('Querying server about possible auth methods', 'start')
 		resp=owner.Dispatcher.SendAndWaitForResponse(Iq('get', NS_AUTH, payload=[Node('username', payload=[self.user])]))
-		if not isResultNode(resp):
+		if(TYPE_RESULT != resp.getType()):
 			self.printf('No result node arrived! Aborting...', 'error')
 			return
 		iq=Iq(typ='set', node=resp)
@@ -78,7 +78,8 @@ class NonSASL(PlugIn):
 			query.setTagData('password', self.password)
 			method='plain'
 		resp=owner.Dispatcher.SendAndWaitForResponse(iq)
-		if isResultNode(resp):
+		stanzaType = resp.getType()
+		if stanzaType == TYPE_RESULT:
 			self.printf('Sucessfully authenticated with remove host.', 'ok')
 			owner.User=self.user
 			owner.Resource=self.resource
@@ -168,7 +169,8 @@ class SASL(PlugIn):
 			try: reason=challenge.getChildren()[0]
 			except: reason=challenge
 			self.printf('Failed SASL authentification: %s'%reason, 'error')
-			return
+			raise NodeProcessed
+			#return
 		elif challenge.getName() == 'success':
 			self.startsasl='success'
 			self.printf('Successfully authenticated with remote server.', 'ok')
@@ -177,7 +179,8 @@ class SASL(PlugIn):
 			dispatcher.Dispatcher().PlugIn(self._owner)
 			self._owner.Dispatcher.restoreHandlers(handlers)
 			self._owner.User=self.username
-			return
+			raise NodeProcessed
+			#return
 ########################################3333
 		incoming_data=challenge.getData()
 		chal={}
@@ -215,6 +218,7 @@ class SASL(PlugIn):
 		else: 
 			self.startsasl='failure'
 			self.printf('Failed SASL authentification: unknown challenge', 'error')
+		raise NodeProcessed
 
 class Bind(PlugIn):
 	""" Bind some JID to the current connection to allow router know of our location."""
@@ -249,14 +253,15 @@ class Bind(PlugIn):
 		if resource: resource=[Node('resource', payload=[resource])]
 		else: resource=[]
 		resp=self._owner.SendAndWaitForResponse(Protocol('iq', typ='set', payload=[Node('bind', attrs={'xmlns':NS_BIND}, payload=resource)]))
-		if isResultNode(resp):
+		stanzaType = resp.getType();
+		if stanzaType == TYPE_RESULT:
 			self.bound.append(resp.getTag('bind').getTagData('jid'))
 			self.printf('Successfully bound %s.'%self.bound[-1], 'ok')
 			jid=JID(resp.getTag('bind').getTagData('jid'))
 			self._owner.User=jid.getNode()
 			self._owner.Resource=jid.getResource()
 			resp=self._owner.SendAndWaitForResponse(Protocol('iq', typ='set', payload=[Node('session', attrs={'xmlns':NS_SESSION})]))
-			if isResultNode(resp):
+			if stanzaType == TYPE_RESULT:
 				self.printf('Successfully opened session.', 'ok')
 				self.session=1
 				return 'ok'
