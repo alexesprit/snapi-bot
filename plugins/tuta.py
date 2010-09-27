@@ -22,13 +22,12 @@ def showHereStatistic(msgType, conference, nick, param):
 	if(nickIsOnline(conference, userNick)):
 		base = gHereTime[conference];
 		trueJid = getTrueJid(conference, userNick);
-		info = base.getKey(trueJid);
-		if(info):
-			joinCount = info['count'];
+		if(trueJid in base):
+			joinCount = base[trueJid]['count'];
 			hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED);
-			totalTime = info['here'] + hereTime;
+			totalTime = base[trueJid]['here'] + hereTime;
 			averageTime = totalTime / joinCount;
-			record = max(info['record'], hereTime);
+			record = max(base[trueJid]['record'], hereTime);
 			message = param and userNick or u'ты';
 			message = u'%s всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d' % (message, time2str(totalTime), time2str(record), time2str(averageTime), joinCount);
 			sendMsg(msgType, conference, nick, message);
@@ -36,41 +35,34 @@ def showHereStatistic(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u'нет информации');
 	else:
 		sendMsg(msgType, conference, nick, u'а это кто?');
-
-registerCommand(showHereStatistic, u'тута', 10, u'Показывает кол-во часов, проведённое в чатике, максимальное и среднее', u'тута [ник]', (u'тута', ), CHAT);
 	
 def updateJoinStatistic(conference, nick, trueJid, aff, role):
 	base = gHereTime[conference];
-	info = base.getKey(trueJid);
-	if(not info):
-		info = {'record': 0, 'count': 0, 'here': 0};
-	info['count'] += 1;
-	base.setKey(trueJid, info);
+	if(trueJid not in base):
+		base[trueJid] = {'record': 0, 'count': 0, 'here': 0};
+	base[trueJid]['count'] += 1;
 	base.save();
-
-registerJoinHandler(updateJoinStatistic);
 
 def updateLeaveStatistic(conference, nick, trueJid, reason, code):
 	base = gHereTime[conference];
 	joinTime = getNickKey(conference, nick, 'joined');
-	if(joinTime):
-		info = base.getKey(trueJid);
-		if(info):
-			hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED);
-			info['here'] += hereTime;
-			info['record'] = max(info['record'], hereTime);
-			base.setKey(trueJid, info);
-			base.save();
-
-registerLeaveHandler(updateLeaveStatistic);
+	if(trueJid in base):
+		hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED);
+		base[trueJid]['here'] += hereTime;
+		base[trueJid]['record'] = max(base[trueJid]['record'], hereTime);
+		base.save();
 
 def loadHereCache(conference):
 	fileName = getConfigPath(conference, HERE_FILE);
 	gHereTime[conference] = database.DataBase(fileName);
 
-registerEvent(loadHereCache, ADDCONF);
-
 def unloadHereCache(conference):
 	del(gHereTime[conference]);
 
+registerEvent(loadHereCache, ADDCONF);
 registerEvent(unloadHereCache, DELCONF);
+
+registerJoinHandler(updateJoinStatistic);
+registerLeaveHandler(updateLeaveStatistic);
+
+registerCommand(showHereStatistic, u'тута', 10, u'Показывает кол-во часов, проведённое в чатике, максимальное и среднее', u'тута [ник]', (u'тута', ), CHAT);

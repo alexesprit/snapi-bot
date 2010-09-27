@@ -105,14 +105,12 @@ def checkAnswer(conference, nick, trueJid, answer):
 		else:
 			sendToConference(conference, u'(!) %s, поздравляю! Верный ответ: %s' % (nick, rightAnswer));
 		base = gQuizScores[conference];
-		scores = base.getKey(trueJid);
-		if(scores):
-			scores[0] = nick;
-			scores[1] += points;
-			scores[2] += 1;
+		if(trueJid in base):
+			base[trueJid][0] = nick;
+			base[trueJid][1] += points;
+			base[trueJid][2] += 1;
 		else:
-			scores = [nick, points, 1];
-		base.setKey(trueJid, scores);
+			base[trueJid] = [nick, points, 1];
 		base.save();
 		askNewQuestion(conference);
 
@@ -124,8 +122,8 @@ def showScoreList(msgType, conference, nick = None):
 	base = gQuizScores[conference];
 	if(not base.isEmpty()):
 		scores = [];
-		for jid in base.items():
-			item = base.getKey(jid);
+		for jid in base:
+			item = base[jid];
 			scores.append([item[1], item[2], item[0]]);
 		scores.sort();
 		scores.reverse();

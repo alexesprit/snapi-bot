@@ -21,8 +21,10 @@ def cmdSwitchOff(msgType, conference, nick, param):
 	if(param):
 		param = param.split();
 		for cmd in param:
-			if(isCommand(cmd) or gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd) and isCommandType(cmd, CHAT)):
-				if(not isCommandType(cmd, FROZEN)):
+			_isCommand = isCommand(cmd) and isCommandType(cmd, CHAT);
+			_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd);
+			if(_isCommand or _isMacros):
+				if(_isMacros or not isCommandType(cmd, FROZEN)):
 					if(isAvailableCommand(conference, cmd)):
 						gCmdOff[conference].append(cmd);
 						validCmd.append(cmd);
@@ -60,7 +62,9 @@ def cmdSwitchOn(msgType, conference, nick, param):
 	message = u'';
 	param = param.split();
 	for cmd in param:
-		if(isCommand(cmd) or gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd) and isCommandType(cmd, CHAT)):
+		_isCommand = isCommand(cmd) and isCommandType(cmd, CHAT);
+		_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd);
+		if(_isCommand or _isMacros):
 			if(not isAvailableCommand(conference, cmd)):
 				gCmdOff[conference].remove(cmd);
 				validCmd.append(cmd);

@@ -19,12 +19,12 @@ gNotes = {};
 
 def addNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick);
-	notes = gNotes.getKey(trueJid);
-	if(not notes):
-		notes = [];
-	date = time.strftime('[%d.%m.%y, %H:%M]\n');
-	notes.append(date + param);
-	gNotes.setKey(trueJid, notes);
+	printf(type(gNotes));
+	if(trueJid not in gNotes):
+		gNotes[trueJid] = [];
+	text = u'%s\n%s' % (time.strftime('[%d.%m.%y, %H:%M]'), param);
+	gNotes[trueJid].append(text);
+	printf(type(gNotes));
 	gNotes.save();
 	sendMsg(msgType, conference, nick, u'записала');
 
@@ -32,14 +32,11 @@ def delNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick);
 	if(trueJid in gNotes):
 		if(param.isdigit()):
-			notes = gNotes.getKey(trueJid);
 			param = int(param) - 1;
-			if(param < len(notes)):
-				del(notes[param]);
-				if(not notes):
-					gNotes.delKey(trueJid);
-				else:
-					gNotes.setKey(trueJid, notes);
+			if(param < len(gNotes[trueJid])):
+				del(gNotes[trueJid][param]);
+				if(not gNotes[trueJid]):
+					del(gNotes[trueJid]);
 				gNotes.save();
 				sendMsg(msgType, conference, nick, u'удалила');
 			else:
@@ -53,7 +50,7 @@ def showNotes(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick);
 	if(param == u'сброс'):
 		if(trueJid in gNotes):
-			gNotes.delKey(trueJid);
+			del(gNotes[trueJid]);
 			gNotes.save();
 			sendMsg(msgType, conference, nick, u'удалила');
 		else:
@@ -61,7 +58,7 @@ def showNotes(msgType, conference, nick, param):
 	elif(not param):
 		if(trueJid in gNotes):
 			message = u'твои заметки:\n';
-			items = [u'%d) %s' % (i + 1, x) for i, x in enumerate(gNotes.getKey(trueJid))];
+			items = [u'%d) %s' % (i + 1, x) for i, x in enumerate(gNotes[trueJid])];
 			sendMsg(msgType, conference, nick, message + '\n'.join(items));
 		else:
 			sendMsg(msgType, conference, nick, u'в твоём блокноте пусто');

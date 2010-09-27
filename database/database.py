@@ -28,10 +28,25 @@ class DataBase:
 		self.base = eval(__main__.readFile(path));
 		self.changes = eval(__main__.readFile(path + '.db'));
 		self.path = path;
-		
+	
 	def __contains__(self, key):
 		return(key in self.base);
+	
+	def __iter__(self):
+		for item in self.base:
+			yield(item);
+	
+	def __getitem__(self, item):
+		return(self.base[item]);
 
+	def __setitem__(self, item, value):
+		self.base[item] = value;
+		self.changes[item] = time.time();
+	
+	def __delitem__(self, item):
+		del(self.base[item]);
+		del(self.changes[item]);		
+	
 	def clear(self):
 		self.base = {};
 		self.changes = {};
@@ -40,22 +55,8 @@ class DataBase:
 		__main__.writeFile(self.path, str(self.base));
 		__main__.writeFile(self.path + '.db', str(self.changes));
 		
-	def items(self):
-		return(self.base.keys());
-		
 	def isEmpty(self):
 		return(not self.base);
 		
-	def getKey(self, key):
-		return(self.base.get(key));
-		
 	def getUpdateTime(self, key):
 		return(self.changes.get(key));
-		
-	def setKey(self, key, value):
-		self.base[key] = value;
-		self.changes[key] = time.time();
-		
-	def delKey(self, key):
-		del(self.base[key]);
-		del(self.changes[key]);

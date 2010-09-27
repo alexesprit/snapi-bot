@@ -29,8 +29,8 @@ def showTopTalkers(msgType, conference, nick):
 		replic = u'Статистика топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n';
 		topListLine = u'%d) %s, %d, %d, %d, %0.1f';
 		count = 10;
-		for jid in base.items():
-			statistic = base.getKey(jid);
+		for jid in base:
+			statistic = base[jid];
 			words = statistic['words'];
 			userNick = statistic['nick'];
 			messages = statistic['messages'];
@@ -67,8 +67,8 @@ def showTalkerInfo(msgType, conference, nick, param):
 		else:
 			return;
 		base = gTalkers[conference];
-		statistic = base.getKey(trueJid);
-		if(statistic):
+		if(trueJid in base):
+			statistic = base[trueJid];
 			statisticLine = u'Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f';
 			nick = statistic['nick'];
 			words = statistic['words'];
@@ -83,17 +83,15 @@ def showTalkerInfo(msgType, conference, nick, param):
 def updateStatistic(stanza, msgType, conference, nick, trueJid, body):
 	if(trueJid != gJid and msgType == xmpp.TYPE_PUBLIC and nick):
 		base = gTalkers[conference];
-		statistic = base.getKey(trueJid);
-		if(statistic):
-			statistic['nick'] = nick;
+		if(trueJid in base):
+			base[trueJid]['nick'] = nick;
 		else:
-			statistic = {'nick': nick, 'words': 0, 'messages': 0, 'mes': 0};
+			base[trueJid] = {'nick': nick, 'words': 0, 'messages': 0, 'mes': 0};
 		if(body.startswith('/me')):
-			statistic['mes'] += 1;
+			base[trueJid]['mes'] += 1;
 		else:
-			statistic['messages'] += 1;
-		statistic['words'] += len(body.split());
-		base.setKey(trueJid, statistic);
+			base[trueJid]['messages'] += 1;
+		base[trueJid]['words'] += len(body.split());
 		if(gMsgCount[conference] >= SAVE_COUNT):
 			base.save();
 			gMsgCount[conference] = 0;

@@ -19,21 +19,20 @@ SEND_FILE = 'send.txt';
 gSend = {};
 
 def addMessageToQueue(msgType, conference, nick, param):
-	param = param.split();
-	if(len(param) >= 2):
+	param = param.split(None, 1);
+	if(len(param) == 2):
 		userNick = param[0];
-		message = u'%s попросил меня передать тебе следующее:\n%s' % (nick, ' '.join(param[1:]));
+		message = param[1];
+		message = u'%s попросил меня передать тебе следующее:\n%s' % (nick, message);
 		if(nickIsOnline(conference, userNick)):
 			sendMsg(xmpp.TYPE_PRIVATE, conference, userNick, message);
 			sendMsg(msgType, conference, nick, u'передала');
 		elif(nickInConference(conference, userNick)):
 			trueJid = getTrueJid(conference, userNick);
 			base = gSend[conference];
-			messages = base.getKey(trueJid);
-			if(not messages):
-				messages = [];
-			messages.append(message);
-			base.setKey(trueJid, messages);
+			if(trueJid not in base):
+				base[trueJid] = [];
+			base[trueJid].append(message);
 			base.save();
 			sendMsg(msgType, conference, nick, u'передам');
 		else:
@@ -43,12 +42,11 @@ registerCommand(addMessageToQueue, u'передать', 10, u'Запоминае
 
 def checkQueue(conference, nick, trueJid, aff, role):
 	base = gSend[conference];
-	messages = base.getKey(trueJid);
-	if(messages):
-		for message in messages:
+	if(trueJid in base):
+		for message in base[trueJid]:
 			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message);
 			time.sleep(0.5);
-		base.delKey(trueJid);
+		del(base[trueJid]);
 		base.save();
 
 registerJoinHandler(checkQueue);

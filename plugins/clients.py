@@ -29,9 +29,8 @@ def showClients(msgType, conference, nick, param):
 	userNick = param or nick;
 	if(nickIsOnline(conference, userNick)):
 		trueJid = getTrueJid(conference, userNick);
-		base = gClients[conference];
-		if(trueJid in base):
-			clients = base.getKey(trueJid);
+		if(trueJid in gClients[conference]):
+			clients = gClients[conference][trueJid];
 			if(clients):
 				if(not param):
 					message = u'ты заходил сюда с ';
@@ -39,14 +38,16 @@ def showClients(msgType, conference, nick, param):
 					message = param + u' заходил сюда с ';
 				sendMsg(msgType, conference, nick, message + u', '.join(clients));
 			else:
-				sendMsg(msgType, conference, nick, u'нет информации' % param);
+				sendMsg(msgType, conference, nick, u'нет информации');
+		else:
+			sendMsg(msgType, conference, nick, u'нет информации');
 	else:
 		sendMsg(msgType, conference, nick, u'а это кто?');
 
 def clientsChecking(conference, nick, trueJid, aff, role):
 	base = gClients[conference];
 	if(trueJid not in base):
-		base.setKey(trueJid, []);
+		base[trueJid] = [];
 	iq = xmpp.Iq(xmpp.TYPE_GET);
 	iq.addChild('query', {}, [], xmpp.NS_VERSION);
 	iq.setTo(conference + '/' + nick);
@@ -56,13 +57,11 @@ def clientsChecking(conference, nick, trueJid, aff, role):
 def _clientsChecking(stanza, conference, trueJid):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		base = gClients[conference];
-		clients = base.getKey(trueJid);
 		for p in stanza.getQueryChildren():
 			if(p.getName() == 'name'):
 				client = p.getData();
-				if(not client in clients):
-					clients.append(client);
-					base.setKey(trueJid, clients);
+				if(not client in base[trueJid]):
+					base[trueJid].append(client);
 					base.save();
 
 registerEvent(loadClientsCache, ADDCONF);

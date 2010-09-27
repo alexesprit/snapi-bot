@@ -650,6 +650,8 @@ def messageHandler(session, stanza):
 			return;
 	rawBody = message.split(None, 1);
 	command = rawBody[0].lower();
+	if(isConference and not isAvailableCommand(conference, command)):
+		return;
 	if(isCommand(command)):
 		access = gCommands[command][CMD_ACCESS];
 	else:
@@ -791,7 +793,7 @@ def shutdown(restart=False):
 def start():
 	global gRoster;
 	loadPlugins();
-
+	
 	printf('Connecting...');
 	if(gClient.connect(server=(gHost, gPort), SSLMode=gSSLMode, useResolver=gUseResolver)):
 		printf('Connection established (%s)' % gClient.isConnected(), FLAG_SUCCESS);

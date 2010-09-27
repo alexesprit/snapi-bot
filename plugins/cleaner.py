@@ -27,12 +27,11 @@ SINGLE_BASES = ('gNotes', );
 
 def cleanBase(base, keepTime):
 	bGetUpdateTime = base.getUpdateTime;
-	bDelKey = base.delKey;
 	cleanedKeys = 0;
-	for key in base.items():
+	for key in base:
 		updateTime = bGetUpdateTime(key);
 		if(time.time() - updateTime >= keepTime):
-			bDelKey(key);
+			del(base[key]);
 			cleanedKeys += 1;
 	if(cleanedKeys):
 		base.save();

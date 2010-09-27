@@ -19,17 +19,17 @@ gSeen = {};
 
 def updateSeenTime(conference, nick, trueJid, reason, code):
 	if('303' != code):
-		gSeen[conference].setKey(trueJid, time.time());
+		gSeen[conference][trueJid] = time.time();
 		gSeen[conference].save();
 
 def showSeenTime(msgType, conference, nick, param):
 	userNick = param or nick;
 	if(nickInConference(conference, userNick)):
 		trueJid = getTrueJid(conference, userNick);
-		seenTime = gSeen[conference].getKey(trueJid);
-		if(seenTime):
-			seenDate = time.strftime('%H:%M, %d.%m.%Y', time.localtime(seenTime));
-			seenTime = time2str(time.time() - seenTime);
+		if(trueJid in gSeen[conference]):
+			seen = gSeen[conference][trueJid];
+			seenDate = time.strftime('%H:%M, %d.%m.%Y', time.localtime(seen));
+			seenTime = time2str(time.time() - seen);
 			if(not param):
 				sendMsg(msgType, conference, nick, u'последний раз я видела тебя %s назад (в %s)' % (seenTime, seenDate));
 			else:
