@@ -29,12 +29,11 @@ def showTopTalkers(msgType, conference, nick):
 		replic = u'Статистика топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n';
 		topListLine = u'%d) %s, %d, %d, %d, %0.1f';
 		count = 10;
-		for jid in base:
-			statistic = base[jid];
-			words = statistic['words'];
-			userNick = statistic['nick'];
-			messages = statistic['messages'];
-			meMessages = statistic['mes'];
+		for jid, info in base.items():
+			words = info['words'];
+			userNick = info['nick'];
+			messages = info['messages'];
+			meMessages = info['mes'];
 			wordsPerMsg = (float(words)) / (messages + meMessages);
 			topList.append([messages, meMessages, words, wordsPerMsg, userNick]);
 		topList.sort();

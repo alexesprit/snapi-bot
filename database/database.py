@@ -47,6 +47,9 @@ class DataBase:
 		del(self.base[item]);
 		del(self.changes[item]);		
 	
+	def items(self):
+		return(self.base.items());
+	
 	def clear(self):
 		self.base = {};
 		self.changes = {};

@@ -30,11 +30,12 @@ def pythonExec(msgType, conference, nick, param):
 def pythonShell(msgType, conference, nick, param):
 	if(os.name == 'posix'):
 		pipe = os.popen('sh -c "%s" 2>&1' % (param.encode('utf-8')));
-		sendMsg(msgType, conference, nick, pipe.read().decode('utf-8'));
 	elif(os.name == 'nt'):
 		pipe = os.popen('%s' % (param.encode('utf-8')));
-		sendMsg(msgType, conference, nick, pipe.read().decode('cp866'));
+	message = pipe.read();
 	pipe.close();
+	enc = chardet.detect(message)['encoding'];
+	sendMsg(msgType, conference, nick, unicode(message, enc));
 
 def pythonCalc(msgType, conference, nick, param):
 	if(re.sub('([0-9]+|[\+\-\/\*\^\.()])', '', param).strip() == ''):

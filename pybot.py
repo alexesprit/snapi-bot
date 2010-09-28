@@ -31,6 +31,7 @@ import time;
 import traceback;
 import urllib;
 
+import chardet;
 import database;
 import macros;
 import simplejson;
@@ -380,8 +381,8 @@ def joinConference(conference, nick, password):
 		prs.setStatus(status);
 	if(show):
 		prs.setShow(show);
-	prs.addChild(node = getCapsNode());
-	mucTag = prs.setTag('x', namespace = xmpp.NS_MUC);
+	prs.addChild(node=getCapsNode());
+	mucTag = prs.setTag('x', namespace=xmpp.NS_MUC);
 	mucTag.addChild('history', {'maxchars':'0'});
 	if(password):
 		mucTag.setTagData('password', password);
@@ -544,7 +545,7 @@ def setPermGlobalAccess(jid, level=0):
 		del(gGlobalAccess[jid]);
 	writeFile(fileName, str(tempAccess));
 
-def setTempGlobalAccess(jid, level = 0):
+def setTempGlobalAccess(jid, level=0):
 	gGlobalAccess[jid] = None;
 	if(level):
 		gGlobalAccess[jid] = level;
@@ -627,7 +628,7 @@ def messageHandler(session, stanza):
 		if(stanza.getTags('request')):
 			reportMsg = xmpp.Message(fullJid);
 			reportMsg.setID(stanza.getID());
-			reportMsg.addChild('received', {}, [], xmpp.NS_RECEIPTS);
+			reportMsg.addChild('received', None, None, xmpp.NS_RECEIPTS);
 			gClient.send(reportMsg);
 	cmdType = isConference and CHAT or ROSTER;
 	callMessageHandlers(msgType, stanza, cmdType, conference, nick, trueJid, message);
@@ -793,7 +794,7 @@ def shutdown(restart=False):
 def start():
 	global gRoster;
 	loadPlugins();
-	
+
 	printf('Connecting...');
 	if(gClient.connect(server=(gHost, gPort), SSLMode=gSSLMode, useResolver=gUseResolver)):
 		printf('Connection established (%s)' % gClient.isConnected(), FLAG_SUCCESS);

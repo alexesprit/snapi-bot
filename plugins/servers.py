@@ -21,7 +21,7 @@ UPTIME_ID = 'uptime_id';
 def _showServerStats(stanza, msgType, conference, nick, param):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		message = u'Инфа о %s:' % param;
-		for stat in stanza.getQueryPayload():
+		for stat in stanza.getQueryChildren():
 			attr = stat.getAttrs();
 			message += u'\n%s: %s %s' % (attr['name'], attr['value'], attr['units']);
 		sendMsg(msgType, conference, nick, message);
@@ -42,7 +42,7 @@ def showServerInfo(msgType, conference, nick, param):
 	param = param or gHost;
 	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_STATS);
 	iq.setTo(param);
-	iq.setID(geUniqueID(INFO_ID));
+	iq.setID(getUniqueID(INFO_ID));
 	gClient.SendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, param, ));
 
 def _showServerUptime(stanza, msgType, conference, nick, param):

@@ -19,7 +19,7 @@ This module contains the low-level implementations of xmpppy connect methods or
 (in other words) transports for xmpp-stanzas.
 Currently here is three transports:
 direct TCP connect - TCPSocket class
-proxied TCP connect - HTTPPROXYsocket class (CONNECT proxies)
+proxied TCP connect - HTTPProxySocket class (CONNECT proxies)
 TLS connection - TLS class. Can be used for SSL connections also.
 
 Transports are stackable so you - f.e. TLS use HTPPROXYsocket or TCPSocket as more low-level transport.
@@ -57,7 +57,7 @@ class TCPSocket(PlugIn):
 		"""
 		PlugIn.__init__(self)
 		self.DBG_LINE = DBG_SOCKET
-		self._exported_methods = [self.send, self.disconnect]
+		self._exportedMethods = [self.send, self.disconnect]
 		self._server, self.useResolver = server, useResolver
 
 	def lookup(self, server):
@@ -91,6 +91,7 @@ class TCPSocket(PlugIn):
 	def getHost(self):
 		""" Return the 'host' value that is connection is [will be] made to."""
 		return self._server[0]
+
 	def getPort(self):
 		""" Return the 'port' value that is connection is [will be] made to."""
 		return self._server[1]
@@ -109,7 +110,8 @@ class TCPSocket(PlugIn):
 			return 'ok'
 		except socket.error, (errno, strerror): 
 			self.printf("Failed to connect to remote host %s: %s (%s)" % (server, strerror, errno), 'error')
-		except: pass
+		except:
+			pass
 
 	def plugout(self):
 		""" Disconnect from the remote server and unregister self.disconnected method from
@@ -129,12 +131,12 @@ class TCPSocket(PlugIn):
 				return ''
 			if e[0] == socket.SSL_ERROR_WANT_WRITE:
 				return ''
-			self.printf('Socket error while receiving data', 'error')
+			self.printf('Socket error while receiving data ololo', 'error')
 			sys.exc_clear()
 			self._owner.disconnected()
 			raise IOError("Disconnected from server")
-		except:
-			received = ''
+		#except:
+		#	received = ''
 
 		while self.pending_data(0):
 			try:
@@ -149,7 +151,7 @@ class TCPSocket(PlugIn):
 			self._seen_data = 1
 			self.printf(received, 'got')
 		else:
-			self.printf('Socket error while receiving data', 'error')
+			self.printf('Socket error while receiving data ss', 'error')
 			self._owner.disconnected()
 			raise IOError("Disconnected from server")
 		return received

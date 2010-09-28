@@ -59,7 +59,7 @@ C_SSL = 'SSL';
 class PlugIn:
 	""" Common xmpppy plugins infrastructure: plugging in/out, printfging. """
 	def __init__(self):
-		self._exported_methods = []
+		self._exportedMethods = []
 		self.DBG_LINE = self.__class__.__name__.lower()
 
 	def PlugIn(self, owner):
@@ -71,11 +71,11 @@ class PlugIn:
 		className = self.__class__.__name__;
 		if hasattr(owner, className):
 			return self.printf('Plugging ignored: another instance already plugged.', 'error')
-		self._old_owners_methods = []
-		for method in self._exported_methods:
+		self._oldMethods = []
+		for method in self._exportedMethods:
 			methodName = method.__name__
 			if hasattr(owner, methodName):
-				self._old_owners_methods.append(getattr(owner, methodName))
+				self._oldMethods.append(getattr(owner, methodName))
 			setattr(owner, methodName, method)
 		setattr(owner, className, self)
 		if hasattr(self, 'plugin'):
@@ -84,16 +84,14 @@ class PlugIn:
 	def PlugOut(self):
 		""" Unregister all our staff from main instance and detach from it. """
 		self.printf('Plugging %s out of %s.' % (self, self._owner), 'stop')
-		ret = None
 		if hasattr(self, 'plugout'):
-			ret = self.plugout()
+			self.plugout()
 		self._owner.debugFlags.remove(self.DBG_LINE)
-		for method in self._exported_methods:
+		for method in self._exportedMethods:
 			delattr(self._owner, method.__name__)
-		for method in self._old_owners_methods:
+		for method in self._oldMethods:
 			setattr(self._owner, method.__name__, method)
 		delattr(self._owner, self.__class__.__name__)
-		return ret
 
 	def printf(self, text, severity='info'):
 		""" Feed a provided printf line to main instance's printf facility along with our ID string. """
@@ -120,7 +118,6 @@ class CommonClient:
 		self._owner = self
 		self._registeredName = None
 		self.connected = None
-		self._route = 0
 
 	def RegisterDisconnectHandler(self, handler):
 		""" Register handler that will be called on disconnect."""

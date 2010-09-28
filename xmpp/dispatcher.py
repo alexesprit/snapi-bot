@@ -39,15 +39,23 @@ class Dispatcher(PlugIn):
 		self.DBG_LINE = 'dispatcher'
 		self.handlers = {}
 		self._expected = {}
-		self._exported_methods = [self.Process, self.RegisterHandler, \
-		self.RegisterHandlerOnce, self.UnregisterHandler, self.RegisterProtocol, \
-		self.WaitForResponse, self.SendAndWaitForResponse, self.send, self.disconnect, \
-		self.SendAndCallForResponse, ]
+		self._exportedMethods = [self.Process,
+									self.RegisterHandler,
+									self.RegisterHandlerOnce,
+									self.UnregisterHandler,
+									self.RegisterProtocol,
+									self.WaitForResponse,
+									self.SendAndWaitForResponse,
+									self.send,
+									self.disconnect,
+									self.SendAndCallForResponse
+								]
 
 	def dumpHandlers(self):
 		""" Return set of user-registered callbacks in it's internal format.
 			Used within the library to carry user handlers set over Dispatcher replugins. """
 		return self.handlers
+
 	def restoreHandlers(self, handlers):
 		""" Restores user-registered callbacks structure from dump previously obtained via dumpHandlers.
 			Used within the library to carry user handlers set over Dispatcher replugins. """
@@ -60,13 +68,15 @@ class Dispatcher(PlugIn):
 		self.RegisterProtocol('iq', Iq)
 		self.RegisterProtocol('presence', Presence)
 		self.RegisterProtocol('message', Message)
-		self.RegisterHandler('error', self.streamErrorHandler, xmlns = NS_STREAMS)
+		self.RegisterHandler('error', self.streamErrorHandler, xmlns=NS_STREAMS)
 
 	def plugin(self, owner):
 		""" Plug the Dispatcher instance into Client class instance and send initial stream header. Used internally."""
 		self._init()
-		for method in self._old_owners_methods:
-			if method.__name__ == 'send': self._owner_send = method; break
+		for method in self._oldMethods:
+			if method.__name__ == 'send':
+				self._owner_send = method;
+				break
 		self._owner.lastErrNode = None
 		self._owner.lastErr = None
 		self._owner.lastErrCode = None
@@ -75,7 +85,6 @@ class Dispatcher(PlugIn):
 	def plugout(self):
 		""" Prepares instance to be destructed. """
 		self.Stream.dispatch = None
-		self.Stream.printf = None
 		self.Stream.features = None
 		self.Stream.destroy()
 
@@ -85,15 +94,13 @@ class Dispatcher(PlugIn):
 		self.Stream._dispatch_depth = 2
 		self.Stream.dispatch = self.dispatch
 		self.Stream.stream_header_received = self._check_stream_start
-		self._owner.debugFlags.append(simplexml.DBG_NODEBUILDER)
-		self.Stream.printf = self._owner.printf
 		self.Stream.features = None
 		self._metastream = Node('stream:stream')
 		self._metastream.setNamespace(self._owner.Namespace)
 		self._metastream.setAttr('version', '1.0')
 		self._metastream.setAttr('xmlns:stream', NS_STREAMS)
 		self._metastream.setAttr('to', self._owner.Server)
-		self._owner.send("<?xml version='1.0'?>%s>"%str(self._metastream)[:-2])
+		self._owner.send("<?xml version='1.0'?>%s>" % str(self._metastream)[:-2])
 
 	def _check_stream_start(self, ns, tag, attrs):
 		if ns != NS_STREAMS or tag != 'stream':
@@ -116,9 +123,10 @@ class Dispatcher(PlugIn):
 			self.Stream.Parse(data)
 			if data:
 				return len(data)
-		return '0'	  # It means that nothing is received but link is alive.
+		# It means that nothing is received but link is alive.
+		return '0'
 		
-	def RegisterNamespace(self, xmlns, order = 'info'):
+	def RegisterNamespace(self, xmlns, order='info'):
 		""" Creates internal structures for newly registered namespace.
 			You can register handlers for this namespace afterwards. By default one namespace
 			already registered (jabber:client or jabber:component:accept depending on context. """
@@ -126,7 +134,7 @@ class Dispatcher(PlugIn):
 		self.handlers[xmlns] = {}
 		self.RegisterProtocol('default', Protocol, xmlns=xmlns)
 
-	def RegisterProtocol(self, tagName, Proto, xmlns = None, order = 'info'):
+	def RegisterProtocol(self, tagName, Proto, xmlns=None, order='info'):
 		""" Used to declare some top-level stanza name to dispatcher.
 		   Needed to start registering handlers for such stanzas.
 		   Iq, message and presence protocols are registered by default. """
@@ -134,28 +142,22 @@ class Dispatcher(PlugIn):
 		self.printf('Registering protocol "%s" as %s (%s)' % (tagName, Proto, xmlns), order)
 		self.handlers[xmlns][tagName] = {'type': Proto, 'default': []}
 
-	def RegisterNamespaceHandler(self, xmlns, handler, typ = '', ns = '', makefirst = 0, system = 0):
+	def RegisterNamespaceHandler(self, xmlns, handler, hType=None, nameSpace=''):
 		""" Register handler for processing all stanzas for specified namespace. """
-		self.RegisterHandler('default', handler, typ, ns, xmlns, makefirst, system)
+		self.RegisterHandler('default', handler, hType, nameSpace, xmlns)
 
 	def RegisterHandler(self, name, handler, hType=None, nameSpace='', xmlns=None):
-		"""Register user callback as stanzas handler of declared type. Callback must take
-		   (if chained, see later) arguments: dispatcher instance (for replying), incomed
-		   return of previous handlers.
-		   The callback must raise xmpp.NodeProcessed just before return if it want preven
-		   callbacks to be called with the same stanza as argument _and_, more importantly
-		   library from returning stanza to sender with error set (to be enabled in 0.2 ve
+		"""	Register user callback as stanzas handler of declared type. Callback must take
+			arguments: dispatcher instance (for replying), incomed return of previous handlers.
+			The callback must raise xmpp.NodeProcessed just before return if it want preven
+			callbacks to be called with the same stanza as argument _and_, more importantly
+			library from returning stanza to sender with error set (to be enabled in 0.2 ve
 			Arguments:
-			  "name" - name of stanza. F.e. "iq".
-			  "handler" - user callback.
-			  "typ" - value of stanza's "type" attribute. If not specified any value match
-			  "ns" - namespace of child that stanza must contain.
-			  "chained" - chain together output of several handlers.
-			  "makefirst" - insert handler in the beginning of handlers list instead of
-				adding it to the end. Note that more common handlers (i.e. w/o "typ" and "
-				will be called first nevertheless.
-			  "system" - call handler even if NodeProcessed Exception were raised already.
-			"""
+				"name" - name of stanza. F.e. "iq".
+				"handler" - user callback.
+				"hType" - value of stanza's "type" attribute. If not specified any value match
+				"nameSpace" - namespace of child that stanza must contain.
+		"""
 		if not xmlns:
 			xmlns = self._owner.defaultNamespace
 		self.printf('Registering handler %s for "%s" type: %s, nameSpace: %s (%s)' % (handler, name, hType, nameSpace, xmlns), 'info')
@@ -210,23 +212,6 @@ class Dispatcher(PlugIn):
 			session = self;
 		session.Stream._mini_dom = None;
 		name = stanza.getName();
-
-		if(not direct and self._owner._route):
-			if(name ==  'route'):
-				if(stanza.getAttr('error') == None):
-					if(len(stanza.getChildren()) ==  1):
-						stanza = stanza.getChildren()[0];
-						name = stanza.getName()
-					else:
-						for each in stanza.getChildren():
-							self.dispatch(each, session, direct=True);
-						return;
-			elif(name == 'presence'):
-				return;
-			elif(name in ('features', 'bind')):
-				pass;
-			else:
-				raise(UnsupportedStanzaType(name));
 
 		if(name == 'features'):
 			session.Stream.features = stanza;
@@ -286,44 +271,47 @@ class Dispatcher(PlugIn):
 				except(NodeProcessed):
 					return;
 
-	def WaitForResponse(self, ID, timeout=DEFAULT_TIMEOUT):
+	def WaitForResponse(self, id, timeout=DEFAULT_TIMEOUT):
 		""" Block and wait until stanza with specific "id" attribute will come.
 			If no such stanza is arrived within timeout, return None.
 			If operation failed for some reason then owner's attributes
-			lastErrNode, lastErr and lastErrCode are set accordingly. """
-		self._expected[ID] = None;
+			lastErrNode, lastErr and lastErrCode are set accordingly.
+		"""
+		self._expected[id] = None;
 		timedOut = 0;
 		abortTime = time.time() + timeout;
-		self.printf("Waiting for ID %s with timeout %s..." % (ID, timeout), 'wait')
-		while(not self._expected[ID]):
+		self.printf("Waiting for ID %s with timeout %s..." % (id, timeout), 'wait')
+		while(not self._expected[id]):
 			if(not self.Process(0.04)):
 				self._owner.lastErr = "Disconnect";
 				return(None);
 			if(time.time() > abortTime):
 				self._owner.lastErr = "Timeout";
 				return(None);
-		response = self._expected[ID];
-		del(self._expected[ID]);
+		response = self._expected[id];
+		del(self._expected[id]);
 		if(response.getErrorCode()):
 			self._owner.lastErrNode = response;
 			self._owner.lastErr = response.getError();
 			self._owner.lastErrCode = response.getErrorCode();
 		return(response);
 
-	def SendAndWaitForResponse(self, stanza, timeout = DEFAULT_TIMEOUT):
+	def SendAndWaitForResponse(self, stanza, timeout=DEFAULT_TIMEOUT):
 		""" Put stanza on the wire and wait for recipient's response to it. """
 		return(self.WaitForResponse(self.send(stanza), timeout));
 
 	def SendAndCallForResponse(self, stanza, func, args=None):
 		""" Put stanza on the wire and call back when recipient replies.
-			Additional callback arguments can be specified in args. """
+			Additional callback arguments can be specified in args.
+		"""
 		if(not args):
 			args = {};
 		self._expected[self.send(stanza)] = (func, args);
 
 	def send(self, stanza):
 		""" Serialise stanza and put it on the wire. Assign an unique ID to it before send.
-			Returns assigned ID."""
+			Returns assigned ID.
+		"""
 		if(isinstance(stanza, basestring)):
 			return self._owner_send(stanza)
 		if(not isinstance(stanza, Protocol)): 
@@ -337,15 +325,6 @@ class Dispatcher(PlugIn):
 			stanzaID = stanza.getID();
 		if(self._owner._registeredName and not stanza.getAttr('from')):
 			stanza.setAttr('from', self._owner._registeredName);
-		if(self._owner._route and stanza.getName() !=  'bind'):
-			to = self._owner.Server;
-			if(stanza.getTo() and stanza.getTo().getDomain()):
-				to = stanza.getTo().getDomain()
-			frm = stanza.getFrom()
-			if(frm.getDomain()):
-				frm = frm.getDomain();
-			route = Protocol('route', to = to, frm = frm, payload = [stanza]);
-			stanza = route;
 		stanza.setNamespace(self._owner.Namespace);
 		stanza.setParent(self._metastream);
 		self._owner_send(stanza);

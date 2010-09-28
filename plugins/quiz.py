@@ -122,9 +122,8 @@ def showScoreList(msgType, conference, nick = None):
 	base = gQuizScores[conference];
 	if(not base.isEmpty()):
 		scores = [];
-		for jid in base:
-			item = base[jid];
-			scores.append([item[1], item[2], item[0]]);
+		for jid, info in base.items():
+			scores.append([info[1], info[2], info[0]]);
 		scores.sort();
 		scores.reverse();
 		scores = scores[:10];

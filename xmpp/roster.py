@@ -41,7 +41,7 @@ class Roster(PlugIn):
 		self.ROSTER_DBG_LINE = 'roster';
 		self.rosterData = {};
 		self.state = ROSTER_EMPTY;
-		self._exported_methods = [self.getRoster];
+		self._exportedMethods = [self.getRoster];
 
 	def plugin(self, owner):
 		""" Register presence and subscription trackers in the owner's dispatcher.
