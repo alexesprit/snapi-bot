@@ -34,7 +34,6 @@ def showUserTime(msgType, conference, nick, param):
 def _showUserTime(stanza, msgType, conference, nick, param):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		tzo, utc = None, None;
-		printf(stanza);
 		for p in stanza.getChildren():
 			tzo = p.getTagData('tzo');
 			utc = p.getTagData('utc');

@@ -200,7 +200,7 @@ class Dispatcher(PlugIn):
 				else:
 					name = tag.getName()
 		if name in streamExceptions:
-			exc = stream_exceptions[name]
+			exc = streamExceptions[name]
 		else:
 			exc = StreamError
 		raise exc((name, text))
