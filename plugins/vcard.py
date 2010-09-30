@@ -23,15 +23,14 @@ DESC = (u'Ник', u'Имя', u'Пол', u'Д/р', u'Город', u'Страна
 def showVCard(msgType, conference, nick, param):
 	if(param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
-			userJid = conference + '/' + param;
+			jid = conference + '/' + param;
 		else:
-			sendMsg(msgType, conference, nick, u'а это кто?');
-			return;
+			jid = param;
 	else:
-		userJid = conferenceInList(conference) and (conference + '/' + nick) or conference;
+		jid = conferenceInList(conference) and (conference + '/' + nick) or conference;
 	iq = xmpp.Iq(xmpp.TYPE_GET);
 	iq.addChild('vCard', {}, [], xmpp.NS_VCARD);
-	iq.setTo(userJid);
+	iq.setTo(jid);
 	iq.setID(getUniqueID(VCARD_ID));
 	gClient.SendAndCallForResponse(iq, _showVCard, (msgType, conference, nick, param, ));
 
@@ -40,16 +39,16 @@ def _showVCard(stanza, msgType, conference, nick, param):
 		queryNode = stanza.getChildren();
 		if(queryNode):
 			vcard = {};
-			for tag in queryNode[0].getChildren():
-				pName = tag.getName();
-				pData = tag.getData();
-				if(not pData):
-					for tag in tag.getChildren():
-						pName = tag.getName();
-						pData = tag.getData();
-						vcard[pName] = pData;
+			for child in queryNode[0].getChildren():
+				tagName = child.getName();
+				tagData = child.getData();
+				if(not tagData):
+					for child in child.getChildren():
+						tagName = child.getName();
+						tagData = child.getData();
+						vcard[tagName] = tagData;
 				else:
-					vcard[pName] = pData;
+					vcard[tagName] = tagData;
 			message = fillVCard(vcard);
 			if(message):
 				if(not param):
@@ -63,12 +62,9 @@ def _showVCard(stanza, msgType, conference, nick, param):
 				sendMsg(msgType, conference, nick, u'вкард заполни сначала');
 			else:
 				sendMsg(msgType, conference, nick, u'пусть %s сначала вкард заполнит' % (param));
-	elif(ERROR == stanza.getType()):
-		if(not param):
-			sendMsg(msgType, conference, nick, u'хехе, твой клиент ничего не знает про вкарды');
-		else:
-			sendMsg(msgType, conference, nick, u'хехе, клиент у %s ничего не знает про вкарды' % (param));
-				
+	else:
+		sendMsg(msgType, conference, nick, u'не получается :(');
+			
 def fillVCard(vcard):
 	name = '';
 	for tag in ('GIVEN', 'MIDDLE', 'FAMILY'):

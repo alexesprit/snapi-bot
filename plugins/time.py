@@ -19,15 +19,14 @@ TIME_ID = 'time_id';
 def showUserTime(msgType, conference, nick, param):
 	if(param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
-			userJid = conference + '/' + param;
+			jid = conference + '/' + param;
 		else:
-			sendMsg(msgType, conference, nick, u'а это кто?');
-			return;
+			jid = param;
 	else:
-		userJid = conference + '/' + nick;
+		jid = conference + '/' + nick;
 	iq = xmpp.Iq(xmpp.TYPE_GET);
 	iq.addChild('time', {}, [], xmpp.NS_ENTITY_TIME);
-	iq.setTo(userJid);
+	iq.setTo(jid);
 	iq.setID(getUniqueID(TIME_ID));
 	gClient.SendAndCallForResponse(iq, _showUserTime, (msgType, conference, nick, param));
 
@@ -52,9 +51,6 @@ def _showUserTime(stanza, msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u'клиент глюк, инфы не хватает');
 	else:
-		if(not param):
-			sendMsg(msgType, conference, nick, u'хехе, твой клиент не дружит с этим');
-		else:
-			sendMsg(msgType, conference, nick, u'хехе, клиент у %s не дружит с этим' % (param));
+		sendMsg(msgType, conference, nick, u'не получается :(');
 
 registerCommand(showUserTime, u'часики', 10, u'Показывает время указанного пользователя', u'часики [ник]', (u'часики', u'часики Nick'));

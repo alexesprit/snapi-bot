@@ -15,48 +15,17 @@
 
 import shutil;
 
-DIR = 1;
-FILE = 2;
-
-def showDirectory(msgType, conference, nick, param):
-	if(os.path.exists(param)):
-		if(os.path.isdir(param)):
-			items = os.listdir(param);
-			if(items):
-				content = [];
-				text = u'содержимое %s:\n' % (param);
-				for item in items:
-					if(os.path.isdir(os.path.join(param, item))):
-						content.append('/%s' % (item));
-					else:
-						content.append(item);
-				content.sort();
-				text += '\n'.join(content);
-				sendMsg(msgType, conference, nick, text);
-			else:
-				sendMsg(msgType, conference, nick, u'папка пуста');
-		else:
-			sendMsg(msgType, conference, nick,	u'а это не папка :)');
-	else:
-		sendMsg(msgType, conference, nick,	u'не найдено');
-
-def deletePath(msgType, conference, nick, param):
-	answer = deleteFile(param);
-	if(answer == DIR):
-		sendMsg(msgType, conference, nick,	u'папка удалена');
-	elif(answer == FILE):
-		sendMsg(msgType, conference, nick,	u'файл удалён');
-	else:
-		sendMsg(msgType, conference, nick,	u'не найдено');
+TYPE_DIR = 1;
+TYPE_FILE = 2;
 		
 def deleteFromConfig(msgType, conference, nick, param):
 	files, dirs = 0, 0;
 	for conf in getConferences():
 		path = getConfigPath(conf, param);
 		answer = deleteFile(path);
-		if(answer == DIR):
+		if(TYPE_DIR == answer):
 			dirs += 1;
-		elif(answer == FILE):
+		elif(TYPE_FILE == answer):
 			files += 1;
 	sendMsg(msgType, conference, nick, u'удалено %d папок и %d файлов' % (dirs, files));
 	
@@ -64,13 +33,11 @@ def deleteFile(path):
 	if(os.path.exists(path)):
 		if(os.path.isdir(path)):
 			shutil.rmtree(path);
-			return(DIR);
+			return(TYPE_DIR);
 		else:
 			os.remove(path);
-			return(FILE);
+			return(TYPE_FILE);
 	else:
 		return(-1);
 
 registerCommand(deleteFromConfig, u'rmcfg', 100, u'Удаляет файл или папку из /config', u'rmcfg <имя>', (u'rmcfg test.txt', ), ROSTER | PARAM);	 
-registerCommand(deletePath, u'rm', 100, u'Удаляет файл или папку', u'rm <имя>', (u'rm test.txt', ), ROSTER | PARAM);
-registerCommand(showDirectory, u'ls', 100, u'Показывает список указанного каталога', u'ls <путь>', (u'ls dynamic', ), ROSTER | PARAM);

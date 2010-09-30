@@ -151,22 +151,6 @@ class Node(object):
 			s += "</%s>" % (self.name)
 		return s
 
-	def getCDATA(self):
-		""" Serialise node, dropping all tags and leaving CDATA intact.
-			That is effectively kills all formatiing, leaving only text were contained in XML.
-		"""
-		s = ""
-		cnt = 0
-		if self.children:
-			for child in self.children:
-				s += self.data[cnt]
-				if child:
-					s += child.getCDATA()
-				cnt=cnt+1
-		if (len(self.data) - 1) >= cnt:
-			s += self.data[cnt]
-		return s
-
 	def addChild(self, name=None, attrs=None, payload=None, namespace=None, node=None):
 		""" If "node" argument is provided, adds it as child node. Else creates new node from
 			the other arguments' values and adds it as well."""
@@ -215,6 +199,10 @@ class Node(object):
 		""" Returns all node's child nodes as list. """
 		return self.children
 
+	def getFirstChild(self):
+		if self.children:
+			return self.children[0]
+
 	def getData(self):
 		""" Returns all node CDATA as string (concatenated). """
 		return ''.join(self.data)
@@ -254,7 +242,7 @@ class Node(object):
 		""" Returns attribute value of the child with specified name (or None if no such attribute)."""
 		try:
 			return self.getTag(tag).attrs[attr]
-		except(AttributeError):
+		except(AttributeError, KeyError):
 			return None
 
 	def getTagData(self,tag):
@@ -365,7 +353,7 @@ class Node(object):
 		except(AttributeError):
 			self.addChild(tag, attrs, payload=[ustr(val)])
 
-	def has_attr(self, key):
+	def hasAttr(self, key):
 		""" Checks if node have attribute "key"."""
 		return key in self.attrs
 

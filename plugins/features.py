@@ -77,8 +77,7 @@ def showFeatures(msgType, conference, nick, param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			jid = conference + '/' + param;
 		else:
-			sendMsg(msgType, conference, nick, u'а это кто?');
-			return;
+			jid = param;
 	else:
 		jid = conference + '/' + nick;
 	iq = xmpp.Iq(xmpp.TYPE_GET);
@@ -100,10 +99,7 @@ def _showFeatures(stanza, msgType, conference, nick, param):
 		if(featList):
 			featList = list(featList);
 			featList.sort();
-			if(param):
-				answer = u'клиент %s поддерживает следующие стандарты:\n%s' % (param, '\n'.join(featList));
-			else:
-				answer = u'твой клиент поддерживает следующие стандарты:\n%s' % ('\n'.join(featList));
+			answer = u'вот, что я узнала:\n%s' % ('\n'.join(featList));
 			if(xmpp.TYPE_PUBLIC == msgType):
 				sendMsg(msgType, conference, nick, u'ушли');
 			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, answer);

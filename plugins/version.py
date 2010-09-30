@@ -24,8 +24,7 @@ def showVersion(msgType, conference, nick, param):
 			if(conferenceInList(conference) and nickIsOnline(conference, param)):
 				jid = conference + '/' + param;
 			else:
-				sendMsg(msgType, conference, nick, u'а это кто?');
-				return;
+				jid = param;
 		else:
 			jid = conference + '/' + nick;
 		iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_VERSION);
@@ -36,13 +35,13 @@ def showVersion(msgType, conference, nick, param):
 def _showVersion(stanza, msgType, conference, nick, param):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		name, ver, os = '', '', '';
-		for p in stanza.getQueryChildren():
-			if(p.getName() == 'name'):
-				name = p.getData();
-			elif(p.getName() == 'version'):
-				ver = p.getData();
-			elif(p.getName() == 'os'):
-				os = p.getData();
+		for child in stanza.getQueryChildren():
+			if(child.getName() == 'name'):
+				name = child.getData();
+			elif(child.getName() == 'version'):
+				ver = child.getData();
+			elif(child.getName() == 'os'):
+				os = child.getData();
 		version = u'';
 		if(name):
 			version += name;
@@ -58,6 +57,6 @@ def _showVersion(stanza, msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u'клиент глюк, инфы не хватает');
 	else:
-		sendMsg(msgType, conference, nick, u'глючит клиент');
+		sendMsg(msgType, conference, nick, u'не получается :(');
 
 registerCommand(showVersion, u'версия', 10, u'Показывает информацию о клиенте указанного пользователя', u'версия [ник]', (u'версия', u'версия Nick'));

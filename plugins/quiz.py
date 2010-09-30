@@ -33,7 +33,7 @@ gQuizTimer = {};
 gQuizAskTime = {};
 gQuizIdleCount = {};
 
-def idleCheck(conference):
+def quizIdleCheck(conference):
 	sendToConference(conference, u'(!) Время вышло! Правильный ответ: %s' % (gQuizAnswer[conference]));
 	gQuizIdleCount[conference] += 1;
 	if(gQuizIdleCount[conference] == QUIZ_IDLE_LIMIT):
@@ -51,8 +51,7 @@ def isTimerEnabled(conference):
 def resetQuizTimer(conference):
 	if(isTimerEnabled(conference)):
 		gQuizTimer[conference].cancel();
-	gInfo['tmr'] += 1;
-	gQuizTimer[conference] = startTimer(QUIZ_TIME_LIMIT, idleCheck, (conference, ));
+	gQuizTimer[conference] = startTimer(QUIZ_TIME_LIMIT, quizIdleCheck, (conference, ));
 
 def getNewQuestion():
 	questionNum = random.randrange(0, QUIZ_TOTAL_LINES);

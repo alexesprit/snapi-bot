@@ -18,49 +18,47 @@ INFO_ID = 'info_id';
 STATS_ID = 'stats_id';
 UPTIME_ID = 'uptime_id';
 
-def _showServerStats(stanza, msgType, conference, nick, param):
+def _showServerStats(stanza, msgType, conference, nick, server):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
-		message = u'Инфа о %s:' % param;
+		message = u'Инфа о %s:' % server;
 		for stat in stanza.getQueryChildren():
-			attr = stat.getAttrs();
-			message += u'\n%s: %s %s' % (attr['name'], attr['value'], attr['units']);
+			attrs = stat.getAttrs();
+			message += u'\n%s: %s %s' % (attrs['name'], attrs['value'], attrs['units']);
 		sendMsg(msgType, conference, nick, message);
 	else:
 		sendMsg(msgType, conference, nick, u'не получается :(');
 
-def _showServerInfo(stanza, msgType, conference, nick, param):
+def _showServerInfo(stanza, msgType, conference, nick, server):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_STATS);
 		iq.setQueryPayload(stanza.getQueryChildren());
-		iq.setTo(param);
+		iq.setTo(server);
 		iq.setID(getUniqueID(STATS_ID));
-		gClient.SendAndCallForResponse(iq, _showServerStats, (msgType, conference, nick, param, ));
+		gClient.SendAndCallForResponse(iq, _showServerStats, (msgType, conference, nick, server, ));
 	else:
 		sendMsg(msgType, conference, nick, u'не получается :(');
 
 def showServerInfo(msgType, conference, nick, param):
-	param = param or gHost;
+	server = param or gHost;
 	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_STATS);
-	iq.setTo(param);
+	iq.setTo(server);
 	iq.setID(getUniqueID(INFO_ID));
 	gClient.SendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, param, ));
 
-def _showServerUptime(stanza, msgType, conference, nick, param):
+def _showServerUptime(stanza, msgType, conference, nick, server):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
-		for p in stanza.getPayload():
-			sec = p.getAttrs()['seconds'];
-			if(not sec == '0'):
-				sendMsg(msgType, conference, nick, u'%s работает уже %s' % (param, time2str(int(sec))));
-				break;
+		child = stanza.getFirstChild();
+		seconds = child.getAttr('seconds');
+		sendMsg(msgType, conference, nick, u'%s работает уже %s' % (server, time2str(int(seconds))));
 	else:
 		sendMsg(msgType, conference, nick, u'не получается :(');
 
 def showServerUptime(msgType, conference, nick, param):
-	param = param or gHost;
+	server = param or gHost;
 	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_LAST);
-	iq.setTo(param);
+	iq.setTo(server);
 	iq.setID(getUniqueID(UPTIME_ID));
-	gClient.SendAndCallForResponse(iq, _showServerUptime, (msgType, conference, nick, param, ));
+	gClient.SendAndCallForResponse(iq, _showServerUptime, (msgType, conference, nick, server, ));
 
 registerCommand(showServerInfo, u'инфа', 10, u'Возвращает статистику о сервере', u'инфа [сервер]', (u'инфа jabber.aq', ));
 registerCommand(showServerUptime, u'аптайм', 10, u'Показывает аптайм определённого сервера', u'аптайм [сервер]', (u'аптайм freize.org', ));

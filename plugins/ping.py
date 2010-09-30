@@ -32,15 +32,14 @@ def _showPing(stanza, t0, msgType, conference, nick, param):
 def showPing(msgType, conference, nick, param):
 	if(param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
-			userJid = conference + '/' + param;
+			jid = conference + '/' + param;
 		else:
-			sendMsg(msgType, conference, nick, u'а это кто?');
-			return;
+			jid = param;
 	else:
-		userJid = conference + '/' + nick;
+		jid = conference + '/' + nick;
 	iq = xmpp.Iq(xmpp.TYPE_GET);
 	iq.addChild('ping', {}, [], xmpp.NS_PING);
-	iq.setTo(userJid);
+	iq.setTo(jid);
 	iq.setID(getUniqueID(PING_ID));
 	t0 = time.time();
 	gClient.SendAndCallForResponse(iq, _showPing, (t0, msgType, conference, nick, param, ));

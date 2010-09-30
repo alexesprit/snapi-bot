@@ -23,11 +23,9 @@ def showOnlineTime(msgType, conference, nick, param):
 
 def _showOnlineTime(stanza, msgType, conference, nick):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
-		for p in stanza.getPayload():
-			sec = p.getAttrs()['seconds'];
-			if(not sec == '0'):
-				sendMsg(msgType, conference, nick, u'ты в сети уже %s' % (time2str(int(sec))));
-				break;
+		child = stanza.getFirstChild();
+		seconds = child.getAttr('seconds');
+		sendMsg(msgType, conference, nick, u'ты в сети уже %s' % (time2str(int(seconds))));
 	else:
 		sendMsg(msgType, conference, nick, u'не получается :(');
 

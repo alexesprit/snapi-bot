@@ -35,9 +35,9 @@ def serviceDiscovery(msgType, conference, nick, param):
 		else:		
 			searchKey = args[1];
 	iq = xmpp.Iq(xmpp.TYPE_GET);
-	query = iq.addChild('query', {}, [], xmpp.NS_DISCO_ITEMS);
+	query = iq.addChild('query', None, None, xmpp.NS_DISCO_ITEMS);
 	if(jid.count('#')):
-		query.setAttr('node', jid.split('#')[1]);
+		iq.setQueryNode(jid.split('#')[1]);
 		iq.setTo(jid.split('#')[0]);
 	else:
 		iq.setTo(jid);
