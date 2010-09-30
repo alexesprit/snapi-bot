@@ -419,7 +419,7 @@ def setRosterStatus(status, show, priority):
 		prs.setStatus(status);
 	if(show):
 		prs.setShow(show);
-	prs.addChild(node = getCapsNode());
+	prs.addChild(node=getCapsNode());
 	gClient.send(prs);
 
 def setBotStatus(conference, status, show):
@@ -428,7 +428,7 @@ def setBotStatus(conference, status, show):
 		prs.setStatus(status);
 	if(show):
 		prs.setShow(show);
-	prs.addChild(node = getCapsNode());
+	prs.addChild(node=getCapsNode());
 	gClient.send(prs);
 
 def setRole(conference, nick, role, reason=None):

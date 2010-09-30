@@ -36,15 +36,28 @@ def H(some):
 def C(some):
 	return ':'.join(some)
 
+DBG_AUTH = "auth"
+DBG_BIND = "bind"
+
+AUTH_FAILURE = 0x0
+AUTH_WAITING = 0x1
+AUTH_NONSASL = 0x2
+AUTH_SUCCESS = 0x3
+
+BIND_WAITING = 0x4
+BIND_BINDING = 0x5
+BIND_FAILURE = 0x6
+BIND_SUCCESS = 0x7
+
 class NonSASL(PlugIn):
 	""" Implements old Non-SASL (JEP-0078) authentication used in jabberd1.4 and transport authentication."""
 	def __init__(self, user, password, resource):
 		""" Caches username,  password and resource for auth. """
 		PlugIn.__init__(self)
-		self.DBG_LINE='auth'
-		self.user=user
-		self.password=password
-		self.resource=resource
+		self.user = user
+		self.password = password
+		self.resource = resource
+		self.DBG_LINE = DBG_AUTH
 
 	def plugin(self, owner):
 		""" Determine the best auth method (digest/0k/plain) and use it for auth.
@@ -55,8 +68,8 @@ class NonSASL(PlugIn):
 		if(TYPE_RESULT != resp.getType()):
 			self.printf('No result node arrived! Aborting...', 'error')
 			return
-		iq=Iq(typ='set', node=resp)
-		query=iq.getTag('query')
+		iq = Iq(typ='set', node=resp)
+		query = iq.getTag('query')
 		query.setTagData('username', self.user)
 		query.setTagData('resource', self.resource)
 
@@ -109,23 +122,30 @@ class SASL(PlugIn):
 	""" Implements SASL authentication. """
 	def __init__(self, username, password):
 		PlugIn.__init__(self)
-		self.username=username
-		self.password=password
+		self.username = username
+		self.password = password
+		self.DBG_LINE = DBG_AUTH
 
 	def plugin(self, owner):
-		if not self._owner.Dispatcher.Stream._document_attrs.has_key('version'): self.startsasl='not-supported'
+		if not self._owner.Dispatcher.Stream._document_attrs.get('version'):
+			self.state = AUTH_FAILURE
 		elif self._owner.Dispatcher.Stream.features:
 			self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
-		else: self.startsasl=None
+		else:
+			self.state = None
 
 	def auth(self):
 		""" Start authentication. Result can be obtained via "SASL.startsasl" attribute and will be
 			either "success" or "failure". Note that successfull auth will take at least
-			two Dispatcher.Process() calls. """
-		if self.startsasl: pass
+			two Dispatcher.Process() calls.
+		"""
+		if self.state:
+			pass
 		elif self._owner.Dispatcher.Stream.features:
-			try: self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
-			except NodeProcessed: pass
+			try:
+				self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
+			except NodeProcessed:
+				pass
 		else: self._owner.RegisterHandler('features', self.FeaturesHandler, xmlns=NS_STREAMS)
 
 	def plugout(self):
@@ -138,50 +158,52 @@ class SASL(PlugIn):
 	def FeaturesHandler(self, conn, feats):
 		""" Used to determine if server supports SASL auth. Used internally. """
 		if not feats.getTag('mechanisms', namespace=NS_SASL):
-			self.startsasl='not-supported'
+			self.state = AUTH_FAILURE
 			self.printf('SASL not supported by server', 'error')
 			return
-		mecs=[]
+		mecs = []
 		for mec in feats.getTag('mechanisms', namespace=NS_SASL).getTags('mechanism'):
 			mecs.append(mec.getData())
 		self._owner.RegisterHandler('challenge', self.SASLHandler, xmlns=NS_SASL)
 		self._owner.RegisterHandler('failure', self.SASLHandler, xmlns=NS_SASL)
 		self._owner.RegisterHandler('success', self.SASLHandler, xmlns=NS_SASL)
-		if "ANONYMOUS" in mecs and self.username  ==  None:
-			node=Node('auth', attrs={'xmlns':NS_SASL, 'mechanism':'ANONYMOUS'})
+		if "ANONYMOUS" in mecs and self.username is None:
+			node = Node('auth', attrs={'xmlns': NS_SASL, 'mechanism': 'ANONYMOUS'})
 		elif "DIGEST-MD5" in mecs:
-			node=Node('auth', attrs={'xmlns':NS_SASL, 'mechanism':'DIGEST-MD5'})
+			node = Node('auth', attrs={'xmlns': NS_SASL, 'mechanism': 'DIGEST-MD5'})
 		elif "PLAIN" in mecs:
-			sasl_data='%s\x00%s\x00%s'%(self.username+'@'+self._owner.Server, self.username, self.password)
-			node=Node('auth', attrs={'xmlns':NS_SASL, 'mechanism':'PLAIN'}, payload=[base64.encodestring(sasl_data).replace('\r', '').replace('\n', '')])
+			sasl_data='%s@%s\x00%s\x00%s' % (self.username, self._owner.Server, self.username, self.password)
+			node=Node('auth', attrs={'xmlns': NS_SASL, 'mechanism': 'PLAIN'}, \
+						payload=[base64.encodestring(sasl_data).replace('\r', '').replace('\n', '')])
 		else:
-			self.startsasl='failure'
+			self.state = AUTH_FAILURE
 			self.printf('I can only use DIGEST-MD5 and PLAIN mecanisms.', 'error')
 			return
-		self.startsasl='in-process'
+		self.state = AUTH_WAITING
 		self._owner.send(node.__str__())
 
 	def SASLHandler(self, conn, challenge):
 		""" Perform next SASL auth step. Used internally. """
-		if challenge.getNamespace()<>NS_SASL: return
+		if challenge.getNamespace() != NS_SASL:
+			return
 		if challenge.getName() == 'failure':
-			self.startsasl='failure'
-			try: reason=challenge.getChildren()[0]
-			except: reason=challenge
-			self.printf('Failed SASL authentification: %s'%reason, 'error')
+			self.state = AUTH_FAILURE
+			try:
+				reason = challenge.getChildren()[0]
+			except:
+				reason = challenge
+			self.printf('Failed SASL authentification: %s' % (reason), 'error')
 			raise NodeProcessed
-			#return
 		elif challenge.getName() == 'success':
-			self.startsasl='success'
-			self.printf('Successfully authenticated with remote server.', 'ok')
-			handlers=self._owner.Dispatcher.dumpHandlers()
+			self.state = AUTH_SUCCESS
+			self.printf('Successfully authenticated with remote server', 'ok')
+			handlers = self._owner.Dispatcher.dumpHandlers()
 			self._owner.Dispatcher.PlugOut()
 			dispatcher.Dispatcher().PlugIn(self._owner)
 			self._owner.Dispatcher.restoreHandlers(handlers)
-			self._owner.User=self.username
+			self._owner.User = self.username
 			raise NodeProcessed
-			#return
-########################################3333
+
 		incoming_data=challenge.getData()
 		chal={}
 		data=base64.decodestring(incoming_data)
@@ -216,7 +238,7 @@ class SASL(PlugIn):
 			self._owner.send(node.__str__())
 		elif chal.has_key('rspauth'): self._owner.send(Node('response', attrs={'xmlns':NS_SASL}).__str__())
 		else: 
-			self.startsasl='failure'
+			self.state = AUTH_FAILURE
 			self.printf('Failed SASL authentification: unknown challenge', 'error')
 		raise NodeProcessed
 
@@ -224,113 +246,52 @@ class Bind(PlugIn):
 	""" Bind some JID to the current connection to allow router know of our location."""
 	def __init__(self):
 		PlugIn.__init__(self)
-		self.DBG_LINE='bind'
-		self.bound=None
+		self.DBG_LINE = DBG_BIND
+		self.bound = BIND_WAITING
 
 	def plugin(self, owner):
 		""" Start resource binding,  if allowed at this time. Used internally. """
 		if self._owner.Dispatcher.Stream.features:
 			self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
-		else: self._owner.RegisterHandler('features', self.FeaturesHandler, xmlns=NS_STREAMS)
+		else:
+			self._owner.RegisterHandler("features", self.FeaturesHandler, xmlns=NS_STREAMS)
 
 	def plugout(self):
-		""" Remove Bind handler from owner's dispatcher. Used internally. """
-		self._owner.UnregisterHandler('features', self.FeaturesHandler, xmlns=NS_STREAMS)
+		""" Remove Bind handler from owner"s dispatcher. Used internally. """
+		self._owner.UnregisterHandler("features", self.FeaturesHandler, xmlns=NS_STREAMS)
 
 	def FeaturesHandler(self, conn, feats):
 		""" Determine if server supports resource binding and set some internal attributes accordingly. """
-		if not feats.getTag('bind', namespace=NS_BIND):
-			self.bound='failure'
-			self.printf('Server does not requested binding.', 'error')
+		if not feats.getTag("bind", namespace=NS_BIND):
+			self.bound = BIND_FAILURE
+			self.printf("Server does not requested binding.", "error")
 			return
-		if feats.getTag('session', namespace=NS_SESSION): self.session=1
-		else: self.session =- 1
-		self.bound=[]
+		self.bound = BIND_BINDING
 
 	def Bind(self, resource=None):
 		""" Perform binding. Use provided resource name or random (if not provided). """
-		while self.bound is None and self._owner.Process(1): pass
-		if resource: resource=[Node('resource', payload=[resource])]
+		while self.bound == BIND_WAITING and self._owner.Process(1): pass
+		if resource: resource=[Node("resource", payload=[resource])]
 		else: resource=[]
-		resp=self._owner.SendAndWaitForResponse(Protocol('iq', typ='set', payload=[Node('bind', attrs={'xmlns':NS_BIND}, payload=resource)]))
+		resp = self._owner.SendAndWaitForResponse(Protocol("iq", typ=TYPE_SET, payload=[Node("bind", attrs={"xmlns":NS_BIND}, payload=resource)]))
 		stanzaType = resp.getType();
 		if stanzaType == TYPE_RESULT:
-			self.bound.append(resp.getTag('bind').getTagData('jid'))
-			self.printf('Successfully bound %s.'%self.bound[-1], 'ok')
-			jid=JID(resp.getTag('bind').getTagData('jid'))
-			self._owner.User=jid.getNode()
-			self._owner.Resource=jid.getResource()
-			resp=self._owner.SendAndWaitForResponse(Protocol('iq', typ='set', payload=[Node('session', attrs={'xmlns':NS_SESSION})]))
+			resource = resp.getTag("bind").getTagData("jid")
+			self.printf("Successfully bound %s" % (resource), "ok")
+			jid = JID(resp.getTag("bind").getTagData("jid"))
+			self._owner.User = jid.getNode()
+			self._owner.Resource = jid.getResource()
+			resp = self._owner.SendAndWaitForResponse(Protocol("iq", typ=TYPE_SET, payload=[Node("session", attrs={"xmlns":NS_SESSION})]))
+			stanzaType = resp.getType();
 			if stanzaType == TYPE_RESULT:
-				self.printf('Successfully opened session.', 'ok')
-				self.session=1
-				return 'ok'
+				self.printf("Successfully opened session", "ok")
+				return BIND_SUCCESS
 			else:
-				self.printf('Session open failed.', 'error')
-				self.session=0
-		elif resp: self.printf('Binding failed: %s.'%resp.getTag('error'), 'error')
-		else:
-			self.printf('Binding failed: timeout expired.', 'error')
-			return ''
-
-class ComponentBind(PlugIn):
-	""" ComponentBind some JID to the current connection to allow router know of our location."""
-	def __init__(self,  sasl):
-		PlugIn.__init__(self)
-		self.DBG_LINE='bind'
-		self.bound=None
-		self.needsUnregister = False
-		self.sasl = sasl
-
-	def plugin(self, owner):
-		""" Start resource binding,  if allowed at this time. Used internally. """
-		if not self.sasl:
-			self.bound=[]
-			return
-		if self._owner.Dispatcher.Stream.features:
-			self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
-		else:
-			self._owner.RegisterHandler('features', self.FeaturesHandler, xmlns=NS_STREAMS)
-			self.needsUnregister = True
-
-	def plugout(self):
-		""" Remove ComponentBind handler from owner's dispatcher. Used internally. """
-		if self.needsUnregister:
-			self._owner.UnregisterHandler('features', self.FeaturesHandler, xmlns=NS_STREAMS)
-
-	def FeaturesHandler(self, conn, feats):
-		""" Determine if server supports resource binding and set some internal attributes accordingly. """
-		if not feats.getTag('bind', namespace=NS_BIND):
-			self.bound='failure'
-			self.printf('Server does not requested binding.', 'error')
-			return
-		if feats.getTag('session', namespace=NS_SESSION): self.session=1
-		else: self.session =- 1
-		self.bound=[]
-
-	def Bind(self, domain=None):
-		""" Perform binding. Use provided domain name (if not provided). """
-		while self.bound is None and self._owner.Process(1): pass
-		if self.sasl:
-			xmlns = NS_COMPONENT_1
-		else:
-			xmlns = None
-		self.bindresponse = None
-		ttl = dispatcher.DefaultTimeout
-		self._owner.RegisterHandler('bind', self.BindHandler, xmlns=xmlns)
-		self._owner.send(Protocol('bind', attrs={'name':domain}, xmlns=NS_COMPONENT_1))
-		while self.bindresponse is None and self._owner.Process(1) and ttl > 0: ttl-=1
-		self._owner.UnregisterHandler('bind', self.BindHandler, xmlns=xmlns)
-		resp=self.bindresponse
-		if resp and resp.getAttr('error'):
-			self.printf('Binding failed: %s.'%resp.getAttr('error'), 'error')
+				self.printf("Session open failed", "error")
+				return BIND_FAILURE
 		elif resp:
-			self.printf('Successfully bound.', 'ok')
-			return 'ok'
+			self.printf("Binding failed: %s" % (resp.getTag("error")), "error")
+			return BIND_FAILURE
 		else:
-			self.printf('Binding failed: timeout expired.', 'error')
-			return ''
-
-	def BindHandler(self, conn, bind):
-		self.bindresponse = bind
-		pass
+			self.printf("Binding failed: timeout expired.", "error")
+			return BIND_FAILURE

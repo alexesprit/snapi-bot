@@ -214,25 +214,22 @@ class Client(CommonClient):
 				pass
 		if sasl:
 			auth.SASL(user, password).PlugIn(self)
-		if not sasl or self.SASL.startsasl == 'not-supported':
+		if not sasl or self.SASL.state == auth.AUTH_FAILURE:
 			if not resource:
-				resource = 'xmpppy'
+				resource = "xmpppy"
 			if auth.NonSASL(user, password, resource).PlugIn(self):
-				return 'old_auth'
-			return
+				return auth.AUTH_NONSASL
+			return auth.AUTH_FAILURE
 		self.SASL.auth()
-		while self.SASL.startsasl == 'in-process' and self.Process(1):
+		while auth.AUTH_WAITING == self.SASL.state and self.Process(1):
 			pass
-		if self.SASL.startsasl == 'success':
+		if auth.AUTH_SUCCESS == self.SASL.state:
 			auth.Bind().PlugIn(self)
-			while self.Bind.bound is None and self.Process(1):
-				pass
-			self.SASL.PlugOut()
-			if self.Bind.Bind(resource):
-				return 'sasl'
-		else:
-			if hasattr(self, 'SASL'):
-				self.SASL.PlugOut()
+			if auth.BIND_SUCCESS == self.Bind.Bind(resource):
+				self.Bind.PlugOut()
+				return auth.AUTH_SUCCESS
+		self.SASL.PlugOut()
+		return auth.AUTH_FAILURE
 
 	def getRoster(self):
 		""" Return the Roster instance, previously plugging it in and
