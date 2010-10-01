@@ -60,5 +60,9 @@ def showServerUptime(msgType, conference, nick, param):
 	iq.setID(getUniqueID(UPTIME_ID));
 	gClient.SendAndCallForResponse(iq, _showServerUptime, (msgType, conference, nick, server, ));
 
-registerCommand(showServerInfo, u'инфа', 10, u'Возвращает статистику о сервере', u'инфа [сервер]', (u'инфа jabber.aq', ));
-registerCommand(showServerUptime, u'аптайм', 10, u'Показывает аптайм определённого сервера', u'аптайм [сервер]', (u'аптайм freize.org', ));
+registerCommand(showServerInfo, u'инфа', 10, \
+				u'Возвращает статистику о сервере', \
+				u'инфа [сервер]', (u'инфа server.tld', ));
+registerCommand(showServerUptime, u'аптайм', 10, \
+				u'Показывает аптайм определённого сервера', \
+				u'аптайм [сервер]', (u'аптайм server.tld', ));

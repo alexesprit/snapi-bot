@@ -59,4 +59,6 @@ def _showVersion(stanza, msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'не получается :(');
 
-registerCommand(showVersion, u'версия', 10, u'Показывает информацию о клиенте указанного пользователя', u'версия [ник]', (u'версия', u'версия Nick'));
+registerCommand(showVersion, u'версия', 10, \
+				u'Показывает информацию о версии ПО указанного пользователя или сервера', \
+				u'версия [ник|сервер]', (u'версия', u'версия Nick', u'версия server.tld'));

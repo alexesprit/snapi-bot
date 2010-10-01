@@ -111,4 +111,6 @@ registerEvent(loadMsgBase, ADDCONF);
 registerEvent(unloadMsgBase, DELCONF);
 registerEvent(setChatterboxState, ADDCONF);
 
-registerCommand(chatterboxControl, u'болталка', 30, u'Отключает (0) или включает (1) болталку. Без параметра покажет текущее значение', u'болталка [0/1]', (u'болталка', u'болталка 0'), CHAT);
+registerCommand(chatterboxControl, u'болталка', 30, \
+				u'Отключает (0) или включает (1) болталку. Без параметра покажет текущее значение', \
+				u'болталка [0|1]', (u'болталка', u'болталка 0'), CHAT);

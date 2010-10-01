@@ -45,4 +45,6 @@ def jokesControl(msgType, conference, nick, param):
 registerEvent(loadJokes, STARTUP);
 registerEvent(setJokesState, ADDCONF);
 
-registerCommand(jokesControl, u'шуточки', 30, u'Отключает (0) или включает (1) шуточки, которыми бот порою подменяет ответ. Без параметра покажет текущее значение', u'шуточки [0/1]', (u'шуточки', u'шуточки 0'), CHAT);
+registerCommand(jokesControl, u'шуточки', 30, \
+				u'Отключает (0) или включает (1) шуточки, которыми бот порою подменяет ответ. Без параметра покажет текущее значение', \
+				u'шуточки [0|1]', (u'шуточки', u'шуточки 0'), CHAT);

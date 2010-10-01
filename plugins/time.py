@@ -53,4 +53,6 @@ def _showUserTime(stanza, msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'не получается :(');
 
-registerCommand(showUserTime, u'часики', 10, u'Показывает время указанного пользователя', u'часики [ник]', (u'часики', u'часики Nick'));
+registerCommand(showUserTime, u'часики', 10, \
+				u'Показывает время указанного пользователя или сервера', \
+				u'часики [ник|сервер]', (u'часики', u'часики Nick', u'часики server.tld'));

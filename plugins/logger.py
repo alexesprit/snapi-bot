@@ -140,4 +140,6 @@ if(gLogDir):
 	registerPresenceHandler(writePresence, CHAT);
 	registerMessageHandler(writeMessage, CHAT);
 registerEvent(setLoggingState, ADDCONF);		
-registerCommand(loggingControl, u'логирование', 30, 'Отключает (0) или включает (1) ведение логов. Без параметра покажет текущее значение','логирование [0/1]', ('логирование', 'логирование 0'), CHAT);
+registerCommand(loggingControl, u'логирование', 30, \
+				'Отключает (0) или включает (1) ведение логов. Без параметра покажет текущее значение', \
+				'логирование [0|1]', ('логирование', 'логирование 0'), CHAT);

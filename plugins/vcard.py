@@ -77,4 +77,6 @@ def fillVCard(vcard):
 	items = ['%s: %s' % (DESC[i], vcard[TAGS[i]]) for i in range(0, len(TAGS)) if(TAGS[i] in vcard and vcard[TAGS[i]])];
 	return('\n'.join(items));
 
-registerCommand(showVCard, u'визитка', 10, u'Показывает vCard указанного пользователя', u'визитка [ник]', (u'визитка', u'визитка Nick'));
+registerCommand(showVCard, u'визитка', 10, \
+				u'Показывает vCard указанного пользователя или сервера', \
+				u'визитка [ник|сервер]', (u'визитка', u'визитка Nick', u'визитка server.tld'));

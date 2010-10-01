@@ -261,56 +261,81 @@ class JID:
 			JID('node@domain/resource')
 			JID(node='node',domain='domain.org')
 		"""
-		if not jid and not domain: raise ValueError('JID must contain at least domain name')
-		elif type(jid)==type(self): self.node,self.domain,self.resource=jid.node,jid.domain,jid.resource
-		elif domain: self.node,self.domain,self.resource=node,domain,resource
+		if not jid and not domain:
+			raise ValueError('JID must contain at least domain name')
+		elif isinstance(jid, JID):
+			self.node = jid.node
+			self.domain = jid.domain
+			self.resource= jid.resource
+		elif domain:
+			self.node,self.domain,self.resource=node,domain,resource
 		else:
-			if jid.find('@')+1: self.node,jid=jid.split('@',1)
-			else: self.node=''
-			if jid.find('/')+1: self.domain,self.resource=jid.split('/',1)
-			else: self.domain,self.resource=jid,''
+			if jid.count('@'):
+				self.node, jid = jid.split('@', 1)
+			else:
+				self.node = ''
+			if jid.count('/'):
+				self.domain, self.resource = jid.split('/', 1)
+			else:
+				self.domain, self.resource = jid, ''
+
 	def getNode(self):
 		""" Return the node part of the JID """
 		return self.node
+
 	def setNode(self,node):
 		""" Set the node part of the JID to new value. Specify None to remove the node part."""
-		self.node=node.lower()
+		self.node = node.lower()
+
 	def getDomain(self):
 		""" Return the domain part of the JID """
 		return self.domain
+
 	def setDomain(self,domain):
 		""" Set the domain part of the JID to new value."""
-		self.domain=domain.lower()
+		self.domain = domain.lower()
+
 	def getResource(self):
 		""" Return the resource part of the JID """
 		return self.resource
+
 	def setResource(self,resource):
 		""" Set the resource part of the JID to new value. Specify None to remove the resource part."""
-		self.resource=resource
+		self.resource = resource
+
 	def getStripped(self):
 		""" Return the bare representation of JID. I.e. string value w/o resource. """
 		return self.__str__(0)
+
 	def __eq__(self, other):
 		""" Compare the JID to another instance or to string for equality. """
-		try: other=JID(other)
-		except ValueError: return 0
-		return self.resource==other.resource and self.__str__(0) == other.__str__(0)
+		try:
+			other = JID(other)
+		except ValueError:
+			return False
+		return self.__str__() == other.__str__()
+
 	def __ne__(self, other):
 		""" Compare the JID to another instance or to string for non-equality. """
 		return not self.__eq__(other)
+
 	def bareMatch(self, other):
 		""" Compare the node and domain parts of the JID's for equality. """
-		return self.__str__(0) == JID(other).__str__(0)
-	def __str__(self,wresource=1):
+		return self.__str__(False) == JID(other).__str__(False)
+
+	def __str__(self, showResource=True):
 		""" Serialise JID into string. """
-		if self.node: jid=self.node+'@'+self.domain
-		else: jid=self.domain
-		if wresource and self.resource: return jid+'/'+self.resource
+		if self.node:
+			jid = self.node+'@'+self.domain
+		else:
+			jid = self.domain
+		if showResource and self.resource:
+			return jid + '/' + self.resource
 		return jid
+
 	def __hash__(self):
 		""" Produce hash of the JID, Allows to use JID objects as keys of the dictionary. """
 		return hash(self.__str__())
-
 class Protocol(Node):
 	""" A "stanza" object class. Contains methods that are common for presences, iqs and messages. """
 	def __init__(self, name=None, to=None, typ=None, frm=None, attrs=None, payload=None, timestamp=None, xmlns=None, node=None):
@@ -321,73 +346,91 @@ class Protocol(Node):
 			xmlns - namespace of top stanza node
 			node - parsed or unparsed stana to be taken as prototype.
 		"""
-		if not attrs: attrs={}
-		if to: attrs['to']=to
-		if frm: attrs['from']=frm
-		if typ: attrs['type']=typ
+		if attrs is None:
+			attrs = {}
+		if to:
+			attrs['to'] = to
+		if frm:
+			attrs['from'] = frm
+		if typ:
+			attrs['type'] = typ
 		Node.__init__(self, tag=name, attrs=attrs, payload=payload, node=node)
-		if not node and xmlns: self.setNamespace(xmlns)
-		if self['to']: self.setTo(self['to'])
-		if self['from']: self.setFrom(self['from'])
-		if node and type(self)==type(node) and self.__class__==node.__class__ and self.attrs.has_key('id'): del self.attrs['id']
-		self.timestamp=None
+		if not node and xmlns:
+			self.setNamespace(xmlns)
+		if self['to']:
+			self.setTo(self['to'])
+		if self['from']:
+			self.setFrom(self['from'])
+		self.timestamp = None
 		for x in self.getTags('x',namespace=NS_DELAY):
 			try:
-				if not self.getTimestamp() or x.getAttr('stamp')<self.getTimestamp(): self.setTimestamp(x.getAttr('stamp'))
-			except: pass
-		if timestamp is not None: self.setTimestamp(timestamp)  # To auto-timestamp stanza just pass timestamp=''
+				if not self.getTimestamp() or x.getAttr('stamp') < self.getTimestamp():
+					self.setTimestamp(x.getAttr('stamp'))
+			except:
+				pass
+		if timestamp is not None:
+			self.setTimestamp(timestamp)  # To auto-timestamp stanza just pass timestamp=''
+
 	def getTo(self):
 		""" Return value of the 'to' attribute. """
 		try: return self['to']
 		except: return None
+	
 	def getFrom(self):
 		""" Return value of the 'from' attribute. """
-		try: return self['from']
-		except: return None
+		try:
+			return self['from']
+		except:
+			return None
+	
 	def getTimestamp(self):
 		""" Return the timestamp in the 'yyyymmddThhmmss' format. """
 		return self.timestamp
+	
 	def getID(self):
 		""" Return the value of the 'id' attribute. """
 		return self.getAttr('id')
+	
 	def setTo(self,val):
 		""" Set the value of the 'to' attribute. """
 		self.setAttr('to', JID(val))
+	
 	def getType(self):
 		""" Return the value of the 'type' attribute. """
 		return self.getAttr('type')
+	
 	def setFrom(self,val):
 		""" Set the value of the 'from' attribute. """
 		self.setAttr('from', JID(val))
+	
 	def setType(self,val):
 		""" Set the value of the 'type' attribute. """
 		self.setAttr('type', val)
+	
 	def setID(self,val):
 		""" Set the value of the 'id' attribute. """
 		self.setAttr('id', val)
+	
 	def getError(self):
 		""" Return the error-condition (if present) or the textual description of the error (otherwise). """
 		errtag=self.getTag('error')
 		if errtag:
 			for tag in errtag.getChildren():
-				if tag.getName()<>'text': return tag.getName()
+				if tag.getName() != 'text':
+					return tag.getName()
 			return errtag.getData()
+
 	def getErrorCode(self):
 		""" Return the error code. Obsolette. """
 		return self.getTagAttr('error','code')
-	def setError(self,error,code=None):
-		""" Set the error code. Obsolette. Use error-conditions instead. """
-		if code:
-			if str(code) in _errorcodes.keys(): error=ErrorNode(_errorcodes[str(code)],text=error)
-			else: error=ErrorNode(ERR_UNDEFINED_CONDITION,code=code,typ='cancel',text=error)
-		elif type(error) in [type(''),type(u'')]: error=ErrorNode(error)
-		self.setType('error')
-		self.addChild(node=error)
+	
 	def setTimestamp(self,val=None):
 		"""Set the timestamp. timestamp should be the yyyymmddThhmmss string."""
-		if not val: val=time.strftime('%Y%m%dT%H:%M:%S', time.gmtime())
-		self.timestamp=val
-		self.setTag('x',{'stamp':self.timestamp},namespace=NS_DELAY)
+		if not val:
+			val = time.strftime('%Y%m%dT%H:%M:%S', time.gmtime())
+		self.timestamp = val
+		self.setTag('x', {'stamp': self.timestamp}, namespace=NS_DELAY)
+	
 	def getProperties(self):
 		""" Return the list of namespaces to which belongs the direct childs of element"""
 		props=[]
@@ -395,6 +438,7 @@ class Protocol(Node):
 			prop=child.getNamespace()
 			if prop not in props: props.append(prop)
 		return props
+	
 	def __setitem__(self,item,val):
 		""" Set the item 'item' to the value 'val'."""
 		if item in ['to','from']: val=JID(val)
@@ -407,33 +451,43 @@ class Message(Protocol):
 			any additional attributes, sender of the message, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
 			Alternatively you can pass in the other XML object as the 'node' parameted to replicate it as message. """
 		Protocol.__init__(self, 'message', to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
-		if body: self.setBody(body)
-		if subject: self.setSubject(subject)
+		if body:
+			self.setBody(body)
+		if subject:
+			self.setSubject(subject)
+	
 	def getBody(self):
 		""" Returns text of the message. """
 		return self.getTagData('body')
+	
 	def getSubject(self):
 		""" Returns subject of the message. """
 		return self.getTagData('subject')
+	
 	def getThread(self):
 		""" Returns thread of the message. """
 		return self.getTagData('thread')
+	
 	def setBody(self,val):
 		""" Sets the text of the message. """
 		self.setTagData('body',val)
+	
 	def setSubject(self,val):
 		""" Sets the subject of the message. """
 		self.setTagData('subject',val)
+	
 	def setThread(self,val):
 		""" Sets the thread of the message. """
 		self.setTagData('thread',val)
+	
 	def buildReply(self,text=None):
 		""" Builds and returns another message object with specified text.
 			The to, from and thread properties of new message are pre-set as reply to this message. """
-		m=Message(to=self.getFrom(),frm=self.getTo(),body=text)
-		th=self.getThread()
-		if th: m.setThread(th)
-		return m
+		msg = Message(to=self.getFrom(), frm=self.getTo(), body=text)
+		thr = self.getThread()
+		if thr:
+			msg.setThread(thr)
+		return msg
 
 class Presence(Protocol):
 	""" XMPP Presence object."""
@@ -442,24 +496,32 @@ class Presence(Protocol):
 			any additional attributes, sender of the presence, timestamp, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
 			Alternatively you can pass in the other XML object as the 'node' parameted to replicate it as presence. """
 		Protocol.__init__(self, 'presence', to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
-		if priority: self.setPriority(priority)
-		if show: self.setShow(show)
-		if status: self.setStatus(status)
+		if priority:
+			self.setPriority(priority)
+		if show:
+			self.setShow(show)
+		if status:
+			self.setStatus(status)
+	
 	def getPriority(self):
 		""" Returns the priority of the message. """
 		return self.getTagData('priority')
+	
 	def getShow(self):
 		""" Returns the show value of the message. """
 		return self.getTagData('show')
 	def getStatus(self):
 		""" Returns the status string of the message. """
 		return self.getTagData('status')
+	
 	def setPriority(self,val):
 		""" Sets the priority of the message. """
 		self.setTagData('priority',val)
+	
 	def setShow(self,val):
 		""" Sets the show value of the message. """
 		self.setTagData('show',val)
+	
 	def setStatus(self,val):
 		""" Sets the status string of the message. """
 		self.setTagData('status',val)
@@ -474,24 +536,31 @@ class Presence(Protocol):
 				for cchild in child.getTags(tag):
 					return cchild.getData(),cchild.getAttr(attr)
 		return None,None
+	
 	def getRole(self):
 		"""Returns the presence role (for groupchat)"""
 		return self._muc_getItemAttr('item','role')
+	
 	def getAffiliation(self):
 		"""Returns the presence affiliation (for groupchat)"""
 		return self._muc_getItemAttr('item','affiliation')
+	
 	def getNick(self):
 		"""Returns the nick value (for nick change in groupchat)"""
 		return self._muc_getItemAttr('item','nick')
+	
 	def getJid(self):
 		"""Returns the presence jid (for groupchat)"""
 		return self._muc_getItemAttr('item','jid')
+	
 	def getReason(self):
 		"""Returns the reason of the presence (for groupchat)"""
 		return self._muc_getSubTagDataAttr('reason','')[0]
+	
 	def getActor(self):
 		"""Returns the reason of the presence (for groupchat)"""
 		return self._muc_getSubTagDataAttr('actor','jid')[1]
+	
 	def getStatusCode(self):
 		"""Returns the status code of the presence (for groupchat)"""
 		return self._muc_getItemAttr('status','code')

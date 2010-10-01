@@ -188,9 +188,10 @@ class SASL(PlugIn):
 			return
 		if challenge.getName() == 'failure':
 			self.state = AUTH_FAILURE
-			try:
-				reason = challenge.getChildren()[0]
-			except:
+			children = challenge.getChildren()
+			if(children):
+				reason = children[0]
+			else:
 				reason = challenge
 			self.printf('Failed SASL authentification: %s' % (reason), 'error')
 			raise NodeProcessed
@@ -204,39 +205,43 @@ class SASL(PlugIn):
 			self._owner.User = self.username
 			raise NodeProcessed
 
-		incoming_data=challenge.getData()
-		chal={}
-		data=base64.decodestring(incoming_data)
+		incoming_data = challenge.getData()
+		chal = {}
+		data = base64.decodestring(incoming_data)
 		self.printf('Got challenge:'+data, 'ok')
 		for pair in re.findall('(\w+\s*=\s*(?:(?:"[^"]+")|(?:[^,]+)))', data):
-			key, value=[x.strip() for x in pair.split('=',  1)]
-			if value[:1] == '"' and value[-1:] == '"': value=value[1:-1]
-			chal[key]=value
+			key, value = [x.strip() for x in pair.split('=',  1)]
+			if value[:1] == '"' and value[-1:] == '"':
+				value = value[1:-1]
+			chal[key] = value
 		if chal.has_key('qop') and 'auth' in [x.strip() for x in chal['qop'].split(', ')]:
 			resp={}
-			resp['username']=self.username
-			resp['realm']=self._owner.Server
-			resp['nonce']=chal['nonce']
-			cnonce=''
+			resp['username'] = self.username
+			resp['realm'] = self._owner.Server
+			resp['nonce'] = chal['nonce']
+			cnonce = ''
 			for i in range(7):
-				cnonce+=hex(int(random.random()*65536*4096))[2:]
-			resp['cnonce']=cnonce
-			resp['nc']=('00000001')
-			resp['qop']='auth'
-			resp['digest-uri']='xmpp/'+self._owner.Server
-			A1=C([H(C([resp['username'], resp['realm'], self.password])), resp['nonce'], resp['cnonce']])
-			A2=C(['AUTHENTICATE', resp['digest-uri']])
-			response= HH(C([HH(A1), resp['nonce'], resp['nc'], resp['cnonce'], resp['qop'], HH(A2)]))
-			resp['response']=response
-			resp['charset']='utf-8'
-			sasl_data=''
-			for key in ['charset', 'username', 'realm', 'nonce', 'nc', 'cnonce', 'digest-uri', 'response', 'qop']:
-				if key in ['nc', 'qop', 'response', 'charset']: sasl_data+="%s=%s, "%(key, resp[key])
-				else: sasl_data+='%s="%s", '%(key, resp[key])
-########################################3333
-			node=Node('response', attrs={'xmlns':NS_SASL}, payload=[base64.encodestring(sasl_data[:-1]).replace('\r', '').replace('\n', '')])
+				cnonce += hex(int(random.random()*65536*4096))[2:]
+			resp['cnonce'] = cnonce
+			resp['nc'] = ('00000001')
+			resp['qop'] = 'auth'
+			resp['digest-uri'] = 'xmpp/' + self._owner.Server
+			A1 = C([H(C([resp['username'], resp['realm'], self.password])), resp['nonce'], resp['cnonce']])
+			A2 = C(['AUTHENTICATE', resp['digest-uri']])
+			response = HH(C([HH(A1), resp['nonce'], resp['nc'], resp['cnonce'], resp['qop'], HH(A2)]))
+			resp['response'] = response
+			resp['charset'] = 'utf-8'
+			saslData = ''
+			for key in ('charset', 'username', 'realm', 'nonce', 'nc', 'cnonce', 'digest-uri', 'response', 'qop'):
+				if key in ('nc', 'qop', 'response', 'charset'):
+					saslData += "%s=%s, " % (key, resp[key])
+				else:
+					saslData += '%s="%s", ' % (key, resp[key])
+			saslData = base64.encodestring(saslData[:-1]).replace('\r', '').replace('\n', '')
+			node = Node('response', attrs={'xmlns': NS_SASL}, payload = [saslData])
 			self._owner.send(node.__str__())
-		elif chal.has_key('rspauth'): self._owner.send(Node('response', attrs={'xmlns':NS_SASL}).__str__())
+		elif chal.has_key('rspauth'):
+			self._owner.send(Node('response', attrs={'xmlns': NS_SASL}).__str__())
 		else: 
 			self.state = AUTH_FAILURE
 			self.printf('Failed SASL authentification: unknown challenge', 'error')

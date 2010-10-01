@@ -156,7 +156,7 @@ class Debug:
 			caller = sys._getframe(1);
 			try:
 				modName = ':%s' % (caller.f_locals['__name__']);
-			except:
+			except NameError:
 				modName = '';
 			self.show('Debug created for %s%s' % (caller.f_code.co_filename, modName));
 			self.show('Flags defined: %s' % ', '.join(self.activeFlags));

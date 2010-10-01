@@ -110,7 +110,7 @@ class TCPSocket(PlugIn):
 			return 'ok'
 		except socket.error, (errno, strerror): 
 			self.printf("Failed to connect to remote host %s: %s (%s)" % (server, strerror, errno), 'error')
-		except:
+		except Exception:
 			pass
 
 	def plugout(self):
@@ -131,17 +131,17 @@ class TCPSocket(PlugIn):
 				return ''
 			if e[0] == socket.SSL_ERROR_WANT_WRITE:
 				return ''
-			self.printf('Socket error while receiving data ololo', 'error')
+			self.printf('Socket error while receiving data', 'error')
 			sys.exc_clear()
 			self._owner.disconnected()
 			raise IOError("Disconnected from server")
-		#except:
-		#	received = ''
+		except Exception:
+			received = ''
 
 		while self.pending_data(0):
 			try:
 				add = self._recv(BUFLEN)
-			except:
+			except Exception:
 				add = ''
 			received += add
 			if not add:
@@ -151,7 +151,7 @@ class TCPSocket(PlugIn):
 			self._seen_data = 1
 			self.printf(received, 'got')
 		else:
-			self.printf('Socket error while receiving data ss', 'error')
+			self.printf('Socket error while receiving data', 'error')
 			self._owner.disconnected()
 			raise IOError("Disconnected from server")
 		return received
@@ -168,7 +168,7 @@ class TCPSocket(PlugIn):
 			# Avoid printing messages that are empty keepalive packets.
 			if rawData.strip():
 				self.printf(rawData, 'sent')
-		except:
+		except Exception:
 			self.printf("Socket error while sending data", 'error')
 			self._owner.disconnected()
 
@@ -225,7 +225,7 @@ class HTTPProxySocket(TCPSocket):
 			return
 		try:
 			proto, code, desc = reply.split('\n')[0].split(' ', 2)
-		except:
+		except Exception:
 			raise ValueError('Invalid proxy reply')
 		if code != '200':
 			self.printf('Invalid proxy reply: %s %s %s'%(proto, code, desc), 'error')

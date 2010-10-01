@@ -108,4 +108,6 @@ def _showFeatures(stanza, msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'не могу :(');
 		
-registerCommand(showFeatures, u'фичи', 10, u'Показывает, какие XEP-ы подерживает клиент указанного пользователя', u'фичи [ник]', (u'фичи', u'фичи Nick'));
+registerCommand(showFeatures, u'фичи', 10, \
+				u'Показывает, какие XEP-ы подерживает клиент указанного пользователя или сервер', \
+				u'фичи [ник|сервер]', (u'фичи', u'фичи Nick', u'фичи server.tld'));
