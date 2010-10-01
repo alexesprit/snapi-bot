@@ -14,20 +14,19 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-BOT_FEATURES = (xmpp.NS_DISCO_INFO,
-			xmpp.NS_DISCO_ITEMS,
-			xmpp.NS_MUC,
-			xmpp.NS_MOOD,
-			xmpp.NS_CAPS,
-			xmpp.NS_RECEIPTS,
-			xmpp.NS_ACTIVITY,
-			xmpp.NS_PING,
-			xmpp.NS_VERSION,
-			xmpp.NS_PRIVACY,
-			xmpp.NS_ROSTER,
-			xmpp.NS_VCARD,
-			xmpp.NS_ENTITY_TIME
-			);
+BOT_FEATURES = (
+				xmpp.NS_DISCO_INFO,
+				xmpp.NS_DISCO_ITEMS,
+				xmpp.NS_MUC,
+				xmpp.NS_MOOD,
+				xmpp.NS_CAPS,
+				xmpp.NS_RECEIPTS,
+				xmpp.NS_ACTIVITY,
+				xmpp.NS_PING,
+				xmpp.NS_VERSION,
+				xmpp.NS_VCARD,
+				xmpp.NS_ENTITY_TIME
+);
 
 def processIqStanzas(stanza, jid, resource):
 	if(xmpp.TYPE_ERROR != stanza.getType()):

@@ -26,7 +26,7 @@ def sendInvite(msgType, conference, nick, param):
 		trueJid = param;
 	msg = xmpp.Message(to = conference)
 	x = xmpp.Node('x')
-	x.setNamespace('http://jabber.org/protocol/muc#user')
+	x.setNamespace(xmpp.NS_MUC_USER)
 	inv = x.addChild('invite', {'to': trueJid})
 	if reason:
 		inv.setTagData('reason', reason)
