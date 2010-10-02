@@ -38,8 +38,12 @@ gRestart = True;
 # warning - предупреждения
 gCoreDebug = ['info', 'error', 'success', 'warning'];
 # always - все типы флагов
-# dispatcher - информация о принятых станзах
-# socket - содержимое передаваемых данных
+# auth - авторизация
+# bind - назначение ресурса
+# dispatcher - обработка станз
+# proxy - подклчение через прокси
+# roster - работа с ростером
+# socket - передаваемые данные
 gXMPPDebug = [];
 
 # папка для логов конференций

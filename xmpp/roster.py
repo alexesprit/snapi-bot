@@ -20,7 +20,7 @@
 """
 
 from protocol import *;
-from client import PlugIn;
+from plugin import PlugIn;
 
 ROSTER_DBG_LINE = 'roster';
 

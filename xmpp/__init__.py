@@ -10,9 +10,6 @@ auth - Non-SASL and SASL stuff. You will need it to auth as a client or transpor
 transports - low level connection handling. TCP and TLS currently. HTTP support planned.
 roster - simple roster for use in clients.
 dispatcher - decision-making logic. Handles all hooks. The first who takes control over fresh stanzas.
-features - different stuff that didn't worths separating into modules
-browser - DISCO server framework. Allows to build dynamic disco tree.
-filetransfer - Currently contains only IBB stuff. Can be used for bot-to-bot transfers.
 
 Most of the classes that is defined in all these modules is an ancestors of 
 class PlugIn so they share a single set of methods allowing you to compile 

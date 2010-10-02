@@ -26,7 +26,7 @@ import sys;
 
 import simplexml;
 from protocol import *
-from client import PlugIn
+from plugin import PlugIn
 
 DEFAULT_TIMEOUT = 25
 gID = 0

@@ -39,7 +39,7 @@ import dispatcher;
 import dns;
 
 from simplexml import ustr;
-from client import PlugIn;
+from plugin import PlugIn;
 from protocol import *;
 
 BUFLEN = 1024

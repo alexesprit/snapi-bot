@@ -27,7 +27,7 @@ import re;
 import dispatcher;
 
 from protocol import *;
-from client import PlugIn;
+from plugin import PlugIn;
 
 def HH(some):
 	return hashlib.md5(some).hexdigest()

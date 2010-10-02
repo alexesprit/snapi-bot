@@ -81,7 +81,6 @@ def convertValues(msgType, conference, nick, param):
 				return;
 			frm = param[0];
 			to = param[1];
-			print (frm in gValues and to in gValues);
 			if(frm in gValues):
 				date = tuple(time.localtime())[:3];
 				url = gConvUrl % (frm, to, count, date[2], date[1], date[0]);

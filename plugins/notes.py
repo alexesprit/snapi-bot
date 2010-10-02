@@ -19,12 +19,10 @@ gNotes = {};
 
 def addNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick);
-	printf(type(gNotes));
 	if(trueJid not in gNotes):
 		gNotes[trueJid] = [];
 	text = u'%s\n%s' % (time.strftime('[%d.%m.%y, %H:%M]'), param);
 	gNotes[trueJid].append(text);
-	printf(type(gNotes));
 	gNotes.save();
 	sendMsg(msgType, conference, nick, u'записала');
 

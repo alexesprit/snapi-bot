@@ -24,7 +24,7 @@ def _showPing(stanza, t0, msgType, conference, nick, param):
 			message = random.choice((u'понг от %s составляет', u'скорость отклика сервера для %s равна', u'скорость отправки пакетов от %s составляет', u'опа! что я откопала! это же понг от %s:', )) % (param);  
 		else:
 			message = random.choice((u'твой понг составляет', u'скорость отклика сервера для тебя равна', u'скорость отправки твоих пакетов', u'опа! что я откопала! это же твой понг:', ));
-		message += u' %s сек.' % (str(round(ping , 2)));
+		message += u' %s сек.' % (str(round(ping , 3)));
 		sendMsg(msgType, conference, nick, message);
 	else:
 		sendMsg(msgType, conference, nick, u'не пингуется :(');
@@ -37,11 +37,10 @@ def showPing(msgType, conference, nick, param):
 			jid = param;
 	else:
 		jid = conference + '/' + nick;
-	iq = xmpp.Iq(xmpp.TYPE_GET);
-	iq.addChild('ping', {}, [], xmpp.NS_PING);
+	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_VERSION);
 	iq.setTo(jid);
 	iq.setID(getUniqueID(PING_ID));
 	t0 = time.time();
 	gClient.SendAndCallForResponse(iq, _showPing, (t0, msgType, conference, nick, param, ));
 
-registerCommand(showPing, u'пинг', 10, u'Пингует тебя или определённый ник', u'пинг [ник]', (u'пинг', u'пинг Nick'));
+registerCommand(showPing, u'пинг', 10, u'Пингует тебя, определённый ник или сервер', u'пинг [ник|сервер]', (u'пинг', u'пинг Nick', u'пинг server.tld'));

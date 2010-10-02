@@ -21,7 +21,7 @@ def startStatusTimer():
 		show = u'dnd';
 	elif(hour >= 0):
 		show = u'xa';
-	setRosterStatus(None, show, gPriority);
+	gClient.setStatus(show, None, gPriority);
 	timeout = 3600 + random.randrange(-800, 801);
 	startTimer(timeout, startStatusTimer);
 

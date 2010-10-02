@@ -26,19 +26,12 @@ import socket
 
 debug.Debug.colors['socket'] = debug.colorDarkGray
 debug.Debug.colors['proxy'] = debug.colorDarkGray
-debug.Debug.colors['xml'] = debug.colorBrown
-debug.Debug.colors['client'] = debug.colorCyan
-debug.Debug.colors['component'] = debug.colorCyan
 debug.Debug.colors['dispatcher'] = debug.colorGreen
-debug.Debug.colors['browser'] = debug.colorBlue
-debug.Debug.colors['auth'] = debug.colorYellow
 debug.Debug.colors['roster'] = debug.colorMagenta
 debug.Debug.colors['auth'] = debug.colorYellow
+debug.Debug.colors['bind'] = debug.colorBrown
 
-debug.Debug.colors['down'] = debug.colorBrown
-debug.Debug.colors['up'] = debug.colorBrown
-debug.Debug.colors['data'] = debug.colorBrown
-debug.Debug.colors['ok'] = debug.colorGreen
+debug.Debug.colors['ok'] = debug.colorBrown
 debug.Debug.colors['warn'] = debug.colorYellow
 debug.Debug.colors['error'] = debug.colorRed
 debug.Debug.colors['start'] = debug.colorDarkGray
@@ -46,58 +39,18 @@ debug.Debug.colors['stop'] = debug.colorDarkGray
 debug.Debug.colors['sent'] = debug.colorYellow
 debug.Debug.colors['got'] = debug.colorBrightCyan
 
-DBG_CLIENT = 'client'
-
 SSL_AUTO = 0x0;
 SSL_FORCE = 0x1;
 SSL_DISABLE = 0x2;
 
-C_TCP = 'TCP';
-C_TLS = 'TLS';
-C_SSL = 'SSL';
+C_TCP = "TCP";
+C_TLS = "TLS";
+C_SSL = "SSL";
 
-class PlugIn:
-	""" Common xmpppy plugins infrastructure: plugging in/out, printfging. """
-	def __init__(self):
-		self._exportedMethods = []
-		self.DBG_LINE = self.__class__.__name__.lower()
-
-	def PlugIn(self, owner):
-		""" Attach to main instance and register ourself and all our staff in it. """
-		self._owner = owner
-		if self.DBG_LINE not in owner.debugFlags:
-			owner.debugFlags.append(self.DBG_LINE)
-		self.printf('Plugging %s into %s' % (self, self._owner), 'start')
-		className = self.__class__.__name__;
-		if hasattr(owner, className):
-			return self.printf('Plugging ignored: another instance already plugged.', 'error')
-		self._oldMethods = []
-		for method in self._exportedMethods:
-			methodName = method.__name__
-			if hasattr(owner, methodName):
-				self._oldMethods.append(getattr(owner, methodName))
-			setattr(owner, methodName, method)
-		setattr(owner, className, self)
-		if hasattr(self, 'plugin'):
-			return self.plugin(owner)
- 
-	def PlugOut(self):
-		""" Unregister all our staff from main instance and detach from it. """
-		self.printf('Plugging %s out of %s.' % (self, self._owner), 'stop')
-		if hasattr(self, 'plugout'):
-			self.plugout()
-		self._owner.debugFlags.remove(self.DBG_LINE)
-		for method in self._exportedMethods:
-			delattr(self._owner, method.__name__)
-		for method in self._oldMethods:
-			setattr(self._owner, method.__name__, method)
-		delattr(self._owner, self.__class__.__name__)
-
-	def printf(self, text, severity='info'):
-		""" Feed a provided printf line to main instance's printf facility along with our ID string. """
-		self._owner.printf(text, self.DBG_LINE, severity)
-
-import transports, dispatcher, auth, roster
+import auth;
+import dispatcher;
+import roster;
+import transports;
 
 class CommonClient:
 	""" Base for Client and Component classes."""
@@ -106,7 +59,7 @@ class CommonClient:
 			the printf IDs that will go into printf output. You can either specifiy an "include"
 			or "exclude" list. The latter is done via adding "always" pseudo-ID to the list.
 		"""
-		self.Namespace, self.DBG = dispatcher.NS_CLIENT, DBG_CLIENT
+		self.Namespace = dispatcher.NS_CLIENT
 		self.defaultNamespace = self.Namespace
 		self.disconnectHandlers = []
 		self.Server = server
@@ -114,10 +67,9 @@ class CommonClient:
 		self._debug = debug.Debug(debugFlags, validateFlags=False, welcomeMsg=False, prefix='', showFlags=False)
 		self.printf = self._debug.show
 		self.debugFlags = self._debug.debugFlags
-		self.debugFlags.append(self.DBG)
 		self._owner = self
 		self._registeredName = None
-		self.connected = None
+		self.connected = False
 
 	def RegisterDisconnectHandler(self, handler):
 		""" Register handler that will be called on disconnect."""
@@ -129,8 +81,7 @@ class CommonClient:
 
 	def disconnected(self):
 		""" Called on disconnection. Calls disconnect handlers and cleans things up. """
-		self.connected = None
-		self.printf(self.DBG, 'Disconnect detected', 'stop')
+		self.connected = False
 		for instance in self.disconnectHandlers:
 			instance()
 		if hasattr(self, C_TLS):
@@ -152,7 +103,7 @@ class CommonClient:
 		connected = sock.PlugIn(self)
 		if not connected: 
 			sock.PlugOut()
-			return
+			return False
 		self._Server, self._Proxy = server, proxy
 		self.connected = C_TCP
 		if (SSLMode == SSL_AUTO and self.Connection.getPort() in (5223, 443)) or SSLMode == SSL_FORCE:
@@ -193,10 +144,12 @@ class Client(CommonClient):
 					pass
 				# TLS not supported by server
 				if not self.Dispatcher.Stream.features.getTag('starttls'):
+					self.TLS.PlugOut()
 					return self.connected
 				while not self.TLS.starttls and self.Process(1):
 					pass
-				if not hasattr(self, C_TLS) or self.TLS.starttls != 'success':
+				if self.TLS.starttls != 'success':
+					self.TLS.PlugOut()
 					return self.connected
 				self.connected = C_TLS
 		return self.connected
@@ -231,9 +184,26 @@ class Client(CommonClient):
 		self.SASL.PlugOut()
 		return auth.AUTH_FAILURE
 
+	def getCapsNode(self):
+		caps = dispatcher.Node("c")
+		caps.setNamespace(dispatcher.NS_CAPS)
+		caps.setAttr("node", "http://jimm.net.ru/caps")
+		caps.setAttr("ver", "Nz009boXYEIrmRWk1N/Vsw==")
+		caps.setAttr("hash", "md5")
+		return(caps);
+
 	def getRoster(self):
 		""" Return the Roster instance, previously plugging it in and
 			requesting roster from server if needed. """
 		if(not hasattr(self, 'Roster')):
 			roster.Roster().PlugIn(self)
 		return self.Roster.getRoster()
+
+	def setStatus(self, show, status, priority):
+		prs = dispatcher.Presence(priority=priority);
+		if(status):
+			prs.setStatus(status);
+		if(show):
+			prs.setShow(show);
+		prs.addChild(node=self.getCapsNode());
+		self.send(prs);

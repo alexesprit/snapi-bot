@@ -1,1 +1,1 @@
-from macros import *;
+from macros import Macros;

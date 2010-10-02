@@ -381,7 +381,7 @@ def joinConference(conference, nick, password):
 		prs.setStatus(status);
 	if(show):
 		prs.setShow(show);
-	prs.addChild(node=getCapsNode());
+	prs.addChild(node=gClient.getCapsNode());
 	mucTag = prs.setTag('x', namespace=xmpp.NS_MUC);
 	mucTag.addChild('history', {'maxchars':'0'});
 	if(password):
@@ -399,28 +399,11 @@ def getBotNick(conference):
 	if(conference in gConferences):
 		return(getConfigKey(conference, 'nick') or gBotNick);
 	return(gBotNick);
-	
-def getCapsNode():
-	caps = xmpp.Node('c')
-	caps.setNamespace(xmpp.NS_CAPS)
-	caps.setAttr('node', 'http://jimm.net.ru/caps')
-	caps.setAttr('ver', 'Nz009boXYEIrmRWk1N/Vsw==')
-	caps.setAttr('hash', 'md5')
-	return(caps);
 
 def getUniqueID(text):
 	global gID;
 	gID += 1;
 	return('%s_%d' % (text, gID));
-
-def setRosterStatus(status, show, priority):
-	prs = xmpp.Presence(priority = gPriority);
-	if(status):
-		prs.setStatus(status);
-	if(show):
-		prs.setShow(show);
-	prs.addChild(node=getCapsNode());
-	gClient.send(prs);
 
 def setBotStatus(conference, status, show):
 	prs = xmpp.Presence(conference, priority=gPriority);
@@ -428,7 +411,7 @@ def setBotStatus(conference, status, show):
 		prs.setStatus(status);
 	if(show):
 		prs.setShow(show);
-	prs.addChild(node=getCapsNode());
+	prs.addChild(node=gClient.getCapsNode());
 	gClient.send(prs);
 
 def setRole(conference, nick, role, reason=None):
@@ -822,7 +805,7 @@ def start():
 	printf('Handlers registered', FLAG_SUCCESS);
 
 	gRoster = gClient.getRoster();
-	setRosterStatus(None, None, gPriority);
+	gClient.setStatus(None, None, gPriority);
 
 	printf('Now I am ready to work :)');
 
