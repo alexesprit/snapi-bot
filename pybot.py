@@ -835,6 +835,8 @@ if(__name__ == '__main__'):
 			prs.setStatus(u'выключаюсь (CTRL+C)');
 			gClient.send(prs);
 		shutdown();
+	except(xmpp.SystemShutdown):
+		shutdown();
 	except(Exception):
 		printf('Exception in main thread', FLAG_ERROR);
 		fileName = getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE));
