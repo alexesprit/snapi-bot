@@ -68,7 +68,8 @@ gConvUrl = "http://conv.rbc.ru/convert.shtml?mode=calc&source=cb.0&tid_from=%s&c
 
 def convertValues(msgType, conference, nick, param):
 	if(param == u"валюты"):
-		values = ["%s - %s" % (name, desc) for name, desc in gValues.items()]
+		values = ["%s - %s" % (name, desc) \
+					for name, desc in gValues.items()]
 		values.sort()
 		sendMsg(msgType, conference, nick, "\n".join(values))
 	else:
@@ -96,7 +97,7 @@ def convertValues(msgType, conference, nick, param):
 				sendMsg(msgType, conference, nick, u"читай помощь по команде")
 
 registerCommand(convertValues, u"перевести", 10, 
-				u"Перевод валют. \"валюты\" в качестве параметра - список валют для перевода", 
+				u"Перевод валют. Указав \"валюты\" в кач-ве параметра можно посмотреть доступные валюты для перевода", 
 				u"перевести <из> <в> <кол-во>", 
-				(u"перевести RUR USD 100.5", u"перевести валюты"), 
+				(u"перевести валюты", u"перевести RUR USD 100.5"), 
 				ANY | PARAM)

@@ -27,27 +27,34 @@ LANGUAGES = {u"en": u"английский", u"ja": u"японский", u"ru": 
 			u"et": u"эстонский"}
 
 def translateText(msgType, conference, nick, param):
-	param = param.split(None, 2)
-	if(len(param) == 3):
-		(src, target, text) = param
-		if(src in LANGUAGES and target in LANGUAGES):
-			if(src == "auto"):
-				if(target == "auto"):
-					sendMsg(msgType, conference, nick, u"ошибочный запрос. прочитай помощь по использованию команды")
-					return
-				else:
-					src = detectLanguage(text)
-					if(src):
-						if(not src in LANGUAGES):
-							sendMsg(msgType, conference, nick, u"не могу понять, что это за язык (%s)" % (src))
-							return
+	if(param == u"языки"):
+		langs = [u"%s - %s" % (lang, name) \
+				for lang, name in LANGUAGES.items()]
+		langs.sort()
+		message = u"Доступные языки:\n%s" % ("\n".join(langs))
+		sendMsg(msgType, conference, nick, message)
+	else:
+		param = param.split(None, 2)
+		if(len(param) == 3):
+			(src, target, text) = param
+			if(src in LANGUAGES and target in LANGUAGES):
+				if(src == "auto"):
+					if(target == "auto"):
+						sendMsg(msgType, conference, nick, u"ошибочный запрос. прочитай помощь по использованию команды")
+						return
 					else:
-						sendMsg(msgType, conference, nick, u"не могу перевести")
-			text = getTranslatedText(text, src, target)
-			if(text):
-				sendMsg(msgType, conference, nick, XMLUnescape(text))
-			else:
-				sendMsg(msgType, conference, nick, u"не могу перевести")
+						src = detectLanguage(text)
+						if(src):
+							if(not src in LANGUAGES):
+								sendMsg(msgType, conference, nick, u"не могу понять, что это за язык (%s)" % (src))
+								return
+						else:
+							sendMsg(msgType, conference, nick, u"не могу перевести")
+				text = getTranslatedText(text, src, target)
+				if(text):
+					sendMsg(msgType, conference, nick, XMLUnescape(text))
+				else:
+					sendMsg(msgType, conference, nick, u"не могу перевести")
 
 def getTranslatedText(text, src, target):
 	try:
@@ -70,7 +77,7 @@ def detectLanguage(text):
 		return(None)
 
 registerCommand(translateText, u"перевод", 10, 
-				u"Перевод текста с одного языка на другой", 
+				u"Перевод текста с одного языка на другой. Указав \"языки\" в кач-ве параметра можно посмотреть доступные языки для перевода", 
 				u"перевод <исходный_язык> <нужный_язык> <фраза>", 
 				(u"перевод en ru hello", u"перевод ru en привет"), 
 				ANY | PARAM)

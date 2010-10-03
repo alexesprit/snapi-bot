@@ -19,7 +19,13 @@ DUMPZ_LANGS_FILE = "languages.txt"
 DUMPZ_LANGS = {}
 
 def uploadToDumpz(msgType, conference, nick, param):
-	if(param):
+	if(param == u"языки"):
+		langs = [u"%s - %s" % (lang, name) \
+				for lang, name in DUMPZ_LANGS.items()]
+		langs.sort()
+		message = u"Доступные языки:\n%s" % ("\n".join(langs))
+		sendMsg(msgType, conference, nick, message)
+	else:
 		args = param.split(None, 1)
 		lang = args[0]
 		if(lang in DUMPZ_LANGS):
@@ -35,12 +41,6 @@ def uploadToDumpz(msgType, conference, nick, param):
 		req = urllib2.Request("http://dumpz.org/", query, {"Content-type": "application/x-www-form-urlencoded"})
 		res = urllib2.urlopen(req)
 		sendMsg(msgType, conference, nick, u"залито на %s" % (res.url))
-	else:
-		langs = [u"%s - %s" % (lang, name) \
-				for lang, name in DUMPZ_LANGS.items()]
-		langs.sort()
-		message = u"Доступные языки:\n%s" % ("\n".join(langs))
-		sendMsg(msgType, conference, nick, message)
 
 def loadDumpzLanguages():
 	global DUMPZ_LANGS
@@ -50,6 +50,7 @@ def loadDumpzLanguages():
 registerEvent(loadDumpzLanguages, STARTUP)
 
 registerCommand(uploadToDumpz, u"пастебин", 10, 
-				u"Заливает текст на пастебин-сервис dumpz.org. Без параметров покажет доступные языки", 
-				u"пастебин [язык] [текст]", 
-				(u"пастебин This is text", u"пастебин cpp int *n, *p;"));
+				u"Заливает текст на пастебин-сервис dumpz.org. Указав \"языки\" в кач-ве параметра можно посмотреть доступные языки", 
+				u"пастебин [язык] <текст>", 
+				(u"пастебин языки", u"пастебин This is text", u"пастебин cpp int *n, *p;"), 
+				ANY | PARAM);

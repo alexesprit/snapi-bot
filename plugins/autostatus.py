@@ -16,11 +16,11 @@
 def startStatusTimer():
 	hour = time.localtime()[3]
 	if(hour >= 18):
-		show = u'chat'
+		show = "chat"
 	elif(hour >= 8):
-		show = u'dnd'
+		show = "dnd"
 	elif(hour >= 0):
-		show = u'xa'
+		show = "xa"
 	gClient.setStatus(show, None, gPriority)
 	timeout = 3600 + random.randrange(-800, 801)
 	startTimer(timeout, startStatusTimer)
