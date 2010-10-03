@@ -40,7 +40,7 @@ class PlugIn:
  
 	def PlugOut(self):
 		""" Unregister all our staff from main instance and detach from it. """
-		self.printf('Plugging %s out of %s.' % (self, self._owner), 'stop')
+		self.printf('Plugging %s out of %s' % (self, self._owner), 'stop')
 		if hasattr(self, 'plugout'):
 			self.plugout()
 		self._owner.debugFlags.remove(self.DBG_LINE)

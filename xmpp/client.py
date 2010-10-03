@@ -154,7 +154,7 @@ class Client(CommonClient):
 				self.connected = C_TLS
 		return self.connected
 
-	def auth(self, user, password, resource=None, sasl=True):
+	def auth(self, user, password, resource=None):
 		""" Authenticate connnection and bind resource. If resource is not provided
 			random one or library name used.
 		"""
@@ -165,24 +165,19 @@ class Client(CommonClient):
 		if(self.Dispatcher.Stream._document_attrs.get('version') == '1.0'):
 			while not self.Dispatcher.Stream.features and self.Process(1):
 				pass
-		if sasl:
-			auth.SASL(user, password).PlugIn(self)
-		if not sasl or self.SASL.state == auth.AUTH_FAILURE:
-			if not resource:
-				resource = "xmpppy"
-			if auth.NonSASL(user, password, resource).PlugIn(self):
-				return auth.AUTH_NONSASL
-			return auth.AUTH_FAILURE
+		auth.SASL(user, password).PlugIn(self)
 		self.SASL.auth()
 		while auth.AUTH_WAITING == self.SASL.state and self.Process(1):
 			pass
 		if auth.AUTH_SUCCESS == self.SASL.state:
+			self.SASL.PlugOut()
 			auth.Bind().PlugIn(self)
 			if auth.BIND_SUCCESS == self.Bind.Bind(resource):
 				self.Bind.PlugOut()
 				return auth.AUTH_SUCCESS
-		self.SASL.PlugOut()
-		return auth.AUTH_FAILURE
+		else:
+			self.SASL.PlugOut()
+			return auth.AUTH_FAILURE
 
 	def getCapsNode(self):
 		caps = dispatcher.Node("c")

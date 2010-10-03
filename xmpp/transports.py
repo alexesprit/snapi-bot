@@ -258,19 +258,16 @@ class TLS(PlugIn):
 		PlugIn.PlugIn(self, owner)
 		if startSSL:
 			return self._startSSL()
-		if self._owner.Dispatcher.Stream.features:
-			try:
-				self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
-			except NodeProcessed:
-				pass
-		else:
-			self._owner.RegisterHandlerOnce('features', self.FeaturesHandler, xmlns=NS_STREAMS)
+		try:
+			self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
+		except NodeProcessed:
+			pass
 		self.starttls = None
 
 	def plugout(self):
 		""" Unregisters TLS handler's from owner's dispatcher. """
+		# FIXME
 		if self._owner.Dispatcher.Stream.features:
-			self._owner.UnregisterHandler('features', self.FeaturesHandler, xmlns=NS_STREAMS)
 			self._owner.UnregisterHandler('proceed', self.StartTLSHandler, xmlns=NS_TLS)
 			self._owner.UnregisterHandler('failure', self.StartTLSHandler, xmlns=NS_TLS)
 
@@ -286,7 +283,7 @@ class TLS(PlugIn):
 		self._owner.Connection.send('<starttls xmlns="%s"/>' % (NS_TLS))
 		raise NodeProcessed
 
-	def pending_data(self, timeout = 0):
+	def pending_data(self, timeout=0):
 		""" Returns true if there possible is a data ready to be read. """
 		return self._tcpsock._seen_data or select.select([self._tcpsock._sock], [], [], timeout)[0]
 
