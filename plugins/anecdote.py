@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # anecdote.py
 # Initial Copyright (c) Gigabyte <gigabyte@ngs.ru>
@@ -13,15 +13,20 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-gAnecdotePattern = re.compile("<div style='color: #000000;(.+?)<a href='http://anekdot.odessa.ua/' target='_blank'>", re.DOTALL);
+gAnecdotePattern = re.compile("<div style='color: #000000;(.+?)<a href='http://anekdot.odessa.ua/' target='_blank'>", re.DOTALL)
 
 def showAnecdote(msgType, conference, nick, param):
-	rawHtml = urllib.urlopen('http://anekdot.odessa.ua/rand-anekdot.php').read();
-	items = gAnecdotePattern.search(rawHtml);
+	url = "http://anekdot.odessa.ua/rand-anekdot.php"
+	rawHTML = urllib.urlopen(url).read()
+	items = gAnecdotePattern.search(rawHTML)
 	if(items):
-		anecdote = decode(items.group(0));
-		sendMsg(msgType, conference, nick, unicode(anecdote, 'windows-1251'));
+		anecdote = decode(items.group(0))
+		sendMsg(msgType, conference, nick, unicode(anecdote, "cp1251"))
 	else:
-		sendMsg(msgType, conference, nick, u'не получается');
+		sendMsg(msgType, conference, nick, u"не получается")
 
-registerCommand(showAnecdote, u'анекдот', 10, u'Показывает случайный анекдот', None, (u'анекдот', ), ANY | NONPARAM);
+registerCommand(showAnecdote, u"анекдот", 10, 
+				u"Показывает случайный анекдот", 
+				None, 
+				(u"анекдот", ), 
+				ANY | NONPARAM)

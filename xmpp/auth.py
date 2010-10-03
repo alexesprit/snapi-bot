@@ -19,15 +19,15 @@
 	Can be used both for client and transport authentication.
 """
 
-import base64;
-import hashlib;
-import random;
-import re;
+import base64
+import hashlib
+import random
+import re
 
-import dispatcher;
+import dispatcher
 
-from protocol import *;
-from plugin import PlugIn;
+from protocol import *
+from plugin import PlugIn
 
 def HH(some):
 	return hashlib.md5(some).hexdigest()
@@ -279,7 +279,7 @@ class Bind(PlugIn):
 		if resource: resource=[Node("resource", payload=[resource])]
 		else: resource=[]
 		resp = self._owner.SendAndWaitForResponse(Protocol("iq", typ=TYPE_SET, payload=[Node("bind", attrs={"xmlns":NS_BIND}, payload=resource)]))
-		stanzaType = resp.getType();
+		stanzaType = resp.getType()
 		if stanzaType == TYPE_RESULT:
 			resource = resp.getTag("bind").getTagData("jid")
 			self.printf("Successfully bound %s" % (resource), "ok")
@@ -287,7 +287,7 @@ class Bind(PlugIn):
 			self._owner.User = jid.getNode()
 			self._owner.Resource = jid.getResource()
 			resp = self._owner.SendAndWaitForResponse(Protocol("iq", typ=TYPE_SET, payload=[Node("session", attrs={"xmlns":NS_SESSION})]))
-			stanzaType = resp.getType();
+			stanzaType = resp.getType()
 			if stanzaType == TYPE_RESULT:
 				self.printf("Successfully opened session", "ok")
 				return BIND_SUCCESS

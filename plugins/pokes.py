@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # pokes.py
 # Initial Copyright (с) ???
@@ -13,37 +13,41 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-POKES_FILE = "pokes.txt";
+POKES_FILE = "pokes.txt"
 
-gPokes = [];
+gPokes = []
 
 def loadPokes():
-	global gPokes;
-	fileName = getFilePath(RESOURCE_DIR, POKES_FILE);
-	gPokes = eval(readFile(fileName, "utf-8"));
+	global gPokes
+	fileName = getFilePath(RESOURCE_DIR, POKES_FILE)
+	gPokes = eval(readFile(fileName, "utf-8"))
 
 def pokeUser(msgType, conference, nick, param):
 	if(msgType == xmpp.TYPE_PUBLIC):
 		if(param):
-			botNick = getBotNick(conference);
+			botNick = getBotNick(conference)
 			if(param != botNick):
-				if(param == u'всех'):
+				if(param == u"всех"):
 					for userNick in getOnlineNicks(conference):
 						if(userNick != botNick and userNick != nick):
-							message = random.choice(gPokes);
-							sendToConference(conference, u'/me ' + message % (userNick));
+							message = random.choice(gPokes)
+							sendToConference(conference, u"/me " + message % (userNick))
 				elif(nickIsOnline(conference, param)):
-					message = random.choice(gPokes);
-					sendToConference(conference, u'/me ' + message % (param));
+					message = random.choice(gPokes)
+					sendToConference(conference, u"/me " + message % (param))
 				else:
-					sendMsg(msgType, conference, nick, u'а это кто?');
+					sendMsg(msgType, conference, nick, u"а это кто?")
 			else:
-				sendMsg(msgType, conference, nick, u'шибко умный, да? ]:->');
+				sendMsg(msgType, conference, nick, u"шибко умный, да? ]:->")
 		else:
-			sendMsg(msgType, conference, nick, u'мазохист? :D');
+			sendMsg(msgType, conference, nick, u"мазохист? :D")
 	else:
-		sendMsg(msgType, conference, nick, u':-P');
+		sendMsg(msgType, conference, nick, u":-P")
 
-registerEvent(loadPokes, STARTUP);
+registerEvent(loadPokes, STARTUP)
 
-registerCommand(pokeUser, u'тык', 10, u'Тыкает пользователя. Заставляет его обратить внимание на вас', u'тык <ник>', (u'тык Nick', ), CHAT);
+registerCommand(pokeUser, u"тык", 10, 
+				u"Тыкает пользователя. Заставляет его обратить внимание на вас", 
+				u"тык <ник>", 
+				(u"тык Nick", ), 
+				CHAT);

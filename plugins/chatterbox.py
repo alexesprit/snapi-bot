@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # chatterbox.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -13,104 +13,108 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-MAX_MSG_COUNT = 100;
-MSG_COUNT_TO_SAVE = 20;
+MAX_MSG_COUNT = 100
+MSG_COUNT_TO_SAVE = 20
 SAVE_CHANCE = 25; # chance 1 of SAVE_CHANCE
-REPLY_CHANCE = 35; # it's the same.
+REPLY_CHANCE = 35; # it"s the same.
 
-CHATTERBOX_FILE = 'chatterbox.txt';
+CHATTERBOX_FILE = "chatterbox.txt"
 
-gChatterCache = {};
-gUpdateCount = {};
+gChatterCache = {}
+gUpdateCount = {}
 
 def removeNicks(message, nickList):
-	nickFound = False;
-	_startswith = message.startswith;
+	nickFound = False
+	_startswith = message.startswith
 	for nick in nickList:
 		if(_startswith(nick)):
-			for x in [nick + x for x in (':', ',')]:
+			for x in [nick + x for x in (":", ",")]:
 				if(_startswith(x)):
-					message = message.replace(x, '');
-					nickFound = True;
+					message = message.replace(x, "")
+					nickFound = True
 		if(nickFound):
-			break;
-	return(message);
+			break
+	return(message)
 
 def messageChatTalker(stanza, msgType, conference, nick, trueJid, message):
-	if(xmpp.TYPE_PUBLIC == msgType and getConfigKey(conference, 'chatterbox')):
+	if(xmpp.TYPE_PUBLIC == msgType and getConfigKey(conference, "chatterbox")):
 		if(not nick): # topic
-			return;
-		botNick = getBotNick(conference);
+			return
+		botNick = getBotNick(conference)
 		if(nick == botNick):
-			return;
+			return
 
-		isHiglight = message.startswith(botNick);
+		isHiglight = message.startswith(botNick)
 
 		if(isHiglight or not random.randrange(0, REPLY_CHANCE)):
-			message = removeNicks(message, getNicks(conference)).strip();
+			message = removeNicks(message, getNicks(conference)).strip()
 			if(message):
-				command = message.split()[0].lower();
-				if(isCommand(command) or gMacros.hasMacros(command, conference) or gMacros.hasMacros(command)):
-					return;
+				command = message.split()[0].lower()
+				_isCommand = isCommand(command) and isCommandType(command, CHAT)
+				_isMacros = gMacros.hasMacros(command, conference) or gMacros.hasMacros(command)
+				if(_isCommand or _isMacros):
+					return
 				if(gChatterCache[conference]):
-					text = random.choice(gChatterCache[conference]);
-					isMe = text.startswith('/me');
-					time.sleep(len(text) / 4 + random.randrange(1, 5));
+					text = random.choice(gChatterCache[conference])
+					isMe = text.startswith("/me")
+					time.sleep(len(text) / 4 + random.randrange(1, 5))
 					if(not isMe and (isHiglight or not random.randrange(0, 2))):
-						sendMsg(msgType, conference, nick, text, True);
+						sendMsg(msgType, conference, nick, text, True)
 					else:
-						sendToConference(conference, text);
+						sendToConference(conference, text)
 		if(isHiglight or not random.randrange(0, SAVE_CHANCE)):
-			message = removeNicks(message, getNicks(conference)).strip();
+			message = removeNicks(message, getNicks(conference)).strip()
 			if(message):
-				command = message.split()[0];
+				command = message.split()[0]
 				if(isCommand(command) or gMacros.hasMacros(command, conference) or gMacros.hasMacros(command)):
-					return;
+					return
 				if(len(gChatterCache[conference]) >= MAX_MSG_COUNT):
-					randNum = random.randrange(0, MAX_MSG_COUNT);
-					del(gChatterCache[conference][randNum]);
-				gChatterCache[conference].append(message);
-				gUpdateCount[conference] += 1;
+					randNum = random.randrange(0, MAX_MSG_COUNT)
+					del(gChatterCache[conference][randNum])
+				gChatterCache[conference].append(message)
+				gUpdateCount[conference] += 1
 				if(gUpdateCount[conference] >= MSG_COUNT_TO_SAVE):
-					fileName = getConfigPath(conference, CHATTERBOX_FILE);
-					writeFile(fileName, str(gChatterCache[conference]));
-					gUpdateCount[conference] = 0;
+					fileName = getConfigPath(conference, CHATTERBOX_FILE)
+					writeFile(fileName, str(gChatterCache[conference]))
+					gUpdateCount[conference] = 0
 
-registerMessageHandler(messageChatTalker, CHAT);
+registerMessageHandler(messageChatTalker, CHAT)
 
 def loadMsgBase(conference):
-	fileName = getConfigPath(conference, CHATTERBOX_FILE);
-	createFile(fileName, '[]');
-	gChatterCache[conference] = eval(readFile(fileName));
-	gUpdateCount[conference] = 0;
+	fileName = getConfigPath(conference, CHATTERBOX_FILE)
+	createFile(fileName, "[]")
+	gChatterCache[conference] = eval(readFile(fileName))
+	gUpdateCount[conference] = 0
 
 def unloadMsgBase(conference):
-	del(gChatterCache[conference]);
+	del(gChatterCache[conference])
 
 def setChatterboxState(conference):
-	if(getConfigKey(conference, 'chatterbox') is None):
-		setConfigKey(conference, 'chatterbox', 0);
+	if(getConfigKey(conference, "chatterbox") is None):
+		setConfigKey(conference, "chatterbox", 0)
 
 def chatterboxControl(msgType, conference, nick, param):
 	if(param):
 		if(param.isdigit()):
-			param = int(param);
+			param = int(param)
 			if(param == 1):
-				setConfigKey(conference, 'chatterbox', 1);
-				sendMsg(msgType, conference, nick, u'болталка включена');
+				setConfigKey(conference, "chatterbox", 1)
+				sendMsg(msgType, conference, nick, u"болталка включена")
 			else:
-				setConfigKey(conference, 'chatterbox', 0);
-				sendMsg(msgType, conference, nick, u'болталка отключена');
-			saveChatConfig(conference);
+				setConfigKey(conference, "chatterbox", 0)
+				sendMsg(msgType, conference, nick, u"болталка отключена")
+			saveChatConfig(conference)
 		else:
-			sendMsg(msgType, conference, nick, u'прочитай помощь по команде');
+			sendMsg(msgType, conference, nick, u"прочитай помощь по команде")
 	else:
-		sendMsg(msgType, conference, nick, u'текущее значение: %d' % (getConfigKey(conference, 'chatterbox')));
+		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (getConfigKey(conference, "chatterbox")))
 
-registerEvent(loadMsgBase, ADDCONF);
-registerEvent(unloadMsgBase, DELCONF);
-registerEvent(setChatterboxState, ADDCONF);
+registerEvent(loadMsgBase, ADDCONF)
+registerEvent(unloadMsgBase, DELCONF)
+registerEvent(setChatterboxState, ADDCONF)
 
-registerCommand(chatterboxControl, u'болталка', 30, \
-				u'Отключает (0) или включает (1) болталку. Без параметра покажет текущее значение', \
-				u'болталка [0|1]', (u'болталка', u'болталка 0'), CHAT);
+registerCommand(chatterboxControl, u"болталка", 30, 
+				u"Отключает (0) или включает (1) болталку. Без параметра покажет текущее значение", 
+				u"болталка [0|1]", 
+				(u"болталка", u"болталка 0"), 
+				CHAT)

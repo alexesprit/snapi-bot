@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # dumpz.py
 
@@ -12,43 +12,44 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import urllib2;
+import urllib2
 
-DUMPZ_LANGS_FILE = "languages.txt";
+DUMPZ_LANGS_FILE = "languages.txt"
 
-DUMPZ_LANGS = {};
+DUMPZ_LANGS = {}
 
 def uploadToDumpz(msgType, conference, nick, param):
 	if(param):
-		args = param.split(None, 1);
-		lang = args[0];
+		args = param.split(None, 1)
+		lang = args[0]
 		if(lang in DUMPZ_LANGS):
 			if(len(args) == 2):
-				text = args[1];
+				text = args[1]
 			else:
-				sendMsg(msgType, conference, nick, u"а где тескт?");
-				return;
+				sendMsg(msgType, conference, nick, u"а где тескт?")
+				return
 		else:
-			text = param;
-			lang = "text";
-		query = urllib.urlencode({'lexer': lang, 'code': text.encode('utf-8')});
-		req = urllib2.Request('http://dumpz.org/', query, {'Content-type': 'application/x-www-form-urlencoded'});
-		res = urllib2.urlopen(req);
-		sendMsg(msgType, conference, nick, u"залито на %s" % (res.url));
+			text = param
+			lang = "text"
+		query = urllib.urlencode({"lexer": lang, "code": text.encode("utf-8")})
+		req = urllib2.Request("http://dumpz.org/", query, {"Content-type": "application/x-www-form-urlencoded"})
+		res = urllib2.urlopen(req)
+		sendMsg(msgType, conference, nick, u"залито на %s" % (res.url))
 	else:
 		langs = [u"%s - %s" % (lang, name) \
-				for lang, name in DUMPZ_LANGS.items()];
-		langs.sort();
-		message = u"Доступные языки:\n%s" % ("\n".join(langs));
-		sendMsg(msgType, conference, nick, message);
+				for lang, name in DUMPZ_LANGS.items()]
+		langs.sort()
+		message = u"Доступные языки:\n%s" % ("\n".join(langs))
+		sendMsg(msgType, conference, nick, message)
 
 def loadDumpzLanguages():
-	global DUMPZ_LANGS;
-	fileName = getFilePath(RESOURCE_DIR, DUMPZ_LANGS_FILE);
-	DUMPZ_LANGS = eval(readFile(fileName));
+	global DUMPZ_LANGS
+	fileName = getFilePath(RESOURCE_DIR, DUMPZ_LANGS_FILE)
+	DUMPZ_LANGS = eval(readFile(fileName))
 
-registerEvent(loadDumpzLanguages, STARTUP);
+registerEvent(loadDumpzLanguages, STARTUP)
 
-registerCommand(uploadToDumpz, u"пастебин", 10, \
-				u"Заливает текст на пастебин-сервис dumpz.org. Без параметров покажен доступные языки", \
-				u'пастебин [язык] [текст]', (u"пастебин This is text", u"пастебин cpp int *n, *p"));
+registerCommand(uploadToDumpz, u"пастебин", 10, 
+				u"Заливает текст на пастебин-сервис dumpz.org. Без параметров покажет доступные языки", 
+				u"пастебин [язык] [текст]", 
+				(u"пастебин This is text", u"пастебин cpp int *n, *p;"));

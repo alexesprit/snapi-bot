@@ -25,27 +25,27 @@ TLS connection - TLS class. Can be used for SSL connections also.
 Transports are stackable so you - f.e. TLS use HTPPROXYsocket or TCPSocket as more low-level transport.
 """
 
-import base64;
-import select;
-import socket;
-import sys;
+import base64
+import select
+import socket
+import sys
 
 isPython26 = sys.version[:3] == '2.6'
 
 if isPython26:
-	import ssl;
+	import ssl
 
-import dispatcher;
-import dns;
+import dispatcher
+import dns
 
-from simplexml import ustr;
-from plugin import PlugIn;
-from protocol import *;
+from simplexml import ustr
+from plugin import PlugIn
+from protocol import *
 
 BUFLEN = 1024
 
-DBG_PROXY = 'proxy';
-DBG_SOCKET = 'socket';
+DBG_PROXY = 'proxy'
+DBG_SOCKET = 'socket'
 
 class TCPSocket(PlugIn):
 	""" This class defines direct TCP connection method. """

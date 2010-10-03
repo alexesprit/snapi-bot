@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # cmdoff.py
 # Initial Copyright (c) 2007 Als <Als@exploit.in>
@@ -13,91 +13,97 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-CMDOFF_FILE = 'cmdoff.txt';
+CMDOFF_FILE = "cmdoff.txt"
+
+def loadCommands(conference):
+	fileName = getConfigPath(conference, CMDOFF_FILE)
+	createFile(fileName, "[]")
+	gCmdOff[conference] = eval(readFile(fileName))
+
+def saveCommands(conference):
+	fileName = getConfigPath(conference, CMDOFF_FILE)
+	writeFile(fileName, str(gCmdOff[conference]))
+
+def unloadCommands(conference):
+	del(gCmdOff[conference])
 
 def cmdSwitchOff(msgType, conference, nick, param):
-	validCmd, invalidCmd, alreadySwitched, nonSwitched = [], [], [], [];
-	message = u'';
+	validCmd, invalidCmd, alreadySwitched, nonSwitched = [], [], [], []
+	message = u""
 	if(param):
-		param = param.split();
+		param = param.split()
 		for cmd in param:
-			_isCommand = isCommand(cmd) and isCommandType(cmd, CHAT);
-			_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd);
+			_isCommand = isCommand(cmd) and isCommandType(cmd, CHAT)
+			_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd)
 			if(_isCommand or _isMacros):
 				if(_isMacros or not isCommandType(cmd, FROZEN)):
 					if(isAvailableCommand(conference, cmd)):
-						gCmdOff[conference].append(cmd);
-						validCmd.append(cmd);
+						gCmdOff[conference].append(cmd)
+						validCmd.append(cmd)
 					else:
-						alreadySwitched.append(cmd);
+						alreadySwitched.append(cmd)
 				else:
-					nonSwitched.append(cmd);
+					nonSwitched.append(cmd)
 			else:
-				invalidCmd.append(cmd);
+				invalidCmd.append(cmd)
 		if(validCmd):
-			validCmd.sort();
-			message += u'были отключены следующие команды:\n' + ', '.join(validCmd);
+			validCmd.sort()
+			message += u"были отключены следующие команды:\n" + ", ".join(validCmd)
 		if(alreadySwitched):
-			alreadySwitched.sort();
-			message += u'\nследующие команды уже отключены:\n' + ', '.join(alreadySwitched);
+			alreadySwitched.sort()
+			message += u"\nследующие команды уже отключены:\n" + ", ".join(alreadySwitched)
 		if(invalidCmd):
 			invalidCmd.sort(); 
-			message += u'\nперечисленное ниже не является командами:\n' + ', '.join(invalidCmd);
+			message += u"\nперечисленное ниже не является командами:\n" + ", ".join(invalidCmd)
 		if(nonSwitched):
-			validCnonSwitchedmd.sort();
-			message += u'\nследующие команды неотключаемы:\n' + ', '.join(nonSwitched);
-		saveCommands(conference);
+			validCnonSwitchedmd.sort()
+			message += u"\nследующие команды неотключаемы:\n" + ", ".join(nonSwitched)
+		saveCommands(conference)
 	else:
-		validCmdReplic = [cmd for cmd in gCmdOff[conference]];
+		validCmdReplic = [cmd for cmd in gCmdOff[conference]]
 		if(validCmdReplic):
-			message = u'в этой конференции отключены следующие команды:\n' + ', '.join(validCmdReplic);
+			message = u"в этой конференции отключены следующие команды:\n" + ", ".join(validCmdReplic)
 		else:
-			message = u'в этой конференции включены все команды';
-	sendMsg(msgType, conference, nick, message);
-
-registerCommand(cmdSwitchOff, u'комвыкл', 30, u'Отключает определённые команды для текущей конференции. Без параметров показывает список отключенных команд', u'комвыкл [команды]', (u'комвыкл', u'комвыкл тык диско версия пинг', ), CHAT | FROZEN);
+			message = u"в этой конференции включены все команды"
+	sendMsg(msgType, conference, nick, message)
 
 def cmdSwitchOn(msgType, conference, nick, param):
-	validCmd, invalidCmd, alreadySwitched = [], [], [];
-	message = u'';
-	param = param.split();
+	validCmd, invalidCmd, alreadySwitched = [], [], []
+	message = u""
+	param = param.split()
 	for cmd in param:
-		_isCommand = isCommand(cmd) and isCommandType(cmd, CHAT);
-		_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd);
+		_isCommand = isCommand(cmd) and isCommandType(cmd, CHAT)
+		_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd)
 		if(_isCommand or _isMacros):
 			if(not isAvailableCommand(conference, cmd)):
-				gCmdOff[conference].remove(cmd);
-				validCmd.append(cmd);
+				gCmdOff[conference].remove(cmd)
+				validCmd.append(cmd)
 			else:
-				alreadySwitched.append(cmd);
+				alreadySwitched.append(cmd)
 		else:
-			invalidCmd.append(cmd);
+			invalidCmd.append(cmd)
 	if(validCmd):
-		validCmd.sort();
-		message += u'были включены следующие команды:\n' + ', '.join(validCmd);
+		validCmd.sort()
+		message += u"были включены следующие команды:\n" + ", ".join(validCmd)
 	if(alreadySwitched):
-		alreadySwitched.sort();
-		message += u'\nследующие команды уже включены:\n' + ', '.join(alreadySwitched);
+		alreadySwitched.sort()
+		message += u"\nследующие команды уже включены:\n" + ", ".join(alreadySwitched)
 	if(invalidCmd):
-		invalidCmd.sort();
-		message += u'\nперечисленное ниже не является командами:\n' + ', '.join(invalidCmd);
-	saveCommands(conference);
-	sendMsg(msgType, conference, nick, message);
+		invalidCmd.sort()
+		message += u"\nперечисленное ниже не является командами:\n" + ", ".join(invalidCmd)
+	saveCommands(conference)
+	sendMsg(msgType, conference, nick, message)
 
-registerCommand(cmdSwitchOn, u'комвкл', 30, u'Включает определённые команды для текущей конференции', u'комвкл <команды>', (u'комвкл тык диско версия пинг', ), CHAT | FROZEN | PARAM);
+registerEvent(loadCommands, ADDCONF)
+registerEvent(unloadCommands, DELCONF)
 
-def saveCommands(conference):
-	fileName = getConfigPath(conference, CMDOFF_FILE);
-	writeFile(fileName, str(gCmdOff[conference]));
-
-def loadCommands(conference):
-	fileName = getConfigPath(conference, CMDOFF_FILE);
-	createFile(fileName, '[]');
-	gCmdOff[conference] = eval(readFile(fileName));
-
-registerEvent(loadCommands, ADDCONF);
-
-def unloadCommands(conference):
-	del(gCmdOff[conference]);
-	
-registerEvent(unloadCommands, DELCONF);
+registerCommand(cmdSwitchOn, u"комвкл", 30, 
+				u"Включает определённые команды для текущей конференции", 
+				u"комвкл <команды>", 
+				(u"комвкл тык диско версия пинг", ), 
+				CHAT | FROZEN | PARAM)
+registerCommand(cmdSwitchOff, u"комвыкл", 30, 
+				u"Отключает определённые команды для текущей конференции. Без параметров показывает список отключенных команд", 
+				u"комвыкл [команды]", 
+				(u"комвыкл", u"комвыкл тык диско версия пинг", ), 
+				CHAT | FROZEN)

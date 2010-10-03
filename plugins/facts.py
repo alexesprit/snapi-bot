@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # facts.py
 # Initial Copyright (c) 2010 -Esprit-
@@ -13,19 +13,24 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-FACTS_COUNT = 28;
+FACTS_COUNT = 28
 
 def showFact(msgType, conference, nick, param):
-	pageNum = random.randrange(1, FACTS_COUNT + 1);
-	rawHtml = urllib.urlopen('http://skio.ru/facts/fact%d.php' % (pageNum)).read();
-	items = re.search('<div style=(.+?)<ul>(.+?)</ul>', rawHtml, re.DOTALL);
+	pageNum = random.randrange(1, FACTS_COUNT + 1)
+	url = "http://skio.ru/facts/fact%d.php" % (pageNum)
+	rawHTML = urllib.urlopen(url).read()
+	items = re.search("<div style=(.+?)<ul>(.+?)</ul>", rawHTML, re.DOTALL)
 	if(items):
-		rawHtml = items.group(2);
-		items = re.findall('<li>(.+?)</li>', rawHtml, re.DOTALL);
-		fact = random.choice(items);
-		fact = decode(fact);
-		sendMsg(msgType, conference, nick, unicode(fact, 'cp1251'));
+		rawHTML = items.group(2)
+		items = re.findall("<li>(.+?)</li>", rawHTML, re.DOTALL)
+		fact = random.choice(items)
+		fact = decode(fact)
+		sendMsg(msgType, conference, nick, unicode(fact, "cp1251"))
 	else:
-		sendMsg(msgType, conference, nick, u'не получается');
+		sendMsg(msgType, conference, nick, u"не получается")
 
-registerCommand(showFact, u'факт', 10, u'Показывает случайный интересный факт', None, (u'факт', ), ANY | NONPARAM);
+registerCommand(showFact, u"факт", 10, 
+				u"Показывает случайный интересный факт", 
+				None, 
+				(u"факт", ), 
+				ANY | NONPARAM)

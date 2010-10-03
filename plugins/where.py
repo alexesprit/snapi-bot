@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # where.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -14,14 +14,18 @@
 # GNU General Public License for more details.
 
 def showWhereIsBot(msgType, conference, nick, param):
-	confCount = len(getConferences());
+	confCount = len(getConferences())
 	if(confCount):
-		message = u'я сижу в %d конфах:\n' % (confCount);
-		infoList = [u'%d) %s\n[%s, %d чел.]' % (i + 1, conf, getBotNick(conf), len(getJidList(conf))) \
-					for i, conf in enumerate(getConferences())];
-		message += '\n'.join(infoList);
-		sendMsg(msgType, conference, nick, message);
+		message = u"я сижу в %d конфах:\n" % (confCount)
+		infoList = [u"%d) %s\n[%s, %d чел.]" % (i + 1, conf, getBotNick(conf), len(getJidList(conf))) \
+					for i, conf in enumerate(getConferences())]
+		message += "\n".join(infoList)
+		sendMsg(msgType, conference, nick, message)
 	else:
-		sendMsg(msgType, conference, nick, u'я пока нигде не сижу');
+		sendMsg(msgType, conference, nick, u"я пока нигде не сижу")
 
-registerCommand(showWhereIsBot, u'хдебот', 10, u'Показывает, в каких конфах сидит бот', None, (u'хдебот', ), ANY | NONPARAM);
+registerCommand(showWhereIsBot, u"хдебот", 10, 
+				u"Показывает, в каких конфах сидит бот", 
+				None, 
+				(u"хдебот", ), 
+				ANY | NONPARAM)

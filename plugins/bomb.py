@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # bomb.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -13,95 +13,99 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-COLORS = (u'красный', u'зеленый', u'черный', u'синий', u'белый', u'желтый', u'серый', u'оранжевый', u'фиолетовый');
+COLORS = (u"красный", u"зеленый", u"черный", u"синий", u"белый", u"желтый", u"серый", u"оранжевый", u"фиолетовый")
 
-gBombColors = {};
-gBombAnswer = {};
-gBombTimers = {};
+gBombColors = {}
+gBombAnswer = {}
+gBombTimers = {}
 
 def getRandomColors():
-	colors = [];
+	colors = []
 	for color in COLORS:
 		if(random.randrange(0, 2)):
-			colors.append(color);
-	return(colors);
+			colors.append(color)
+	return(colors)
 
 def bombMarked(conference, trueJid):
-	return(trueJid in gBombAnswer[conference]);
+	return(trueJid in gBombAnswer[conference])
 
 def giveBomb(msgType, conference, nick, param):
 	if(xmpp.TYPE_PRIVATE == msgType):
-		sendMsg(msgType, conference, nick, u'ага, хочешь без палева кинуть??? ]:->')
-		return;
-	userNick = param or random.choice(getOnlineNicks(conference));
+		sendMsg(msgType, conference, nick, u"ага, хочешь без палева кинуть??? ]:->")
+		return
+	userNick = param or random.choice(getOnlineNicks(conference))
 	if(nickIsOnline(conference, userNick)): 
-		trueJid = getTrueJid(conference, userNick);
+		trueJid = getTrueJid(conference, userNick)
 		if(bombMarked(conference, trueJid)):
-			sendMsg(msgType, conference, nick, u'в него уже кинули, ему хватит :-D');
+			sendMsg(msgType, conference, nick, u"в него уже кинули, ему хватит :-D")
 		else:
-			colors = getRandomColors();
-			gBombAnswer[conference][trueJid] = random.choice(colors);
-			gBombColors[conference][trueJid] = colors;
-			timeout = random.randrange(40, 71);
+			colors = getRandomColors()
+			gBombAnswer[conference][trueJid] = random.choice(colors)
+			gBombColors[conference][trueJid] = colors
+			timeout = random.randrange(40, 71)
 			if(colors):
-				message = u'вам вручена бомба, на ней %d цветов: %s, ' % (len(colors), ', '.join(colors));
-				message += u'выберите цвет провода, который нужно перерезать, бомба взорвется через %s' % (time2str(timeout));
+				message = u"вам вручена бомба, на ней %d цветов: %s, " % (len(colors), ", ".join(colors))
+				message += u"выберите цвет провода, который нужно перерезать, бомба взорвется через %s" % (time2str(timeout))
 			else:
 				# это не баг, это фича :)
-				message = u'хаха, тебе не повезло, у тебя бомба БЕЗ проводов! она взорвётся через %s' % (time2str(timeout));
-			sendMsg(msgType, conference, userNick, message);
-			gBombTimers[conference][trueJid] = startTimer(timeout, bombExec, (msgType, conference, userNick, trueJid));
+				message = u"хаха, тебе не повезло, у тебя бомба БЕЗ проводов! она взорвётся через %s" % (time2str(timeout))
+			sendMsg(msgType, conference, userNick, message)
+			gBombTimers[conference][trueJid] = startTimer(timeout, bombExec, (msgType, conference, userNick, trueJid))
 	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');			
+		sendMsg(msgType, conference, nick, u"а это кто?");			
 
 def bombExec(msgType, conference, nick, trueJid):
 	if(nickIsOnline(conference, nick)):
-		sendMsg(msgType, conference, nick, u'надо было резать %s, чего тормозишь? :)' % (gBombAnswer[conference][trueJid]));
-		detonate(msgType, conference, nick);
+		sendMsg(msgType, conference, nick, u"надо было резать %s, чего тормозишь? :)" % (gBombAnswer[conference][trueJid]))
+		detonate(msgType, conference, nick)
 	else:
-		sendMsg(msgType, conference, nick, u'трус :/');
+		sendMsg(msgType, conference, nick, u"трус :/")
 
 def bombColorsListener(stanza, msgType, conference, nick, trueJid, param):
 	if(bombMarked(conference, trueJid)):
-		color = param.lower();
+		color = param.lower()
 		if(color in gBombColors[conference][trueJid]):
-			gBombTimers[conference][trueJid].cancel();
+			gBombTimers[conference][trueJid].cancel()
 			if(color in gBombAnswer[conference][trueJid]):
-				sendMsg(msgType, conference, nick, u'бомба обезврежена!');
+				sendMsg(msgType, conference, nick, u"бомба обезврежена!")
 			else:
-				sendMsg(msgType, conference, nick, u':-| блин, надо было резать %s' % gBombAnswer[conference][trueJid]);
-				detonate(msgType, conference, nick);
-			del(gBombAnswer[conference][trueJid]);
-			del(gBombColors[conference][trueJid]);
-			del(gBombTimers[conference][trueJid]);
+				sendMsg(msgType, conference, nick, u":-| блин, надо было резать %s" % gBombAnswer[conference][trueJid])
+				detonate(msgType, conference, nick)
+			del(gBombAnswer[conference][trueJid])
+			del(gBombColors[conference][trueJid])
+			del(gBombTimers[conference][trueJid])
 
-registerMessageHandler(bombColorsListener, CHAT);
+registerMessageHandler(bombColorsListener, CHAT)
 
 def detonate(msgType, conference, nick):
-	num = random.randrange(0, 10);
+	num = random.randrange(0, 10)
 	if(num < 1 or getNickKey(conference, nick, NICK_MODER)):
-		sendMsg(msgType, conference, nick, u'бомба глюкнула...');
+		sendMsg(msgType, conference, nick, u"бомба глюкнула...")
 	elif(num < 7):
-		setRole(conference, nick, xmpp.ROLE_NONE, u'бабах!!!');
+		setRole(conference, nick, xmpp.ROLE_NONE, u"бабах!!!")
 	else:
-		setRole(conference, nick, xmpp.ROLE_VISITOR, u'бабах!!!');
-		timeout = random.randrange(100, 501);
-		startTimer(timeout, voiceUser, (msgType, conference, nick));
+		setRole(conference, nick, xmpp.ROLE_VISITOR, u"бабах!!!")
+		timeout = random.randrange(100, 501)
+		startTimer(timeout, voiceUser, (msgType, conference, nick))
 
 def voiceUser(msgType, conference, nick):
-	setRole(conference, nick, xmpp.ROLE_PARTICIPANT, u'none');
+	setRole(conference, nick, xmpp.ROLE_PARTICIPANT)
 
 def clearBombCache(conference):
-	del(gBombAnswer[conference]);
-	del(gBombColors[conference]);
+	del(gBombAnswer[conference])
+	del(gBombColors[conference])
 	del(gBombTimers[conference]);	
 
-registerEvent(clearBombCache, DELCONF);
+registerEvent(clearBombCache, DELCONF)
 
 def initBombCache(conference):
-	gBombColors[conference] = {};
-	gBombAnswer[conference] = {};
-	gBombTimers[conference] = {};
+	gBombColors[conference] = {}
+	gBombAnswer[conference] = {}
+	gBombTimers[conference] = {}
 
-registerEvent(initBombCache, ADDCONF);
-registerCommand(giveBomb, u'бомба', 15, u'Вручает пользователю бомбу. Если перерезать не тот провод, то будет кик или контузия. Если ник не указан, то берется произвольный ник из чата', u'бомба [ник]', (u'бомба', u'бомба Nick'), CHAT);
+registerEvent(initBombCache, ADDCONF)
+registerCommand(giveBomb, u"бомба", 15,
+				u"Вручает пользователю бомбу. Если пользователь не обезвредит её, то бот может выкинуть его из конференции или лишить голоса",
+				u"бомба [ник]", 
+				(u"бомба", u"бомба Nick"), 
+				CHAT)

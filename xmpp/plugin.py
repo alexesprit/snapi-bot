@@ -23,7 +23,7 @@ class PlugIn:
 		self._owner = owner
 		if self.DBG_LINE not in owner.debugFlags:
 			owner.debugFlags.append(self.DBG_LINE)
-		className = self.__class__.__name__;
+		className = self.__class__.__name__
 		if not hasattr(owner, className):
 			self.printf('Plugging %s into %s' % (self, self._owner), 'start')
 			self._oldMethods = []

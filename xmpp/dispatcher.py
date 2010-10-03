@@ -21,10 +21,10 @@ Contains one tunable attribute: DEFAULT_TIMEOUT (25 seconds by default). It defi
 Dispatcher.SendAndWaitForResponce method will wait for reply stanza before giving up.
 """
 
-import time;
-import sys;
+import time
+import sys
 
-import simplexml;
+import simplexml
 from protocol import *
 from plugin import PlugIn
 
@@ -75,7 +75,7 @@ class Dispatcher(PlugIn):
 		self._init()
 		for method in self._oldMethods:
 			if method.__name__ == 'send':
-				self._owner_send = method;
+				self._owner_send = method
 				break
 		self._owner.lastErrNode = None
 		self._owner.lastErr = None
@@ -109,8 +109,8 @@ class Dispatcher(PlugIn):
 	def Process(self, timeout=0):
 		""" Check incoming stream for data waiting. If "timeout" is positive - block for as max. this time.
 			Returns:
-			1) length of processed data if some data were processed;
-			2) '0' string if no data were processed but link is alive;
+			1) length of processed data if some data were processed
+			2) '0' string if no data were processed but link is alive
 			3) 0 (zero) if underlying connection is closed.
 			Take note that in case of disconnection detect during Process() call
 			disconnect handlers are called automatically.
@@ -167,7 +167,7 @@ class Dispatcher(PlugIn):
 			self.RegisterNamespace(xmlns, 'warn')
 		if name not in self.handlers[xmlns]:
 			self.RegisterProtocol(name, Protocol, xmlns, 'warn')
-		key = hType + nameSpace;
+		key = hType + nameSpace
 		if key not in self.handlers[xmlns][name]:
 			self.handlers[xmlns][name][key] = []
 		self.handlers[xmlns][name][key].append(handler)
@@ -209,67 +209,67 @@ class Dispatcher(PlugIn):
 		""" Main procedure that performs XMPP stanza recognition and calling apppropriate handlers for it.
 			Called internally. """
 		if(not session):
-			session = self;
-		session.Stream._mini_dom = None;
-		name = stanza.getName();
+			session = self
+		session.Stream._mini_dom = None
+		name = stanza.getName()
 
 		if(name == 'features'):
-			session.Stream.features = stanza;
+			session.Stream.features = stanza
 
-		xmlns = stanza.getNamespace();
+		xmlns = stanza.getNamespace()
 		if(xmlns not in self.handlers):
-			self.printf("Unknown namespace: %s" % (xmlns), 'warn');
-			xmlns = 'default';
+			self.printf("Unknown namespace: %s" % (xmlns), 'warn')
+			xmlns = 'default'
 		if(name not in self.handlers[xmlns]):
-			self.printf("Unknown stanza: %s" % (name), 'warn');
-			name = 'default';
+			self.printf("Unknown stanza: %s" % (name), 'warn')
+			name = 'default'
 		else:
-			self.printf("Got %s/%s stanza" % (xmlns, name), 'ok');
+			self.printf("Got %s/%s stanza" % (xmlns, name), 'ok')
 
 		if(isinstance(stanza, Node)):
-			stanza = self.handlers[xmlns][name]['type'](node = stanza);
+			stanza = self.handlers[xmlns][name]['type'](node = stanza)
 
-		stanzaType = stanza.getType();
-		stanzaID = stanza.getID();
+		stanzaType = stanza.getType()
+		stanzaID = stanza.getID()
 		if(not stanzaType): 
-			stanzaType = '';
-		stanzaProps = stanza.getProperties();
+			stanzaType = ''
+		stanzaProps = stanza.getProperties()
 
-		session.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID), 'ok');
+		session.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID), 'ok')
 
-		excType = None;
+		excType = None
 		if(stanzaID in session._expected):
 			if(isinstance(session._expected[stanzaID], tuple)):
-				function, args = session._expected[stanzaID];
-				session.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), 'ok');
+				function, args = session._expected[stanzaID]
+				session.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), 'ok')
 				try:
-					function(stanza, *args);
+					function(stanza, *args)
 				except(NodeProcessed):
-					pass;
-				del(self._expected[stanzaID]);
+					pass
+				del(self._expected[stanzaID])
 			else:
 				session.printf("Expected stanza arrived!", 'ok')
-				session._expected[stanzaID] = stanza;
+				session._expected[stanzaID] = stanza
 		else:
-			handlerList = ['default'];
+			handlerList = ['default']
 			if(stanzaType in self.handlers[xmlns][name]):
 				handlerList.append(stanzaType)
 			for prop in stanzaProps:
 				if(prop in self.handlers[xmlns][name]):
-					handlerList.append(prop);
+					handlerList.append(prop)
 				if(stanzaType and (stanzaType + prop) in self.handlers[xmlns][name]):
-					handlerList.append(stanzaType + prop);
+					handlerList.append(stanzaType + prop)
 
-			chain = self.handlers[xmlns]['default']['default'];
+			chain = self.handlers[xmlns]['default']['default']
 			for key in handlerList:
 				if(key):
-					chain = chain + self.handlers[xmlns][name][key];
-			self.printf(chain);
+					chain = chain + self.handlers[xmlns][name][key]
+			self.printf(chain)
 			for handler in chain:
 				try:
-					handler(session, stanza);
+					handler(session, stanza)
 				except(NodeProcessed):
-					return;
+					return
 
 	def WaitForResponse(self, id, timeout=DEFAULT_TIMEOUT):
 		""" Block and wait until stanza with specific "id" attribute will come.
@@ -277,36 +277,36 @@ class Dispatcher(PlugIn):
 			If operation failed for some reason then owner's attributes
 			lastErrNode, lastErr and lastErrCode are set accordingly.
 		"""
-		self._expected[id] = None;
-		timedOut = 0;
-		abortTime = time.time() + timeout;
+		self._expected[id] = None
+		timedOut = 0
+		abortTime = time.time() + timeout
 		self.printf("Waiting for ID %s with timeout %s..." % (id, timeout), 'wait')
 		while(not self._expected[id]):
 			if(not self.Process(0.04)):
-				self._owner.lastErr = "Disconnect";
-				return(None);
+				self._owner.lastErr = "Disconnect"
+				return(None)
 			if(time.time() > abortTime):
-				self._owner.lastErr = "Timeout";
-				return(None);
-		response = self._expected[id];
-		del(self._expected[id]);
+				self._owner.lastErr = "Timeout"
+				return(None)
+		response = self._expected[id]
+		del(self._expected[id])
 		if(response.getErrorCode()):
-			self._owner.lastErrNode = response;
-			self._owner.lastErr = response.getError();
-			self._owner.lastErrCode = response.getErrorCode();
-		return(response);
+			self._owner.lastErrNode = response
+			self._owner.lastErr = response.getError()
+			self._owner.lastErrCode = response.getErrorCode()
+		return(response)
 
 	def SendAndWaitForResponse(self, stanza, timeout=DEFAULT_TIMEOUT):
 		""" Put stanza on the wire and wait for recipient's response to it. """
-		return(self.WaitForResponse(self.send(stanza), timeout));
+		return(self.WaitForResponse(self.send(stanza), timeout))
 
 	def SendAndCallForResponse(self, stanza, func, args=None):
 		""" Put stanza on the wire and call back when recipient replies.
 			Additional callback arguments can be specified in args.
 		"""
 		if(not args):
-			args = {};
-		self._expected[self.send(stanza)] = (func, args);
+			args = {}
+		self._expected[self.send(stanza)] = (func, args)
 
 	def send(self, stanza):
 		""" Serialise stanza and put it on the wire. Assign an unique ID to it before send.
@@ -315,23 +315,23 @@ class Dispatcher(PlugIn):
 		if(isinstance(stanza, basestring)):
 			return self._owner_send(stanza)
 		if(not isinstance(stanza, Protocol)): 
-			stanzaID = None;
+			stanzaID = None
 		elif(not stanza.getID()):
-			global gID;
-			gID +=  1;
-			stanzaID = str(gID);
-			stanza.setID(stanzaID);
+			global gID
+			gID +=  1
+			stanzaID = str(gID)
+			stanza.setID(stanzaID)
 		else:
-			stanzaID = stanza.getID();
+			stanzaID = stanza.getID()
 		if(self._owner._registeredName and not stanza.getAttr('from')):
-			stanza.setAttr('from', self._owner._registeredName);
-		stanza.setNamespace(self._owner.Namespace);
-		stanza.setParent(self._metastream);
-		self._owner_send(stanza);
-		return(stanzaID);
+			stanza.setAttr('from', self._owner._registeredName)
+		stanza.setNamespace(self._owner.Namespace)
+		stanza.setParent(self._metastream)
+		self._owner_send(stanza)
+		return(stanzaID)
 
 	def disconnect(self):
 		""" Send a stream terminator and and handle all incoming stanzas before stream closure. """
-		self._owner_send('</stream:stream>');
+		self._owner_send('</stream:stream>')
 		while(self.Process(1)):
-			pass;
+			pass

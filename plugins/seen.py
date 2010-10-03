@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # seen.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -13,43 +13,47 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-SEEN_FILE = 'seen.txt';
+SEEN_FILE = "seen.txt"
 
-gSeen = {};
-
-def updateSeenTime(conference, nick, trueJid, reason, code):
-	if('303' != code):
-		gSeen[conference][trueJid] = time.time();
-		gSeen[conference].save();
-
-def showSeenTime(msgType, conference, nick, param):
-	userNick = param or nick;
-	if(nickInConference(conference, userNick)):
-		trueJid = getTrueJid(conference, userNick);
-		if(trueJid in gSeen[conference]):
-			seen = gSeen[conference][trueJid];
-			seenDate = time.strftime('%H:%M, %d.%m.%Y', time.localtime(seen));
-			seenTime = time2str(time.time() - seen);
-			if(not param):
-				sendMsg(msgType, conference, nick, u'последний раз я видела тебя %s назад (в %s)' % (seenTime, seenDate));
-			else:
-				sendMsg(msgType, conference, nick, u'последний раз я видела %s %s назад (в %s)' % (userNick, seenTime, seenDate));
-		else:
-			sendMsg(msgType, conference, nick, u'нет информации');
-	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+gSeen = {}
 
 def loadSeenBase(conference):
-	fileName = getConfigPath(conference, SEEN_FILE);
-	createFile(fileName, '{}');
-	gSeen[conference] = database.DataBase(fileName);
+	fileName = getConfigPath(conference, SEEN_FILE)
+	createFile(fileName, "{}")
+	gSeen[conference] = database.DataBase(fileName)
 
 def unloadSeenBase(conference):
-	del(gSeen[conference]);
+	del(gSeen[conference])
 
-registerLeaveHandler(updateSeenTime);
+def updateSeenTime(conference, nick, trueJid, reason, code):
+	if("303" != code):
+		gSeen[conference][trueJid] = time.time()
+		gSeen[conference].save()
 
-registerEvent(loadSeenBase, ADDCONF);
-registerEvent(unloadSeenBase, DELCONF);
+def showSeenTime(msgType, conference, nick, param):
+	userNick = param or nick
+	if(nickInConference(conference, userNick)):
+		trueJid = getTrueJid(conference, userNick)
+		if(trueJid in gSeen[conference]):
+			seen = gSeen[conference][trueJid]
+			seenDate = time.strftime("%H:%M, %d.%m.%Y", time.localtime(seen))
+			seenTime = time2str(time.time() - seen)
+			if(not param):
+				sendMsg(msgType, conference, nick, u"последний раз я видела тебя %s назад (в %s)" % (seenTime, seenDate))
+			else:
+				sendMsg(msgType, conference, nick, u"последний раз я видела %s %s назад (в %s)" % (userNick, seenTime, seenDate))
+		else:
+			sendMsg(msgType, conference, nick, u"нет информации")
+	else:
+		sendMsg(msgType, conference, nick, u"а это кто?")
 
-registerCommand(showSeenTime, u'когдабыл', 10, u'Показывает, сколько времени назад пользователь вышел из чата', u'когдабыл [ник]', (u'когдабыл Nick', ), CHAT);
+registerLeaveHandler(updateSeenTime)
+
+registerEvent(loadSeenBase, ADDCONF)
+registerEvent(unloadSeenBase, DELCONF)
+
+registerCommand(showSeenTime, u"когдабыл", 10, 
+				u"Показывает, сколько времени назад пользователь вышел из чата", 
+				u"когдабыл [ник]", 
+				(u"когдабыл Nick", ), 
+				CHAT)

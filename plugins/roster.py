@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # roster.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -14,8 +14,12 @@
 # GNU General Public License for more details.
 
 def showRoster(msgType, conference, nick, param):
-	items = [u'%d) %s [%s]' % (i + 1, jid, gRoster.getSubscription(jid)) \
-			for i, jid in enumerate(gRoster.getItems())];
-	sendMsg(msgType, conference, nick,  u'смотри, кто у меня есть:\n' + '\n'.join(items));
+	items = [u"%d) %s [%s]" % (i + 1, jid, gRoster.getSubscription(jid)) \
+			for i, jid in enumerate(gRoster.getItems())]
+	sendMsg(msgType, conference, nick,  u"смотри, кто у меня есть:\n" + "\n".join(items))
 
-registerCommand(showRoster, u'ростер', 100, u'Показывает содержимое ростера', None, (u'ростер', ), ROSTER | NONPARAM);
+registerCommand(showRoster, u"ростер", 100, 
+				u"Показывает содержимое ростера", 
+				None, 
+				(u"ростер", ), 
+				ROSTER | NONPARAM)

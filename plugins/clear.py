@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # clear.py
 # Initial Copyright (c) Gigabyte <gigabyte@ngs.ru>
@@ -13,12 +13,15 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-CLEAR_ITERATIONS = 20;
+CLEAR_ITERATIONS = 20
 
 def clearConference(msgType, conference, nick, param):
-	sendMsg(msgType, conference, nick, u'сейчас уберу...');
+	sendMsg(msgType, conference, nick, u"сейчас уберу...")
 	for i in xrange(CLEAR_ITERATIONS):
-		sendToConference(conference, '');
-		time.sleep(2);
+		sendToConference(conference, None)
+		time.sleep(2)
 
-registerCommand(clearConference, u'чисть', 15, u'Очищает конференцию', None, (u'чисть', ), CHAT | NONPARAM);
+registerCommand(clearConference, u"чисть", 15, 
+				u"Очищает конференцию", 
+				None, (u"чисть", ), 
+				CHAT | NONPARAM)

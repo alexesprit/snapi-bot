@@ -39,18 +39,18 @@ debug.Debug.colors['stop'] = debug.colorDarkGray
 debug.Debug.colors['sent'] = debug.colorYellow
 debug.Debug.colors['got'] = debug.colorBrightCyan
 
-SSL_AUTO = 0x0;
-SSL_FORCE = 0x1;
-SSL_DISABLE = 0x2;
+SSL_AUTO = 0x0
+SSL_FORCE = 0x1
+SSL_DISABLE = 0x2
 
-C_TCP = "TCP";
-C_TLS = "TLS";
-C_SSL = "SSL";
+C_TCP = "TCP"
+C_TLS = "TLS"
+C_SSL = "SSL"
 
-import auth;
-import dispatcher;
-import roster;
-import transports;
+import auth
+import dispatcher
+import roster
+import transports
 
 class CommonClient:
 	""" Base for Client and Component classes."""
@@ -115,7 +115,7 @@ class CommonClient:
 		dispatcher.Dispatcher().PlugIn(self)
 		while self.Dispatcher.Stream._document_attrs is None:
 			if not self.Process(1):
-				return False;
+				return False
 		# If we get version 1.0 stream the features tag MUST BE presented
 		if(self.Dispatcher.Stream._document_attrs.get('version') == '1.0'):
 			while not self.Dispatcher.Stream.features and self.Process(1):
@@ -135,7 +135,7 @@ class Client(CommonClient):
 			Returns '' or 'TCP' or 'TLS', depending on the result.
 		"""
 		if(not CommonClient.connect(self, server, proxy, SSLMode, useResolver)):
-			return False;
+			return False
 		if(SSLMode != SSL_DISABLE and not hasattr(self, C_TLS)):
 			transports.TLS().PlugIn(self)
 			if(self.Dispatcher.Stream._document_attrs.get('version') == '1.0'):
@@ -190,7 +190,7 @@ class Client(CommonClient):
 		caps.setAttr("node", "http://jimm.net.ru/caps")
 		caps.setAttr("ver", "Nz009boXYEIrmRWk1N/Vsw==")
 		caps.setAttr("hash", "md5")
-		return(caps);
+		return(caps)
 
 	def getRoster(self):
 		""" Return the Roster instance, previously plugging it in and
@@ -200,10 +200,10 @@ class Client(CommonClient):
 		return self.Roster.getRoster()
 
 	def setStatus(self, show, status, priority):
-		prs = dispatcher.Presence(priority=priority);
+		prs = dispatcher.Presence(priority=priority)
 		if(status):
-			prs.setStatus(status);
+			prs.setStatus(status)
 		if(show):
-			prs.setShow(show);
-		prs.addChild(node=self.getCapsNode());
-		self.send(prs);
+			prs.setShow(show)
+		prs.addChild(node=self.getCapsNode())
+		self.send(prs)

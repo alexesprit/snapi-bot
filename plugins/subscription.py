@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # subscription.py
 # Initial Copyright (с) ???
@@ -14,13 +14,13 @@
 # GNU General Public License for more details.
 		
 def processSubscriptions(stanza, conference, nick, trueJid):
-	jid = stanza.getFrom().getStripped();
-	prsType = stanza.getType();
+	jid = stanza.getFrom().getStripped()
+	prsType = stanza.getType()
 	if(xmpp.PRS_SUBSCRIBE == prsType):
-		gRoster.authorize(jid);
-		gRoster.subscribe(jid);
+		gRoster.authorize(jid)
+		gRoster.subscribe(jid)
 	elif(xmpp.PRS_UBSUBSCRIBE == prsType):
-		gRoster.unauthorize(jid);
-		gRoster.delItem(jid);
+		gRoster.unauthorize(jid)
+		gRoster.delItem(jid)
 
-registerPresenceHandler(processSubscriptions, ROSTER);
+registerPresenceHandler(processSubscriptions, ROSTER)

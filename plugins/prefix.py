@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # prefix.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -15,24 +15,28 @@
 
 def prefixControl(msgType, conference, nick, param):
 	if(param):
-		if(param.lower() != 'none'):
-			setConfigKey(conference, 'prefix', param);
-			sendMsg(msgType, conference, nick, u'установлен префикс: %s' % (param));
+		if(param.lower() != "none"):
+			setConfigKey(conference, "prefix", param)
+			sendMsg(msgType, conference, nick, u"установлен префикс: %s" % (param))
 		else:
-			setConfigKey(conference, 'prefix', '');
-			sendMsg(msgType, conference, nick, u'префикс для команд отключен');
-		saveChatConfig(conference);
+			setConfigKey(conference, "prefix", "")
+			sendMsg(msgType, conference, nick, u"префикс для команд отключен")
+		saveChatConfig(conference)
 	else:
-		prefixValue = getConfigKey(conference, 'prefix');
+		prefixValue = getConfigKey(conference, "prefix")
 		if(prefixValue):
-			sendMsg(msgType, conference, nick, u'текущее значение: %s' % (prefixValue));
+			sendMsg(msgType, conference, nick, u"текущее значение: %s" % (prefixValue))
 		else:
-			sendMsg(msgType, conference, nick, u'префикс не установлен');
+			sendMsg(msgType, conference, nick, u"префикс не установлен")
 
 def setDefaultPrefix(conference):
-	if(getConfigKey(conference, 'prefix') is None):
-		setConfigKey(conference, 'prefix', '');
+	if(getConfigKey(conference, "prefix") is None):
+		setConfigKey(conference, "prefix", "")
 
-registerEvent(setDefaultPrefix, ADDCONF);
+registerEvent(setDefaultPrefix, ADDCONF)
 
-registerCommand(prefixControl, u'префикс', 30, u'Устанавливает или отключает (если указать None) префикс для команд. Без параметра покажет текущее значение', u'префикс [что-то]', (u'префикс _', u'префикс None'), CHAT);
+registerCommand(prefixControl, u"префикс", 30, 
+				u"Устанавливает или отключает (если указать None) префикс для команд. Без параметра покажет текущее значение", 
+				u"префикс [что-то]", 
+				(u"префикс _", u"префикс None"), 
+				CHAT)

@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # turn.py
 # Initial Copyright (с) ???
@@ -13,82 +13,80 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-TURN_TIMEOUT = 0.6;
+TURN_TIMEOUT = 0.6
 
-#TABLE_RU = u",№;:?&йцукенгшщзхъфывапролджэячсмитьбюёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮЁ";
-#TABLE_EN = u"?#$^,?qwertyuiop[]asdfghjkl;'zxcvbnm,.`QWERTYUIOP{}ASDFGHJKL:\ZXCVBNM<>~";
+BIG_RU = u"ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,?Ё"
+BIG_EN = u"QWERTYUIOP{}ASDFGHJKL:\"ZXCVBNM<>?&~"
+SML_RU = u"йцукенгшщзхъфывапролджэячсмитьбю.ё"
+SML_EN = u"qwertyuiop[]asdfghjkl;'zxcvbnm,./`"
 
-BIG_RU = u'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,?Ё';
-BIG_EN = u'QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?&~';
-SML_RU = u"йцукенгшщзхъфывапролджэячсмитьбю.ё";
-SML_EN = u"qwertyuiop[]asdfghjkl;'zxcvbnm,./`";
+TABLE_BIG = dict(zip(BIG_RU + BIG_EN, BIG_EN + BIG_RU))
+TABLE_SML = dict(zip(SML_RU + SML_EN, SML_EN + SML_RU))
 
-TABLE_BIG = dict(zip(BIG_RU + BIG_EN, BIG_EN + BIG_RU));
-TABLE_SML = dict(zip(SML_RU + SML_EN, SML_EN + SML_RU));
-
-gTurnMsgCache = {};
+gTurnMsgCache = {}
 
 def getBigChar(char):
-	return(TABLE_BIG.get(char, char));
+	return(TABLE_BIG.get(char, char))
 
 def getSmlChar(char):
-	return(TABLE_SML.get(char, char));
+	return(TABLE_SML.get(char, char))
 
 def turnMessage(text):
-	text = ''.join(map(getSmlChar, text));
-	text = ''.join(map(getBigChar, text));
-	return(text);
+	text = "".join(map(getSmlChar, text))
+	text = "".join(map(getBigChar, text))
+	return(text)
 
 def turnLastMessage(msgType, conference, nick, param):
 	if(not msgType == xmpp.TYPE_PUBLIC):
-		sendMsg(msgType, conference, nick, u'тока в чате');
-		return;
+		sendMsg(msgType, conference, nick, u"тока в чате")
+		return
 	if(param):
-		sendMsg(msgType, conference, nick, turnMessage(param));
+		sendMsg(msgType, conference, nick, turnMessage(param))
 	else:
-		trueJid = getTrueJid(conference, nick);
+		trueJid = getTrueJid(conference, nick)
 		if(trueJid not in gTurnMsgCache[conference]):
-			sendMsg(msgType, conference, nick, u'а ты ещё ничего не говорил');
-		elif(gTurnMsgCache[conference][trueJid].lower() == u'turn'):
-			sendMsg(msgType, conference, nick, u'последнее, что ты сказал, это "turn" :-D');
+			sendMsg(msgType, conference, nick, u"а ты ещё ничего не говорил")
+		elif(gTurnMsgCache[conference][trueJid].lower() == u"turn"):
+			sendMsg(msgType, conference, nick, u"последнее, что ты сказал, это \"turn\" :-D")
 		else:
-			savedMsg = gTurnMsgCache[conference][trueJid];
-			receiver = None;
+			savedMsg = gTurnMsgCache[conference][trueJid]
+			receiver = None
 			for userNick in getNicks(conference):
 				if(savedMsg.startswith(userNick)):
-					for x in [userNick + x for x in (':', ',')]:
+					for x in [userNick + x for x in (":", ",")]:
 						if(savedMsg.startswith(x)):
-							savedMsg = savedMsg.replace(x, turnMessage(x));
-							receiver = userNick;
+							savedMsg = savedMsg.replace(x, turnMessage(x))
+							receiver = userNick
 				if(receiver):
-					break;
+					break
 			if(receiver):
-				sendToConference(conference, u'%s (от %s)' % (turnMessage(savedMsg), nick));
+				sendToConference(conference, u"%s (от %s)" % (turnMessage(savedMsg), nick))
 			else:
-				sendMsg(msgType, conference, nick, turnMessage(savedMsg));
-
-registerCommand(turnLastMessage, u'turn', 10, u'Переключает раскладку для последнего сообщения пользователя, вызвавшего команду', u'turn [текст]', (u'turn', u'turn jkjkj'), CHAT);
+				sendMsg(msgType, conference, nick, turnMessage(savedMsg))
 
 def saveMessage(stanza, msgType, conference, nick, trueJid, body):
 	if(msgType == xmpp.TYPE_PUBLIC):
 		if(trueJid != gJid and trueJid != conference):
-			time.sleep(TURN_TIMEOUT);
-			gTurnMsgCache[conference][trueJid] = body;
-
-registerMessageHandler(saveMessage, CHAT);
+			time.sleep(TURN_TIMEOUT)
+			gTurnMsgCache[conference][trueJid] = body
 
 def initTurnCache(conference):
-	gTurnMsgCache[conference] = {};
-
-registerEvent(initTurnCache, ADDCONF);
+	gTurnMsgCache[conference] = {}
 
 def unloadTurnCache(conference):
-	del(gTurnMsgCache[conference]);
-
-registerEvent(unloadTurnCache, DELCONF);
+	del(gTurnMsgCache[conference])
 
 def clearTurnCache(conference, nick, trueJid, reason, code):
 	if(trueJid in gTurnMsgCache[conference]):
-		del(gTurnMsgCache[conference][trueJid]);
+		del(gTurnMsgCache[conference][trueJid])
 
-registerLeaveHandler(clearTurnCache);
+registerMessageHandler(saveMessage, CHAT)
+registerEvent(initTurnCache, ADDCONF)
+registerEvent(unloadTurnCache, DELCONF)
+registerLeaveHandler(clearTurnCache)
+
+registerCommand(turnLastMessage, u"turn", 10, 
+				u"Переключает раскладку для последнего сообщения пользователя, вызвавшего команду", 
+				u"turn [текст]", 
+				(u"turn", u"turn jkjkj"), 
+				CHAT)

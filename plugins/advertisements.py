@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # advertisement.py
 # Initial Copyright (c) 2010 -Esprit-
@@ -13,17 +13,22 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-ADV_COUNT = 12;
+ADV_COUNT = 12
 
 def showAdvert(msgType, conference, nick, param):
-	pageNum = random.randrange(1, ADV_COUNT + 1);
-	rawHtml = urllib.urlopen('http://skio.ru/funnyad/%d.php' % (pageNum)).read();
-	items = re.findall('<tr><td>(.+?)</td></tr>', rawHtml, re.DOTALL);
+	pageNum = random.randrange(1, ADV_COUNT + 1)
+	url = "http://skio.ru/funnyad/%d.php" % (pageNum)
+	rawHTML = urllib.urlopen(url).read()
+	items = re.findall(r"<tr><td>(.+?)</td></tr>", rawHTML, re.DOTALL)
 	if(items):
-		adv = random.choice(items);
-		adv = decode(adv);
-		sendMsg(msgType, conference, nick, unicode(adv, 'cp1251'));
+		adv = random.choice(items)
+		adv = decode(adv)
+		sendMsg(msgType, conference, nick, unicode(adv, "cp1251"))
 	else:
-		sendMsg(msgType, conference, nick, u'не получается');
+		sendMsg(msgType, conference, nick, u"не получается")
 
-registerCommand(showAdvert, u'объявление', 10, u'Показывает случайное интересное объявление', None, (u'объявление', ), ANY | NONPARAM);
+registerCommand(showAdvert, u"объявление", 10, 
+				u"Показывает случайное интересное объявление", 
+				None, 
+				(u"объявление", ), 
+				ANY | NONPARAM)

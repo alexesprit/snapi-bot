@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # keepalive.py
 # Initial Copyright (с) ???
@@ -13,24 +13,24 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-KEEP_ID = 'keep_id';
-KEEPALIVE_TIMEOUT = 300;
+KEEP_ID = "keep_id"
+KEEPALIVE_TIMEOUT = 300
 
 def _sendKeepAlivePacket(stanza, conference):
 	if(xmpp.TYPE_ERROR == stanza.getType()):
-		if(stanza.getErrorCode() == '503'):
-			startTimer(REJOIN_TIMEOUT, joinConference, (conference, getBotNick(conference), getChatKey(conference, 'password')));
+		if(stanza.getErrorCode() == "503"):
+			startTimer(REJOIN_TIMEOUT, joinConference, (conference, getBotNick(conference), getChatKey(conference, "password")))
 	
 def sendKeepAlivePacket():
 	for conference in getConferences():
-		iq = xmpp.Iq(xmpp.TYPE_GET);
-		iq.setID(getUniqueID(KEEP_ID));
-		iq.addChild('ping', {}, [], xmpp.NS_PING);
-		iq.setTo(conference + '/' + getBotNick(conference));
-		gClient.SendAndCallForResponse(iq, _sendKeepAlivePacket, (conference, ));
-	startKeepAliveTimer();
+		iq = xmpp.Iq(xmpp.TYPE_GET)
+		iq.setID(getUniqueID(KEEP_ID))
+		iq.addChild("ping", {}, [], xmpp.NS_PING)
+		iq.setTo(conference + "/" + getBotNick(conference))
+		gClient.SendAndCallForResponse(iq, _sendKeepAlivePacket, (conference, ))
+	startKeepAliveTimer()
 
 def startKeepAliveTimer():
-	startTimer(KEEPALIVE_TIMEOUT, sendKeepAlivePacket);
+	startTimer(KEEPALIVE_TIMEOUT, sendKeepAlivePacket)
 
-registerEvent(startKeepAliveTimer, INIT_2);
+registerEvent(startKeepAliveTimer, INIT_2)

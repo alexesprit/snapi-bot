@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # botnick.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -14,8 +14,12 @@
 # GNU General Public License for more details.
 
 def setBotNick(msgType, conference, nick, param):
-	joinConference(conference, param, getConfigKey(conference, 'password'));
-	saveChatConfig(conference);
-	sendMsg(msgType, conference, nick, u'запомнила');
+	joinConference(conference, param, getConfigKey(conference, "password"))
+	saveChatConfig(conference)
+	sendMsg(msgType, conference, nick, u"запомнила")
 
-registerCommand(setBotNick, u'ботник', 30, u'Меняет ник бота', u'ботник <ник>', (u'ботник ПеЛоТкО.о', ), CHAT | PARAM);
+registerCommand(setBotNick, u"ботник", 30,
+				u"Меняет ник бота", 
+				u"ботник <ник>",
+				(u"ботник ПеЛоТкО.о", ), 
+				CHAT | PARAM)

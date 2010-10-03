@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # autostatus.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -14,15 +14,15 @@
 # GNU General Public License for more details.
 
 def startStatusTimer():
-	hour = time.localtime()[3];
+	hour = time.localtime()[3]
 	if(hour >= 18):
-		show = u'chat';
+		show = u'chat'
 	elif(hour >= 8):
-		show = u'dnd';
+		show = u'dnd'
 	elif(hour >= 0):
-		show = u'xa';
-	gClient.setStatus(show, None, gPriority);
-	timeout = 3600 + random.randrange(-800, 801);
-	startTimer(timeout, startStatusTimer);
+		show = u'xa'
+	gClient.setStatus(show, None, gPriority)
+	timeout = 3600 + random.randrange(-800, 801)
+	startTimer(timeout, startStatusTimer)
 
-registerEvent(startStatusTimer, INIT_2);
+registerEvent(startStatusTimer, INIT_2)

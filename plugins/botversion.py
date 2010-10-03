@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # botversion.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -13,26 +13,30 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-VER_FILE = 'version.txt';
+VER_FILE = "version.txt"
 
 def setBotVersion(msgType, conference, nick, param):
-	global gVersion;
+	global gVersion
 	if(not param):
-		sendMsg(msgType, conference, nick, u'|'.join(gVersion));
-	elif(param.count('|') == 2):
-		gVersion = tuple(param.split('|'));
-		fileName = getConfigPath(VER_FILE);
-		writeFile(fileName, str(gVersion));
-		sendMsg(msgType, conference, nick, u'поняла, сейчас поставлю');
+		sendMsg(msgType, conference, nick, u"|".join(gVersion))
+	elif(param.count("|") == 2):
+		gVersion = tuple(param.split("|"))
+		fileName = getConfigPath(VER_FILE)
+		writeFile(fileName, str(gVersion))
+		sendMsg(msgType, conference, nick, u"поняла, сейчас поставлю")
 	else:
-		sendMsg(msgType, conference, nick, u'читай справку по команде');
+		sendMsg(msgType, conference, nick, u"читай справку по команде")
 
 def loadBotVersion():
-	global gVersion;
-	fileName = getConfigPath(VER_FILE);
-	createFile(fileName, str(gVersion));
-	gVersion = eval(readFile(fileName));
+	global gVersion
+	fileName = getConfigPath(VER_FILE)
+	createFile(fileName, str(gVersion))
+	gVersion = eval(readFile(fileName))
 
-registerEvent(loadBotVersion, STARTUP);
+registerEvent(loadBotVersion, STARTUP)
 
-registerCommand(setBotVersion, u'ботверсия', 100, u'Выставляет версию клиента у бота. Без параметра покажет текущее значение', u'ботверсия [клиент|версия|ось]', (u'ботверсия', u'ботверсия Jimm|0.6.4|Nokia 3310'), ROSTER);
+registerCommand(setBotVersion, u"ботверсия", 100, 
+				u"Выставляет версию клиента у бота. Без параметра покажет текущее значение", 
+				u"ботверсия [клиент|версия|ось]", 
+				(u"ботверсия", u"ботверсия Jimm|0.6.4|Nokia 3310"), 
+				ROSTER)

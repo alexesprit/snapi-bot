@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # messages.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -15,21 +15,33 @@
 
 def sendToAdmins(msgType, conference, nick, param):
 	for admin in gAdmins:
-		sendTo(xmpp.TYPE_PRIVATE, admin, u'Сообщение от %s/%s:\n%s' % (conference, nick, param));
-	sendMsg(msgType, conference, nick, u'ваше сообщение отправлено');
+		sendTo(xmpp.TYPE_PRIVATE, admin, u"Сообщение от %s/%s:\n%s" % (conference, nick, param))
+	sendMsg(msgType, conference, nick, u"ваше сообщение отправлено")
 
 def sendToConferences(msgType, conference, nick, param):
-	conferences = getConferences();
-	count = 0;
+	conferences = getConferences()
+	count = 0
 	for conf in conferences:
-		if(getConfigKey(conf, 'popups')):
-			sendToConference(conf, u'Новости от администрации:\n%s' % param);
-			count += 1;
-	sendMsg(msgType, conference, nick, 'мессага ушла в %d конференций из %d' % (count, len(conferences)));
+		if(getConfigKey(conf, "popups")):
+			sendToConference(conf, u"Новости от администрации:\n%s" % param)
+			count += 1
+	sendMsg(msgType, conference, nick, "мессага ушла в %d конференций из %d" % (count, len(conferences)))
 	
 def messageToChat(msgType, conference, nick, param):
-	sendToConference(conference, param);
+	sendToConference(conference, param)
 
-registerCommand(sendToConferences, u'мессага_конфам', 100, u'Отправляет сообщение по всем конференциям, в которых сидит бот', u'мессага_конфам [сообщение]', (u'мессага_конфам привет!11', ), ANY | PARAM);
-registerCommand(sendToAdmins, u'мессага_админу', 10, u'Отправляет сообщение всем администраторам бота', u'мессага_админу <сообщение>', (u'мессага_админу привет!11', ), ANY | PARAM);
-registerCommand(messageToChat, u'сказать', 20, u'Говорить через бота в конференции', u'сказать <сообщение>', (u'сказать салют пиплы', ), CHAT | PARAM);
+registerCommand(sendToConferences, u"мессага_конфам", 100, 
+				u"Отправляет сообщение по всем конференциям, в которых сидит бот", 
+				u"мессага_конфам [сообщение]", 
+				(u"мессага_конфам привет!11", ), 
+				ANY | PARAM)
+registerCommand(sendToAdmins, u"мессага_админу", 10, 
+				u"Отправляет сообщение всем администраторам бота", 
+				u"мессага_админу <сообщение>", 
+				(u"мессага_админу привет!11", ), 
+				ANY | PARAM)
+registerCommand(messageToChat, u"сказать", 20, 
+				u"Сказать через бота в конференции", 
+				u"сказать <сообщение>", 
+				(u"сказать салют пиплы", ), 
+				CHAT | PARAM)

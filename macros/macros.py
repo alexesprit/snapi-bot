@@ -1,4 +1,4 @@
-﻿# coding: utf-8;
+﻿# coding: utf-8
 
 # macros.py
 # Modification Copyright (c) -Esprit-
@@ -13,210 +13,210 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import os;
-import random;
-import re;
+import os
+import random
+import re
 
-import __main__;
-import xmpp;
+import __main__
+import xmpp
 
-MACROS_FILE = 'macros.txt';
-MACCESS_FILE = 'macrosaccess.txt';
+MACROS_FILE = 'macros.txt'
+MACCESS_FILE = 'macrosaccess.txt'
 
 class Macros:
 	def __init__(self):
 		self.commands = {
 			'rand': self.getRand,
 			'context': self.getContext
-		};
-		self.gMacrosList = {};
-		self.gAccessList = {};
+		}
+		self.gMacrosList = {}
+		self.gAccessList = {}
 
-		self.macrosList = {};
+		self.macrosList = {}
 		self.accessList = {};		
 
 	def loadMacroses(self, conference = None):
 		if(conference):
-			macrosFileName = __main__.getConfigPath(conference, MACROS_FILE);
-			accessFileName = __main__.getConfigPath(conference, MACCESS_FILE);
+			macrosFileName = __main__.getConfigPath(conference, MACROS_FILE)
+			accessFileName = __main__.getConfigPath(conference, MACCESS_FILE)
 			
-			__main__.createFile(macrosFileName, '{}');
-			__main__.createFile(accessFileName, '{}');
+			__main__.createFile(macrosFileName, '{}')
+			__main__.createFile(accessFileName, '{}')
 
-			self.macrosList[conference] = eval(__main__.readFile(macrosFileName));
-			self.accessList[conference] = eval(__main__.readFile(accessFileName));
+			self.macrosList[conference] = eval(__main__.readFile(macrosFileName))
+			self.accessList[conference] = eval(__main__.readFile(accessFileName))
 		else:
-			macrosFileName = __main__.getConfigPath(MACROS_FILE);
-			accessFileName = __main__.getConfigPath(MACCESS_FILE);
+			macrosFileName = __main__.getConfigPath(MACROS_FILE)
+			accessFileName = __main__.getConfigPath(MACCESS_FILE)
 
-			__main__.createFile(macrosFileName, '{}');
-			__main__.createFile(accessFileName, '{}');
+			__main__.createFile(macrosFileName, '{}')
+			__main__.createFile(accessFileName, '{}')
 
-			self.gMacrosList = eval(__main__.readFile(macrosFileName));
-			self.gAccessList = eval(__main__.readFile(accessFileName));
+			self.gMacrosList = eval(__main__.readFile(macrosFileName))
+			self.gAccessList = eval(__main__.readFile(accessFileName))
 
 	def saveMacroses(self, conference = None):
 		if(conference):
-			macrosFileName = __main__.getConfigPath(conference, MACROS_FILE);
-			accessFileName = __main__.getConfigPath(conference, MACCESS_FILE);
-			__main__.writeFile(macrosFileName, str(self.macrosList[conference]));
-			__main__.writeFile(accessFileName, str(self.accessList[conference]));
+			macrosFileName = __main__.getConfigPath(conference, MACROS_FILE)
+			accessFileName = __main__.getConfigPath(conference, MACCESS_FILE)
+			__main__.writeFile(macrosFileName, str(self.macrosList[conference]))
+			__main__.writeFile(accessFileName, str(self.accessList[conference]))
 		else:
-			__main__.writeFile('config/macros.txt', str(self.gMacrosList));
-			__main__.writeFile('config/macrosaccess.txt', str(self.gAccessList));
+			__main__.writeFile('config/macros.txt', str(self.gMacrosList))
+			__main__.writeFile('config/macrosaccess.txt', str(self.gAccessList))
 			
 	def unloadMacroses(self, conference):
 		if(conference in self.macrosList):
-			del(self.macrosList[conference]);
+			del(self.macrosList[conference])
 
 	def getMacrosList(self, conference = None):
 		if(conference):
-			return(self.macrosList[conference].keys());
+			return(self.macrosList[conference].keys())
 		else:
-			return(self.gMacrosList.keys());
+			return(self.gMacrosList.keys())
 
 	def getMacros(self, macros, conference = None):
 		if(conference):
-			return(self.macrosList[conference].get(macros));
+			return(self.macrosList[conference].get(macros))
 		else:
-			return(self.gMacrosList.get(macros));
+			return(self.gMacrosList.get(macros))
 		
 	def hasMacros(self, macros, conference = None):
 		if(conference):
-			return(macros in self.macrosList[conference]);
+			return(macros in self.macrosList[conference])
 		else:
-			return(macros in self.gMacrosList);
+			return(macros in self.gMacrosList)
 			
 	def getAccess(self, macros, conference = None):
 		if(conference):
-			return(self.accessList[conference].get(macros));
+			return(self.accessList[conference].get(macros))
 		else:
-			return(self.gAccessList[macros]);
+			return(self.gAccessList[macros])
 
 	def setAccess(self, macros, access, conference = None):
 		if(conference):
-			self.accessList[conference][macros] = access;
+			self.accessList[conference][macros] = access
 		else:
-			self.gAccessList[macros] = access;
+			self.gAccessList[macros] = access
 
 	def add(self, macros, param, access, conference = None):
 		if(conference):
-			self.macrosList[conference][macros] = param;
+			self.macrosList[conference][macros] = param
 		else:
-			self.gMacrosList[macros] = param;
-		self.setAccess(macros, access, conference);
+			self.gMacrosList[macros] = param
+		self.setAccess(macros, access, conference)
 
 	def remove(self, macros, conference = None):
 		if(conference):
 			if(macros in self.macrosList[conference]):
-				del(self.macrosList[conference][macros]);
-				del(self.accessList[conference][macros]);
+				del(self.macrosList[conference][macros])
+				del(self.accessList[conference][macros])
 		else:
 			if(macros in  self.gMacrosList):
-				del(self.gMacrosList[macros]);
-				del(self.gAccessList[macros]);
+				del(self.gMacrosList[macros])
+				del(self.gAccessList[macros])
 
 	def expand(self, message, context, conference = None):
-		macros = None;
-		rawBody = message.split(None, 1);
-		command = rawBody[0].lower();
-		param = (len(rawBody) == 2) and rawBody[1] or '';
+		macros = None
+		rawBody = message.split(None, 1)
+		command = rawBody[0].lower()
+		param = (len(rawBody) == 2) and rawBody[1] or ''
 		if(conference in self.macrosList):
 			if(command in self.macrosList[conference]):
-				macros = self.macrosList[conference][command];
+				macros = self.macrosList[conference][command]
 		if(command in self.gMacrosList):
-			macros = self.gMacrosList[command];
+			macros = self.gMacrosList[command]
 		if(not macros):
-			return(message);
-		message = self.replace(macros, param, context);
-		expanded = self.expand(message, context, conference);
-		return(expanded);
+			return(message)
+		message = self.replace(macros, param, context)
+		expanded = self.expand(message, context, conference)
+		return(expanded)
 
 	def replace(self, message, param, context):
 		if(message.count('$*')):
-			message = message.replace('$*', param);
+			message = message.replace('$*', param)
 		else:
-			param = param.split();
-			paramLen = len(param);
+			param = param.split()
+			paramLen = len(param)
 			for i, n in enumerate(re.findall('\$[0-9]+', message)):
 				if(i < paramLen):
-					message = message.replace(n, param[i]);
+					message = message.replace(n, param[i])
 				else:
-					message = message.replace(n, '');
+					message = message.replace(n, '')
 		for i in self.parseCommand(message):
-			cmd = [x.strip() for x in i.split(',')];
-			res = self.proccess(cmd, context);
+			cmd = [x.strip() for x in i.split(',')]
+			res = self.proccess(cmd, context)
 			if(res):
-				message = message.replace('%%(%s)' % i, res);
+				message = message.replace('%%(%s)' % i, res)
 		while(message.count('  ')):
-			message = message.replace('  ', ' ');
-		return(message);
+			message = message.replace('  ', ' ')
+		return(message)
 
 	def getRand(self, args, source):
 		try:
-			f = int(args[0]);
-			t = int(args[1]);
-			return(str(random.randrange(f, t)));
+			f = int(args[0])
+			t = int(args[1])
+			return(str(random.randrange(f, t)))
 		except:
-			return('');
+			return('')
 
 	def getContext(self, args, context):
-		arg = args[0];
+		arg = args[0]
 		if(arg == 'conf'):
-			return(context[0]);
+			return(context[0])
 		elif(arg == 'nick'):
-			return(context[1]);
+			return(context[1])
 		else:
-			return('');
+			return('')
 
 	def charMap(self, x, i):
-		st = i['state'];
+		st = i['state']
 		if(i['esc']):
-			i['esc'] = False;
-			ret = i['level'];
+			i['esc'] = False
+			ret = i['level']
 		elif(x == '\\'):
-			i['esc'] = True;
-			ret = 0;
+			i['esc'] = True
+			ret = 0
 		elif(x == '%'):
-			i['state'] = 'cmd_p';
-			ret = 0;
+			i['state'] = 'cmd_p'
+			ret = 0
 		elif(x == '('):
 			if(i['state'] == 'cmd_p'):
-				i['level'] += 1;
-				i['state'] = 'args';
+				i['level'] += 1
+				i['state'] = 'args'
 			ret=0
 		elif(x == ')'):
 			if(i['state'] == 'args'):
-				i['state'] = 'null';
-			ret = 0;
+				i['state'] = 'null'
+			ret = 0
 		else:
 			if(i['state'] == 'args'):
-				ret = i['level'];
+				ret = i['level']
 			else:
-				i['state'] = 'null';
-				ret = 0;
-		return(ret);
+				i['state'] = 'null'
+				ret = 0
+		return(ret)
 
 	def getMap(self, inp):
-		i = {'level': 0, 'state': 'null', 'esc': False};
-		return([self.charMap(x, i) for x in list(inp)]);
+		i = {'level': 0, 'state': 'null', 'esc': False}
+		return([self.charMap(x, i) for x in list(inp)])
 
 	def parseCommand(self, me):
-		i = 0;
-		m = self.getMap(me);
-		args = [''] * max(m);
+		i = 0
+		m = self.getMap(me)
+		args = [''] * max(m)
 		while(i < len(m)):
 			if(m[i]):
-				args[m[i]-1] += me[i];
-			i += 1;
-		return(args);
+				args[m[i]-1] += me[i]
+			i += 1
+		return(args)
 		
 	def execCommand(self, cmd, args, source):
 		if(cmd in self.commands):
-			return(self.commands[cmd](args, source));
-		return('');
+			return(self.commands[cmd](args, source))
+		return('')
 
 	def proccess(self, cmd, source):
-		command = cmd[0];
-		args = cmd[1:];
-		return(self.execCommand(command, args, source));
+		command = cmd[0]
+		args = cmd[1:]
+		return(self.execCommand(command, args, source))

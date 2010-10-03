@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # quotes.py
 # Initial Copyright (c) ???
@@ -16,55 +16,71 @@
 
 def showBashOrgRu(msgType, conference, nick, param):
 	if(param and param.isdigit()):
-		req = 'http://bash.org.ru/quote/' + param;
+		req = "http://bash.org.ru/quote/" + param
 	else:
-		req = 'http://bash.org.ru/random';
-	rawHtml = urllib.urlopen(req).read();
-	items = re.search('<div class="vote">(.+?)<div>(.+?)</div>', rawHtml, re.DOTALL);
+		req = "http://bash.org.ru/random"
+	rawHTML = urllib.urlopen(req).read()
+	items = re.search("<div class=\"vote\">(.+?)<div>(.+?)</div>", rawHTML, re.DOTALL)
 	if(items):
-		message = decode(items.group(2));
-		sendMsg(msgType, conference, nick, unicode(message, 'cp1251'));
+		message = decode(items.group(2))
+		sendMsg(msgType, conference, nick, unicode(message, "cp1251"))
 	else:
-		sendMsg(msgType, conference, nick, u'не могу :(');
+		sendMsg(msgType, conference, nick, u"не могу :(")
 
 def showBashOrgRuAbyss(msgType, conference, nick, param):
-	rawHtml = urllib.urlopen('http://bash.org.ru/abysstop').read();
-	items = re.findall('<div class="vote">(.+?)<div>(.+?)</div>', rawHtml, re.DOTALL);
+	rawHTML = urllib.urlopen("http://bash.org.ru/abysstop").read()
+	items = re.findall("<div class=\"vote\">(.+?)<div>(.+?)</div>", rawHTML, re.DOTALL)
 	if(items):
-		items = [i[1] for i in items];
-		message = random.choice(items);
-		message = decode(message);
-		sendMsg(msgType, conference, nick, unicode(message, 'cp1251'));
+		items = [i[1] for i in items]
+		message = random.choice(items)
+		message = decode(message)
+		sendMsg(msgType, conference, nick, unicode(message, "cp1251"))
 	else:
-		sendMsg(msgType, conference, nick, u'не могу :(');
+		sendMsg(msgType, conference, nick, u"не могу :(")
 
 def showItHappens(msgType, conference, nick, param):
 	if(param and param.isdigit()):
-		url = "http://ithappens.ru/%s" % (param);
+		url = "http://ithappens.ru/%s" % (param)
 	else:
-		url = "http://ithappens.ru/random";
-	rawHtml = urllib.urlopen(url).read();
-	items = re.search(r"<p class=\"text\">(.+?)</p>", rawHtml, re.DOTALL);
+		url = "http://ithappens.ru/random"
+	rawHTML = urllib.urlopen(url).read()
+	items = re.search(r"<p class=\"text\">(.+?)</p>", rawHTML, re.DOTALL)
 	if(items):
-		text = decode(items.group(0));
-		sendMsg(msgType, conference, nick, unicode(text, "cp1251"));
+		text = decode(items.group(0))
+		sendMsg(msgType, conference, nick, unicode(text, "cp1251"))
 	else:
-		sendMsg(msgType, conference, nick, u'не могу');
+		sendMsg(msgType, conference, nick, u"не могу")
 
 def showJQuote(msgType, conference, nick, param):
-	url = "http://jabber-quotes.ru/random";
-	rawHtml = urllib.urlopen(url).read();
-	items = re.findall(r"<blockquote>(.*?)</blockquote>", rawHtml);
-	if(items):
-		message = random.choice(items);
-		message = message.replace("<br><br>", "<br>");
-		message = decode(message);
-		message = unicode(message, "cp1251");
-		sendMsg(msgType, conference, nick, message);
+	if(param and param.isdigit()):
+		url = "http://jabber-quotes.ru/id%s" % (param)
 	else:
-		sendMsg(msgType, conference, nick, u"не могу :(");
+		url = "http://jabber-quotes.ru/random"
+	rawHTML = urllib.urlopen(url).read()
+	items = re.findall(r"<blockquote>(.*?)</blockquote>", rawHTML)
+	if(items):
+		message = random.choice(items)
+		message = message.replace("<br><br>", "<br>")
+		message = decode(message)
+		message = unicode(message, "cp1251")
+		sendMsg(msgType, conference, nick, message)
+	else:
+		sendMsg(msgType, conference, nick, u"не могу :(")
 
-registerCommand(showBashOrgRu, u"бор", 10, u"Показывает случайную/указанную цитату c bash.org.ru", u"бор [номер]", (u"бор", u"бор 223344"));
-registerCommand(showBashOrgRuAbyss, u"борб", 10, u"Показывает случайную цитату из бездны bash.org.ru", None, (u"борб", ), ANY | NONPARAM);
-registerCommand(showItHappens, u"ит", 10, u"Показывает случайную/указанную цитату c ithappens.ru", None, (u"ит", ));
-registerCommand(showJQuote, u"жк", 10, u"Показывает случайную с jabber-quotes.ru", None, (u"жк", ), ANY | NONPARAM);
+registerCommand(showBashOrgRuAbyss, u"борб", 10, 
+				u"Показывает случайную цитату из бездны bash.org.ru", 
+				None, 
+				(u"борб", ), 
+				ANY | NONPARAM)
+registerCommand(showBashOrgRu, u"бор", 10, 
+				u"Показывает случайную/указанную цитату c bash.org.ru", 
+				u"бор [номер]", 
+				(u"бор", u"бор 143498"))
+registerCommand(showItHappens, u"ит", 10, 
+				u"Показывает случайную/указанную цитату c ithappens.ru", 
+				u"ит [номер]", 
+				(u"ит", u"ит 2691"))
+registerCommand(showJQuote, u"жк", 10, 
+				u"Показывает случайную/указанную цитату с jabber-quotes.ru", 
+				u"жк [номер]", 
+				(u"жк", u"жк 204"));

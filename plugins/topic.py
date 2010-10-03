@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # topic.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -14,8 +14,12 @@
 # GNU General Public License for more details.
 
 def setTopic(msgType, conference, nick, param):
-	message = xmpp.Message(to=conference, typ=xmpp.TYPE_PUBLIC, subject=param);
-	gClient.send(message);
-	sendMsg(msgType, conference, nick, u'поставила');
+	message = xmpp.Message(to=conference, typ=xmpp.TYPE_PUBLIC, subject=param)
+	gClient.send(message)
+	sendMsg(msgType, conference, nick, u"поставила")
 
-registerCommand(setTopic, u'топег', 20, u'Устанавливает тему в конференции', u'топег <текст>', (u'топег ололо', ), CHAT | PARAM);
+registerCommand(setTopic, u"топег", 20, 
+				u"Устанавливает тему в конференции", 
+				u"топег <текст>", 
+				(u"топег ололо", ), 
+				CHAT | PARAM)

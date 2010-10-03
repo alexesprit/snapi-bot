@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # yandex.py
 # Initial Copyright (c) ferym <ferym@jabbim.org.ru>
@@ -14,21 +14,25 @@
 # GNU General Public License for more details.
 
 def yandexSearch(msgType, conference, nick, param):
-	query = urllib.urlencode({'query' : param.encode("utf-8")});
-	rawHtml = urllib.urlopen('http://yandex.ru/msearch?s=all&%s' % (query)).read();
-	rawHtml = unicode(rawHtml, 'utf-8');
-	items = re.findall('<li>(.+?)<div class="www">(.+?)</li>', rawHtml, re.DOTALL);
+	query = urllib.urlencode({"query" : param.encode("utf-8")})
+	rawHTML = urllib.urlopen("http://yandex.ru/msearch?s=all&%s" % (query)).read()
+	rawHTML = unicode(rawHTML, "utf-8")
+	items = re.findall("<li>(.+?)<div class=\"www\">(.+?)</li>", rawHTML, re.DOTALL)
 	if(items):
 		if(xmpp.TYPE_PUBLIC == msgType):
-			text = items[0][0].strip();
-			url = items[0][1];
-			message = u'%shttp://%s' % (text, url);
+			text = items[0][0].strip()
+			url = items[0][1]
+			message = u"%shttp://%s" % (text, url)
 		else:
-			items = [u'%shttp://%s' % (item[0].strip(), item[1]) for item in items[:5]];
-			message = '\n'.join(items);
-		message = message.replace('...', '');
+			items = [u"%shttp://%s" % (item[0].strip(), item[1]) for item in items[:5]]
+			message = "\n".join(items)
+		message = message.replace("...", "")
 		sendMsg(msgType, conference, nick, decode(message));	
 	else:
-		sendMsg(msgType, conference, nick, u'по вашему запросу ничего не найдено');
+		sendMsg(msgType, conference, nick, u"по вашему запросу ничего не найдено")
 
-registerCommand(yandexSearch, u'яндекс', 10, u'Поиск в Яндексе', u'яндекс <запрос>', (u'яндекс google', ), ANY | PARAM);
+registerCommand(yandexSearch, u"яндекс", 10, 
+				u"Поиск в Яндексе", 
+				u"яндекс <запрос>", 
+				(u"яндекс google", ), 
+				ANY | PARAM)

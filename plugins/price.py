@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # price.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -14,19 +14,23 @@
 # GNU General Public License for more details.
 
 def showPrice(msgType, conference, nick, param):
-	query = urllib.quote(param.encode('utf-8'));
-	url = 'http://www.webvaluer.org/ru/www.%s' % (query);
-	rawHtml = urllib.urlopen(url).read();
-	items = re.search(r'<td class="value">(.+?)</td>', rawHtml, re.DOTALL);
+	query = urllib.quote(param.encode("utf-8"))
+	url = "http://www.webvaluer.org/ru/www.%s" % (query)
+	rawHTML = urllib.urlopen(url).read()
+	items = re.search(r"<td class=\"value\">(.+?)</td>", rawHTML, re.DOTALL)
 	if(items):
-		cost = unicode(decode(items.group(0)), 'utf-8');
-		cost = cost.split();
+		cost = unicode(decode(items.group(0)), "utf-8")
+		cost = cost.split()
 		if(len(cost) == 2):
-			cost = '%s %s' % (cost[1], cost[0]);
+			cost = "%s %s" % (cost[1], cost[0])
 		else:
-			cost = cost[0];
-		sendMsg(msgType, conference, nick, u'стоимость домена %s составляет %s' %  (param, cost));
+			cost = cost[0]
+		sendMsg(msgType, conference, nick, u"стоимость домена %s составляет %s" %  (param, cost))
 	else:
-		sendMsg(msgType, conference, nick, u'не получается :(');
+		sendMsg(msgType, conference, nick, u"не получается :(")
 
-registerCommand(showPrice, u'домен', 10, u'Показывает оценочную стоимость домена', u'домен <запрос>', (u'домен microsoft.com', ), ANY | PARAM);
+registerCommand(showPrice, u"домен", 10, 
+				u"Показывает оценочную стоимость домена", 
+				u"домен <запрос>", 
+				(u"домен microsoft.com", ), 
+				ANY | PARAM)

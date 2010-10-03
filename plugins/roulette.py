@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # servers.py
 # Initial Copyright (c) 2007 dimichxp <dimichxp@gmail.com>
@@ -17,12 +17,16 @@
 def playRoulette(msgType, conference, nick, param):
 	if(not getNickKey(conference, nick, NICK_MODER)):
 		if(not random.randrange(0, 6)):
-			sendMsg(msgType, conference, nick, u'ЩЁЛК!');
+			sendMsg(msgType, conference, nick, u"ЩЁЛК!")
 		else:
-			sendToConference(conference, u'/me выстрелила в %s' % (nick));
-			time.sleep(0.5);
-			setRole(conference, nick, 'none', u'ПЫЩЩЬ-ПТЫДЫЩЬ!');
+			sendToConference(conference, u"/me выстрелила в %s" % (nick))
+			time.sleep(0.5)
+			setRole(conference, nick, xmpp.ROLE_NONE, u"ПЫЩЩЬ-ПТЫДЫЩЬ!")
 	else:
-		sendMsg(msgType, conference, nick, u'не могу я в модера стрелять :(');
+		sendMsg(msgType, conference, nick, u"не могу я в модера стрелять :(")
 
-registerCommand(playRoulette, u'рр', 10, u'Старая добрая русская рулетка', u'рр', (u'рр', ), CHAT | NONPARAM);
+registerCommand(playRoulette, u"рр", 10, 
+				u"Старая добрая русская рулетка", 
+				None, 
+				(u"рр", ), 
+				CHAT | NONPARAM)

@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # muclists.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -13,43 +13,56 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-MUC_ID = 'muc_id';
+MUC_ID = "muc_id"
 
 def _showSomeList(stanza, msgType, conference, nick):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
-		items = [u'%d) %s' % (i + 1, p.getAttrs()['jid']) for i, p in enumerate(stanza.getQueryChildren())];
+		items = [u"%d) %s" % (i + 1, p.getAttrs()["jid"]) for i, p in enumerate(stanza.getQueryChildren())]
 		if(items):
-			message = u'смотри, что я нашла:\n';
+			message = u"смотри, что я нашла:\n"
 			if(msgType == xmpp.TYPE_PUBLIC):
-				sendMsg(msgType, conference, nick, u'смотри в привате');
-			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message + '\n'.join(items));
+				sendMsg(msgType, conference, nick, u"смотри в привате")
+			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message + "\n".join(items))
 		else:
-			sendMsg(msgType, conference, nick, u'список пуст');
+			sendMsg(msgType, conference, nick, u"список пуст")
 	else:
-		sendMsg(msgType, conference, nick, u'не получается :(');
+		sendMsg(msgType, conference, nick, u"не получается :(")
 
 def showSomeList(msgType, conference, nick, aff):
-	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_MUC_ADMIN, payload = [xmpp.Node('item', {'affiliation': aff})]);
-	iq.setTo(conference);
-	iq.setID(getUniqueID(MUC_ID));
-	gClient.SendAndCallForResponse(iq, _showSomeList, (msgType, conference, nick, ));
+	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_MUC_ADMIN, payload = [xmpp.Node("item", {"affiliation": aff})])
+	iq.setTo(conference)
+	iq.setID(getUniqueID(MUC_ID))
+	gClient.SendAndCallForResponse(iq, _showSomeList, (msgType, conference, nick, ))
 
 def showBanList(msgType, conference, nick, param):
-	showSomeList(msgType, conference, nick, xmpp.AFF_OUTCAST);
-
-registerCommand(showBanList, u'банлист', 20, u'Показывает список забаненных', None, (u'банлист', ), CHAT | NONPARAM);
+	showSomeList(msgType, conference, nick, xmpp.AFF_OUTCAST)
 
 def showMemberList(msgType, conference, nick, param):
-	showSomeList(msgType, conference, nick, xmpp.AFF_MEMBER);
-
-registerCommand(showMemberList, u'мемберлист', 20, u'Показывает список мемберов', None, (u'мемберлист', ), CHAT | NONPARAM);
+	showSomeList(msgType, conference, nick, xmpp.AFF_MEMBER)
 
 def showAdminList(msgType, conference, nick, param):
-	showSomeList(msgType, conference, nick, xmpp.AFF_ADMIN);
-
-registerCommand(showAdminList, u'админлист', 20, u'Показывает список админов', None, (u'админлист', ), CHAT | NONPARAM);
+	showSomeList(msgType, conference, nick, xmpp.AFF_ADMIN)
 
 def showOwnerList(msgType, conference, nick, param):
-	showSomeList(msgType, conference, nick, xmpp.AFF_OWNER);
+	showSomeList(msgType, conference, nick, xmpp.AFF_OWNER)
 
-registerCommand(showOwnerList, u'овнерлист', 20, u'Показывает список овнеров', None, (u'овнерлист', ), CHAT | NONPARAM);
+registerCommand(showBanList, u"банлист", 20, 
+				u"Показывает список забаненных", 
+				None, 
+				(u"банлист", ), 
+				CHAT | NONPARAM)
+registerCommand(showMemberList, u"мемберлист", 20, 
+				u"Показывает список мемберов", 
+				None, 
+				(u"мемберлист", ), 
+				CHAT | NONPARAM)
+registerCommand(showAdminList, u"админлист", 20, 
+				u"Показывает список админов", 
+				None, 
+				(u"админлист", ), 
+				CHAT | NONPARAM)
+registerCommand(showOwnerList, u"овнерлист", 20, 
+				u"Показывает список овнеров", 
+				None, 
+				(u"овнерлист", ), 
+				CHAT | NONPARAM)

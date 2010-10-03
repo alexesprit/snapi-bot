@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # dns.py
 # Initial Copyright (c) 2002-2005 Mike Mintz <mikemintz@gmail.com>
@@ -14,24 +14,28 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import socket;
+import socket
 
 def dnsQuery(query):
 	try:
-		if(not re.sub('([0-9]+).([0-9]+).([0-9]+).([0-9]+)', '', query)):
-			(hostname, aliaslist, ipaddrlist) = socket.gethostbyaddr(query);
-			return(hostname);
+		if(not re.sub("([0-9]+).([0-9]+).([0-9]+).([0-9]+)", "", query)):
+			(hostname, aliaslist, ipaddrlist) = socket.gethostbyaddr(query)
+			return(hostname)
 		else:
-			(hostname, aliaslist, ipaddrlist) = socket.gethostbyaddr(query);
-			return(', '.join(ipaddrlist));
+			(hostname, aliaslist, ipaddrlist) = socket.gethostbyaddr(query)
+			return(", ".join(ipaddrlist))
 	except(socket.gaierror, socket.herror):
-		return(None);
+		return(None)
 
 def showServerDns(msgType, conference, nick, param):
-	answer = dnsQuery(param);
+	answer = dnsQuery(param)
 	if(answer):
-		sendMsg(msgType, conference, nick, answer);
+		sendMsg(msgType, conference, nick, answer)
 	else:
-		sendMsg(msgType, conference, nick, u'не могу');
+		sendMsg(msgType, conference, nick, u"не могу")
 
-registerCommand(showServerDns, u'днс', 10, u'Показывает ответ от DNS для определённого хоста или IP адреса', u'днс <хост/IP>', (u'днс jabber.aq', u'днс 127.0.0.1'), ANY | PARAM);
+registerCommand(showServerDns, u"днс", 10, 
+				u"Показывает ответ от DNS для определённого хоста или IP адреса", 
+				u"днс <хост/IP>", 
+				(u"днс server.tld", u"днс 127.0.0.1"), 
+				ANY | PARAM)

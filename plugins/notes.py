@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # notes.py
 # Initial Copyright (с) ???
@@ -13,60 +13,71 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-NOTE_FILE = 'notepad.txt';
+NOTE_FILE = "notepad.txt"
 
-gNotes = {};
+gNotes = {}
 
 def addNote(msgType, conference, nick, param):
-	trueJid = getTrueJid(conference, nick);
+	trueJid = getTrueJid(conference, nick)
 	if(trueJid not in gNotes):
-		gNotes[trueJid] = [];
-	text = u'%s\n%s' % (time.strftime('[%d.%m.%y, %H:%M]'), param);
-	gNotes[trueJid].append(text);
-	gNotes.save();
-	sendMsg(msgType, conference, nick, u'записала');
+		gNotes[trueJid] = []
+	text = u"%s\n%s" % (time.strftime("[%d.%m.%y, %H:%M]"), param)
+	gNotes[trueJid].append(text)
+	gNotes.save()
+	sendMsg(msgType, conference, nick, u"записала")
 
 def delNote(msgType, conference, nick, param):
-	trueJid = getTrueJid(conference, nick);
+	trueJid = getTrueJid(conference, nick)
 	if(trueJid in gNotes):
 		if(param.isdigit()):
-			param = int(param) - 1;
+			param = int(param) - 1
 			if(param < len(gNotes[trueJid])):
-				del(gNotes[trueJid][param]);
+				del(gNotes[trueJid][param])
 				if(not gNotes[trueJid]):
-					del(gNotes[trueJid]);
-				gNotes.save();
-				sendMsg(msgType, conference, nick, u'удалила');
+					del(gNotes[trueJid])
+				gNotes.save()
+				sendMsg(msgType, conference, nick, u"удалила")
 			else:
-				sendMsg(msgType, conference, nick, u'нет такого пункта');
+				sendMsg(msgType, conference, nick, u"нет такого пункта")
 		else:
-			sendMsg(msgType, conference, nick, u'читай справку по команде');
+			sendMsg(msgType, conference, nick, u"читай справку по команде")
 	else:
-		sendMsg(msgType, conference, nick, u'в твоём блокноте пусто');
+		sendMsg(msgType, conference, nick, u"в твоём блокноте пусто")
 
 def showNotes(msgType, conference, nick, param):
-	trueJid = getTrueJid(conference, nick);
-	if(param == u'сброс'):
+	trueJid = getTrueJid(conference, nick)
+	if(param == u"сброс"):
 		if(trueJid in gNotes):
-			del(gNotes[trueJid]);
-			gNotes.save();
-			sendMsg(msgType, conference, nick, u'удалила');
+			del(gNotes[trueJid])
+			gNotes.save()
+			sendMsg(msgType, conference, nick, u"удалила")
 		else:
-			sendMsg(msgType, conference, nick, u'а у тебя и так ничего нет :P');
+			sendMsg(msgType, conference, nick, u"а у тебя и так ничего нет :P")
 	elif(not param):
 		if(trueJid in gNotes):
-			message = u'твои заметки:\n';
-			items = [u'%d) %s' % (i + 1, x) for i, x in enumerate(gNotes[trueJid])];
-			sendMsg(msgType, conference, nick, message + '\n'.join(items));
+			message = u"твои заметки:\n"
+			items = [u"%d) %s" % (i + 1, x) for i, x in enumerate(gNotes[trueJid])]
+			sendMsg(msgType, conference, nick, message + "\n".join(items))
 		else:
-			sendMsg(msgType, conference, nick, u'в твоём блокноте пусто');
+			sendMsg(msgType, conference, nick, u"в твоём блокноте пусто")
 
 def loadNotes():
-	global gNotes;
-	gNotes = database.DataBase(getConfigPath(NOTE_FILE));
+	global gNotes
+	gNotes = database.DataBase(getConfigPath(NOTE_FILE))
 
-registerEvent(loadNotes, STARTUP);
+registerEvent(loadNotes, STARTUP)
 
-registerCommand(addNote, u'заметка+', 10, u'Добавляет запись в ваш блокнот', u'заметка+ <что-то>', (u'заметка+ ы', ), ANY | PARAM);
-registerCommand(delNote, u'заметка-', 10, u'Удаляет запись из вашего блокнота', u'заметка- <номер>', (u'заметка- 2', ), ANY | PARAM);
-registerCommand(showNotes, u'заметки', 10, u'Показывает все записи из вашего блокнота. Параметр "сброс" очищает весь список ваших записей', u'заметки [параметры]', (u'заметки', u'заметки сброс'));
+registerCommand(addNote, u"заметка+", 10, 
+				u"Добавляет запись в ваш блокнот", 
+				u"заметка+ <что-то>", 
+				(u"заметка+ ы", ), 
+				ANY | PARAM)
+registerCommand(delNote, u"заметка-", 10, 
+				u"Удаляет запись из вашего блокнота", 
+				u"заметка- <номер>", 
+				(u"заметка- 2", ), 
+				ANY | PARAM)
+registerCommand(showNotes, u"заметки", 10, 
+				u"Показывает все записи из вашего блокнота. Параметр \"сброс\" очищает весь список ваших записей", 
+				u"заметки [параметры]", 
+				(u"заметки", u"заметки сброс"))

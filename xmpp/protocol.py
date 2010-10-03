@@ -102,16 +102,16 @@ _errorCodes = {
 				"504": "remote-server-timeout",
 }
 
-TYPE_PRIVATE = "chat";
-TYPE_PUBLIC = "groupchat";
-TYPE_ERROR = "error";
-TYPE_HEADLINE = "headline";
-TYPE_NORMAL = "normal";
-TYPE_RESULT = "result";
-TYPE_GET = "get";
-TYPE_SET = "set";
+TYPE_PRIVATE = "chat"
+TYPE_PUBLIC = "groupchat"
+TYPE_ERROR = "error"
+TYPE_HEADLINE = "headline"
+TYPE_NORMAL = "normal"
+TYPE_RESULT = "result"
+TYPE_GET = "get"
+TYPE_SET = "set"
 
-PRS_OFFLINE = "unavailable";
+PRS_OFFLINE = "unavailable"
 PRS_ONLINE = "online"
 PRS_CHAT = "chat"
 PRS_AWAY = "away"
@@ -121,16 +121,16 @@ PRS_NA = "xa"
 PRS_SUBSCRIBE = "subscribe"
 PRS_UBSUBSCRIBE = "unsubscribe"
 
-ROLE_NONE = "none";
-ROLE_VISITOR = "visitor";
-ROLE_PARTICIPANT = "participant";
-ROLE_MODERATOR = "moderator";
+ROLE_NONE = "none"
+ROLE_VISITOR = "visitor"
+ROLE_PARTICIPANT = "participant"
+ROLE_MODERATOR = "moderator"
 
-AFF_OUTCAST = "outcast";
-AFF_NONE = "none";
-AFF_MEMBER = "member";
-AFF_ADMIN = "admin";
-AFF_OWNER = "owner";
+AFF_OUTCAST = "outcast"
+AFF_NONE = "none"
+AFF_MEMBER = "member"
+AFF_ADMIN = "admin"
+AFF_OWNER = "owner"
 
 def isResultNode(node):
 	""" Returns true if the node is a positive reply. """

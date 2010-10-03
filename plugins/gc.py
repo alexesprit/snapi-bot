@@ -1,6 +1,7 @@
-# coding: utf-8;
+# coding: utf-8
 
 # gc.py
+# Garbage cleaner
 # Initial Copyright (с) ???
 
 # This program is free software; you can redistribute it and/or modify
@@ -13,17 +14,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-'''
-	Сборка мусора. Вынесена из pybot.py
-'''
+import gc
 
-import gc;
-
-COLLECT_TIMEOUT = 300;
+COLLECT_TIMEOUT = 300
 		
 def startCollecting():
-	sys.exc_clear();
-	gc.collect();
-	startTimer(COLLECT_TIMEOUT, startCollecting);
+	sys.exc_clear()
+	gc.collect()
+	startTimer(COLLECT_TIMEOUT, startCollecting)
 
-registerEvent(startCollecting, INIT_2);
+registerEvent(startCollecting, INIT_2)

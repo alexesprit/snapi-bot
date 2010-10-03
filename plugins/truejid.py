@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # truejid.py
 # Initial Copyright (с) ???
@@ -16,10 +16,14 @@
 def showTrueJid(msgType, conference, nick, param):
 	if(nickInConference(conference, param)):
 		if(xmpp.TYPE_PUBLIC == msgType):
-			sendMsg(msgType, conference, nick, u'смотри в привате');
-		trueJid = getTrueJid(conference, param);
-		sendMsg(xmpp.TYPE_PRIVATE, conference, nick, u'реальный жид %s: %s' % (param, trueJid));
+			sendMsg(msgType, conference, nick, u"смотри в привате")
+		trueJid = getTrueJid(conference, param)
+		sendMsg(xmpp.TYPE_PRIVATE, conference, nick, u"реальный жид %s: %s" % (param, trueJid))
 	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+		sendMsg(msgType, conference, nick, u"а это кто?")
 
-registerCommand(showTrueJid, u'тружид', 20, u'Показывает реальный жид указанного ника', u'тружид <ник>', (u'тружид guy', ), CHAT | PARAM);
+registerCommand(showTrueJid, u"тружид", 20, 
+				u"Показывает реальный жид указанного ника", 
+				u"тружид <ник>", 
+				(u"тружид guy", ), 
+				CHAT | PARAM)

@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # status.py
 # Initial Copyright (c) 2007 Als <Als@exploit.in>
@@ -14,31 +14,35 @@
 # GNU General Public License for more details.
 
 def showUserStatus(msgType, conference, nick, param):
-	userNick = param or nick;
+	userNick = param or nick
 	if(nickIsOnline(conference, userNick)):
-		show = getNickKey(conference, userNick, NICK_SHOW);
-		status = getNickKey(conference, userNick, NICK_STATUS);
+		show = getNickKey(conference, userNick, NICK_SHOW)
+		status = getNickKey(conference, userNick, NICK_STATUS)
 		if(param):
 			if(status):
-				sendMsg(msgType, conference, nick, u'%s сейчас %s (%s)' % (userNick, show, status));
+				sendMsg(msgType, conference, nick, u"%s сейчас %s (%s)" % (userNick, show, status))
 			else:
-				sendMsg(msgType, conference, nick, u'%s сейчас %s' % (userNick, show));
+				sendMsg(msgType, conference, nick, u"%s сейчас %s" % (userNick, show))
 		else:
 			if(status):
-				sendMsg(msgType, conference, nick, u'ты сейчас %s (%s)' % (show, status));
+				sendMsg(msgType, conference, nick, u"ты сейчас %s (%s)" % (show, status))
 			else:
-				sendMsg(msgType, conference, nick, u'ты сейчас %s' % (show));
+				sendMsg(msgType, conference, nick, u"ты сейчас %s" % (show))
 	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+		sendMsg(msgType, conference, nick, u"а это кто?")
 
 def updateStatus(stanza, conference, nick, trueJid):
 	if(conferenceInList(conference) and nickIsOnline(conference, nick)):
-		show = stanza.getShow() or u'online';
-		status = stanza.getStatus();
-		setNickKey(conference, nick, NICK_SHOW, show);
+		show = stanza.getShow() or u"online"
+		status = stanza.getStatus()
+		setNickKey(conference, nick, NICK_SHOW, show)
 		if(status):
-			setNickKey(conference, nick, NICK_STATUS, status);
+			setNickKey(conference, nick, NICK_STATUS, status)
 
-registerPresenceHandler(updateStatus, CHAT);
+registerPresenceHandler(updateStatus, CHAT)
 
-registerCommand(showUserStatus, u'статус', 10, u'Показывает статус указанного пользователя', u'статус [ник]', (u'статус', u'статус Nick'), CHAT);
+registerCommand(showUserStatus, u"статус", 10, 
+				u"Показывает статус указанного пользователя", 
+				u"статус [ник]", 
+				(u"статус", u"статус Nick"), 
+				CHAT);

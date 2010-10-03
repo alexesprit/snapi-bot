@@ -1,6 +1,7 @@
-# coding: utf-8;
+# coding: utf-8
 
 # cleaner.py
+# Removing bases from old keys
 # Initial Copyright (с) 2010 -Esprit-
 
 # This program is free software; you can redistribute it and/or modify
@@ -13,46 +14,42 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-'''	
-	Очиcтка базы данных от старых ключей.
-'''
+CLEAN_TIMEOUT = 86400
+CHAT_KEEP_TIME = 86400 * 30
+SINGLE_KEEP_TIME = 86400 * 90
+LOGS_KEEP_TIME = 86400 * 10
 
-CLEAN_TIMEOUT = 86400;
-CHAT_KEEP_TIME = 86400 * 30;
-SINGLE_KEEP_TIME = 86400 * 90;
-LOGS_KEEP_TIME = 86400 * 10;
-
-CHAT_BASES = ('gClients', 'gTalkers', 'gQuizScores', 'gHereTime', 'gSend', 'gSeen');
-SINGLE_BASES = ('gNotes', );
+CHAT_BASES = ("gClients", "gTalkers", "gQuizScores", "gHereTime", "gSend", "gSeen")
+SINGLE_BASES = ("gNotes", )
 
 def cleanBase(base, keepTime):
-	bGetUpdateTime = base.getUpdateTime;
-	cleanedKeys = 0;
+	bGetUpdateTime = base.getUpdateTime
+	cleanedKeys = 0
 	for key in base:
-		updateTime = bGetUpdateTime(key);
+		updateTime = bGetUpdateTime(key)
 		if(time.time() - updateTime >= keepTime):
-			del(base[key]);
-			cleanedKeys += 1;
+			del(base[key])
+			cleanedKeys += 1
 	if(cleanedKeys):
-		base.save();
+		base.save()
 
 def cleanBases():
-	_cleanBase = cleanBase;
+	_cleanBase = cleanBase
 	for conference in getConferences():
 		for item in CHAT_BASES:
-			base = globals()[item][conference];
-			_cleanBase(base, CHAT_KEEP_TIME);
+			base = globals()[item][conference]
+			_cleanBase(base, CHAT_KEEP_TIME)
 	for item in SINGLE_BASES:
-		base = globals()[item];
-		_cleanBase(base, SINGLE_KEEP_TIME);
+		base = globals()[item]
+		_cleanBase(base, SINGLE_KEEP_TIME)
 	for log in os.listdir(SYSLOG_DIR):
-		logPath = os.path.join(SYSLOG_DIR, log);
-		changeTime = os.path.getctime(logPath);
+		logPath = os.path.join(SYSLOG_DIR, log)
+		changeTime = os.path.getctime(logPath)
 		if(time.time() - changeTime > LOGS_KEEP_TIME):
-			os.remove(logPath);
-	startCleanTimer();
+			os.remove(logPath)
+	startCleanTimer()
 
 def startCleanTimer():
-	startTimer(CLEAN_TIMEOUT, cleanBases);
+	startTimer(CLEAN_TIMEOUT, cleanBases)
 
-registerEvent(startCleanTimer, INIT_2);
+registerEvent(startCleanTimer, INIT_2)

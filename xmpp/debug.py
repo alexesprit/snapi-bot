@@ -35,12 +35,12 @@ For samples of usage, see samples subdir in distro source, and selftest
 in this code
 '''
 
-import os;
-import sys;
-import time;
-import traceback;
+import os
+import sys
+import time
+import traceback
 
-useColors = ('TERM' in os.environ);
+useColors = ('TERM' in os.environ)
 
 colorNone			= chr(27) + "[0m"
 colorBlack			= chr(27) + "[30m"
@@ -89,25 +89,25 @@ To speed code up, typically for product releases or such
 use this class instead if you globaly want to disable debugging
 '''
 
-DBG_ALWAYS = 'always';
+DBG_ALWAYS = 'always'
 
 class NoDebug:
-	colors = {};
+	colors = {}
 
 	def __init__(self, *args, **kwargs ):
-		self.debugFlags = [];
+		self.debugFlags = []
 
 	def show(self,  *args, **kwargs):
-		pass;
+		pass
 
 	def isActive(self, flag):
-		pass;
+		pass
 
 	def setActiveFlags(self, activeFlags=None):
-		return(0);
+		return(0)
 
 class Debug:  
-	colors = {};
+	colors = {}
     
 	def __init__(self, activeFlags=None, logFile=sys.stderr, \
 				prefix="DEBUG: ", suffix="\n", timeStamp=0,
@@ -126,103 +126,103 @@ class Debug:
 		
 		"""
 		if(isinstance(activeFlags, tuple) or isinstance(activeFlags, list)):
-			self.debugFlags = activeFlags;
+			self.debugFlags = activeFlags
 		else:
-			raise(TypeError("debugFlags must be list or tuple!"));
+			raise(TypeError("debugFlags must be list or tuple!"))
 		if(welcomeMsg):
-			welcomeMsg = activeFlags and 1 or 0;
+			welcomeMsg = activeFlags and 1 or 0
 		if(logFile):
 			if(isinstance(logFile, str)):
 				try:
-					self._fh = open(logFile, 'w');
+					self._fh = open(logFile, 'w')
 				except:
-					print('ERROR: can open %s for writing');
+					print('ERROR: can open %s for writing')
 					sys.exit(0)
 			else:
-				self._fh = logFile;
+				self._fh = logFile
 		else:
-			self._fh = sys.stdout;
+			self._fh = sys.stdout
 		
 		if(timeStamp not in (0, 1, 2)):
-			raise('Invalid timeStamp param', timeStamp);
-		self.prefix = prefix;
-		self.suffix = suffix;
-		self.timeStamp = timeStamp;
-		self.validateFlags = validateFlags;
-		self.showFlags = showFlags;
+			raise('Invalid timeStamp param', timeStamp)
+		self.prefix = prefix
+		self.suffix = suffix
+		self.timeStamp = timeStamp
+		self.validateFlags = validateFlags
+		self.showFlags = showFlags
 
-		self.setActiveFlags(activeFlags);
+		self.setActiveFlags(activeFlags)
 		if(welcomeMsg):
-			caller = sys._getframe(1);
+			caller = sys._getframe(1)
 			try:
-				modName = ':%s' % (caller.f_locals['__name__']);
+				modName = ':%s' % (caller.f_locals['__name__'])
 			except NameError:
-				modName = '';
-			self.show('Debug created for %s%s' % (caller.f_code.co_filename, modName));
-			self.show('Flags defined: %s' % ', '.join(self.activeFlags));
+				modName = ''
+			self.show('Debug created for %s%s' % (caller.f_code.co_filename, modName))
+			self.show('Flags defined: %s' % ', '.join(self.activeFlags))
 
 	def setActiveFlags(self, activeFlags=None):
-		validFlags = [];
+		validFlags = []
 		if(not activeFlags):
-			self.activeFlags = [];
-			return;
+			self.activeFlags = []
+			return
 		elif(isinstance(activeFlags, tuple) or isinstance(activeFlags, list)):
 			for flag in activeFlags:
-				self._validateFlag(flag);
-				validFlags.append(flag);
-			self.activeFlags = validFlags;
-		self._removeDuplicates();
+				self._validateFlag(flag)
+				validFlags.append(flag)
+			self.activeFlags = validFlags
+		self._removeDuplicates()
 	
 	def getActiveFlags(self):
-		return self.active;
+		return self.active
 
 	def show(self, msg, flag=None, prefix=''):
 		if(flag and self.validateFlags):
-			self._validateFlag(flag);
+			self._validateFlag(flag)
 		if(not flag or self.isActive(flag)):
 			if(not isinstance(msg, basestring)):
-				msg = unicode(msg);
-			prefixcolor = '';
+				msg = unicode(msg)
+			prefixcolor = ''
 			if(useColors and prefix in self.colors):
-				msg = self.colors[prefix] + msg + colorNone;
+				msg = self.colors[prefix] + msg + colorNone
 				if(flag):
-					prefixcolor = self.colors[flag];
+					prefixcolor = self.colors[flag]
 			if(prefix == 'error'):
-				exception = sys.exc_info();
+				exception = sys.exc_info()
 				if(exception[0]):
-					msg += '\n' + traceback.format_exc().rstrip();
-			prefix = prefixcolor + self.prefix;
+					msg += '\n' + traceback.format_exc().rstrip()
+			prefix = prefixcolor + self.prefix
 			if(flag and self.showFlags):
-				prefix += '[%s] ' % (flag);
+				prefix += '[%s] ' % (flag)
 			if(self.timeStamp == 2):
-				output = '%s%s ' % (prefix, time.strftime('[%H:%M:%S]', time.localtime()));
+				output = '%s%s ' % (prefix, time.strftime('[%H:%M:%S]', time.localtime()))
 			elif(self.timeStamp == 1):
-				output = '%s %s' % (time.strftime('[%H:%M:%S]', time.localtime()), prefix);
+				output = '%s %s' % (time.strftime('[%H:%M:%S]', time.localtime()), prefix)
 			else:
-				output = prefix;
-			output = '%s%s%s' % (output, msg, self.suffix);
+				output = prefix
+			output = '%s%s%s' % (output, msg, self.suffix)
 			try:
-				self._fh.write(output);
+				self._fh.write(output)
 			except:
 				if(os.name == 'posix'):
-					self._fh.write(output.encode('utf-8'));
+					self._fh.write(output.encode('utf-8'))
 				elif(os.name == 'nt'):
-					self._fh.write(output.encode('cp866'));
-			self._fh.flush();
+					self._fh.write(output.encode('cp866'))
+			self._fh.flush()
 
 	def isActive(self, flag):
 		if(self.activeFlags): 
 			if(not flag or flag in self.activeFlags or DBG_ALWAYS in self.activeFlags):
-				return(True);
-		return(False);
+				return(True)
+		return(False)
 
 	def _validateFlag(self, flag):
 		if(flag and not flag in self.debugFlags):
-			raise(Exception('Invalid debug flag given: %s' % flag));
+			raise(Exception('Invalid debug flag given: %s' % flag))
 
 	def _removeDuplicates(self):
-		uniqueFlags = [];
+		uniqueFlags = []
 		for f in self.debugFlags:
 			if(f not in uniqueFlags):
-				uniqueFlags.append(f);
-		self.debugFlags = uniqueFlags;
+				uniqueFlags.append(f)
+		self.debugFlags = uniqueFlags

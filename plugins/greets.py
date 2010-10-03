@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # greets.py
 # Initial Copyright (с) ???
@@ -13,47 +13,49 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-GREET_FILE = 'greets.txt';
+GREET_FILE = "greets.txt"
 
-gGreets = {};
+gGreets = {}
+
+def loadGreetings(conference):
+	fileName = getConfigPath(conference, GREET_FILE)
+	createFile(fileName, "{}")
+	gGreets[conference] = eval(readFile(fileName))
+
+def unloadGreetings(conference):
+	del(gGreets[conference])
 
 def setGreet(msgType, conference, nick, param):
-	rawGreet = param.split('=', 1);
+	rawGreet = param.split("=", 1)
 	if(len(rawGreet) == 2):
-		userNick = rawGreet[0].strip();
-		greet = rawGreet[1].strip();
-		if(userNick.count('@')):
-			trueJid = userNick;
+		userNick = rawGreet[0].strip()
+		greet = rawGreet[1].strip()
+		if(userNick.count("@")):
+			trueJid = userNick
 		elif(userNick in getNicks(conference)):
-			trueJid = getTrueJid(conference, userNick);
+			trueJid = getTrueJid(conference, userNick)
 		else:
-			sendMsg(msgType, conference, nick, u'а это кто?');
-			return;
+			sendMsg(msgType, conference, nick, u"а это кто?")
+			return
 		if(not greet):
 			if(trueJid in gGreets[conference]):
-				del(gGreets[conference][trueJid]);
+				del(gGreets[conference][trueJid])
 		else:
-			gGreets[conference][trueJid] = greet;
-		fileName = getConfigPath(conference, GREET_FILE);
-		writeFile(fileName, str(gGreets[conference]));
-		sendMsg(msgType, conference, nick, u'запомнила');
-
-registerCommand(setGreet, u'приветствие', 30, u'Добавляет приветствие для определённого ника/жида', u'приветствие <ник/жид> = [текст]', (u'приветствие Nick = something', ), CHAT | PARAM);
+			gGreets[conference][trueJid] = greet
+		fileName = getConfigPath(conference, GREET_FILE)
+		writeFile(fileName, str(gGreets[conference]))
+		sendMsg(msgType, conference, nick, u"запомнила")
 
 def sendGreeting(conference, nick, trueJid, aff, role):
 	if(trueJid in gGreets[conference]):
-		sendMsg(xmpp.TYPE_PUBLIC, conference, nick, gGreets[conference][trueJid]);
+		sendMsg(xmpp.TYPE_PUBLIC, conference, nick, gGreets[conference][trueJid])
 
-registerJoinHandler(sendGreeting);
+registerEvent(loadGreetings, ADDCONF)
+registerEvent(unloadGreetings, DELCONF)
+registerJoinHandler(sendGreeting)
 
-def loadGreetings(conference):
-	fileName = getConfigPath(conference, GREET_FILE);
-	createFile(fileName, '{}');
-	gGreets[conference] = eval(readFile(fileName));
-
-registerEvent(loadGreetings, ADDCONF);
-
-def unloadGreetings(conference):
-	del(gGreets[conference]);
-
-registerEvent(unloadGreetings, DELCONF);
+registerCommand(setGreet, u"приветствие", 30, 
+				u"Добавляет приветствие для определённого ника/жида", 
+				u"приветствие <ник|жид> = [текст]", 
+				(u"приветствие Nick = something", ), 
+				CHAT | PARAM)

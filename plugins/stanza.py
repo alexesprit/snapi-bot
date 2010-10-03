@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # stanza.py
 # Initial Copyright (c) 2007 dimichxp <dimichxp@gmail.com>
@@ -14,7 +14,11 @@
 # GNU General Public License for more details.
 
 def sendStanza(source, conference, nick, param):
-	stanza = xmpp.simplexml.XML2Node(param);
-	gClient.send(stanza);
+	stanza = xmpp.simplexml.XML2Node(param)
+	gClient.send(stanza)
 
-registerCommand(sendStanza, u'станза', 100, u'Топка', u'станза <херь>', (u'станза ololo', ), ANY | FROZEN | PARAM);
+registerCommand(sendStanza, u"станза", 100, 
+				u"Топка", 
+				u"станза <что-то>", 
+				(u"станза </stream:stream>", ), 
+				ANY | FROZEN | PARAM)

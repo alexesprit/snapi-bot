@@ -1,32 +1,32 @@
-# coding: utf-8;
+# coding: utf-8
 
 # учётная запись и пароль
-gJid = 'username@server.tld';
-gPassword = 'secret';
+gJid = "username@server.tld"
+gPassword = "secret"
 
 # сервер и порт для подключения 
-gHost = 'server.tld';
-gPort = 5222;
+gHost = "server.tld"
+gPort = 5222
 
 # xmpp.SSL_DISABLE - отключить SSL
 # xmpp.SSL_AUTO - автоопределение (порт 443 или 5223)
 # xmpp.SSL_FORCE - форсировать (нестандартный порт)
-gSSLMode = xmpp.SSL_DISABLE;
-gUseResolver = False;
+gSSLMode = xmpp.SSL_DISABLE
+gUseResolver = False
 
 # ресурс и приоритет
-gResource = 'Snapi-Snup';
-gPriority = 0;
+gResource = "Snapi-Snup"
+gPriority = 0
 
 # станд. ник для конференций
-gBotNick = u'Snapi-Snup';
+gBotNick = u"Snapi-Snup"
 
 # список владельцев бота и пароль
-gAdmins = ['admin@server.tld'];
-gAdminPass = 'secret';
+gAdmins = ["admin@server.tld"]
+gAdminPass = "secret"
 
 # перезагружаться при ошибках?
-gRestart = True;
+gRestart = True
 
 # Описание флагов лога:
 # always - все типы флагов
@@ -36,15 +36,15 @@ gRestart = True;
 # error - ошибки
 # success - успешные результаты
 # warning - предупреждения
-gCoreDebug = ['info', 'error', 'success', 'warning'];
-# always - все типы флагов
+gCoreDebug = ["info", "error", "success", "warning"]
+# always - все типы флагоz
 # auth - авторизация
 # bind - назначение ресурса
 # dispatcher - обработка станз
 # proxy - подклчение через прокси
 # roster - работа с ростером
 # socket - передаваемые данные
-gXMPPDebug = [];
+gXMPPDebug = []
 
 # папка для логов конференций
-gLogDir = '';
+gLogDir = ""

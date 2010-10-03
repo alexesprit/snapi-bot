@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # catapult.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -15,8 +15,12 @@
 
 def runCatapult(msgType, conference, nick, param):
 	if(not getNickKey(conference, nick, NICK_MODER)):
-		setRole(conference, nick, 'none', u'КАТАПУЛЬТИРУЮСЬ!');
+		setRole(conference, nick, xmpp.ROLE_NONE, u"КАТАПУЛЬТИРУЮСЬ!")
 	else:
-		sendMsg(msgType, conference, nick, u'не могу :(');
+		sendMsg(msgType, conference, nick, u"не могу :(")
 
-registerCommand(runCatapult, u'катапульту', 10, u'Катапульта', None, (u'катапульту', ), CHAT | NONPARAM);
+registerCommand(runCatapult, u"катапульту", 10, 
+				u"Катапульта", 
+				None, 
+				(u"катапульту", ), 
+				CHAT | NONPARAM)

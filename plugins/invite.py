@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # invite.py
 # Initial Copyright (c) 2008 Als <Als@exploit.in>
@@ -14,26 +14,31 @@
 # GNU General Public License for more details.
 
 def sendInvite(msgType, conference, nick, param):
-	reason = '';
-	if(not param.count('@')):
-		userNick = param.split()[0];
-		if(nickInConference(conference, userNick)):
-			trueJid = getTrueJid(conference, userNick);
-			reason = ' '.join(param.split()[1:]);
+	#reason = ""
+	param = param.split(None, 1)
+	user = param[0]
+	if(not user.count("@")):
+		if(nickInConference(conference, user)):
+			trueJid = getTrueJid(conference, user)
+			reason = (len(param) == 2) and param[1] or None
 		else:
-			return;
+			return
 	else:
-		trueJid = param;
-	msg = xmpp.Message(to = conference)
-	x = xmpp.Node('x')
+		trueJid = param
+	msg = xmpp.Message(to=conference)
+	x = xmpp.Node("x")
 	x.setNamespace(xmpp.NS_MUC_USER)
-	inv = x.addChild('invite', {'to': trueJid})
+	inv = x.addChild("invite", {"to": trueJid})
 	if reason:
-		inv.setTagData('reason', reason)
+		inv.setTagData("reason", reason)
 	else:
-		inv.setTagData('reason', u'Вас приглашает ' + nick)
-	msg.addChild(node = x)
-	gClient.send(msg);
-	sendMsg(msgType, conference, nick, u'кинула инвайт');
+		inv.setTagData("reason", u"Вас приглашает %s" % (nick))
+	msg.addChild(node=x)
+	gClient.send(msg)
+	sendMsg(msgType, conference, nick, u"кинула инвайт")
 			
-registerCommand(sendInvite, u'призвать', 10, u'Приглашет заданного пользователя в конференцию', u'призвать <ник/жид> [причина]', (u'призвать guy', u'призвать guy@jabber.aq есть дело'), CHAT | PARAM);
+registerCommand(sendInvite, u"призвать", 10, 
+				u"Приглашет заданного пользователя в конференцию", 
+				u"призвать <ник|жид> [причина]", 
+				(u"призвать guy", u"призвать guy@jabber.aq есть дело"), 
+				CHAT | PARAM)

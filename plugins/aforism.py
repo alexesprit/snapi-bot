@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # aforism.py
 # Initial Copyright (c) ferym <ferym@jabbim.org.ru>
@@ -36,16 +36,23 @@ AFOR_PAGES = (
 		'happy_quotes.php',
 		'work_quotes.php',
 		'humour_quotes.php',
-);
+)
+
+gAforPattern = re.compile("<form id=\"qForm\" method=\"post\"><div align=\"center\">(.+?)</div>", re.DOTALL)
 
 def showAforism(msgType, conference, nick, param):
-	randPage = random.choice(AFOR_PAGES);
-	rawHtml = urllib.urlopen('http://skio.ru/quotes/%s' % (randPage)).read();
-	items = re.search('<form id="qForm" method="post"><div align="center">(.+?)</div>', rawHtml, re.DOTALL);
+	randPage = random.choice(AFOR_PAGES)
+	url = "http://skio.ru/quotes/%s" % (randPage)
+	rawHTML = urllib.urlopen(url).read()
+	items = gAforPattern.search(rawHTML)
 	if(items):
-		aforism = decode(items.group(0));
-		sendMsg(msgType, conference, nick, unicode(aforism, 'cp1251'));
+		aforism = decode(items.group(0))
+		sendMsg(msgType, conference, nick, unicode(aforism, "cp1251"))
 	else:
-		sendMsg(msgType, conference, nick, u'не получается');
+		sendMsg(msgType, conference, nick, u"не получается")
 
-registerCommand(showAforism, u'афор', 10, u'Показывает случайный афоризм', None, (u'афор', ), ANY | NONPARAM);
+registerCommand(showAforism, u"афор", 10, 
+				u"Показывает случайный афоризм", 
+				None, 
+				(u"афор", ), 
+				ANY | NONPARAM)

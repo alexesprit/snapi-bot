@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # time.py
 # Initial Copyright (с) 2007 Als <Als@exploit.in>
@@ -14,45 +14,46 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-TIME_ID = 'time_id';
+TIME_ID = "time_id"
 
 def showUserTime(msgType, conference, nick, param):
 	if(param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
-			jid = conference + '/' + param;
+			jid = conference + "/" + param
 		else:
-			jid = param;
+			jid = param
 	else:
-		jid = conference + '/' + nick;
-	iq = xmpp.Iq(xmpp.TYPE_GET);
-	iq.addChild('time', {}, [], xmpp.NS_ENTITY_TIME);
-	iq.setTo(jid);
-	iq.setID(getUniqueID(TIME_ID));
-	gClient.SendAndCallForResponse(iq, _showUserTime, (msgType, conference, nick, param));
+		jid = conference + "/" + nick
+	iq = xmpp.Iq(xmpp.TYPE_GET)
+	iq.addChild("time", {}, [], xmpp.NS_ENTITY_TIME)
+	iq.setTo(jid)
+	iq.setID(getUniqueID(TIME_ID))
+	gClient.SendAndCallForResponse(iq, _showUserTime, (msgType, conference, nick, param))
 
 def _showUserTime(stanza, msgType, conference, nick, param):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
-		tzo, utc = None, None;
+		tzo, utc = None, None
 		for p in stanza.getChildren():
-			tzo = p.getTagData('tzo');
-			utc = p.getTagData('utc');
+			tzo = p.getTagData("tzo")
+			utc = p.getTagData("utc")
 		if(tzo and utc):
-			sign, tzHour, tzMin = re.match('(\+|-)?([0-9]+):([0-9]+)', tzo).groups();
-			offset = int(tzHour) * 3600 + int(tzMin) * 60;
+			sign, tzHour, tzMin = re.match("(\+|-)?([0-9]+):([0-9]+)", tzo).groups()
+			offset = int(tzHour) * 3600 + int(tzMin) * 60
 			if(sign == "-"):
-				offset = -offset;
-			rawTime = time.strptime(utc, "%Y-%m-%dT%H:%M:%SZ");
-			rawTime = time.mktime(rawTime) + offset;
-			userTime = time.strftime("%H:%M:%S (%d.%m.%y)", time.localtime(rawTime));
+				offset = -offset
+			rawTime = time.strptime(utc, "%Y-%m-%dT%H:%M:%SZ")
+			rawTime = time.mktime(rawTime) + offset
+			userTime = time.strftime("%H:%M:%S (%d.%m.%y)", time.localtime(rawTime))
 			if(param):
-				sendMsg(msgType, conference, nick, u'у %s сейчас %s' % (param, userTime));
+				sendMsg(msgType, conference, nick, u"у %s сейчас %s" % (param, userTime))
 			else:
-				sendMsg(msgType, conference, nick, u'у тебя сейчас %s' % (userTime));
+				sendMsg(msgType, conference, nick, u"у тебя сейчас %s" % (userTime))
 		else:
-			sendMsg(msgType, conference, nick, u'клиент глюк, инфы не хватает');
+			sendMsg(msgType, conference, nick, u"клиент глюк, инфы не хватает")
 	else:
-		sendMsg(msgType, conference, nick, u'не получается :(');
+		sendMsg(msgType, conference, nick, u"не получается :(")
 
-registerCommand(showUserTime, u'часики', 10, \
-				u'Показывает время указанного пользователя или сервера', \
-				u'часики [ник|сервер]', (u'часики', u'часики Nick', u'часики server.tld'));
+registerCommand(showUserTime, u"часики", 10, 
+				u"Показывает время указанного пользователя или сервера", 
+				u"часики [ник|сервер]", 
+				(u"часики", u"часики Nick", u"часики server.tld"))

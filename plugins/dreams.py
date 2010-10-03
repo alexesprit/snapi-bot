@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # dreams.py
 # Initial Copyright (c) Avinar <avinar@xmpp.ru>
@@ -14,12 +14,17 @@
 # GNU General Public License for more details.
 
 def showDreamInfo(msgType, conference, nick, param):
-	query = urllib.urlencode({'key' : param.encode('cp1251')});
-	text = urllib.urlopen('http://www.sonnik.ru/search.php?%s' % (query)).read();
-	items = re.search(r'<div id="mntxt">(.+?)</p>', text, re.DOTALL);
-	text = decode(items.group(0));
+	query = urllib.urlencode({"key" : param.encode("cp1251")})
+	url = "http://www.sonnik.ru/search.php?%s" % (query)
+	rawHTML = urllib.urlopen(url).read()
+	items = re.search(r"<div id=\"mntxt\">(.+?)</p>", rawHTML, re.DOTALL)
+	message = decode(items.group(0))
 	if(xmpp.TYPE_PUBLIC == msgType):
-		sendMsg(msgType, conference, nick, u'ушло в приват');
-	sendMsg(xmpp.TYPE_PRIVATE, conference, nick, unicode(text, 'cp1251'));
+		sendMsg(msgType, conference, nick, u"ушло в приват")
+	sendMsg(xmpp.TYPE_PRIVATE, conference, nick, unicode(message, "cp1251"))
 
-registerCommand(showDreamInfo, u'сонник', 10, u'Толкователь снов', u'сонник <что-то>', (u'сонник деньги', ), ANY | PARAM);
+registerCommand(showDreamInfo, u"сонник", 10, 
+				u"Толкователь снов", 
+				u"сонник <что-то>", 
+				(u"сонник деньги", ), 
+				ANY | PARAM)

@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # idle.py
 # Initial Copyright (c) 2007 Als <Als@exploit.in>
@@ -15,9 +15,13 @@
 
 def showUserIdleTime(msgType, conference, nick, param):
 	if(nickIsOnline(conference, param)):
-		idleTime = int(time.time() - getNickKey(conference, param, NICK_IDLE));
-		sendMsg(msgType, conference, nick, u'%s заснул %s назад' % (param, time2str(idleTime)));
+		idleTime = int(time.time() - getNickKey(conference, param, NICK_IDLE))
+		sendMsg(msgType, conference, nick, u"%s заснул %s назад" % (param, time2str(idleTime)))
 	else:
-		sendMsg(msgType, conference, nick, u'а это кто?');
+		sendMsg(msgType, conference, nick, u"а это кто?")
 
-registerCommand(showUserIdleTime, u'жив', 10, u'Показывает время неактивности пользователя', u'жив <ник>', (u'жив Nick', ), CHAT | PARAM);
+registerCommand(showUserIdleTime, u"жив", 10, 
+				u"Показывает время неактивности пользователя", 
+				u"жив <ник>", 
+				(u"жив Nick", ), 
+				CHAT | PARAM)

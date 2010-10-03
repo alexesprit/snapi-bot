@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # files.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -13,31 +13,35 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import shutil;
+import shutil
 
-TYPE_DIR = 1;
-TYPE_FILE = 2;
+TYPE_DIR = 1
+TYPE_FILE = 2
 		
 def deleteFromConfig(msgType, conference, nick, param):
-	files, dirs = 0, 0;
+	files, dirs = 0, 0
 	for conf in getConferences():
-		path = getConfigPath(conf, param);
-		answer = deleteFile(path);
+		path = getConfigPath(conf, param)
+		answer = deleteFile(path)
 		if(TYPE_DIR == answer):
-			dirs += 1;
+			dirs += 1
 		elif(TYPE_FILE == answer):
-			files += 1;
-	sendMsg(msgType, conference, nick, u'удалено %d папок и %d файлов' % (dirs, files));
+			files += 1
+	sendMsg(msgType, conference, nick, u"удалено %d папок и %d файлов" % (dirs, files))
 	
 def deleteFile(path):
 	if(os.path.exists(path)):
 		if(os.path.isdir(path)):
-			shutil.rmtree(path);
-			return(TYPE_DIR);
+			shutil.rmtree(path)
+			return(TYPE_DIR)
 		else:
-			os.remove(path);
-			return(TYPE_FILE);
+			os.remove(path)
+			return(TYPE_FILE)
 	else:
-		return(-1);
+		return(-1)
 
-registerCommand(deleteFromConfig, u'rmcfg', 100, u'Удаляет файл или папку из /config', u'rmcfg <имя>', (u'rmcfg test.txt', ), ROSTER | PARAM);	 
+registerCommand(deleteFromConfig, u"rmcfg", 100, 
+				u"Удаляет файл или папку из /config", 
+				u"rmcfg <имя>", 
+				(u"rmcfg test.txt", ), 
+				ROSTER | PARAM);	 

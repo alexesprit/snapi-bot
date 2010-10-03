@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # timetable.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -13,64 +13,68 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-gTimePattern = re.compile(r'<strong(.+?)</strong>');
-gNamePattern = re.compile(r'<a href="(.+?)>(.+?)</a>', re.DOTALL);
+gTimePattern = re.compile(r"<strong(.+?)</strong>")
+gNamePattern = re.compile(r"<a href=\"(.+?)>(.+?)</a>", re.DOTALL)
 
 def getTrainTable(cityFrom, cityTo, dateForward):
-	query = urllib.urlencode({'cityFrom' : cityFrom.encode('utf-8'),
-								'cityTo': cityTo.encode('utf-8'),
-								'dateForward': dateForward.encode('utf-8'),
-								});
-	url = 'http://rasp.yandex.ru/search?%s' % (query);
-	rawHtml = urllib.urlopen(url).read();
-	rawHtml = unicode(rawHtml, 'utf-8');
-	items = re.findall(u'<tr class="{(.+?)</tr>', rawHtml, re.DOTALL);
-	tableList = [];
+	query = urllib.urlencode({"cityFrom" : cityFrom.encode("utf-8"),
+								"cityTo": cityTo.encode("utf-8"),
+								"dateForward": dateForward.encode("utf-8"),
+								})
+	url = "http://rasp.yandex.ru/search?%s" % (query)
+	rawHTML = urllib.urlopen(url).read()
+	rawHTML = unicode(rawHTML, "utf-8")
+	items = re.findall(u"<tr class=\"{(.+?)</tr>", rawHTML, re.DOTALL)
+	tableList = []
 	for info in items:
-		trainName = re.search('<a href="(.+?)>(.+?)</a>', info, re.DOTALL);
-		trainName = decode(trainName.group(2)).strip();
+		trainName = re.search("<a href=\"(.+?)>(.+?)</a>", info, re.DOTALL)
+		trainName = decode(trainName.group(2)).strip()
 
-		dispatch, arrive = re.findall(r'<span class="point">(.+?)</span>', info, re.DOTALL);
+		dispatch, arrive = re.findall(r"<span class=\"point\">(.+?)</span>", info, re.DOTALL)
 		
-		disTime = gTimePattern.search(dispatch);
-		disTime = decode(disTime.group(0)).strip();
-		disName = gNamePattern.search(dispatch);
-		disName = decode(disName.group(2)).strip();
+		disTime = gTimePattern.search(dispatch)
+		disTime = decode(disTime.group(0)).strip()
+		disName = gNamePattern.search(dispatch)
+		disName = decode(disName.group(2)).strip()
 		
-		arrTime = gTimePattern.search(arrive);
-		arrTime = decode(arrTime.group(0)).strip();
-		arrName = gNamePattern.search(arrive);
-		arrName = decode(arrName.group(2)).strip();
+		arrTime = gTimePattern.search(arrive)
+		arrTime = decode(arrTime.group(0)).strip()
+		arrName = gNamePattern.search(arrive)
+		arrName = decode(arrName.group(2)).strip()
 		
-		travelTime = re.search(r'td class="{raw:(.+?)>(.+?)</i>(.+?)</td>', info, re.DOTALL);
-		travelTime = decode(travelTime.group(3)).strip();
+		travelTime = re.search(r"td class=\"{raw:(.+?)>(.+?)</i>(.+?)</td>", info, re.DOTALL)
+		travelTime = decode(travelTime.group(3)).strip()
 
-		if(info.find("tickets': 'yes") != -1):
-			places = u'есть';
+		if(info.find("tickets\": \"yes") != -1):
+			places = u"есть"
 		else:
-			places = u'нет';
-		tableList.append([trainName, disTime, disName, arrTime, arrName, travelTime, places]);
-	return(tableList);
+			places = u"нет"
+		tableList.append([trainName, disTime, disName, arrTime, arrName, travelTime, places])
+	return(tableList)
 
 def showTrainTable(msgType, conference, nick, param):
-	param = param.split(None, 1);
+	param = param.split(None, 1)
 	if(len(param) == 2):
-		cities = param[1];
-		if(cities.count('>')):
-			cityFrom, cityTo = cities.split('>');
-			date = param[0];
-			tableList = getTrainTable(cityFrom, cityTo, date);
-			message = [];
-			msgText = u'%d) %s\nВремя отправления: %s (%s)\nВремя прибытия: %s (%s)\nВремя в пути: %s\nМеста: %s';
+		cities = param[1]
+		if(cities.count(">")):
+			cityFrom, cityTo = cities.split(">")
+			date = param[0]
+			tableList = getTrainTable(cityFrom, cityTo, date)
+			message = []
+			msgText = u"%d) %s\nВремя отправления: %s (%s)\nВремя прибытия: %s (%s)\nВремя в пути: %s\nМеста: %s"
 			if(tableList):
 				for i, table in enumerate(tableList):
-					message.append(msgText % (i + 1, table[0], table[1], table[2], table[3], table[4], table[5], table[6]));
+					message.append(msgText % (i + 1, table[0], table[1], table[2], table[3], table[4], table[5], table[6]))
 				if(xmpp.TYPE_PUBLIC == msgType):
-					sendMsg(msgType, conference, nick, u'ушло');
-				sendMsg(xmpp.TYPE_PRIVATE, conference, nick, '\n'.join(message));
+					sendMsg(msgType, conference, nick, u"ушло")
+				sendMsg(xmpp.TYPE_PRIVATE, conference, nick, "\n".join(message))
 			else:
-				sendMsg(msgType, conference, nick, u'не найдено');
+				sendMsg(msgType, conference, nick, u"не найдено")
 		else:
-			sendMsg(msgType, conference, nick, u'читай справку по команде');
+			sendMsg(msgType, conference, nick, u"читай справку по команде")
 
-registerCommand(showTrainTable, u'расписание', 10, u'Расписание поездов', u'расписание <дата> <место_отправления > место прибытия>', (u'расписание 12.09 Котлас > Ярославль', ), ANY | PARAM);
+registerCommand(showTrainTable, u"расписание", 10, 
+				u"Расписание поездов", 
+				u"расписание <дата> <место_отправления > место прибытия>", 
+				(u"расписание 12.09 Котлас > Ярославль", ), 
+				ANY | PARAM)

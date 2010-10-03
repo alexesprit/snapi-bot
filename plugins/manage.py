@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # manage.py
 # Initial Copyright (c) ???
@@ -14,27 +14,33 @@
 # GNU General Public License for more details.
 
 def joinConf(msgType, conference, nick, param):
-	param = param.split();
-	if(param and param[0].count('@')):
-		conf = param[0];
+	param = param.split()
+	if(param and param[0].count("@")):
+		conf = param[0]
 		if(conferenceInList(conf)):
-			sendMsg(msgType, conference, nick, u'я уже там!');
+			sendMsg(msgType, conference, nick, u"я уже там!")
 		else:
-			password = (len(param) == 2) and param[1] or None;
-			addConference(conf);
-			joinConference(conf, gBotNick, getConfigKey(conf, 'password'));
-			saveChatConfig(conf);
-			sendMsg(msgType, conference, nick, u'зашла');
+			password = (len(param) == 2) and param[1] or None
+			addConference(conf)
+			joinConference(conf, gBotNick, getConfigKey(conf, "password"))
+			saveChatConfig(conf)
+			sendMsg(msgType, conference, nick, u"зашла")
 
 def leaveConf(msgType, conference, nick, param):
-	conf = param or conference;
+	conf = param or conference
 	if(conferenceInList(conf)):
 		if(not conferenceInList(conference)):
-			sendMsg(msgType, conference, nick, u'ушла');
-		myNick = (conferenceInList(conference)) and nick or conference.split('@')[0];
-		leaveConference(conf, u'меня уводит %s' % (myNick));
+			sendMsg(msgType, conference, nick, u"ушла")
+		myNick = (conferenceInList(conference)) and nick or conference.split("@")[0]
+		leaveConference(conf, u"меня уводит %s" % (myNick))
 	else:
-		sendMsg(msgType, conference, nick, u'а меня там нету');
+		sendMsg(msgType, conference, nick, u"а меня там нету")
 
-registerCommand(joinConf, u'зайти', 100, u'Зайти в определённую конференцию', u'зайти <конференция> [пароль]', (u'зайти test@conference.jabber.aq', u'зайти test@conference.jabber.ru 1234'));
-registerCommand(leaveConf, u'свали', 30, u'Заставляет выйти из текущей или определённой конференции', u'свали [конференция]', (u'свали test@conference.jabber.ru', u'свали'));
+registerCommand(joinConf, u"зайти", 100, 
+				u"Зайти в определённую конференцию", 
+				u"зайти <конференция> [пароль]", 
+				(u"зайти test@conference.jabber.aq", u"зайти test@conference.jabber.ru 1234"))
+registerCommand(leaveConf, u"свали", 
+				30, u"Заставляет выйти из текущей или определённой конференции", 
+				u"свали [конференция]", 
+				(u"свали test@conference.jabber.ru", u"свали"))

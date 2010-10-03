@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # botstatus.py
 # Initial Copyright (с) ???
@@ -18,27 +18,30 @@ STATUSES = (
 	xmpp.PRS_NA, 
 	xmpp.PRS_DND, 
 	xmpp.PRS_CHAT
-);
-
-def changeStatus(msgType, conference, nick, param):
-	args = param.split(None, 1);
-	show, status = '', '';
-	if(args[0] in (STATUSES)):
-		show = args[0];
-		if(len(args) > 1):
-			status = args[1];
-	else:
-		status = param;
-	setBotStatus(conference, status, show);
-	setConfigKey(conference, 'status', status);
-	setConfigKey(conference, 'show', show);
-	saveChatConfig(conference);
-
-registerCommand(changeStatus, u'ботстатус', 30, u'Меняет статус бота', u'ботстатус <[статус] [сообщение]>', (u'ботстатус away', u'ботстатус away сплю'), CHAT | PARAM);
+)
 
 def setDefaultStatus(conference):
-	if(not getConfigKey(conference, 'show')):
-		setConfigKey(conference, 'show', u'online');
-		setConfigKey(conference, 'status', None);
+	if(not getConfigKey(conference, "show")):
+		setConfigKey(conference, "show", u"online")
+		setConfigKey(conference, "status", None)
 
-registerEvent(setDefaultStatus, ADDCONF);
+def changeStatus(msgType, conference, nick, param):
+	args = param.split(None, 1)
+	show, status = "", ""
+	if(args[0] in (STATUSES)):
+		show = args[0]
+		if(len(args) > 1):
+			status = args[1]
+	else:
+		status = param
+	setBotStatus(conference, status, show)
+	setConfigKey(conference, "status", status)
+	setConfigKey(conference, "show", show)
+	saveChatConfig(conference)
+
+registerEvent(setDefaultStatus, ADDCONF)
+registerCommand(changeStatus, u"ботстатус", 30, 
+				u"Меняет статус бота", 
+				u"ботстатус <[статус] [сообщение]>", 
+				(u"ботстатус away", u"ботстатус away сплю"), 
+				CHAT | PARAM)

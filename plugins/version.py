@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # version.py
 # Initial Copyright (c) 2007 dimichxp <dimichxp@gmail.com>
@@ -14,51 +14,52 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-VER_ID = 'ver_id';
+VER_ID = "ver_id"
 
 def showVersion(msgType, conference, nick, param):
 	if(param == getBotNick(conference)):
-		sendMsg(msgType, conference, nick, u'я юзаю %s %s в %s' % (gVersion[0], gVersion[1], gVersion[2]));
+		sendMsg(msgType, conference, nick, u"я юзаю %s %s в %s" % (gVersion[0], gVersion[1], gVersion[2]))
 	else:
 		if(param):
 			if(conferenceInList(conference) and nickIsOnline(conference, param)):
-				jid = conference + '/' + param;
+				jid = conference + "/" + param
 			else:
-				jid = param;
+				jid = param
 		else:
-			jid = conference + '/' + nick;
-		iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_VERSION);
-		iq.setTo(jid);
-		iq.setID(getUniqueID(VER_ID));
-		gClient.SendAndCallForResponse(iq, _showVersion, (msgType, conference, nick, param, ));
+			jid = conference + "/" + nick
+		iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_VERSION)
+		iq.setTo(jid)
+		iq.setID(getUniqueID(VER_ID))
+		gClient.SendAndCallForResponse(iq, _showVersion, (msgType, conference, nick, param, ))
 
 def _showVersion(stanza, msgType, conference, nick, param):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
-		name, ver, os = '', '', '';
+		name, ver, os = "", "", ""
 		for child in stanza.getQueryChildren():
-			if(child.getName() == 'name'):
-				name = child.getData();
-			elif(child.getName() == 'version'):
-				ver = child.getData();
-			elif(child.getName() == 'os'):
-				os = child.getData();
-		version = u'';
+			if(child.getName() == "name"):
+				name = child.getData()
+			elif(child.getName() == "version"):
+				ver = child.getData()
+			elif(child.getName() == "os"):
+				os = child.getData()
+		version = u""
 		if(name):
-			version += name;
+			version += name
 		if(ver):
-			version += u' ' + ver;
+			version += u" " + ver
 		if(os):
-			version += u' в ' + os;
+			version += u" в " + os
 		if(version):
 			if(not param):
-				sendMsg(msgType, conference, nick, u'ты юзаешь %s' % (version));
+				sendMsg(msgType, conference, nick, u"ты юзаешь %s" % (version))
 			else:
-				sendMsg(msgType, conference, nick, u'%s юзает %s' % (param, version));
+				sendMsg(msgType, conference, nick, u"%s юзает %s" % (param, version))
 		else:
-			sendMsg(msgType, conference, nick, u'клиент глюк, инфы не хватает');
+			sendMsg(msgType, conference, nick, u"клиент глюк, инфы не хватает")
 	else:
-		sendMsg(msgType, conference, nick, u'не получается :(');
+		sendMsg(msgType, conference, nick, u"не получается :(")
 
-registerCommand(showVersion, u'версия', 10, \
-				u'Показывает информацию о версии ПО указанного пользователя или сервера', \
-				u'версия [ник|сервер]', (u'версия', u'версия Nick', u'версия server.tld'));
+registerCommand(showVersion, u"версия", 10, 
+				u"Показывает информацию о версии ПО указанного пользователя или сервера", 
+				u"версия [ник|сервер]", 
+				(u"версия", u"версия Nick", u"версия server.tld"))

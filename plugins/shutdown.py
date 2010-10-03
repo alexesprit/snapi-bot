@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # shutdown.py
 # Initial Copyright (c) ???
@@ -14,32 +14,40 @@
 # GNU General Public License for more details.
 
 def botRestart(msgType, conference, nick, param):
-	nick = (conferenceInList(conference)) and nick or conference.split('@')[0];
+	nick = (conferenceInList(conference)) and nick or conference.split("@")[0]
 	if(param):
-		message = u'меня перезагружает %s (%s)' % (nick, param);
+		message = u"меня перезагружает %s (%s)" % (nick, param)
 	else:
-		message = u'меня перезагружает %s' % (nick);
+		message = u"меня перезагружает %s" % (nick)
 	for conference in getConferences():
-		if(getConfigKey(conference, 'popups')):
-			sendToConference(conference, message);
-	prs = xmpp.Presence(typ = 'unavailable');
-	prs.setStatus(message);
-	gClient.send(prs);
-	shutdown(True);
+		if(getConfigKey(conference, "popups")):
+			sendToConference(conference, message)
+	prs = xmpp.Presence(typ = "unavailable")
+	prs.setStatus(message)
+	gClient.send(prs)
+	shutdown(True)
 
 def botShutdown(msgType, conference, nick, param):
-	nick = (conferenceInList(conference)) and nick or conference.split('@')[0];
+	nick = (conferenceInList(conference)) and nick or conference.split("@")[0]
 	if(param):
-		message = u'меня выключает %s (%s)' % (nick, param);
+		message = u"меня выключает %s (%s)" % (nick, param)
 	else:
-		message = u'меня выключает %s' % (nick);
+		message = u"меня выключает %s" % (nick)
 	for conference in getConferences():
-		if(getConfigKey(conference, 'popups')):
-			sendToConference(conference, message);
-	prs = xmpp.Presence(typ = 'unavailable');
-	prs.setStatus(message);
-	gClient.send(prs);
-	shutdown();
+		if(getConfigKey(conference, "popups")):
+			sendToConference(conference, message)
+	prs = xmpp.Presence(typ = "unavailable")
+	prs.setStatus(message)
+	gClient.send(prs)
+	shutdown()
 
-registerCommand(botRestart, u'рестарт', 100, u'Перезапускает бота', u'рестарт [причина]', (u'рестарт', u'рестарт ы!'), ANY | FROZEN);
-registerCommand(botShutdown, u'идиспать', 100, u'Остановка и полный выход бота', u'идиспать [причина]', (u'идиспать', u'идиспать обновления!11'), ANY | FROZEN);
+registerCommand(botRestart, u"рестарт", 100, 
+				u"Перезапускает бота", 
+				u"рестарт [причина]", 
+				(u"рестарт", u"рестарт ы!"), 
+				ANY | FROZEN)
+registerCommand(botShutdown, u"идиспать", 100, 
+				u"Остановка и полный выход бота", 
+				u"идиспать [причина]", 
+				(u"идиспать", u"идиспать обновления!11"), 
+				ANY | FROZEN)

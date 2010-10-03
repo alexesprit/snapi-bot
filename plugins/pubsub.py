@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # pubsub.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -13,54 +13,57 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-'''
-	Установка активностей и настроений. Для ростера. Написано от нежелания
-	заняться чем-то полезным :)
-'''
-
 def setMood(msgType, jid, resource, param):
-	if(param == u'сброс' or param.count('|')):
-		iq = xmpp.Iq('set');
-		iq.setType(xmpp.TYPE_HEADLINE);
-		pubsub = iq.addChild('pubsub', {}, [], xmpp.NS_PUBSUB);
-		pubNode = xmpp.Node('publish', {'node': xmpp.NS_MOOD});
-		moodNode = xmpp.Node('mood', {'xmlns': xmpp.NS_MOOD});
-		if(param.count('|')):
-			param = param.split('|');
-			moodNode.addChild(node = xmpp.Node(param[0]));
-			moodNode.setTagData('text', param[1]);
-		pubNode.addChild('item', {}, [moodNode], '');
-		pubsub.addChild(node = pubNode);
-		gClient.send(iq);
-		if(param == u'сброс'):
-			sendMsg(msgType, jid, resource, u'сбросила');
+	if(param == u"сброс" or param.count("|")):
+		iq = xmpp.Iq("set")
+		iq.setType(xmpp.TYPE_HEADLINE)
+		pubsub = iq.addChild("pubsub", {}, [], xmpp.NS_PUBSUB)
+		pubNode = xmpp.Node("publish", {"node": xmpp.NS_MOOD})
+		moodNode = xmpp.Node("mood", {"xmlns": xmpp.NS_MOOD})
+		if(param.count("|")):
+			param = param.split("|")
+			moodNode.addChild(node = xmpp.Node(param[0]))
+			moodNode.setTagData("text", param[1])
+		pubNode.addChild("item", {}, [moodNode], "")
+		pubsub.addChild(node = pubNode)
+		gClient.send(iq)
+		if(param == u"сброс"):
+			sendMsg(msgType, jid, resource, u"сбросила")
 		else:
-			sendMsg(msgType, jid, resource, u'поставила');
+			sendMsg(msgType, jid, resource, u"поставила")
 	else:
-		sendMsg(msgType, jid, resource, u'читай справку по команде');
+		sendMsg(msgType, jid, resource, u"читай справку по команде")
 
 def setActivity(msgType, jid, resource, param):
-	if(param == u'сброс' or param.count('|')):
-		iq = xmpp.Iq('set');
-		iq.setType(xmpp.TYPE_HEADLINE);
-		pubsub = iq.addChild('pubsub', {}, [], xmpp.NS_PUBSUB);
-		pubNode = xmpp.Node('publish', {'node': xmpp.NS_ACTIVITY});
-		actNode = xmpp.Node('activity', {'xmlns': xmpp.NS_ACTIVITY});
-		if(param.count('|')):
-			param = param.split('|');
-			act = actNode.addChild(node = xmpp.Node(param[0]));
+	if(param == u"сброс" or param.count("|")):
+		iq = xmpp.Iq("set")
+		iq.setType(xmpp.TYPE_HEADLINE)
+		pubsub = iq.addChild("pubsub", {}, [], xmpp.NS_PUBSUB)
+		pubNode = xmpp.Node("publish", {"node": xmpp.NS_ACTIVITY})
+		actNode = xmpp.Node("activity", {"xmlns": xmpp.NS_ACTIVITY})
+		if(param.count("|")):
+			param = param.split("|")
+			act = actNode.addChild(node = xmpp.Node(param[0]))
 			if(param[1]):
-				act.addChild(node = xmpp.Node(param[1]));
-			actNode.setTagData('text', param[2]);
-		pubNode.addChild('item', {}, [actNode], '');
-		pubsub.addChild(node = pubNode);
-		gClient.send(iq);
-		if(param == u'сброс'):
-			sendMsg(msgType, jid, resource, u'сбросила');
+				act.addChild(node = xmpp.Node(param[1]))
+			actNode.setTagData("text", param[2])
+		pubNode.addChild("item", {}, [actNode], "")
+		pubsub.addChild(node = pubNode)
+		gClient.send(iq)
+		if(param == u"сброс"):
+			sendMsg(msgType, jid, resource, u"сбросила")
 		else:
-			sendMsg(msgType, jid, resource, u'поставила');
+			sendMsg(msgType, jid, resource, u"поставила")
 	else:
-		sendMsg(msgType, jid, resource, u'читай справку по команде');
+		sendMsg(msgType, jid, resource, u"читай справку по команде")
 
-registerCommand(setActivity, u'активность', 100, u'Устанавливает активность для бота. "Cброс" в кач-ве параметра сбрасывает активность', u'активность <осн.|доп.|текст>', (u'активность doing_chores|doing_maintenance|ололо', ), ROSTER | PARAM);
-registerCommand(setMood, u'настроение', 100, u'Устанавливает настроение для бота. "Cброс" в кач-ве параметра сбрасывает настроение', u'настроение <название|текст>', (u'настроение calm|ололо', ), ROSTER | PARAM);
+registerCommand(setActivity, u"активность", 100, 
+				u"Устанавливает активность для бота. \"Cброс\" в кач-ве параметра сбрасывает активность", 
+				u"активность <осн.|доп.|текст>", 
+				(u"активность doing_chores|doing_maintenance|ололо", ), 
+				ROSTER | PARAM)
+registerCommand(setMood, u"настроение", 100, 
+				u"Устанавливает настроение для бота. \"Cброс\" в кач-ве параметра сбрасывает настроение", 
+				u"настроение <название|текст>", 
+				(u"настроение calm|ололо", ), 
+				ROSTER | PARAM)

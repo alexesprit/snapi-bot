@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # dates.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -14,14 +14,18 @@
 # GNU General Public License for more details.
 
 def showDates(msgType, conference, nick, param):
-	rawHtml = urllib.urlopen('http://wap.n-urengoy.ru/cgi-bin/wappr.pl').read();
-	rawHtml = unicode(rawHtml, 'utf-8');
-	dates = rawHtml.split('<br/>-----<br/>');
-	dates = dates[1:-1];
+	rawHTML = urllib.urlopen("http://wap.n-urengoy.ru/cgi-bin/wappr.pl").read()
+	rawHTML = unicode(rawHTML, "utf-8")
+	dates = rawHTML.split("<br/>-----<br/>")
+	dates = dates[1:-1]
 	if(dates):
-		dates = [x.split('/')[0] for x in dates];
-		sendMsg(msgType, conference, nick, u'глянь, что я нашла:' + u'\n'.join(dates));
+		dates = [date.split("/")[0] for date in dates]
+		sendMsg(msgType, conference, nick, u"глянь, что я нашла:" + u"\n".join(dates))
 	else:
-		sendMsg(msgType, conference, nick, u'ничего не нашла :(');
+		sendMsg(msgType, conference, nick, u"ничего не нашла :(")
 
-registerCommand(showDates, u'праздники', 10, u'Показывает праздники на сегодня и завтра', None, (u'праздники', ));
+registerCommand(showDates, u"праздники", 10, 
+				u"Показывает праздники на сегодня и завтра", 
+				None, 
+				(u"праздники", ),
+				CHAT | NONPARAM)

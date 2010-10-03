@@ -1,4 +1,4 @@
-# coding: utf-8;
+# coding: utf-8
 
 # record.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -13,35 +13,40 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-REC_FILE = 'record.txt';
-gRecords = {};
+REC_FILE = "record.txt"
+gRecords = {}
 
 def showRecord(msgType, conference, nick, param):
 	if(gRecords[conference]):
-		sendMsg(msgType, conference, nick, u'рекорд посещаемости - %(count)d человек (%(time)s)' % (gRecords[conference]));
+		sendMsg(msgType, conference, nick, 
+				u"рекорд посещаемости - %(count)d человек (%(time)s)" % (gRecords[conference]))
 	else:
-		sendMsg(msgType, conference, nick, u'нет информации');
+		sendMsg(msgType, conference, nick, u"нет информации")
 		
 def calculateRecord(conference, nick, trueJid, aff, role):
 	userCount = len(getJidList(conference))
-	lastCount = gRecords[conference] and gRecords[conference]['count'] or 0;
+	lastCount = gRecords[conference] and gRecords[conference]["count"] or 0
 	if(userCount >= lastCount):
-		gRecords[conference]['time'] = time.strftime('%d.%m.%y, %H:%M');
-		gRecords[conference]['count'] = userCount;
-		fileName = getConfigPath(conference, REC_FILE);
-		writeFile(fileName, str(gRecords[conference]));
+		gRecords[conference]["time"] = time.strftime("%d.%m.%y, %H:%M")
+		gRecords[conference]["count"] = userCount
+		fileName = getConfigPath(conference, REC_FILE)
+		writeFile(fileName, str(gRecords[conference]))
 
 def loadRecordCache(conference):
-	fileName = getConfigPath(conference, REC_FILE);
-	createFile(fileName, '{}');
-	gRecords[conference] = eval(readFile(fileName));
+	fileName = getConfigPath(conference, REC_FILE)
+	createFile(fileName, "{}")
+	gRecords[conference] = eval(readFile(fileName))
 
 def unloadRecordCache(conference):
-	del(gRecords[conference]);
+	del(gRecords[conference])
 	
-registerJoinHandler(calculateRecord);
+registerJoinHandler(calculateRecord)
 
-registerEvent(loadRecordCache, ADDCONF);
-registerEvent(unloadRecordCache, DELCONF);
+registerEvent(loadRecordCache, ADDCONF)
+registerEvent(unloadRecordCache, DELCONF)
 
-registerCommand(showRecord, u'рекорд', 10, u'Показывает рекорд посещаемости конференции', None, (u'рекорд', ), CHAT | NONPARAM);
+registerCommand(showRecord, u"рекорд", 10, 
+				u"Показывает рекорд посещаемости конференции", 
+				None, 
+				(u"рекорд", ), 
+				CHAT | NONPARAM)
