@@ -117,7 +117,7 @@ def answerListener(stanza, msgType, conference, nick, trueJid, text):
 	if(gQuizEnable[conference]):
 		checkAnswer(conference, nick, trueJid, text)
 
-def showScoreList(msgType, conference, nick = None):
+def showScoreList(msgType, conference, nick=None):
 	base = gQuizScores[conference]
 	if(not base.isEmpty()):
 		scores = []
@@ -134,7 +134,8 @@ def showScoreList(msgType, conference, nick = None):
 			message = u"(*) Счёт:\nНик, счет, ответов\n"
 			sendToConference(conference, message + "\n".join(items))
 	else:
-		sendMsg(msgType, conference, nick, u"cтатистика по игре отсутствует")
+		if(nick):
+			sendMsg(msgType, conference, nick, u"cтатистика по игре отсутствует")
 
 def startQuiz(msgType, conference, nick, param):
 	if(gQuizEnable[conference]):

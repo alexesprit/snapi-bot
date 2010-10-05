@@ -31,17 +31,18 @@ from plugin import PlugIn
 DEFAULT_TIMEOUT = 25
 gID = 0
 
+DBG_DISPATCHER = "dispatcher"
+
 class Dispatcher(PlugIn):
 	""" Ancestor of PlugIn class. Handles XMPP stream, i.e. aware of stream headers.
 		Can be plugged out/in to restart these headers (used for SASL f.e.). """
 	def __init__(self):
 		PlugIn.__init__(self)
-		self.DBG_LINE = 'dispatcher'
+		self.DBG_LINE = DBG_DISPATCHER
 		self.handlers = {}
 		self._expected = {}
 		self._exportedMethods = [self.Process,
 									self.RegisterHandler,
-									self.RegisterHandlerOnce,
 									self.UnregisterHandler,
 									self.RegisterProtocol,
 									self.WaitForResponse,
@@ -95,12 +96,12 @@ class Dispatcher(PlugIn):
 		self.Stream.dispatch = self.dispatch
 		self.Stream.stream_header_received = self._check_stream_start
 		self.Stream.features = None
-		self._metastream = Node('stream:stream')
-		self._metastream.setNamespace(self._owner.Namespace)
-		self._metastream.setAttr('version', '1.0')
-		self._metastream.setAttr('xmlns:stream', NS_STREAMS)
-		self._metastream.setAttr('to', self._owner.Server)
-		self._owner.send("<?xml version='1.0'?>%s>" % str(self._metastream)[:-2])
+		metastream = Node('stream:stream')
+		metastream.setNamespace(self._owner.Namespace)
+		metastream.setAttr('version', '1.0')
+		metastream.setAttr('xmlns:stream', NS_STREAMS)
+		metastream.setAttr('to', self._owner.Server)
+		self._owner.send("<?xml version='1.0'?>%s>" % str(metastream)[:-2])
 
 	def _check_stream_start(self, ns, tag, attrs):
 		if ns != NS_STREAMS or tag != 'stream':
@@ -126,27 +127,24 @@ class Dispatcher(PlugIn):
 		# It means that nothing is received but link is alive.
 		return '0'
 		
-	def RegisterNamespace(self, xmlns, order='info'):
+	def RegisterNamespace(self, xmlns, order="info"):
 		""" Creates internal structures for newly registered namespace.
 			You can register handlers for this namespace afterwards. By default one namespace
 			already registered (jabber:client or jabber:component:accept depending on context. """
 		self.printf('Registering namespace "%s"' % (xmlns), order)
 		self.handlers[xmlns] = {}
-		self.RegisterProtocol('default', Protocol, xmlns=xmlns)
+		self.RegisterProtocol("default", Protocol, xmlns=xmlns)
 
-	def RegisterProtocol(self, tagName, Proto, xmlns=None, order='info'):
+	def RegisterProtocol(self, tagName, protocol, xmlns=None, order="info"):
 		""" Used to declare some top-level stanza name to dispatcher.
 		   Needed to start registering handlers for such stanzas.
 		   Iq, message and presence protocols are registered by default. """
-		if not xmlns: xmlns = self._owner.defaultNamespace
-		self.printf('Registering protocol "%s" as %s (%s)' % (tagName, Proto, xmlns), order)
-		self.handlers[xmlns][tagName] = {'type': Proto, 'default': []}
+		if not xmlns:
+			xmlns = self._owner.defaultNamespace
+		self.printf('Registering protocol "%s" as %s (%s)' % (tagName, protocol, xmlns), order)
+		self.handlers[xmlns][tagName] = {"type": protocol, "default": []}
 
-	def RegisterNamespaceHandler(self, xmlns, handler, hType=None, nameSpace=''):
-		""" Register handler for processing all stanzas for specified namespace. """
-		self.RegisterHandler('default', handler, hType, nameSpace, xmlns)
-
-	def RegisterHandler(self, name, handler, hType=None, nameSpace='', xmlns=None):
+	def RegisterHandler(self, name, handler, htype="", namespace="", xmlns=None, isOnce=False):
 		"""	Register user callback as stanzas handler of declared type. Callback must take
 			arguments: dispatcher instance (for replying), incomed return of previous handlers.
 			The callback must raise xmpp.NodeProcessed just before return if it want preven
@@ -155,41 +153,37 @@ class Dispatcher(PlugIn):
 			Arguments:
 				"name" - name of stanza. F.e. "iq".
 				"handler" - user callback.
-				"hType" - value of stanza's "type" attribute. If not specified any value match
-				"nameSpace" - namespace of child that stanza must contain.
+				"htype" - value of stanza's "type" attribute. If not specified any value match
+				"namespace" - namespace of child that stanza must contain.
 		"""
 		if not xmlns:
 			xmlns = self._owner.defaultNamespace
-		self.printf('Registering handler %s for "%s" type: %s, nameSpace: %s (%s)' % (handler, name, hType, nameSpace, xmlns), 'info')
-		if not hType and not nameSpace:
-			hType = 'default'
+		self.printf('Registering %s for "%s" type: %s, namespace: %s (%s)' % (handler, name, htype, namespace, xmlns), 'info')
+		if not htype and not namespace:
+			htype = "default"
 		if xmlns not in self.handlers:
 			self.RegisterNamespace(xmlns, 'warn')
 		if name not in self.handlers[xmlns]:
 			self.RegisterProtocol(name, Protocol, xmlns, 'warn')
-		key = hType + nameSpace
+		key = htype + namespace
 		if key not in self.handlers[xmlns][name]:
 			self.handlers[xmlns][name][key] = []
 		self.handlers[xmlns][name][key].append(handler)
 
-	def RegisterHandlerOnce(self, name, handler, hType='', nameSpace='', xmlns=None):
-		""" Unregister handler after first call (not implemented yet). """
+	def UnregisterHandler(self, name, handler, htype='', namespace='', xmlns=None):
+		""" Unregister handler. "htype" and "namespace" must be specified exactly the same as with registering."""
 		if not xmlns:
 			xmlns = self._owner.defaultNamespace
-		self.RegisterHandler(name, handler, hType, nameSpace, xmlns)
-
-	def UnregisterHandler(self, name, handler, hType='', nameSpace='', xmlns=None):
-		""" Unregister handler. "typ" and "ns" must be specified exactly the same as with registering."""
-		if not xmlns:
-			xmlns = self._owner.defaultNamespace
-		self.printf('Unregistering handler %s for "%s" type: %s, nameSpace: %s (%s)' % (handler, name, hType, nameSpace, xmlns), 'stop')
+		self.printf('Unregistering handler %s for "%s" type: %s, namespace: %s (%s)' % (handler, name, htype, namespace, xmlns), 'stop')
 		if xmlns not in self.handlers:
 			return
-		if not hType and not nameSpace:
-			hType = 'default'
-		key = hType+nameSpace
+		if not htype and not namespace:
+			htype = "default"
+		key = htype + namespace
 		if(handler in self.handlers[xmlns][name][key]):
-			self.handlers[xmlns][name][key].remove(handler)		
+			self.handlers[xmlns][name][key].remove(handler)
+			if(not self.handlers[xmlns][name][key]):
+				del(self.handlers[xmlns][name])
 
 	def streamErrorHandler(self, conn, error):
 		name, text = 'error', error.getData()
@@ -203,26 +197,25 @@ class Dispatcher(PlugIn):
 			exc = streamExceptions[name]
 		else:
 			exc = StreamError
-		raise exc((name, text))
+		raise exc(name, text)
 
-	def dispatch(self, stanza, session=None, direct=False):
+	def dispatch(self, stanza, session=None):
 		""" Main procedure that performs XMPP stanza recognition and calling apppropriate handlers for it.
 			Called internally. """
 		if(not session):
 			session = self
 		session.Stream._mini_dom = None
 		name = stanza.getName()
-
 		if(name == 'features'):
 			session.Stream.features = stanza
 
 		xmlns = stanza.getNamespace()
 		if(xmlns not in self.handlers):
 			self.printf("Unknown namespace: %s" % (xmlns), 'warn')
-			xmlns = 'default'
+			xmlns = "default"
 		if(name not in self.handlers[xmlns]):
 			self.printf("Unknown stanza: %s" % (name), 'warn')
-			name = 'default'
+			name = "default"
 		else:
 			self.printf("Got %s/%s stanza" % (xmlns, name), 'ok')
 
@@ -264,7 +257,6 @@ class Dispatcher(PlugIn):
 			for key in handlerList:
 				if(key):
 					chain = chain + self.handlers[xmlns][name][key]
-			self.printf(chain)
 			for handler in chain:
 				try:
 					handler(session, stanza)
@@ -318,7 +310,7 @@ class Dispatcher(PlugIn):
 			stanzaID = None
 		elif(not stanza.getID()):
 			global gID
-			gID +=  1
+			gID += 1
 			stanzaID = str(gID)
 			stanza.setID(stanzaID)
 		else:
@@ -326,7 +318,7 @@ class Dispatcher(PlugIn):
 		if(self._owner._registeredName and not stanza.getAttr('from')):
 			stanza.setAttr('from', self._owner._registeredName)
 		stanza.setNamespace(self._owner.Namespace)
-		stanza.setParent(self._metastream)
+		#stanza.setParent(self._metastream)
 		self._owner_send(stanza)
 		return(stanzaID)
 

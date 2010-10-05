@@ -38,18 +38,9 @@ def _showVCard(stanza, msgType, conference, nick, param):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		queryNode = stanza.getChildren()
 		if(queryNode):
-			vcard = {}
-			for child in queryNode[0].getChildren():
-				tagName = child.getName()
-				tagData = child.getData()
-				if(not tagData):
-					for child in child.getChildren():
-						tagName = child.getName()
-						tagData = child.getData()
-						vcard[tagName] = tagData
-				else:
-					vcard[tagName] = tagData
-			message = fillVCard(vcard)
+			rawVCard = {}
+			loadRawVCard(queryNode[0], rawVCard)
+			message = getVCard(rawVCard)
 			if(message):
 				if(not param):
 					sendMsg(msgType, conference, nick, u"про тебя я знаю следующее:\n%s" % (message))
@@ -64,17 +55,25 @@ def _showVCard(stanza, msgType, conference, nick, param):
 				sendMsg(msgType, conference, nick, u"пусть %s сначала вкард заполнит" % (param))
 	else:
 		sendMsg(msgType, conference, nick, u"не получается :(")
-			
-def fillVCard(vcard):
+
+def loadRawVCard(node, rawVCard):
+	for child in node.getChildren():
+		tagData = child.getData()
+		if(tagData):
+			tagName = child.getName()
+			rawVCard[tagName] = tagData
+		else:
+			loadRawVCard(child, rawVCard)
+		
+def getVCard(rawVCard):
 	name = ""
 	for tag in ("GIVEN", "MIDDLE", "FAMILY"):
-		tagData = vcard.get(tag)
+		tagData = rawVCard.get(tag)
 		if(tagData):
 			name += tagData + " "
 	if(name):
-		vcard["FN"] = name
-	
-	items = ["%s: %s" % (DESC[i], vcard[TAGS[i]]) for i in range(0, len(TAGS)) if(TAGS[i] in vcard and vcard[TAGS[i]])]
+		rawVCard["FN"] = name
+	items = ["%s: %s" % (DESC[i], rawVCard[TAGS[i]]) for i in range(0, len(TAGS)) if(TAGS[i] in rawVCard and rawVCard[TAGS[i]])]
 	return("\n".join(items))
 
 registerCommand(showVCard, u"визитка", 10, 

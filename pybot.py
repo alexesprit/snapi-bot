@@ -561,7 +561,7 @@ def sendToConference(conference, text):
 		
 def sendMsg(msgType, conference, nick, text, force=False):
 	if(xmpp.TYPE_PUBLIC == msgType and not force):
-		fools = getConfigKey(conference, "fools")
+		fools = getConfigKey(conference, "jokes")
 		if(fools and not random.randrange(0, 30)):
 			text = random.choice(gJokes)
 		else:

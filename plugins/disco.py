@@ -23,7 +23,7 @@ def serviceDiscovery(msgType, conference, nick, param):
 	jid = param[0]
 	searchKey = None
 	maxCount = (xmpp.TYPE_PUBLIC == msgType) and 10 or 50
-	if(len(args) > 1):
+	if(len(param) > 1):
 		count = args[1]
 		if(count.isdigit()):
 			count = int(count)
@@ -31,10 +31,10 @@ def serviceDiscovery(msgType, conference, nick, param):
 				maxCount = min(50, count)
 			else:
 				maxCount = min(250, count);	
-			if(len(args) > 2):
-				searchKey = args[2]
+			if(len(param) > 2):
+				searchKey = param[2]
 		else:		
-			searchKey = args[1]
+			searchKey = param[1]
 	iq = xmpp.Iq(xmpp.TYPE_GET)
 	query = iq.addChild("query", None, None, xmpp.NS_DISCO_ITEMS)
 	iq.setTo(jid)

@@ -20,11 +20,16 @@ UPTIME_ID = "uptime_id"
 
 def _showServerStats(stanza, msgType, conference, nick, server):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
-		message = u"Инфа о %s:" % server
+		items = []
 		for stat in stanza.getQueryChildren():
 			attrs = stat.getAttrs()
-			message += u"\n%s: %s %s" % (attrs["name"], attrs["value"], attrs["units"])
-		sendMsg(msgType, conference, nick, message)
+			if(len(attrs) == 3):
+				items.append(u"%(name)s: %(value)s %(units)s" % (attrs))
+		if(items):
+			message = u"Инфа о %s:\n%s" % (server, "\n".join(items))
+			sendMsg(msgType, conference, nick, message)
+		else:
+			sendMsg(msgType, conference, nick, u"пустая инфа")
 	else:
 		sendMsg(msgType, conference, nick, u"не получается :(")
 
@@ -43,7 +48,7 @@ def showServerInfo(msgType, conference, nick, param):
 	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_STATS)
 	iq.setTo(server)
 	iq.setID(getUniqueID(INFO_ID))
-	gClient.SendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, param, ))
+	gClient.SendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, server, ))
 
 def _showServerUptime(stanza, msgType, conference, nick, server):
 	if(xmpp.TYPE_RESULT == stanza.getType()):

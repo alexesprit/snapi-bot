@@ -146,9 +146,9 @@ class Client(CommonClient):
 				if not self.Dispatcher.Stream.features.getTag('starttls'):
 					self.TLS.PlugOut()
 					return self.connected
-				while not self.TLS.starttls and self.Process(1):
+				while not self.TLS.state and self.Process(1):
 					pass
-				if self.TLS.starttls != 'success':
+				if self.TLS.state != transports.TLS_SUCCESS:
 					self.TLS.PlugOut()
 					return self.connected
 				self.connected = C_TLS

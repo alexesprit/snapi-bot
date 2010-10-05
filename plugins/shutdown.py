@@ -22,7 +22,7 @@ def botRestart(msgType, conference, nick, param):
 	for conference in getConferences():
 		if(getConfigKey(conference, "popups")):
 			sendToConference(conference, message)
-	prs = xmpp.Presence(typ = "unavailable")
+	prs = xmpp.Presence(typ=xmpp.PRS_OFFLINE)
 	prs.setStatus(message)
 	gClient.send(prs)
 	shutdown(True)
@@ -36,7 +36,7 @@ def botShutdown(msgType, conference, nick, param):
 	for conference in getConferences():
 		if(getConfigKey(conference, "popups")):
 			sendToConference(conference, message)
-	prs = xmpp.Presence(typ = "unavailable")
+	prs = xmpp.Presence(typ=xmpp.PRS_OFFLINE)
 	prs.setStatus(message)
 	gClient.send(prs)
 	shutdown()

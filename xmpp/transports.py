@@ -44,8 +44,12 @@ from protocol import *
 
 BUFLEN = 1024
 
-DBG_PROXY = 'proxy'
-DBG_SOCKET = 'socket'
+DBG_PROXY = "proxy"
+DBG_SOCKET = "socket"
+DBG_TLS = "tls"
+
+TLS_SUCCESS = 0x1
+TLS_FAILURE = 0x2
 
 class TCPSocket(PlugIn):
 	""" This class defines direct TCP connection method. """
@@ -252,9 +256,10 @@ class TLS(PlugIn):
 			If 'startSSL' is false then starts encryption as soon as TLS feature is
 			declared by the server (if it were already declared - it is ok).
 		"""
+		# Already enabled
 		if hasattr(owner, 'TLS'):
-			return  # Already enabled.
-		self.DBG_LINE = 'TLS'
+			return
+		self.DBG_LINE = DBG_TLS
 		PlugIn.PlugIn(self, owner)
 		if startSSL:
 			return self._startSSL()
@@ -262,25 +267,23 @@ class TLS(PlugIn):
 			self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
 		except NodeProcessed:
 			pass
-		self.starttls = None
+		self.state = None
 
 	def plugout(self):
 		""" Unregisters TLS handler's from owner's dispatcher. """
-		# FIXME
-		if self._owner.Dispatcher.Stream.features:
-			self._owner.UnregisterHandler('proceed', self.StartTLSHandler, xmlns=NS_TLS)
-			self._owner.UnregisterHandler('failure', self.StartTLSHandler, xmlns=NS_TLS)
+		self._owner.UnregisterHandler("proceed", self.StartTLSHandler, xmlns=NS_TLS)
+		self._owner.UnregisterHandler("failure", self.StartTLSHandler, xmlns=NS_TLS)
 
 	def FeaturesHandler(self, conn, feats):
 		""" Used to analyse server <features/> tag for TLS support.
 			If TLS is supported starts the encryption negotiation. Used internally"""
-		if not feats.getTag('starttls', namespace=NS_TLS):
+		if not feats.getTag("starttls", namespace=NS_TLS):
 			self.printf("TLS unsupported by remote server.", 'warn')
 			return
 		self.printf("TLS supported by remote server. Requesting TLS start.", 'ok')
-		self._owner.RegisterHandlerOnce('proceed', self.StartTLSHandler, xmlns=NS_TLS)
-		self._owner.RegisterHandlerOnce('failure', self.StartTLSHandler, xmlns=NS_TLS)
-		self._owner.Connection.send('<starttls xmlns="%s"/>' % (NS_TLS))
+		self._owner.RegisterHandler("proceed", self.StartTLSHandler, xmlns=NS_TLS)
+		self._owner.RegisterHandler("failure", self.StartTLSHandler, xmlns=NS_TLS)
+		self._owner.Connection.send("<starttls xmlns=\"%s\"/>" % (NS_TLS))
 		raise NodeProcessed
 
 	def pending_data(self, timeout=0):
@@ -302,17 +305,20 @@ class TLS(PlugIn):
 		tcpsock.pending_data = self.pending_data
 		tcpsock._sock.setblocking(0)
 
-		self.starttls = 'success'
+		self.state = 'success'
 
-	def StartTLSHandler(self, conn, starttls):
+	def StartTLSHandler(self, conn, stanza):
 		""" Handle server reply if TLS is allowed to process. Behaves accordingly.
-			Used internally."""
-		if starttls.getNamespace() != NS_TLS: return
-		self.starttls = starttls.getName()
-		if self.starttls == 'failure':
-			self.printf("Got starttls response: %s" % (self.starttls), 'error')
+			Used internally.
+		"""
+		if stanza.getNamespace() != NS_TLS:
 			return
-		self.printf("Got starttls proceed response. Switching to TLS/SSL...", 'ok')
+		if stanza.getName() == "failure":
+			self.state = TLS_FAILURE
+			self.printf("Got starttls response: %s" % (self.state), "error")
+			return
+		self.state = TLS_SUCCESS
+		self.printf("Got starttls proceed response. Switching to TLS/SSL...", "ok")
 		self._startSSL()
 		self._owner.Dispatcher.PlugOut()
 		dispatcher.Dispatcher().PlugIn(self._owner)

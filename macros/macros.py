@@ -33,7 +33,7 @@ class Macros:
 		self.gAccessList = {}
 
 		self.macrosList = {}
-		self.accessList = {};		
+		self.accessList = {}
 
 	def loadMacroses(self, conference = None):
 		if(conference):
