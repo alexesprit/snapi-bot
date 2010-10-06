@@ -64,29 +64,29 @@ def turnLastMessage(msgType, conference, nick, param):
 			else:
 				sendMsg(msgType, conference, nick, turnMessage(savedMsg))
 
-def saveMessage(stanza, msgType, conference, nick, trueJid, body):
+def saveTurnMessage(stanza, msgType, conference, nick, trueJid, body):
 	if(msgType == xmpp.TYPE_PUBLIC):
 		if(trueJid != gJid and trueJid != conference):
 			time.sleep(TURN_TIMEOUT)
 			gTurnMsgCache[conference][trueJid] = body
 
-def initTurnCache(conference):
+def createTurnCache(conference):
 	gTurnMsgCache[conference] = {}
 
-def unloadTurnCache(conference):
+def deleteTurnCache(conference):
 	del(gTurnMsgCache[conference])
 
 def clearTurnCache(conference, nick, trueJid, reason, code):
 	if(trueJid in gTurnMsgCache[conference]):
 		del(gTurnMsgCache[conference][trueJid])
 
-registerMessageHandler(saveMessage, CHAT)
-registerEvent(initTurnCache, ADDCONF)
-registerEvent(unloadTurnCache, DELCONF)
+registerEvent(createTurnCache, ADDCONF)
+registerEvent(deleteTurnCache, DELCONF)
 registerLeaveHandler(clearTurnCache)
+registerMessageHandler(saveTurnMessage, CHAT)
 
 registerCommand(turnLastMessage, u"turn", 10, 
-				u"Переключает раскладку для последнего сообщения пользователя, вызвавшего команду", 
+				u"Переключает раскладку вашего последнего сообщения или текста в параметре команды", 
 				u"turn [текст]", 
 				(u"turn", u"turn jkjkj"), 
 				CHAT)

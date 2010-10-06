@@ -14,13 +14,16 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-AA = {"question": u"сорок + семь", "answer": "47"}
-AB = {"question": u"60 + четыре", "answer": "64"}
-AC = {"question": u"тридцать + 2", "answer": "32"}
-AD = {"question": u"7 + девять", "answer": "16"}
-AE = {"question": u"2 + шесть", "answer": "8"}
-AF = {"question": u"2 + два", "answer": "4"}
-AG = {"question": u"один + один", "answer": "2"}
+
+AUTH_QUESTIONS = (
+	(u"сорок + три", "43"),
+	(u"60 + четыре", "64"),
+	(u"десять + 22", "32"),
+	(u"17 + девять", "26"),
+	(u"12 + восемь", "20"),
+	(u"сто - шесть", "94"),
+	(u"сорок * два", "80")
+)
 
 gAuthAnswer = {}
 
@@ -29,17 +32,17 @@ def setAuthState(conference):
 	if(getConfigKey(conference, "auth") is None):
 		setConfigKey(conference, "auth", 0)
 
-def unloadAuthCache(conference):
+def freeAuthCache(conference):
 	del(gAuthAnswer[conference])
 
 def askAuthQuestion(conference, nick, trueJid, aff, role):
 	if(getConfigKey(conference, "auth")):
 		if(aff == xmpp.AFF_NONE):
-			question = random.choice((AA, AB, AC, AD, AE, AF, AG, ))
+			question, answer = random.choice(AUTH_QUESTIONS)
 			setRole(conference, nick, xmpp.ROLE_VISITOR, u"неавторизованый участник")
-			message = u"Чтобы получить голос, реши пример: %(question)s. Как решишь, напиши мне ответ" % (question)
+			message = u"Чтобы получить голос, реши пример: %s. Как решишь, напиши мне ответ" % (question)
 			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message)
-			gAuthAnswer[conference][trueJid] = question["answer"]
+			gAuthAnswer[conference][trueJid] = answer
 
 def clearAuthCache(conference, nick, trueJid, reason, code):
 	if(trueJid in gAuthAnswer[conference]):
@@ -72,7 +75,7 @@ def authControl(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (getConfigKey(conference, "auth")))
 
 registerEvent(setAuthState, ADDCONF)
-registerEvent(unloadAuthCache, DELCONF)
+registerEvent(freeAuthCache, DELCONF)
 
 registerJoinHandler(askAuthQuestion)
 registerLeaveHandler(clearAuthCache)

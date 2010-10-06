@@ -16,9 +16,22 @@
 # GNU General Public License for more details.
 
 VCARD_ID = "vcard_id"
-		
-TAGS = ("NICKNAME", "FN", "GENDER", "BDAY", "LOCALITY", "CTRY", u"ORGNAME", "ROLE", "TITLE", "NUMBER", "URL", "EMAIL", "DESC")
-DESC = (u"Ник", u"Имя", u"Пол", u"Д/р", u"Город", u"Страна", u"Огранизация", u"Профессия", u"Должность", u"Телефон", u"Сайт", u"E-mail", u"Заметки")
+
+VCARD_TAGS = (
+	("NICKNAME", u"Ник"),
+	("FN", u"Имя"),
+	("GENDER", u"Пол"),
+	("BDAY", u"Д/р"),
+	("LOCALITY", u"Город"),
+	("CTRY", u"Страна"),
+	("ORGNAME", u"Огранизация"),
+	("ROLE", u"Профессия"),
+	("TITLE", u"Должность"),
+	("NUMBER", u"Телефон"),
+	("URL", u"Сайт"),
+	("EMAIL", u"E-mail"),
+	("DESC", u"Заметки"),
+)
 
 def showVCard(msgType, conference, nick, param):
 	if(param):
@@ -64,17 +77,22 @@ def loadRawVCard(node, rawVCard):
 			rawVCard[tagName] = tagData
 		else:
 			loadRawVCard(child, rawVCard)
-		
+			
 def getVCard(rawVCard):
 	name = ""
 	for tag in ("GIVEN", "MIDDLE", "FAMILY"):
 		tagData = rawVCard.get(tag)
-		if(tagData):
+		if tagData:
 			name += tagData + " "
 	if(name):
 		rawVCard["FN"] = name
-	items = ["%s: %s" % (DESC[i], rawVCard[TAGS[i]]) for i in range(0, len(TAGS)) if(TAGS[i] in rawVCard and rawVCard[TAGS[i]])]
-	return("\n".join(items))
+	vCardItems = []
+	for i in xrange(len(VCARD_TAGS)):
+		tagName, tagDesc = VCARD_TAGS[i]
+		tagData = rawVCard.get(tagName)
+		if tagData:
+			vCardItems.append(u"%s: %s" % (tagDesc, tagData))
+	return("\n".join(vCardItems))
 
 registerCommand(showVCard, u"визитка", 10, 
 				u"Показывает vCard указанного пользователя или сервера", 

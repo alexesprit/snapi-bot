@@ -40,20 +40,20 @@ def quizIdleCheck(conference):
 		sendToConference(conference, u"(!) Викторина автоматичеки заверщена по бездействию!")
 		quizStop()
 	else:
-		askNewQuestion(conference)
+		askQuizQuestion(conference)
 
-def getHintString(answer):
+def getQuizHint(answer):
 	return(["*"] * len(answer))
 
-def isTimerEnabled(conference):
+def isQuizTimerEnabled(conference):
 	return(conference in gQuizTimer and gQuizTimer[conference])
 	
 def resetQuizTimer(conference):
-	if(isTimerEnabled(conference)):
+	if(isQuizTimerEnabled(conference)):
 		gQuizTimer[conference].cancel()
 	gQuizTimer[conference] = startTimer(QUIZ_TIME_LIMIT, quizIdleCheck, (conference, ))
 
-def getNewQuestion():
+def getQuizQuestion():
 	questionNum = random.randrange(0, QUIZ_TOTAL_LINES)
 	fp = file(getFilePath(RESOURCE_DIR, QUIZ_FILE))
 	for i in xrange(QUIZ_TOTAL_LINES):
@@ -64,11 +64,11 @@ def getNewQuestion():
 		else:
 			fp.readline()
 
-def askNewQuestion(conference, lastAnswer = None):
-	question, answer = getNewQuestion()
+def askQuizQuestion(conference, lastAnswer = None):
+	question, answer = getQuizQuestion()
 	gQuizAnswer[conference] = answer
 	gQuizQuestion[conference] = question
-	gQuizHint[conference] = getHintString(answer)
+	gQuizHint[conference] = getQuizHint(answer)
 	gQuizIdleCount[conference] = 0
 	gQuizAskTime[conference] = time.time()
 	resetQuizTimer(conference)
@@ -90,7 +90,7 @@ def quizStop(conference):
 		del(gQuizTimer[conference])
 	showScoreList(xmpp.TYPE_PUBLIC, conference)
 
-def checkAnswer(conference, nick, trueJid, answer):
+def checkQuizAnswer(conference, nick, trueJid, answer):
 	rightAnswer = gQuizAnswer[conference].lower()
 	userAnswer = answer.lower()
 	if(rightAnswer == userAnswer):	
@@ -111,11 +111,11 @@ def checkAnswer(conference, nick, trueJid, answer):
 		else:
 			base[trueJid] = [nick, points, 1]
 		base.save()
-		askNewQuestion(conference)
+		askQuizQuestion(conference)
 
-def answerListener(stanza, msgType, conference, nick, trueJid, text):
+def quizAnswerListener(stanza, msgType, conference, nick, trueJid, text):
 	if(gQuizEnable[conference]):
-		checkAnswer(conference, nick, trueJid, text)
+		checkQuizAnswer(conference, nick, trueJid, text)
 
 def showScoreList(msgType, conference, nick=None):
 	base = gQuizScores[conference]
@@ -148,11 +148,11 @@ def stopQuiz(msgType, conference, nick, param):
 		sendToConference(conference, u"(!) Викторина остановлена")
 		quizStop(conference)
 
-def askQuestion(msgType, conference, nick, param):
+def showNextQuestion(msgType, conference, nick, param):
 	if(gQuizEnable[conference]):
 		askNewQuestion(conference, gQuizAnswer[conference])
 
-def showHint(msgType, conference, nick, param):
+def showQuizHint(msgType, conference, nick, param):
 	if(gQuizEnable[conference]):
 		answer = gQuizAnswer[conference]
 		hint = gQuizHint[conference]
@@ -172,10 +172,10 @@ def showHint(msgType, conference, nick, param):
 		else:
 			askNewQuestion(conference, answer)
 
-def showScores(msgType, conference, nick, param):
+def showQuizScores(msgType, conference, nick, param):
 	showScoreList(msgType, conference, nick)
 
-def showQuestion(msgType, conference, nick, param):
+def showQuizQuestion(msgType, conference, nick, param):
 	if(gQuizEnable[conference]):
 		sendMsg(msgType, conference, nick, u"(*) Текущий вопрос: \n" + gQuizQuestion[conference])
 		
@@ -184,14 +184,13 @@ def loadQuizScores(conference):
 	gQuizScores[conference] = database.DataBase(fileName)
 	gQuizEnable[conference] = False
 
-registerEvent(loadQuizScores, ADDCONF)
-
 def unloadQuizScores(conference):
 	del(gQuizScores[conference])
 
+registerEvent(loadQuizScores, ADDCONF)
 registerEvent(unloadQuizScores, DELCONF)
+registerMessageHandler(quizAnswerListener, CHAT)
 
-registerMessageHandler(answerListener, CHAT)
 registerCommand(startQuiz, u"старт", 10, 
 				u"Запуск игры", 
 				None, 
@@ -202,22 +201,22 @@ registerCommand(stopQuiz, u"стоп", 10,
 				None, 
 				(u"стоп", ), 
 				CHAT | NONPARAM)
-registerCommand(showScores, u"счет", 10, 
+registerCommand(showQuizScores, u"счет", 10, 
 				u"Показывает счёт игры", 
 				None, 
 				(u"счет", ), 
 				CHAT | NONPARAM)
-registerCommand(showHint, u"х", 10, 
+registerCommand(showQuizHint, u"х", 10, 
 				u"Показать подсказку", 
 				None, 
 				(u"х", ), 
 				CHAT | NONPARAM)
-registerCommand(showQuestion, u"повтор", 10, 
+registerCommand(showQuizQuestion, u"повтор", 10, 
 				u"Повтор текущего вопроса", 
 				None, 
 				(u"повтор", ), 
 				CHAT | NONPARAM)
-registerCommand(askQuestion, u"сл", 10, 
+registerCommand(showNextQuestion, u"сл", 10, 
 				u"Следущий вопрос", None, 
 				(u"сл", ), 
 				CHAT | NONPARAM)

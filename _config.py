@@ -37,14 +37,18 @@ gRestart = True
 # success - успешные результаты
 # warning - предупреждения
 gCoreDebug = ["info", "error", "success", "warning"]
-# always - все типы флагоz
+# always - все типы флагов
 # auth - авторизация
 # bind - назначение ресурса
 # dispatcher - обработка станз
 # proxy - подклчение через прокси
 # roster - работа с ростером
 # socket - передаваемые данные
+# tls - TLS/SSL-подключение
 gXMPPDebug = []
+# расскоментируйте, чтобы отключить логирование действий
+# лог ошибок по прежнему можно будет посмотреть в syslogs
+#xmpp.debug.Debug = xmpp.debug.NoDebug
 
 # папка для логов конференций
 gLogDir = ""

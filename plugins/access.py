@@ -145,21 +145,19 @@ def loadGlobalAccesses():
 	for jid in gAdmins:
 		gGlobalAccess[jid] = 100
 
-registerEvent(loadGlobalAccesses, STARTUP)
-
 def loadLocalAccesses(conference):
 	fileName = getConfigPath(conference, ACCESS_FILE)
 	createFile(fileName, "{}")
 	gPermAccess[conference] = eval(readFile(fileName))
 	gTempAccess[conference] = {}
 
-registerEvent(loadLocalAccesses, ADDCONF)
-
-def unloadLocalAccesses(conference):
+def freeLocalAccesses(conference):
 	del(gPermAccess[conference])
 	del(gTempAccess[conference])
 
-registerEvent(unloadLocalAccesses, DELCONF)
+registerEvent(loadGlobalAccesses, STARTUP)
+registerEvent(loadLocalAccesses, ADDCONF)
+registerEvent(freeLocalAccesses, DELCONF)
 
 registerCommand(login, u"логин", 0,
 				u"Авторизоваться как админиcтратор бота", 

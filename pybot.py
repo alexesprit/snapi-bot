@@ -191,7 +191,7 @@ def registerPresenceHandler(function, prsType):
 def registerEvent(function, evtType):
 	gEventHandlers[evtType].append(function)
 
-def registerCommand(function, command, access, desc, syntax, examples, cmdType = ANY):
+def registerCommand(function, command, access, desc, syntax, examples, cmdType=ANY):
 	gCmdHandlers[command] = function
 	gCommands[command] = {CMD_ACCESS: access, CMD_DESC: desc, CMD_SYNTAX: syntax, CMD_EXAMPLE: examples, CMD_TYPE: cmdType}
 

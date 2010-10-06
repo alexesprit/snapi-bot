@@ -36,7 +36,7 @@ def removeNicks(message, nickList):
 			break
 	return(message)
 
-def messageChatTalker(stanza, msgType, conference, nick, trueJid, message):
+def processChatter(stanza, msgType, conference, nick, trueJid, message):
 	if(xmpp.TYPE_PUBLIC == msgType and getConfigKey(conference, "chatterbox")):
 		if(not nick): # topic
 			return
@@ -78,22 +78,19 @@ def messageChatTalker(stanza, msgType, conference, nick, trueJid, message):
 					writeFile(fileName, str(gChatterCache[conference]))
 					gUpdateCount[conference] = 0
 
-registerMessageHandler(messageChatTalker, CHAT)
-
-def loadMsgBase(conference):
+def loadChatterBase(conference):
 	fileName = getConfigPath(conference, CHATTERBOX_FILE)
 	createFile(fileName, "[]")
 	gChatterCache[conference] = eval(readFile(fileName))
 	gUpdateCount[conference] = 0
 
-def unloadMsgBase(conference):
-	del(gChatterCache[conference])
-
-def setChatterboxState(conference):
 	if(getConfigKey(conference, "chatterbox") is None):
 		setConfigKey(conference, "chatterbox", 0)
 
-def chatterboxControl(msgType, conference, nick, param):
+def freeChatterBase(conference):
+	del(gChatterCache[conference])
+
+def chatterControl(msgType, conference, nick, param):
 	if(param):
 		if(param.isdigit()):
 			param = int(param)
@@ -109,11 +106,11 @@ def chatterboxControl(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (getConfigKey(conference, "chatterbox")))
 
-registerEvent(loadMsgBase, ADDCONF)
-registerEvent(unloadMsgBase, DELCONF)
-registerEvent(setChatterboxState, ADDCONF)
+registerEvent(loadChatterBase, ADDCONF)
+registerEvent(freeChatterBase, DELCONF)
+registerMessageHandler(processChatter, CHAT)
 
-registerCommand(chatterboxControl, u"болталка", 30, 
+registerCommand(chatterControl, u"болталка", 30, 
 				u"Отключает (0) или включает (1) болталку. Без параметра покажет текущее значение", 
 				u"болталка [0|1]", 
 				(u"болталка", u"болталка 0"), 

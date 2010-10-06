@@ -22,7 +22,7 @@ def loadClientsCache(conference):
 	fileName = getConfigPath(conference, CLIENTS_FILE)
 	gClients[conference] = database.DataBase(fileName)
 
-def unloadClientsCache(conference):
+def freeClientsCache(conference):
 	del(gClients[conference])
 
 def showClients(msgType, conference, nick, param):
@@ -44,7 +44,7 @@ def showClients(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"а это кто?")
 
-def clientsChecking(conference, nick, trueJid, aff, role):
+def saveUserClient(conference, nick, trueJid, aff, role):
 	base = gClients[conference]
 	if(trueJid not in base):
 		base[trueJid] = []
@@ -52,9 +52,9 @@ def clientsChecking(conference, nick, trueJid, aff, role):
 	iq.addChild("query", {}, [], xmpp.NS_VERSION)
 	iq.setTo(conference + "/" + nick)
 	iq.setID(getUniqueID(CLIENTS_ID))
-	gClient.SendAndCallForResponse(iq, _clientsChecking, (conference, trueJid, ))
+	gClient.SendAndCallForResponse(iq, _saveUserClient, (conference, trueJid, ))
 
-def _clientsChecking(stanza, conference, trueJid):
+def _saveUserClient(stanza, conference, trueJid):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		base = gClients[conference]
 		for p in stanza.getQueryChildren():
@@ -65,9 +65,9 @@ def _clientsChecking(stanza, conference, trueJid):
 					base.save()
 
 registerEvent(loadClientsCache, ADDCONF)
-registerEvent(unloadClientsCache, DELCONF)
+registerEvent(freeClientsCache, DELCONF)
 
-registerJoinHandler(clientsChecking)
+registerJoinHandler(saveUserClient)
 
 registerCommand(showClients, u"клиенты", 10, 
 				u"Показывает, с каких клиентов заходил пользователь", 

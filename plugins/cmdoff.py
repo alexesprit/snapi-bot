@@ -24,7 +24,7 @@ def saveCommands(conference):
 	fileName = getConfigPath(conference, CMDOFF_FILE)
 	writeFile(fileName, str(gCmdOff[conference]))
 
-def unloadCommands(conference):
+def freeCommands(conference):
 	del(gCmdOff[conference])
 
 def cmdSwitchOff(msgType, conference, nick, param):
@@ -95,7 +95,7 @@ def cmdSwitchOn(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, message)
 
 registerEvent(loadCommands, ADDCONF)
-registerEvent(unloadCommands, DELCONF)
+registerEvent(freeCommands, DELCONF)
 
 registerCommand(cmdSwitchOn, u"комвкл", 30, 
 				u"Включает определённые команды для текущей конференции", 

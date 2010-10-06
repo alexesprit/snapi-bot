@@ -18,14 +18,14 @@ SEND_FILE = "send.txt"
 
 gSend = {}
 
-def loadSendCache(conference):
+def loadSendBase(conference):
 	fileName = getConfigPath(conference, SEND_FILE)
 	gSend[conference] = database.DataBase(fileName)
 
-def unloadSendCache(conference):
+def freeSendBase(conference):
 	del(gSend[conference])
 
-def addMessageToQueue(msgType, conference, nick, param):
+def addToSendBase(msgType, conference, nick, param):
 	param = param.split(None, 1)
 	if(len(param) == 2):
 		userNick = param[0]
@@ -45,7 +45,7 @@ def addMessageToQueue(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"а это кто?")
 
-def checkQueue(conference, nick, trueJid, aff, role):
+def checkSendBase(conference, nick, trueJid, aff, role):
 	base = gSend[conference]
 	if(trueJid in base):
 		for message in base[trueJid]:
@@ -54,11 +54,11 @@ def checkQueue(conference, nick, trueJid, aff, role):
 		del(base[trueJid])
 		base.save()
 
-registerEvent(loadSendCache, ADDCONF)
-registerEvent(unloadSendCache, DELCONF)
-registerJoinHandler(checkQueue)
+registerEvent(loadSendBase, ADDCONF)
+registerEvent(freeSendBase, DELCONF)
+registerJoinHandler(checkSendBase)
 
-registerCommand(addMessageToQueue, u"передать", 10, 
+registerCommand(addToSendBase, u"передать", 10, 
 				u"Запоминает сообщение и передаёт его указанному пользователю, как только он зайдёт в конференцию", 
 				u"передать <кому> <что>", 
 				(u"передать Nick хай!", ), 

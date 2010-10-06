@@ -13,22 +13,22 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def google(msgType, conference, nick, text):
+def searchInGoogleAll(msgType, conference, nick, text):
 	query = urllib.urlencode({"q" : text.encode("utf-8")})
 	url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&hl=ru&%s" % (query)
-	googleSearch(msgType, conference, nick, url)
+	searchInGoogle(msgType, conference, nick, url)
 
-def googleEn(msgType, conference, nick, text):
+def searchInGoogleEN(msgType, conference, nick, text):
 	query = urllib.urlencode({"q" : text.encode("utf-8")})
 	url = "http://ajax.googleapis.com/ajax/services/search/web?hl=en&v=1.0&%s&lr=lang_en" % (query)
-	googleSearch(msgType, conference, nick, url)
+	searchInGoogle(msgType, conference, nick, url)
 
-def googleRu(msgType, conference, nick, text):
+def searchInGoogleRU(msgType, conference, nick, text):
 	query = urllib.urlencode({"q" : text.encode("utf-8")})
 	url = "http://ajax.googleapis.com/ajax/services/search/web?hl=ru&v=1.0&%s&lr=lang_ru" % (query)
-	googleSearch(msgType, conference, nick, url)
+	searchInGoogle(msgType, conference, nick, url)
 
-def googleSearch(msgType, conference, nick, url):
+def searchInGoogle(msgType, conference, nick, url):
 	req = urllib.urlopen(url)
 	answer = simplejson.load(req)
 	results = answer["responseData"]["results"]
@@ -41,17 +41,17 @@ def googleSearch(msgType, conference, nick, url):
 	else:
 		sendMsg(msgType, conference, nick, u"не найдено")
 
-registerCommand(googleEn, u"гугльен", 10, 
+registerCommand(searchInGoogleEN, u"гугльен", 10, 
 				u"Поиск через Google по зарубежным сайтам", 
 				u"гугльен <текст>", 
 				(u"гугльен yandex", ), 
 				ANY | PARAM)
-registerCommand(googleRu, u"гугльру", 10, 
+registerCommand(searchInGoogleRU, u"гугльру", 10, 
 				u"Поиск через Google по русскоязычным сайтам", 
 				u"гугльру <текст>", 
 				(u"гугльру yandex", ), 
 				ANY | PARAM)
-registerCommand(google, u"гугль", 10, 
+registerCommand(searchInGoogleAll, u"гугль", 10, 
 				u"Поиск через Google", 
 				u"гугль <текст>", 
 				(u"гугль yandex", ), 

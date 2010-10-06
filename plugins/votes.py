@@ -17,18 +17,18 @@ VOTES_FILE = "votes.txt"
 
 gVotes = {}
 
-STATE_STARTED = 0x1
-STATE_FINISHED = 0x2
+VOTE_STARTED = 0x1
+VOTE_FINISHED = 0x2
 
-KEY_TEXT = 0x0
-KEY_STATE = 0x1
-KEY_VOTED = 0x2
-KEY_CREATOR = 0x3
-KEY_OPINIONS = 0x4
+VOTE_TEXT = 0x0
+VOTE_STATE = 0x1
+VOTE_VOTED = 0x2
+VOTE_CREATOR = 0x3
+VOTE_OPINIONS = 0x4
 
-SHOW_OPINIONS = 0x1
-SHOW_FIRSTONLY = 0x2
-SHOW_SCORES = 0x4
+VOTE_OPINIONS = 0x1
+VOTE_FIRSTONLY = 0x2
+VOTE_SCORES = 0x4
 
 voteTemplate = u"голосование создано! Чтобы показать его, напишите \"голосование %d\". \
 Чтобы проголосовать напишите \"мнение %d <номер_мнения>\". \
@@ -49,23 +49,23 @@ def createOpinions(opinions):
 
 def getOpinionScores(vote):
 	scores = 0
-	for opinion in vote[KEY_OPINIONS]:
+	for opinion in vote[VOTE_OPINIONS]:
 		scores += opinion[0]
 	return(scores)
 
 def getVoteText(vote, flags=0x0):
-	voteText = vote[KEY_TEXT]
-	if(flags & SHOW_OPINIONS):
-		if(flags & SHOW_SCORES):
-			voteOpinions = sorted(vote[KEY_OPINIONS])
+	voteText = vote[VOTE_TEXT]
+	if(flags & VOTE_OPINIONS):
+		if(flags & VOTE_SCORES):
+			voteOpinions = sorted(vote[VOTE_OPINIONS])
 			voteOpinions.reverse()
 		else:
-			voteOpinions = vote[KEY_OPINIONS]
-		if(flags & SHOW_FIRSTONLY):
+			voteOpinions = vote[VOTE_OPINIONS]
+		if(flags & VOTE_FIRSTONLY):
 			voteOpinions = voteOpinions[:1]
 		for opinion in voteOpinions:
 			scores, text = opinion
-			if(flags & SHOW_SCORES):
+			if(flags & VOTE_SCORES):
 				voteText += u"\n * %s (%s голосов)" % (text, scores)
 			else:
 				voteText += u"\n * %s" % (text)
@@ -79,14 +79,14 @@ def showVotes(msgType, conference, nick, param):
 		except(KeyError):
 			sendMsg(msgType, conference, nick, u"такого голосования нет!")
 			return
-		sendMsg(msgType, conference, nick, getVoteText(vote, SHOW_OPINIONS))
+		sendMsg(msgType, conference, nick, getVoteText(vote, VOTE_OPINIONS))
 	elif(not param):
 		if(not gVotes[conference].isEmpty()):
 			voteText = u"Текущие голосования:\n"
 			for i, vote in enumerate(gVotes[conference]):
 				vote = gVotes[conference][vote]
 				voteText += u"%d) %s" % (i + 1, getVoteText(vote))
-				if(vote[KEY_STATE] == STATE_STARTED):
+				if(vote[VOTE_STATE] == VOTE_STARTED):
 					voteText += u"\nНе завершено, голосов: %d\n\n" \
 								% (getOpinionScores(vote))
 				else:
@@ -102,11 +102,11 @@ def createVote(msgType, conference, nick, param):
 	if(len(rawData) > 1):
 		text, opinions = rawData[0], rawData[1:]
 		vote = {}
-		vote[KEY_TEXT] = text
-		vote[KEY_STATE] = STATE_STARTED
-		vote[KEY_VOTED] = []
-		vote[KEY_CREATOR] = [nick, getTrueJid(conference, nick)]
-		vote[KEY_OPINIONS] = createOpinions(opinions)
+		vote[VOTE_TEXT] = text
+		vote[VOTE_STATE] = VOTE_STARTED
+		vote[VOTE_VOTED] = []
+		vote[VOTE_CREATOR] = [nick, getTrueJid(conference, nick)]
+		vote[VOTE_OPINIONS] = createOpinions(opinions)
 		voteID = getFreeID(gVotes[conference])
 		gVotes[conference][voteID] = vote
 		gVotes[conference].save()
@@ -120,7 +120,7 @@ def deleteVote(msgType, conference, nick, param):
 			voteID = int(param)
 			vote = gVotes[conference][voteID]
 			trueJid = getTrueJid(conference, nick)
-			creatorJid = vote[KEY_CREATOR][1]
+			creatorJid = vote[VOTE_CREATOR][1]
 			userAccess = getAccess(conference, trueJid)
 			if(trueJid == creatorJid or userAccess >= 20):
 				del(gVotes[conference][voteID])
@@ -147,19 +147,19 @@ def showOpinions(msgType, conference, nick, param):
 			try:
 				vote = gVotes[conference][voteID]
 				votes = [vote]
-				flags = SHOW_OPINIONS | SHOW_SCORES
+				flags = VOTE_OPINIONS | VOTE_SCORES
 			except(KeyError):
 				sendMsg(msgType, conference, nick, u"такого голосования нет!")
 				return
 		else:
 			votes = [gVotes[conference][i] for i in gVotes[conference]]
-			flags = SHOW_OPINIONS | SHOW_FIRSTONLY | SHOW_SCORES
+			flags = VOTE_OPINIONS | VOTE_FIRSTONLY | VOTE_SCORES
 		voteText = []
 		userJid = getTrueJid(conference, nick)
 		for i, vote in enumerate(votes):
-			creatorJid = vote[KEY_CREATOR][1]
-			voteState = vote[KEY_STATE]
-			if(creatorJid == userJid or voteState == STATE_FINISHED):
+			creatorJid = vote[VOTE_CREATOR][1]
+			voteState = vote[VOTE_STATE]
+			if(creatorJid == userJid or voteState == VOTE_FINISHED):
 				voteText.append(u"%d) %s" % (i + 1, getVoteText(vote, flags)))
 			else:
 				voteText.append(u"%d) %s\nРезультаты недоступны" % (i + 1, getVoteText(vote)))
@@ -177,10 +177,10 @@ def vote(msgType, conference, nick, param):
 			opinionNum = int(param[1]) - 1
 			trueJid = getTrueJid(conference, nick)
 			vote = gVotes[conference][voteID]
-			if(trueJid not in vote[KEY_VOTED]):
-				opinion = vote[KEY_OPINIONS][opinionNum]
+			if(trueJid not in vote[VOTE_VOTED]):
+				opinion = vote[VOTE_OPINIONS][opinionNum]
 				opinion[0] += 1
-				vote[KEY_VOTED].append(trueJid)
+				vote[VOTE_VOTED].append(trueJid)
 				gVotes[conference].save()
 				sendMsg(msgType, conference, nick, u"поняла")
 			else:
@@ -194,16 +194,16 @@ def endVote(msgType, conference, nick, param):
 			voteID = int(param)
 			try:
 				vote = gVotes[conference][voteID]
-				if(STATE_FINISHED != vote[KEY_STATE]):
+				if(VOTE_FINISHED != vote[VOTE_STATE]):
 					trueJid = getTrueJid(conference, nick)
-					creatorJid = vote[KEY_CREATOR][1]
+					creatorJid = vote[VOTE_CREATOR][1]
 					userAccess = getAccess(conference, trueJid)
 					if(trueJid == creatorJid or userAccess >= 20):
-						vote[KEY_STATE] = STATE_FINISHED
-						del(vote[KEY_VOTED])
+						vote[VOTE_STATE] = VOTE_FINISHED
+						del(vote[VOTE_VOTED])
 						gVotes[conference].save()
 
-						flags = SHOW_OPINIONS | SHOW_SCORES
+						flags = VOTE_OPINIONS | VOTE_SCORES
 						message = u"Результаты:\n%s" % (getVoteText(vote, flags))
 						sendMsg(msgType, conference, nick, message)
 					else:
@@ -221,9 +221,9 @@ def endVote(msgType, conference, nick, param):
 def sendNewVotes(conference, nick, trueJid, role, aff):
 	for voteID in gVotes[conference]:
 		vote = gVotes[conference][voteID]
-		if(vote[KEY_STATE] != STATE_FINISHED):
-			if(trueJid not in vote[KEY_VOTED]):
-				voteText = u"Голосование\n%s" % (getVoteText(vote, SHOW_OPINIONS))
+		if(vote[VOTE_STATE] != VOTE_FINISHED):
+			if(trueJid not in vote[VOTE_VOTED]):
+				voteText = u"Голосование\n%s" % (getVoteText(vote, VOTE_OPINIONS))
 				voteText += u"\nЧтобы проголосовать напишите \"мнение %d <номер_мнения>\"" % (voteID)
 				sendMsg(xmpp.TYPE_PRIVATE, conference, nick, voteText)
 

@@ -16,7 +16,7 @@
 
 import socket
 
-def dnsQuery(query):
+def getDNSAnswer(query):
 	try:
 		if(not re.sub("([0-9]+).([0-9]+).([0-9]+).([0-9]+)", "", query)):
 			(hostname, aliaslist, ipaddrlist) = socket.gethostbyaddr(query)
@@ -28,7 +28,7 @@ def dnsQuery(query):
 		return(None)
 
 def showServerDns(msgType, conference, nick, param):
-	answer = dnsQuery(param)
+	answer = getDNSAnswer(param)
 	if(answer):
 		sendMsg(msgType, conference, nick, answer)
 	else:

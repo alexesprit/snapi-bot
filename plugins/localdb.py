@@ -18,14 +18,14 @@ LOCALDB_FILE = "localdb.txt"
 
 gLocalBase = {}
 
-def getKeyToPublic(msgType, conference, nick, param):
+def getLocalKeyToPublic(msgType, conference, nick, param):
 	param = param.lower()
 	if(param in gLocalBase[conference]):
 		sendMsg(msgType, conference, nick, u"про %s я знаю следующее:\n%s" % (param, gLocalBase[conference][param]))
 	else:	
 		sendMsg(msgType, conference, nick, u"я хз что такое %s :(" % (param))
 
-def getKeyToPrivate(msgType, conference, nick, param):
+def getLocalKeyToPrivate(msgType, conference, nick, param):
 	param = param.split()
 	confJid = ""
 	if(len(param) == 2):
@@ -46,7 +46,7 @@ def getKeyToPrivate(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"кому?")
 
-def setBaseKey(msgType, conference, nick, param):
+def setLocalKey(msgType, conference, nick, param):
 	param = param.split("=", 1)
 	if(len(param) == 2):
 		key = param[0].lower().strip()
@@ -65,7 +65,7 @@ def setBaseKey(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"читай справку по команде")
 
-def searchKey(msgType, conference, nick, param):
+def searchLocalKey(msgType, conference, nick, param):
 	foundItems = []
 	for key in gLocalBase[conference].keys():
 		if(key.count(param)):
@@ -75,7 +75,7 @@ def searchKey(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"ни с чем не совпало :(")
 
-def showAllKeys(msgType, conference, nick, parameters):
+def showAllLocalKeys(msgType, conference, nick, parameters):
 	if(gLocalBase[conference]):
 		sendMsg(msgType, conference, nick, ", ".join(sorted(gLocalBase[conference].keys())))
 	else:
@@ -86,37 +86,37 @@ def loadLocalBase(conference):
 	createFile(fileName, "{}")
 	gLocalBase[conference] = eval(readFile(fileName))
 
-def unloadLocalBase(conference):
-	del(gLocalBase[conference])
-
 def saveLocalBase(conference):
 	fileName = getConfigPath(conference, LOCALDB_FILE)
 	writeFile(fileName, str(gLocalBase[conference]))
 
-registerEvent(loadLocalBase, ADDCONF)
-registerEvent(unloadLocalBase, DELCONF)
+def freeLocalBase(conference):
+	del(gLocalBase[conference])
 
-registerCommand(getKeyToPublic, u"???", 10, 
+registerEvent(loadLocalBase, ADDCONF)
+registerEvent(freeLocalBase, DELCONF)
+
+registerCommand(getLocalKeyToPublic, u"???", 10, 
 				u"Ищет ответ на вопрос в локальной базе", 
 				u"??? <запрос>", 
 				(u"??? что-то", u"??? что-то ещё"), 
 				CHAT | PARAM)
-registerCommand(getKeyToPrivate, u"!??", 10, 
+registerCommand(getLocalKeyToPrivate, u"!??", 10, 
 				u"Ищет ответ на вопрос в локальной базе и посылает его в приват", 
 				u"!?? [ник] <запрос>", 
 				(u"!?? что-то", u"!?? guy что-то"), 
 				CHAT | PARAM)
-registerCommand(setBaseKey, u"!!!", 20, 
+registerCommand(setLocalKey, u"!!!", 20, 
 				u"Устанавливает ответ на вопрос в локальной базе", 
 				u"!!! <запрос> = <ответ>", 
 				(u"!!! что-то = the best!", u"!!! что-то ="), 
 				CHAT | PARAM)
-registerCommand(searchKey, u"???поиск", 10, 
+registerCommand(searchLocalKey, u"???поиск", 10, 
 				u"Поиск по базе", 
 				"???поиск <запрос>", 
 				(u"???поиск что-то", ), 
 				CHAT | PARAM)
-registerCommand(showAllKeys, u"???все", 10, 
+registerCommand(showAllLocalKeys, u"???все", 10, 
 				u"Показывает все ключи базы", 
 				None, 
 				(u"???все", ), 

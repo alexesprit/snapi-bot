@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def yandexSearch(msgType, conference, nick, param):
+def searchInYandex(msgType, conference, nick, param):
 	query = urllib.urlencode({"query" : param.encode("utf-8")})
 	rawHTML = urllib.urlopen("http://yandex.ru/msearch?s=all&%s" % (query)).read()
 	rawHTML = unicode(rawHTML, "utf-8")
@@ -31,7 +31,7 @@ def yandexSearch(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"по вашему запросу ничего не найдено")
 
-registerCommand(yandexSearch, u"яндекс", 10, 
+registerCommand(searchInYandex, u"яндекс", 10, 
 				u"Поиск в Яндексе", 
 				u"яндекс <запрос>", 
 				(u"яндекс google", ), 

@@ -15,19 +15,20 @@
 
 LAST_ID = "last_id"
 
-def showOnlineTime(msgType, conference, nick, param):
+def showOnlineTime(msgType, jid, resource, param):
 	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_LAST)
-	iq.setTo(conference)
+	iq.setTo(jid)
 	iq.setID(getUniqueID(LAST_ID))
-	gClient.SendAndCallForResponse(iq, _showOnlineTime, (msgType, conference, nick, ))
+	gClient.SendAndCallForResponse(iq, _showOnlineTime, (msgType, jid, resource, ))
 
-def _showOnlineTime(stanza, msgType, conference, nick):
+def _showOnlineTime(stanza, msgType, jid, resource):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		child = stanza.getFirstChild()
+		print child
 		seconds = child.getAttr("seconds")
-		sendMsg(msgType, conference, nick, u"ты в сети уже %s" % (time2str(int(seconds))))
+		sendMsg(msgType, jid, resource, u"ты в сети уже %s" % (time2str(int(seconds))))
 	else:
-		sendMsg(msgType, conference, nick, u"не получается :(")
+		sendMsg(msgType, jid, resource, u"не получается :(")
 
 registerCommand(showOnlineTime, u"всети", 10, 
 				u"Показывает ваше время в сети", 

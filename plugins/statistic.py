@@ -26,13 +26,17 @@ def showStatistic(msgType, conference, nick, param):
 	text += u"забанили %(ban)d. Также ники сменили %(nick)d раз, статусами нафлудили %(status)d раз."
 	sendMsg(msgType, conference, nick, text % (gStats[conference]))
 
-def botMessageUpdate(msgType, jid, text):
+def botMessageUpdate(msgType, conference, text):
 	if(xmpp.TYPE_PUBLIC == msgType and text):
-		gStats[jid]["mymsg"] += 1
+		gStats[conference]["mymsg"] += 1
 
 def messageUpdate(stanza, msgType, conference, nick, trueJid, text):
 	if(nick != getBotNick(conference)):
 		gStats[conference][msgType] += 1
+		if conference is None or msgType is None:
+			print conference
+			print msgType
+			print text
 
 def joinUpdate(conference, nick, trueJid, aff, role):
 	if(not trueJid in gJoined[conference]):
@@ -52,14 +56,12 @@ def leaveUpdate(conference, nick, trueJid, reason, code):
 		gBanned[conference].append(trueJid)
 
 def presenceUpdate(stanza, conference, nick, trueJid):
-	if(conferenceInList(conference)):
-		code = stanza.getStatusCode()
-		if(code == "303"):
-			gStats[conference]["nick"] += 1
-		else:
-			msgType = stanza.getType()
-			if(msgType != "unavailable"):
-				gStats[conference]["status"] += 1
+	if("303" == stanza.getStatusCode()):
+		gStats[conference]["nick"] += 1
+	else:
+		msgType = stanza.getType()
+		if(msgType != xmpp.PRS_OFFLINE):
+			gStats[conference]["status"] += 1
 	
 def createStatistic(conference):
 	gStats[conference] = {
