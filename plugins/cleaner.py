@@ -25,12 +25,12 @@ SINGLE_BASES = ("gNotes", )
 def cleanBase(base, keepTime):
 	bGetUpdateTime = base.getUpdateTime
 	cleanedKeys = 0
-	for key in base:
+	for key in base.keys():
 		updateTime = bGetUpdateTime(key)
-		if(time.time() - updateTime >= keepTime):
-			del(base[key])
+		if time.time() - updateTime >= keepTime:
+			del base[key]
 			cleanedKeys += 1
-	if(cleanedKeys):
+	if cleanedKeys:
 		base.save()
 
 def cleanBases():

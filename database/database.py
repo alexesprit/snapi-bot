@@ -30,25 +30,31 @@ class DataBase:
 		self.path = path
 	
 	def __contains__(self, key):
-		return(key in self.base)
+		return key in self.base
 	
 	def __iter__(self):
 		for item in self.base:
-			yield(item)
+			yield item
 	
 	def __getitem__(self, item):
-		return(self.base[item])
+		return self.base[item]
 
 	def __setitem__(self, item, value):
 		self.base[item] = value
 		self.changes[item] = time.time()
 	
 	def __delitem__(self, item):
-		del(self.base[item])
-		del(self.changes[item]);		
-	
+		del self.base[item]
+		del self.changes[item]
+
+	def keys(self):
+		return self.base.keys()
+
+	def values(self):
+		return self.base.items()
+
 	def items(self):
-		return(self.base.items())
+		return self.base.items()
 	
 	def clear(self):
 		self.base = {}
@@ -59,7 +65,7 @@ class DataBase:
 		__main__.writeFile(self.path + '.db', str(self.changes))
 		
 	def isEmpty(self):
-		return(not self.base)
+		return not self.base
 		
 	def getUpdateTime(self, key):
-		return(self.changes.get(key))
+		return self.changes[key]
