@@ -71,5 +71,5 @@ registerCommand(showWhoWas, u"хтобыл", 10,
 registerCommand(showUserNicks, u"ники", 10, 
 				u"Выводит все ники пользователя", 
 				u"ники [ник]", 
-				(u"ники", u"ники Nick"), 
-				CHAT | NONPARAM)
+				(u"ники", u"ники Nick"),
+				CHAT)

@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def searchInYandex(msgType, conference, nick, param):
-	query = urllib.urlencode({"query" : param.encode("utf-8")})
+	query = urllib.urlencode({"s": "all", "query": param.encode("utf-8")})
 	rawHTML = urllib.urlopen("http://yandex.ru/msearch?s=all&%s" % (query)).read()
 	rawHTML = unicode(rawHTML, "utf-8")
 	items = re.findall("<li>(.+?)<div class=\"www\">(.+?)</li>", rawHTML, re.DOTALL)

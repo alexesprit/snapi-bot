@@ -94,7 +94,7 @@ def writeUserLeave(conference, nick, trueJid, reason, code):
 				writeLog(xmpp.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты (%s)" % (nick, reason))
 			else:
 				writeLog(xmpp.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты" % (nick));		
-		elif("301" == code ):
+		elif("301" == code):
 			if(reason):
 				writeLog(xmpp.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили (%s)" % (nick, reason))
 			else:

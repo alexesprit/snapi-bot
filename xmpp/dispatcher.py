@@ -234,12 +234,12 @@ class Dispatcher(PlugIn):
 		if(stanzaID in session._expected):
 			if(isinstance(session._expected[stanzaID], tuple)):
 				function, args = session._expected[stanzaID]
+				del(self._expected[stanzaID])
 				session.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), 'ok')
 				try:
 					function(stanza, *args)
 				except(NodeProcessed):
 					pass
-				del(self._expected[stanzaID])
 			else:
 				session.printf("Expected stanza arrived!", 'ok')
 				session._expected[stanzaID] = stanza

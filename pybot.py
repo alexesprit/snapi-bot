@@ -383,7 +383,7 @@ def joinConference(conference, nick, password):
 		prs.setShow(show)
 	prs.addChild(node=gClient.getCapsNode())
 	mucTag = prs.setTag("x", namespace=xmpp.NS_MUC)
-	mucTag.addChild("history", {"maxchars":"0"})
+	mucTag.addChild("history", {"maxchars": "0"})
 	if(password):
 		mucTag.setTagData("password", password)
 	gClient.send(prs)
@@ -706,11 +706,15 @@ def presenceHandler(session, stanza):
 		elif(prsType == ERROR):
 			errorCode = stanza.getErrorCode()
 			if(errorCode == "409"):
-				joinConference(conference, getBotNick(conference) + ".", getConfigKey(conference, "password"))
+				newNick = getBotNick(conference) + "."
+				password = getConfigKey(conference, "password")
+				joinConference(conference, newNick, password)
 			elif(errorCode == "404"):
 				delConference(conference)
 			elif(errorCode == "503"):
-				startTimer(REJOIN_TIMEOUT, conference, (conference, getBotNick(conference), getConfigKey(conference, "password"), ))
+				botNick = getBotNick(conference)
+				password = getConfigKey(conference, "password")
+				startTimer(REJOIN_TIMEOUT, conference, (conference, botNick, password, ))
 			elif(errorCode in ("401", "403", "405")):
 				leaveConference(conference, u"got %s error code" % errorCode)
 		callPresenceHandlers(stanza, CHAT, conference, nick, trueJid)

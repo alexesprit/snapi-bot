@@ -24,7 +24,6 @@ def showOnlineTime(msgType, jid, resource, param):
 def _showOnlineTime(stanza, msgType, jid, resource):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		child = stanza.getFirstChild()
-		print child
 		seconds = child.getAttr("seconds")
 		sendMsg(msgType, jid, resource, u"ты в сети уже %s" % (time2str(int(seconds))))
 	else:

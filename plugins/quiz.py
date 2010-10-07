@@ -85,7 +85,7 @@ def quizStop(conference):
 	del(gQuizIdleCount[conference])
 	del(gQuizAskTime[conference])
 	gQuizEnable[conference] = False
-	if(isTimerEnabled(conference)):
+	if(isQuizTimerEnabled(conference)):
 		gQuizTimer[conference].cancel()
 		del(gQuizTimer[conference])
 	showScoreList(xmpp.TYPE_PUBLIC, conference)
@@ -141,7 +141,7 @@ def startQuiz(msgType, conference, nick, param):
 	if(gQuizEnable[conference]):
 		sendMsg(msgType, conference, nick, u"Викторина уже существует!")
 	else:
-		askNewQuestion(conference)
+		askQuizQuestion(conference)
 
 def stopQuiz(msgType, conference, nick, param):
 	if(gQuizEnable[conference]):
@@ -150,7 +150,7 @@ def stopQuiz(msgType, conference, nick, param):
 
 def showNextQuestion(msgType, conference, nick, param):
 	if(gQuizEnable[conference]):
-		askNewQuestion(conference, gQuizAnswer[conference])
+		askQuizQuestion(conference, gQuizAnswer[conference])
 
 def showQuizHint(msgType, conference, nick, param):
 	if(gQuizEnable[conference]):
@@ -170,7 +170,7 @@ def showQuizHint(msgType, conference, nick, param):
 			gQuizIdleCount[conference] = 0
 			resetQuizTimer(conference)
 		else:
-			askNewQuestion(conference, answer)
+			askQuizQuestion(conference, answer)
 
 def showQuizScores(msgType, conference, nick, param):
 	showScoreList(msgType, conference, nick)
