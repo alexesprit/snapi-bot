@@ -99,16 +99,6 @@ FORBIDDEN_TYPES = (
 		xmpp.TYPE_HEADLINE
 )
 
-ESCAPE_MAP = {
-	"&apos;": "'",
-	"&gt;": ">",
-	"&lt;": "<",
-	"&amp;": "&",
-	"&quot;": "\"",
-	"&nbsp;": " ",
-	"&mdash;": "-"	
-}
-
 IDLE_TIMEOUT = 600
 JOIN_TIMEOUT = 5
 REJOIN_TIMEOUT = 120
@@ -222,7 +212,7 @@ def callPresenceHandlers(stanza, prsType, jid, resource, trueJid):
 	for handler in gPresenceHandlers[prsType]:
 		startThread(handler, (stanza, jid, resource, trueJid))
 
-def callEventHandlers(evtType, param = None):
+def callEventHandlers(evtType, param=None):
 	if(param):
 		for function in gEventHandlers[evtType]:
 			function(*param)
@@ -242,7 +232,7 @@ def startThread(func, param=None):
 	else:
 		threading.Thread(None, execute, func.__name__, (func, )).start()
 
-def execute(function, param = None):
+def execute(function, param=None):
 	try:
 		if(param):
 			with(gSemaphore):
@@ -291,14 +281,9 @@ def time2str(time):
 		rep = u"%d дн. %s" % (days, rep)
 	return(rep)
 
-def XMLUnescape(s):
-	for char in ESCAPE_MAP:
-		s = s.replace(char, ESCAPE_MAP[char])
-	return(s)
-
 def decode(text):
 	text = gTagPattern.sub("", text.replace("<br />","\n").replace("<br>","\n"))
-	return(XMLUnescape(text))
+	return(xmpp.simplexml.XMLUnescape(text))
 
 def createFile(path, data):
 	path = path.encode("utf-8")

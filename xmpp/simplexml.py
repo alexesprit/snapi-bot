@@ -20,22 +20,46 @@
 
 import xml.parsers.expat
 
-def XMLescape(txt):
-	"""Returns provided string with symbols & < > " replaced by their respective XML entities."""
-	# replace also FORM FEED and ESC, because they are not valid XML chars
-	return txt.replace(u'&', u'&amp;').replace(u'<', u'&lt;').replace(u'>', u'&gt;').replace(u'"', u'&quot;').replace(u'\x0C', u"").replace(u'\x1B', u"")
+UNESCAPE_MAP = {
+	"&amp;": "&",
+	"&gt;": ">",
+	"&lt;": "<",
+	"&quot;": "\"",
+	"&apos;": "'",
+	"&nbsp;": " ",
+	"&mdash;": "-"	
+}
 
-def ustr(what):
-	"""Converts object "what" to unicode string using it's own __str__ method if accessible or unicode method otherwise."""
-	if isinstance(what, unicode):
-		return what
+ESCAPE_MAP = {
+	"&": "&amp;",
+	"<": "&lt;",
+	">": "&gt;",
+	"\"": "&quot;",
+	"'": "&apos;"
+}
+
+def XMLEscape(xml):
+	"""Returns provided string with symbols & < > " replaced by their respective XML entities."""
+	for char, esc in ESCAPE_MAP.items():
+		xml = xml.replace(char, esc)
+	return(xml)	
+	
+def XMLUnescape(xml):
+	for esc, char in UNESCAPE_MAP.items():
+		xml = xml.replace(esc, char)
+	return(xml)
+
+def ustr(text):
+	"""Converts object "text" to unicode string using it's own __str__ method if accessible or unicode method otherwise."""
+	if isinstance(text, unicode):
+		return text
 	try:
-		r = what.__str__()
+		text = text.__str__()
 	except AttributeError:
-		r = str(what)
-	if not isinstance(r, unicode):
-		return unicode(r, 'utf-8')
-	return r
+		text = str(text)
+	if not isinstance(text, unicode):
+		return unicode(text, 'utf-8')
+	return text
 
 class Node(object):
 	""" Node class describes syntax of separate XML Node. It have a constructor that permits node creation
@@ -132,19 +156,19 @@ class Node(object):
 					s = s + ' xmlns="%s"' % (self.namespace)
 		for key in self.attrs.keys():
 			val = ustr(self.attrs[key])
-			s = s + ' %s="%s"' % (key, XMLescape(val))
+			s = s + ' %s="%s"' % (key, XMLEscape(val))
 		s = s + ">"
 		cnt = 0
 		dataLen = len(self.data)
 		if self.children:
 			for child in self.children:
 				if(dataLen - 1) >= cnt:
-					s += XMLescape(self.data[cnt].strip())
+					s += XMLEscape(self.data[cnt].strip())
 				if child:
 					s += ustr(child)
 				cnt += 1
 		if (dataLen - 1) >= cnt:
-			s = s + XMLescape(self.data[cnt].strip())
+			s = s + XMLEscape(self.data[cnt].strip())
 		if not self.children and not self.data:
 			s = s[:-1] + " />"
 		else:
