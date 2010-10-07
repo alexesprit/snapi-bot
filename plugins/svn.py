@@ -13,11 +13,11 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-URLS = ("http://", "https://", "svn://")
+URL_STRINGS = ("http://", "https://", "svn://")
 
-def showSvnLog(msgType, conference, nick, param):
+def showSVNLog(msgType, conference, nick, param):
 	if(param):
-		for x in URLS:
+		for x in URL_STRINGS:
 			if(param.startswith(x)):
 				param = param.split()
 				if(len(param) == 2):
@@ -30,11 +30,13 @@ def showSvnLog(msgType, conference, nick, param):
 					count = 10
 				url = param[0]
 				pipe = os.popen("svn log %s --limit %d" % (url, count))
-				sendMsg(msgType, conference, nick, unicode(pipe.read(), "utf-8"))
+				message = pipe.read()
 				pipe.close()
+				enc = chardet.detect(message)["encoding"]
+				sendMsg(msgType, conference, nick, unicode(message, enc))
 				return
 
-registerCommand(showSvnLog, u"svn", 10, 
+registerCommand(showSVNLog, u"svn", 10, 
 				u"Показывает лог с svn", 
 				u"svn <адрес> [кол-во]", 
 				(u"svn http://jimm-fork.googlecode.com/svn/trunk 5", ), 
