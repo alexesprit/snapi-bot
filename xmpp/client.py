@@ -21,8 +21,13 @@
 	These classes can be used for simple applications "AS IS" though.
 """
 
-import debug
 import socket
+
+import auth
+import debug
+import dispatcher
+import roster
+import transports
 
 debug.Debug.colors['socket'] = debug.colorDarkGray
 debug.Debug.colors['proxy'] = debug.colorDarkGray
@@ -46,11 +51,6 @@ SSL_DISABLE = 0x2
 C_TCP = "TCP"
 C_TLS = "TLS"
 C_SSL = "SSL"
-
-import auth
-import dispatcher
-import roster
-import transports
 
 class CommonClient:
 	""" Base for Client and Component classes."""

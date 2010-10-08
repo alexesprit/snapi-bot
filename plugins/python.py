@@ -28,14 +28,15 @@ def pythonExec(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, traceback.format_exc())
 
 def pythonShell(msgType, conference, nick, param):
-	if(os.name == "posix"):
+	if "posix" == os.name:
 		pipe = os.popen("sh -c \"%s\" 2>&1" % (param.encode("utf-8")))
-	elif(os.name == "nt"):
-		pipe = os.popen("%s" % (param.encode("utf-8")))
+	elif "nt" == os.name:
+		pipe = os.popen(param.encode("utf-8"))
 	message = pipe.read()
 	pipe.close()
-	enc = chardet.detect(message)["encoding"]
-	sendMsg(msgType, conference, nick, unicode(message, enc))
+	if message:
+		enc = chardet.detect(message)["encoding"]
+		sendMsg(msgType, conference, nick, unicode(message, enc))
 
 def pythonCalc(msgType, conference, nick, param):
 	if(re.sub("([0-9]+|[\+\-\/\*\^\.()])", "", param).strip() == ""):

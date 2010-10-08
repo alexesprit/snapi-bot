@@ -41,25 +41,28 @@ class Dispatcher(PlugIn):
 		self.DBG_LINE = DBG_DISPATCHER
 		self.handlers = {}
 		self._expected = {}
-		self._exportedMethods = [self.Process,
-									self.RegisterHandler,
-									self.UnregisterHandler,
-									self.RegisterProtocol,
-									self.WaitForResponse,
-									self.SendAndWaitForResponse,
-									self.send,
-									self.disconnect,
-									self.SendAndCallForResponse
-								]
+		self._exportedMethods = [
+			self.Process,
+			self.RegisterHandler,
+			self.UnregisterHandler,
+			self.RegisterProtocol,
+			self.WaitForResponse,
+			self.SendAndWaitForResponse,
+			self.send,
+			self.disconnect,
+			self.SendAndCallForResponse
+		]
 
 	def dumpHandlers(self):
 		""" Return set of user-registered callbacks in it's internal format.
-			Used within the library to carry user handlers set over Dispatcher replugins. """
+			Used within the library to carry user handlers set over Dispatcher replugins. 
+		"""
 		return self.handlers
 
 	def restoreHandlers(self, handlers):
 		""" Restores user-registered callbacks structure from dump previously obtained via dumpHandlers.
-			Used within the library to carry user handlers set over Dispatcher replugins. """
+			Used within the library to carry user handlers set over Dispatcher replugins. 
+		"""
 		self.handlers = handlers
 
 	def _init(self):
@@ -130,7 +133,8 @@ class Dispatcher(PlugIn):
 	def RegisterNamespace(self, xmlns, order="info"):
 		""" Creates internal structures for newly registered namespace.
 			You can register handlers for this namespace afterwards. By default one namespace
-			already registered (jabber:client or jabber:component:accept depending on context. """
+			already registered (jabber:client or jabber:component:accept depending on context. 
+		"""
 		self.printf('Registering namespace "%s"' % (xmlns), order)
 		self.handlers[xmlns] = {}
 		self.RegisterProtocol("default", Protocol, xmlns=xmlns)
@@ -138,7 +142,8 @@ class Dispatcher(PlugIn):
 	def RegisterProtocol(self, tagName, protocol, xmlns=None, order="info"):
 		""" Used to declare some top-level stanza name to dispatcher.
 		   Needed to start registering handlers for such stanzas.
-		   Iq, message and presence protocols are registered by default. """
+		   Iq, message and presence protocols are registered by default. 
+		"""
 		if not xmlns:
 			xmlns = self._owner.defaultNamespace
 		self.printf('Registering protocol "%s" as %s (%s)' % (tagName, protocol, xmlns), order)
@@ -225,7 +230,7 @@ class Dispatcher(PlugIn):
 		stanzaType = stanza.getType()
 		stanzaID = stanza.getID()
 		if(not stanzaType): 
-			stanzaType = ''
+			stanzaType = ""
 		stanzaProps = stanza.getProperties()
 
 		session.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID), 'ok')
@@ -318,7 +323,6 @@ class Dispatcher(PlugIn):
 		if(self._owner._registeredName and not stanza.getAttr('from')):
 			stanza.setAttr('from', self._owner._registeredName)
 		stanza.setNamespace(self._owner.Namespace)
-		#stanza.setParent(self._metastream)
 		self._owner_send(stanza)
 		return(stanzaID)
 
