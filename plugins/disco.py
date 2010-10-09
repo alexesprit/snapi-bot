@@ -39,7 +39,7 @@ def serviceDiscovery(msgType, conference, nick, param):
 	query = iq.addChild("query", None, None, xmpp.NS_DISCO_ITEMS)
 	iq.setTo(jid)
 	iq.setID(getUniqueID(DISCO_ID))
-	gClient.SendAndCallForResponse(iq, _serviceDiscovery, (msgType, conference, nick, jid, maxCount, searchKey))
+	gClient.sendAndCallForResponse(iq, _serviceDiscovery, (msgType, conference, nick, jid, maxCount, searchKey))
 
 def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKey):
 	if(xmpp.TYPE_RESULT == stanza.getType()):

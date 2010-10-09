@@ -788,9 +788,9 @@ def start():
 
 	callEventHandlers(STARTUP)
 
-	gClient.RegisterHandler("message", messageHandler)
-	gClient.RegisterHandler("presence", presenceHandler)
-	gClient.RegisterHandler("iq", iqHandler)
+	gClient.registerHandler("message", messageHandler)
+	gClient.registerHandler("presence", presenceHandler)
+	gClient.registerHandler("iq", iqHandler)
 	printf("Handlers registered", FLAG_SUCCESS)
 
 	gRoster = gClient.getRoster()
@@ -808,7 +808,7 @@ def start():
 
 	callEventHandlers(INIT_2)
 	while(1):
-		gClient.Process(10)
+		gClient.process(10)
 
 if(__name__ == "__main__"):
 	try:

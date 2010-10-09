@@ -55,7 +55,7 @@ def showPing(msgType, conference, nick, param):
 	iq.setTo(jid)
 	iq.setID(getUniqueID(PING_ID))
 	t0 = time.time()
-	gClient.SendAndCallForResponse(iq, _showPing, (t0, msgType, conference, nick, param, ))
+	gClient.sendAndCallForResponse(iq, _showPing, (t0, msgType, conference, nick, param, ))
 
 registerCommand(showPing, u"пинг", 10, 
 				u"Пингует тебя, определённый ник или сервер", 

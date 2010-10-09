@@ -52,7 +52,7 @@ def saveUserClient(conference, nick, trueJid, aff, role):
 	iq.addChild("query", {}, [], xmpp.NS_VERSION)
 	iq.setTo(conference + "/" + nick)
 	iq.setID(getUniqueID(CLIENTS_ID))
-	gClient.SendAndCallForResponse(iq, _saveUserClient, (conference, trueJid, ))
+	gClient.sendAndCallForResponse(iq, _saveUserClient, (conference, trueJid, ))
 
 def _saveUserClient(stanza, conference, trueJid):
 	if(xmpp.TYPE_RESULT == stanza.getType()):

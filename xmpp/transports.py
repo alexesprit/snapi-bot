@@ -271,8 +271,8 @@ class TLS(PlugIn):
 
 	def plugout(self):
 		""" Unregisters TLS handler's from owner's dispatcher. """
-		self._owner.UnregisterHandler("proceed", self.StartTLSHandler, xmlns=NS_TLS)
-		self._owner.UnregisterHandler("failure", self.StartTLSHandler, xmlns=NS_TLS)
+		self._owner.unregisterHandler("proceed", self.StartTLSHandler, xmlns=NS_TLS)
+		self._owner.unregisterHandler("failure", self.StartTLSHandler, xmlns=NS_TLS)
 
 	def FeaturesHandler(self, conn, feats):
 		""" Used to analyse server <features/> tag for TLS support.
@@ -281,8 +281,8 @@ class TLS(PlugIn):
 			self.printf("TLS unsupported by remote server.", 'warn')
 			return
 		self.printf("TLS supported by remote server. Requesting TLS start.", 'ok')
-		self._owner.RegisterHandler("proceed", self.StartTLSHandler, xmlns=NS_TLS)
-		self._owner.RegisterHandler("failure", self.StartTLSHandler, xmlns=NS_TLS)
+		self._owner.registerHandler("proceed", self.StartTLSHandler, xmlns=NS_TLS)
+		self._owner.registerHandler("failure", self.StartTLSHandler, xmlns=NS_TLS)
 		self._owner.Connection.send("<starttls xmlns=\"%s\"/>" % (NS_TLS))
 		raise NodeProcessed
 

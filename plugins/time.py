@@ -28,7 +28,7 @@ def showUserTime(msgType, conference, nick, param):
 	iq.addChild("time", {}, [], xmpp.NS_ENTITY_TIME)
 	iq.setTo(jid)
 	iq.setID(getUniqueID(TIME_ID))
-	gClient.SendAndCallForResponse(iq, _showUserTime, (msgType, conference, nick, param))
+	gClient.sendAndCallForResponse(iq, _showUserTime, (msgType, conference, nick, param))
 
 def _showUserTime(stanza, msgType, conference, nick, param):
 	if(xmpp.TYPE_RESULT == stanza.getType()):

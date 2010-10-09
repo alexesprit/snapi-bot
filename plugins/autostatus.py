@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def startStatusTimer():
+def changeRosterStatus():
 	hour = time.localtime()[3]
 	if(hour >= 18):
 		show = "chat"
@@ -23,6 +23,6 @@ def startStatusTimer():
 		show = "xa"
 	gClient.setStatus(show, None, gPriority)
 	timeout = 3600 + random.randrange(-800, 801)
-	startTimer(timeout, startStatusTimer)
+	startTimer(timeout, changeRosterStatus)
 
-registerEvent(startStatusTimer, INIT_2)
+registerEvent(changeRosterStatus, INIT_2)

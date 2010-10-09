@@ -16,10 +16,11 @@
 
 import gc
 
-COLLECT_TIMEOUT = 300
+COLLECT_TIMEOUT = 600
 		
 def collectGarbage():
 	sys.exc_clear()
+	gClient.clearExpectedIDs()
 	gc.collect()
 	startTimer(COLLECT_TIMEOUT, collectGarbage)
 

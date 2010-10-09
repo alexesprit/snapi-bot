@@ -27,7 +27,7 @@ def sendKeepAlivePacket():
 		iq.setID(getUniqueID(KEEP_ID))
 		iq.addChild("ping", {}, [], xmpp.NS_PING)
 		iq.setTo(conference + "/" + getBotNick(conference))
-		gClient.SendAndCallForResponse(iq, _sendKeepAlivePacket, (conference, ))
+		gClient.sendAndCallForResponse(iq, _sendKeepAlivePacket, (conference, ))
 	startKeepAliveTimer()
 
 def startKeepAliveTimer():

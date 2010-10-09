@@ -73,7 +73,7 @@ def showFeatures(msgType, conference, nick, param):
 	iq.setTo(jid)
 	iq.addChild("query", {}, [], xmpp.NS_DISCO_INFO)
 	iq.setID(getUniqueID(FEAT_ID))
-	gClient.SendAndCallForResponse(iq, _showFeatures, (msgType, conference, nick, param, ))
+	gClient.sendAndCallForResponse(iq, _showFeatures, (msgType, conference, nick, param, ))
 
 def _showFeatures(stanza, msgType, conference, nick, param):
 	if(xmpp.TYPE_RESULT == stanza.getType()):

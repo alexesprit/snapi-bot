@@ -114,11 +114,11 @@ class CommonClient:
 				pass
 		dispatcher.Dispatcher().PlugIn(self)
 		while self.Dispatcher.Stream._document_attrs is None:
-			if not self.Process(1):
+			if not self.process(1):
 				return False
 		# If we get version 1.0 stream the features tag MUST BE presented
 		if(self.Dispatcher.Stream._document_attrs.get('version') == '1.0'):
-			while not self.Dispatcher.Stream.features and self.Process(1):
+			while not self.Dispatcher.Stream.features and self.process(1):
 				pass	  
 		return self.connected
 
@@ -140,13 +140,13 @@ class Client(CommonClient):
 			transports.TLS().PlugIn(self)
 			if(self.Dispatcher.Stream._document_attrs.get('version') == '1.0'):
 				# If we get version 1.0 stream the features tag MUST BE presented
-				while not self.Dispatcher.Stream.features and self.Process(1):
+				while not self.Dispatcher.Stream.features and self.process(1):
 					pass
 				# TLS not supported by server
 				if not self.Dispatcher.Stream.features.getTag('starttls'):
 					self.TLS.PlugOut()
 					return self.connected
-				while not self.TLS.state and self.Process(1):
+				while not self.TLS.state and self.process(1):
 					pass
 				if self.TLS.state != transports.TLS_SUCCESS:
 					self.TLS.PlugOut()
@@ -159,15 +159,15 @@ class Client(CommonClient):
 			random one or library name used.
 		"""
 		self._User, self._Password, self._Resource = user, password, resource
-		while not self.Dispatcher.Stream._document_attrs and self.Process(1):
+		while not self.Dispatcher.Stream._document_attrs and self.process(1):
 			pass
 		# If we get version 1.0 stream the features tag MUST BE presented
 		if(self.Dispatcher.Stream._document_attrs.get('version') == '1.0'):
-			while not self.Dispatcher.Stream.features and self.Process(1):
+			while not self.Dispatcher.Stream.features and self.process(1):
 				pass
 		auth.SASL(user, password).PlugIn(self)
 		self.SASL.auth()
-		while auth.AUTH_WAITING == self.SASL.state and self.Process(1):
+		while auth.AUTH_WAITING == self.SASL.state and self.process(1):
 			pass
 		if auth.AUTH_SUCCESS == self.SASL.state:
 			self.SASL.PlugOut()

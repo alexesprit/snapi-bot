@@ -30,7 +30,7 @@ def showVersion(msgType, conference, nick, param):
 		iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_VERSION)
 		iq.setTo(jid)
 		iq.setID(getUniqueID(VER_ID))
-		gClient.SendAndCallForResponse(iq, _showVersion, (msgType, conference, nick, param, ))
+		gClient.sendAndCallForResponse(iq, _showVersion, (msgType, conference, nick, param, ))
 
 def _showVersion(stanza, msgType, conference, nick, param):
 	if(xmpp.TYPE_RESULT == stanza.getType()):

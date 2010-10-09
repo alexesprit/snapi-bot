@@ -47,9 +47,9 @@ class Roster(PlugIn):
 		""" Register presence and subscription trackers in the owner's dispatcher.
 			Also request roster from server if the 'request' argument is set.
 			Used internally. """
-		self._owner.RegisterHandler('iq', self.rosterIqHandler, TYPE_RESULT, NS_ROSTER)
-		self._owner.RegisterHandler('iq', self.rosterIqHandler, TYPE_SET, NS_ROSTER)
-		self._owner.RegisterHandler('presence', self.presenceHandler)
+		self._owner.registerHandler('iq', self.rosterIqHandler, TYPE_RESULT, NS_ROSTER)
+		self._owner.registerHandler('iq', self.rosterIqHandler, TYPE_SET, NS_ROSTER)
+		self._owner.registerHandler('presence', self.presenceHandler)
 
 	def requestRoster(self):
 		""" Request roster from server if it were not yet requested 
@@ -65,7 +65,7 @@ class Roster(PlugIn):
 		if(self.state == ROSTER_EMPTY):
 			self.requestRoster()
 		while(not self.state == ROSTER_LOADED):
-			self._owner.Process(10)
+			self._owner.process(10)
 		return(self)
 
 	def rosterIqHandler(self, dis, stanza):

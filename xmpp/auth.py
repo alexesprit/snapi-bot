@@ -61,7 +61,7 @@ class SASL(PlugIn):
 	def auth(self):
 		""" Start authentication. Result can be obtained via "SASL.state" attribute and will be
 			either "success" or "failure". Note that successfull auth will take at least
-			two Dispatcher.Process() calls.
+			two Dispatcher.process() calls.
 		"""
 		try:
 			self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
@@ -70,9 +70,9 @@ class SASL(PlugIn):
 
 	def plugout(self):
 		""" Remove SASL handlers from owner"s dispatcher. Used internally. """
-		self._owner.UnregisterHandler("challenge", self.SASLHandler, xmlns=NS_SASL)
-		self._owner.UnregisterHandler("failure", self.SASLHandler, xmlns=NS_SASL)
-		self._owner.UnregisterHandler("success", self.SASLHandler, xmlns=NS_SASL)
+		self._owner.unregisterHandler("challenge", self.SASLHandler, xmlns=NS_SASL)
+		self._owner.unregisterHandler("failure", self.SASLHandler, xmlns=NS_SASL)
+		self._owner.unregisterHandler("success", self.SASLHandler, xmlns=NS_SASL)
 
 	def FeaturesHandler(self, conn, feats):
 		""" Used to determine if server supports SASL auth. Used internally. """
@@ -83,9 +83,9 @@ class SASL(PlugIn):
 		mecs = []
 		for mec in feats.getTag("mechanisms", namespace=NS_SASL).getTags("mechanism"):
 			mecs.append(mec.getData())
-		self._owner.RegisterHandler("challenge", self.SASLHandler, xmlns=NS_SASL)
-		self._owner.RegisterHandler("failure", self.SASLHandler, xmlns=NS_SASL)
-		self._owner.RegisterHandler("success", self.SASLHandler, xmlns=NS_SASL)
+		self._owner.registerHandler("challenge", self.SASLHandler, xmlns=NS_SASL)
+		self._owner.registerHandler("failure", self.SASLHandler, xmlns=NS_SASL)
+		self._owner.registerHandler("success", self.SASLHandler, xmlns=NS_SASL)
 		if "ANONYMOUS" in mecs and self.username is None:
 			node = Node("auth", attrs={"xmlns": NS_SASL, "mechanism": "ANONYMOUS"})
 		elif "DIGEST-MD5" in mecs:
@@ -175,11 +175,11 @@ class Bind(PlugIn):
 
 	def plugin(self, owner):
 		""" Start resource binding,  if allowed at this time. Used internally. """
-		self._owner.RegisterHandler("features", self.FeaturesHandler, xmlns=NS_STREAMS)
+		self._owner.registerHandler("features", self.FeaturesHandler, xmlns=NS_STREAMS)
 
 	def plugout(self):
 		""" Remove Bind handler from owner's dispatcher. Used internally. """
-		self._owner.UnregisterHandler("features", self.FeaturesHandler, xmlns=NS_STREAMS)
+		self._owner.unregisterHandler("features", self.FeaturesHandler, xmlns=NS_STREAMS)
 
 	def FeaturesHandler(self, conn, feats):
 		""" Determine if server supports resource binding and set some internal attributes accordingly. """
@@ -191,13 +191,13 @@ class Bind(PlugIn):
 
 	def Bind(self, resource=None):
 		""" Perform binding. Use provided resource name or random (if not provided). """
-		while self.bound == BIND_WAITING and self._owner.Process(1):
+		while self.bound == BIND_WAITING and self._owner.process(1):
 			pass
 		if resource:
 			resource = [Node("resource", payload=[resource])]
 		else:
 			resource = []
-		stanza = self._owner.SendAndWaitForResponse(Protocol("iq", typ=TYPE_SET, payload=[Node("bind", attrs={"xmlns":NS_BIND}, payload=resource)]))
+		stanza = self._owner.sendAndWaitForResponse(Protocol("iq", typ=TYPE_SET, payload=[Node("bind", attrs={"xmlns":NS_BIND}, payload=resource)]))
 		stanzaType = stanza.getType()
 		if stanzaType == TYPE_RESULT:
 			resource = stanza.getTag("bind").getTagData("jid")
@@ -205,7 +205,7 @@ class Bind(PlugIn):
 			jid = JID(stanza.getTag("bind").getTagData("jid"))
 			self._owner.User = jid.getNode()
 			self._owner.Resource = jid.getResource()
-			stanza = self._owner.SendAndWaitForResponse(Protocol("iq", typ=TYPE_SET, payload=[Node("session", attrs={"xmlns":NS_SESSION})]))
+			stanza = self._owner.sendAndWaitForResponse(Protocol("iq", typ=TYPE_SET, payload=[Node("session", attrs={"xmlns":NS_SESSION})]))
 			stanzaType = stanza.getType()
 			if stanzaType == TYPE_RESULT:
 				self.printf("Successfully opened session", "ok")

@@ -39,7 +39,7 @@ def _showServerInfo(stanza, msgType, conference, nick, server):
 		iq.setQueryPayload(stanza.getQueryChildren())
 		iq.setTo(server)
 		iq.setID(getUniqueID(STATS_ID))
-		gClient.SendAndCallForResponse(iq, _showServerStats, (msgType, conference, nick, server, ))
+		gClient.sendAndCallForResponse(iq, _showServerStats, (msgType, conference, nick, server, ))
 	else:
 		sendMsg(msgType, conference, nick, u"не получается :(")
 
@@ -48,7 +48,7 @@ def showServerInfo(msgType, conference, nick, param):
 	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_STATS)
 	iq.setTo(server)
 	iq.setID(getUniqueID(INFO_ID))
-	gClient.SendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, server, ))
+	gClient.sendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, server, ))
 
 def _showServerUptime(stanza, msgType, conference, nick, server):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
@@ -63,7 +63,7 @@ def showServerUptime(msgType, conference, nick, param):
 	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_LAST)
 	iq.setTo(server)
 	iq.setID(getUniqueID(UPTIME_ID))
-	gClient.SendAndCallForResponse(iq, _showServerUptime, (msgType, conference, nick, server, ))
+	gClient.sendAndCallForResponse(iq, _showServerUptime, (msgType, conference, nick, server, ))
 
 registerCommand(showServerInfo, u"инфа", 10, 
 				u"Возвращает статистику о сервере", 

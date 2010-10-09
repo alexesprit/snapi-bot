@@ -32,7 +32,7 @@ def showMUCList(msgType, conference, nick, aff):
 	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_MUC_ADMIN, payload = [xmpp.Node("item", {"affiliation": aff})])
 	iq.setTo(conference)
 	iq.setID(getUniqueID(MUC_ID))
-	gClient.SendAndCallForResponse(iq, _showMUCList, (msgType, conference, nick, ))
+	gClient.sendAndCallForResponse(iq, _showMUCList, (msgType, conference, nick, ))
 
 def showOutcastsList(msgType, conference, nick, param):
 	showMUCList(msgType, conference, nick, xmpp.AFF_OUTCAST)

@@ -19,7 +19,7 @@ def showOnlineTime(msgType, jid, resource, param):
 	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_LAST)
 	iq.setTo(jid)
 	iq.setID(getUniqueID(LAST_ID))
-	gClient.SendAndCallForResponse(iq, _showOnlineTime, (msgType, jid, resource, ))
+	gClient.sendAndCallForResponse(iq, _showOnlineTime, (msgType, jid, resource, ))
 
 def _showOnlineTime(stanza, msgType, jid, resource):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
