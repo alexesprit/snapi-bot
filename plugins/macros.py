@@ -14,11 +14,11 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def loadMacroses(conference):
+def loadLocalMacroses(conference):
 	gMacros.loadMacroses(conference)
 
-def unloadMacroses(conference):
-	gMacros.unloadMacroses(conference)
+def freeLocalMacroses(conference):
+	gMacros.freeMacroses(conference)
 	
 def loadGlobalMacroses():
 	gMacros.loadMacroses()
@@ -240,8 +240,8 @@ def showMacrosList(msgType, conference, nick, parameters):
 	else:
 		sendMsg(msgType, conference, nick, u"нету макросов :(")
 
-registerEvent(loadMacroses, ADDCONF)
-registerEvent(unloadMacroses, DELCONF)
+registerEvent(loadLocalMacroses, ADDCONF)
+registerEvent(freeLocalMacroses, DELCONF)
 registerEvent(loadGlobalMacroses, STARTUP)
 
 registerCommand(addLocalMacros, u"макроадд", 20, 

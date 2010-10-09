@@ -65,7 +65,7 @@ class Macros:
 			__main__.writeFile('config/macros.txt', str(self.gMacrosList))
 			__main__.writeFile('config/macrosaccess.txt', str(self.gAccessList))
 			
-	def unloadMacroses(self, conference):
+	def freeMacroses(self, conference):
 		if(conference in self.macrosList):
 			del(self.macrosList[conference])
 

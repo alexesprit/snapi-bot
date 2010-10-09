@@ -19,9 +19,6 @@ def botRestart(msgType, conference, nick, param):
 		message = u"меня перезагружает %s (%s)" % (nick, param)
 	else:
 		message = u"меня перезагружает %s" % (nick)
-	for conference in getConferences():
-		if(getConfigKey(conference, "popups")):
-			sendToConference(conference, message)
 	prs = xmpp.Presence(typ=xmpp.PRS_OFFLINE)
 	prs.setStatus(message)
 	gClient.send(prs)
@@ -33,9 +30,6 @@ def botShutdown(msgType, conference, nick, param):
 		message = u"меня выключает %s (%s)" % (nick, param)
 	else:
 		message = u"меня выключает %s" % (nick)
-	for conference in getConferences():
-		if(getConfigKey(conference, "popups")):
-			sendToConference(conference, message)
 	prs = xmpp.Presence(typ=xmpp.PRS_OFFLINE)
 	prs.setStatus(message)
 	gClient.send(prs)

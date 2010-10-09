@@ -63,7 +63,7 @@ def presenceUpdate(stanza, conference, nick, trueJid):
 		if(msgType != xmpp.PRS_OFFLINE):
 			gStats[conference]["status"] += 1
 	
-def createStatistic(conference):
+def initStatistic(conference):
 	gStats[conference] = {
 			"nick": 0, 
 			"status": 0, 
@@ -83,15 +83,15 @@ def createStatistic(conference):
 	gKicked[conference] = []
 	gBanned[conference] = []
 
-def deleteStatistic(conference):
+def freeStatistic(conference):
 	del(gStats[conference])
 	del(gJoined[conference])
 	del(gLeaved[conference])
 	del(gKicked[conference])
 	del(gBanned[conference])
 
-registerEvent(createStatistic, ADDCONF)
-registerEvent(deleteStatistic, DELCONF)
+registerEvent(initStatistic, ADDCONF)
+registerEvent(freeStatistic, DELCONF)
 registerLeaveHandler(leaveUpdate)
 registerJoinHandler(joinUpdate)
 registerPresenceHandler(presenceUpdate, CHAT)

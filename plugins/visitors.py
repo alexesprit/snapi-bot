@@ -26,12 +26,12 @@ def loadAutoVisitors(conference):
 	createFile(fileName, "[]")
 	gVisitors[conference] = eval(readFile(fileName))
 
-def unloadAutoVisitors(conference):
+def freeAutoVisitors(conference):
 	del(gVisitors[conference])
 
 def setAutoVisitor(conference, nick, trueJid, aff, role):
 	if(trueJid in gVisitors[conference]):
-		setRole(conference, nick, xmpp.ROLE_VISITOR, u"автовизитор")
+		setMUCRole(conference, nick, xmpp.ROLE_VISITOR, u"автовизитор")
 
 def addAutoVisitor(msgType, conference, nick, param):
 	user = param
@@ -53,7 +53,7 @@ def addAutoVisitor(msgType, conference, nick, param):
 		saveAutoVisitors(conference)
 		sendMsg(msgType, conference, nick, u"добавила")
 		if(setVisitorRole):
-			setRole(conference, user, xmpp.ROLE_VISITOR)
+			setMUCRole(conference, user, xmpp.ROLE_VISITOR)
 	else:
 		sendMsg(msgType, conference, nick, u"%s уже есть в списке" % (param))
 
@@ -77,7 +77,7 @@ def delAutoVisitort(msgType, conference, nick, param):
 		saveAutoVisitors(conference)
 		sendMsg(msgType, conference, nick, u"удалила")
 		if(setParticipantRole):
-			setRole(conference, user, xmpp.ROLE_PARTICIPANT)
+			setMUCRole(conference, user, xmpp.ROLE_PARTICIPANT)
 	else:
 		sendMsg(msgType, conference, nick, u"а %s итак нет в списке" % (param))
 
@@ -90,7 +90,7 @@ def showAutoVisitors(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"список автопосетителей пуст")
 
 registerEvent(loadAutoVisitors, ADDCONF)
-registerEvent(unloadAutoVisitors, DELCONF)
+registerEvent(freeAutoVisitors, DELCONF)
 registerJoinHandler(setAutoVisitor)
 
 registerCommand(addAutoVisitor, u"девойс+", 15, 

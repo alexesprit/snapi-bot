@@ -16,21 +16,21 @@
 CLIENTS_FILE = "clients.txt"
 CLIENTS_ID = "clients_id"
 
-gClients = {}
+gUserClients = {}
 
 def loadClientsCache(conference):
 	fileName = getConfigPath(conference, CLIENTS_FILE)
-	gClients[conference] = database.DataBase(fileName)
+	gUserClients[conference] = database.DataBase(fileName)
 
 def freeClientsCache(conference):
-	del(gClients[conference])
+	del(gUserClients[conference])
 
 def showClients(msgType, conference, nick, param):
 	userNick = param or nick
 	if(nickInConference(conference, userNick)):
 		trueJid = getTrueJid(conference, userNick)
-		if(trueJid in gClients[conference]):
-			clients = gClients[conference][trueJid]
+		if(trueJid in gUserClients[conference]):
+			clients = gUserClients[conference][trueJid]
 			if(clients):
 				if(not param):
 					message = u"ты заходил сюда с "
@@ -45,7 +45,7 @@ def showClients(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"а это кто?")
 
 def saveUserClient(conference, nick, trueJid, aff, role):
-	base = gClients[conference]
+	base = gUserClients[conference]
 	if(trueJid not in base):
 		base[trueJid] = []
 	iq = xmpp.Iq(xmpp.TYPE_GET)
@@ -56,7 +56,7 @@ def saveUserClient(conference, nick, trueJid, aff, role):
 
 def _saveUserClient(stanza, conference, trueJid):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
-		base = gClients[conference]
+		base = gUserClients[conference]
 		for p in stanza.getQueryChildren():
 			if(p.getName() == "name"):
 				client = p.getData()

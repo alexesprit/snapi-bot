@@ -52,15 +52,15 @@ def updateLeaveStatistic(conference, nick, trueJid, reason, code):
 		base[trueJid]["record"] = max(base[trueJid]["record"], hereTime)
 		base.save()
 
-def loadHereCache(conference):
+def loadHereBase(conference):
 	fileName = getConfigPath(conference, HERE_FILE)
 	gHereTime[conference] = database.DataBase(fileName)
 
-def unloadHereCache(conference):
+def freeHereBase(conference):
 	del(gHereTime[conference])
 
-registerEvent(loadHereCache, ADDCONF)
-registerEvent(unloadHereCache, DELCONF)
+registerEvent(loadHereBase, ADDCONF)
+registerEvent(freeHereBase, DELCONF)
 
 registerJoinHandler(updateJoinStatistic)
 registerLeaveHandler(updateLeaveStatistic)

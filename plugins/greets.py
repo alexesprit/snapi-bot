@@ -22,10 +22,10 @@ def loadGreetings(conference):
 	createFile(fileName, "{}")
 	gGreets[conference] = eval(readFile(fileName))
 
-def unloadGreetings(conference):
+def freeGreetings(conference):
 	del(gGreets[conference])
 
-def setGreet(msgType, conference, nick, param):
+def setUserGreeting(msgType, conference, nick, param):
 	rawGreet = param.split("=", 1)
 	if(len(rawGreet) == 2):
 		userNick = rawGreet[0].strip()
@@ -46,15 +46,15 @@ def setGreet(msgType, conference, nick, param):
 		writeFile(fileName, str(gGreets[conference]))
 		sendMsg(msgType, conference, nick, u"запомнила")
 
-def sendGreeting(conference, nick, trueJid, aff, role):
+def sendUserGreeting(conference, nick, trueJid, aff, role):
 	if(trueJid in gGreets[conference]):
 		sendMsg(xmpp.TYPE_PUBLIC, conference, nick, gGreets[conference][trueJid])
 
 registerEvent(loadGreetings, ADDCONF)
-registerEvent(unloadGreetings, DELCONF)
-registerJoinHandler(sendGreeting)
+registerEvent(freeGreetings, DELCONF)
+registerJoinHandler(sendUserGreeting)
 
-registerCommand(setGreet, u"приветствие", 30, 
+registerCommand(setUserGreeting, u"приветствие", 30, 
 				u"Добавляет приветствие для определённого ника/жида", 
 				u"приветствие <ник|жид> = [текст]", 
 				(u"приветствие Nick = something", ), 

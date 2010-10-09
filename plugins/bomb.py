@@ -50,14 +50,14 @@ def giveBomb(msgType, conference, nick, param):
 				# это не баг, это фича :)
 				message = u"хаха, тебе не повезло, у тебя бомба БЕЗ проводов! она взорвётся через %s" % (time2str(timeout))
 			sendMsg(msgType, conference, userNick, message)
-			gBombTimers[conference][trueJid] = startTimer(timeout, bombExec, (msgType, conference, userNick, trueJid))
+			gBombTimers[conference][trueJid] = startTimer(timeout, bombExecute, (msgType, conference, userNick, trueJid))
 	else:
 		sendMsg(msgType, conference, nick, u"а это кто?");			
 
-def bombExec(msgType, conference, nick, trueJid):
+def bombExecute(msgType, conference, nick, trueJid):
 	if(nickIsOnline(conference, nick)):
 		sendMsg(msgType, conference, nick, u"надо было резать %s, чего тормозишь? :)" % (gBombAnswer[conference][trueJid]))
-		detonate(msgType, conference, nick)
+		bombDetonate(msgType, conference, nick)
 	else:
 		sendMsg(msgType, conference, nick, u"трус :/")
 
@@ -70,40 +70,37 @@ def bombColorsListener(stanza, msgType, conference, nick, trueJid, param):
 				sendMsg(msgType, conference, nick, u"бомба обезврежена!")
 			else:
 				sendMsg(msgType, conference, nick, u":-| блин, надо было резать %s" % gBombAnswer[conference][trueJid])
-				detonate(msgType, conference, nick)
+				bombDetonate(msgType, conference, nick)
 			del(gBombAnswer[conference][trueJid])
 			del(gBombColors[conference][trueJid])
 			del(gBombTimers[conference][trueJid])
 
-registerMessageHandler(bombColorsListener, CHAT)
-
-def detonate(msgType, conference, nick):
+def bombDetonate(msgType, conference, nick):
 	num = random.randrange(0, 10)
 	if(num < 1 or getNickKey(conference, nick, NICK_MODER)):
 		sendMsg(msgType, conference, nick, u"бомба глюкнула...")
 	elif(num < 7):
-		setRole(conference, nick, xmpp.ROLE_NONE, u"бабах!!!")
+		setMUCRole(conference, nick, xmpp.ROLE_NONE, u"бабах!!!")
 	else:
-		setRole(conference, nick, xmpp.ROLE_VISITOR, u"бабах!!!")
+		setMUCRole(conference, nick, xmpp.ROLE_VISITOR, u"бабах!!!")
 		timeout = random.randrange(100, 501)
-		startTimer(timeout, voiceUser, (msgType, conference, nick))
-
-def voiceUser(msgType, conference, nick):
-	setRole(conference, nick, xmpp.ROLE_PARTICIPANT)
-
-def clearBombCache(conference):
-	del(gBombAnswer[conference])
-	del(gBombColors[conference])
-	del(gBombTimers[conference]);	
-
-registerEvent(clearBombCache, DELCONF)
+		startTimer(timeout, setMUCRole, (conference, nick, xmpp.ROLE_PARTICIPANT))
 
 def initBombCache(conference):
 	gBombColors[conference] = {}
 	gBombAnswer[conference] = {}
 	gBombTimers[conference] = {}
 
+def freeBombCache(conference):
+	del(gBombAnswer[conference])
+	del(gBombColors[conference])
+	del(gBombTimers[conference])	
+
+
 registerEvent(initBombCache, ADDCONF)
+registerEvent(freeBombCache, DELCONF)
+registerMessageHandler(bombColorsListener, CHAT)
+
 registerCommand(giveBomb, u"бомба", 15,
 				u"Вручает пользователю бомбу. Если пользователь не обезвредит её, то бот может выкинуть его из конференции или лишить голоса",
 				u"бомба [ник]", 

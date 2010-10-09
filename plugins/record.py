@@ -32,18 +32,18 @@ def calculateRecord(conference, nick, trueJid, aff, role):
 		fileName = getConfigPath(conference, REC_FILE)
 		writeFile(fileName, str(gRecords[conference]))
 
-def loadRecordCache(conference):
+def loadRecordsBase(conference):
 	fileName = getConfigPath(conference, REC_FILE)
 	createFile(fileName, "{}")
 	gRecords[conference] = eval(readFile(fileName))
 
-def unloadRecordCache(conference):
+def freeRecordsBase(conference):
 	del(gRecords[conference])
 	
 registerJoinHandler(calculateRecord)
 
-registerEvent(loadRecordCache, ADDCONF)
-registerEvent(unloadRecordCache, DELCONF)
+registerEvent(loadRecordsBase, ADDCONF)
+registerEvent(freeRecordsBase, DELCONF)
 
 registerCommand(showRecord, u"рекорд", 10, 
 				u"Показывает рекорд посещаемости конференции", 

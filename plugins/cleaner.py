@@ -19,8 +19,15 @@ CHAT_KEEP_TIME = 86400 * 30
 SINGLE_KEEP_TIME = 86400 * 90
 LOGS_KEEP_TIME = 86400 * 10
 
-CHAT_BASES = ("gClients", "gTalkers", "gQuizScores", "gHereTime", "gSend", "gSeen")
-SINGLE_BASES = ("gNotes", )
+CHAT_BASES = (
+		"gUserClients", 
+		"gTalkersCache", 
+		"gQuizScores", 
+		"gHereTime", 
+		"gSendCache", 
+		"gSeenCache"
+)
+SINGLE_BASES = ("gUserNotes", )
 
 def cleanBase(base, keepTime):
 	bGetUpdateTime = base.getUpdateTime

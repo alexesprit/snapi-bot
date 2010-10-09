@@ -15,27 +15,27 @@
 
 SEEN_FILE = "seen.txt"
 
-gSeen = {}
+gSeenCache = {}
 
 def loadSeenBase(conference):
 	fileName = getConfigPath(conference, SEEN_FILE)
 	createFile(fileName, "{}")
-	gSeen[conference] = database.DataBase(fileName)
+	gSeenCache[conference] = database.DataBase(fileName)
 
-def unloadSeenBase(conference):
-	del(gSeen[conference])
+def freeSeenBase(conference):
+	del(gSeenCache[conference])
 
 def updateSeenTime(conference, nick, trueJid, reason, code):
 	if("303" != code):
-		gSeen[conference][trueJid] = time.time()
-		gSeen[conference].save()
+		gSeenCache[conference][trueJid] = time.time()
+		gSeenCache[conference].save()
 
 def showSeenTime(msgType, conference, nick, param):
 	userNick = param or nick
 	if(nickInConference(conference, userNick)):
 		trueJid = getTrueJid(conference, userNick)
-		if(trueJid in gSeen[conference]):
-			seen = gSeen[conference][trueJid]
+		if(trueJid in gSeenCache[conference]):
+			seen = gSeenCache[conference][trueJid]
 			seenDate = time.strftime("%H:%M, %d.%m.%Y", time.localtime(seen))
 			seenTime = time2str(time.time() - seen)
 			if(not param):
@@ -50,7 +50,7 @@ def showSeenTime(msgType, conference, nick, param):
 registerLeaveHandler(updateSeenTime)
 
 registerEvent(loadSeenBase, ADDCONF)
-registerEvent(unloadSeenBase, DELCONF)
+registerEvent(freeSeenBase, DELCONF)
 
 registerCommand(showSeenTime, u"когдабыл", 10, 
 				u"Показывает, сколько времени назад пользователь вышел из чата", 

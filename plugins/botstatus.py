@@ -20,12 +20,12 @@ STATUSES = (
 	xmpp.PRS_CHAT
 )
 
-def setDefaultStatus(conference):
+def setDefBotStatusValue(conference):
 	if(not getConfigKey(conference, "show")):
 		setConfigKey(conference, "show", u"online")
 		setConfigKey(conference, "status", None)
 
-def changeStatus(msgType, conference, nick, param):
+def manageBotStatusValue(msgType, conference, nick, param):
 	args = param.split(None, 1)
 	show, status = "", ""
 	if(args[0] in (STATUSES)):
@@ -37,10 +37,10 @@ def changeStatus(msgType, conference, nick, param):
 	setBotStatus(conference, status, show)
 	setConfigKey(conference, "status", status)
 	setConfigKey(conference, "show", show)
-	saveChatConfig(conference)
+	saveConferenceConfig(conference)
 
-registerEvent(setDefaultStatus, ADDCONF)
-registerCommand(changeStatus, u"ботстатус", 30, 
+registerEvent(setDefBotStatusValue, ADDCONF)
+registerCommand(manageBotStatusValue, u"ботстатус", 30, 
 				u"Меняет статус бота", 
 				u"ботстатус <[статус] [сообщение]>", 
 				(u"ботстатус away", u"ботстатус away сплю"), 

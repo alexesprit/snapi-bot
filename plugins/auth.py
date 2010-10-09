@@ -27,10 +27,12 @@ AUTH_QUESTIONS = (
 
 gAuthAnswer = {}
 
-def setAuthState(conference):
-	gAuthAnswer[conference] = {}
+def setDefAuthValue(conference):
 	if(getConfigKey(conference, "auth") is None):
 		setConfigKey(conference, "auth", 0)
+
+def initAuthCache(conference):
+	gAuthAnswer[conference] = {}
 
 def freeAuthCache(conference):
 	del(gAuthAnswer[conference])
@@ -39,7 +41,7 @@ def askAuthQuestion(conference, nick, trueJid, aff, role):
 	if(getConfigKey(conference, "auth")):
 		if(aff == xmpp.AFF_NONE):
 			question, answer = random.choice(AUTH_QUESTIONS)
-			setRole(conference, nick, xmpp.ROLE_VISITOR, u"неавторизованый участник")
+			setMUCRole(conference, nick, xmpp.ROLE_VISITOR, u"неавторизованый участник")
 			message = u"Чтобы получить голос, реши пример: %s. Как решишь, напиши мне ответ" % (question)
 			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message)
 			gAuthAnswer[conference][trueJid] = answer
@@ -53,12 +55,12 @@ def authAnswerListener(stanza, msgType, conference, nick, trueJid, body):
 		if(trueJid in gAuthAnswer[conference]):
 			if(gAuthAnswer[conference][trueJid] == body):
 				sendMsg(msgType, conference, nick, u"ок, признаю - ты не бот =)")
-				setRole(conference, nick, xmpp.ROLE_PARTICIPANT, u"авторизация пройдена")
+				setMUCRole(conference, nick, xmpp.ROLE_PARTICIPANT, u"авторизация пройдена")
 				del(gAuthAnswer[conference][trueJid])
 			else:
 				sendMsg(msgType, conference, nick, u"неправильный ответ. подумай или заюзай гугл")
 
-def authControl(msgType, conference, nick, param):
+def manageAuthValue(msgType, conference, nick, param):
 	if(param):
 		if(param.isdigit()):
 			param = int(param)
@@ -68,13 +70,14 @@ def authControl(msgType, conference, nick, param):
 			else:
 				setConfigKey(conference, "auth", 0)
 				sendMsg(msgType, conference, nick, u"авторизация отключена")
-			saveChatConfig(conference)
+			saveConferenceConfig(conference)
 		else:
 			sendMsg(msgType, conference, nick, u"прочитай помощь по команде")
 	else:
 		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (getConfigKey(conference, "auth")))
 
-registerEvent(setAuthState, ADDCONF)
+registerEvent(setDefAuthValue, ADDCONF)
+registerEvent(initAuthCache, ADDCONF)
 registerEvent(freeAuthCache, DELCONF)
 
 registerJoinHandler(askAuthQuestion)
@@ -82,7 +85,7 @@ registerLeaveHandler(clearAuthCache)
 
 registerMessageHandler(authAnswerListener, CHAT)
 
-registerCommand(authControl, u"авторизация", 30, 
+registerCommand(manageAuthValue, u"авторизация", 30, 
 				u"Отключает (0) или включает (1) проверку вошедшего пользователя на человечность. Без параметра покажет текущее значение", 
 				u"авторизация [0|1]", 
 				(u"авторизация", u"авторизация 0"), 

@@ -15,14 +15,14 @@
 
 def setUserRole(msgType, conference, nick, user, role):
 	if(user.count("@") or nickInConference(conference, user)):
-		setRole(conference, user, role)
+		setMUCRole(conference, user, role)
 		sendMsg(msgType, conference, nick, u"сделала")
 	else:
 		sendMsg(msgType, conference, nick, u"а это кто?")
 	
 def setUserAffiliation(msgType, conference, nick, user, aff):
 	if(user.count("@") or nickInConference(conference, user)):
-		setAffiliation(conference, user, aff)
+		setMUCAffiliation(conference, user, aff)
 		sendMsg(msgType, conference, nick, u"сделала")
 	else:
 		sendMsg(msgType, conference, nick, u"а это кто?")

@@ -113,7 +113,7 @@ def writePresence(stanza, conference, nick, trueJid):
 			newnick = stanza.getNick()
 			writeLog(xmpp.TYPE_PUBLIC, conference, "@$$nick$$@", u"%s сменил ник на %s" % (nick, newnick))
 
-def loggingControl(msgType, conference, nick, param):
+def manageLoggingValue(msgType, conference, nick, param):
 	if(param):
 		if(param.isdigit()):
 			param = int(param)
@@ -123,14 +123,14 @@ def loggingControl(msgType, conference, nick, param):
 			else:
 				setConfigKey(conference, "log", 0)
 				sendMsg(msgType, conference, nick, u"логирование отключено")
-			saveChatConfig(conference)
+			saveConferenceConfig(conference)
 		else:
 			sendMsg(msgType, conference, nick, u"прочитай помощь по команде")
 	else:
 		loggerValue = getConfigKey(conference, "log")
 		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (loggerValue))
 
-def setLoggingState(conference):
+def setDefLoggingValue(conference):
 	if(getConfigKey(conference, "log") is None):
 		setConfigKey(conference, "log", 1)
 
@@ -139,8 +139,8 @@ if(gLogDir):
 	registerLeaveHandler(writeUserLeave)
 	registerPresenceHandler(writePresence, CHAT)
 	registerMessageHandler(writeMessage, CHAT)
-registerEvent(setLoggingState, ADDCONF);		
-registerCommand(loggingControl, u"логирование", 30, 
+registerEvent(setDefLoggingValue, ADDCONF);		
+registerCommand(manageLoggingValue, u"логирование", 30, 
 				"Отключает (0) или включает (1) ведение логов. Без параметра покажет текущее значение", 
 				"логирование [0|1]", 
 				("логирование", "логирование 0"), 

@@ -319,12 +319,12 @@ def getConfigPath(*param):
 def getFilePath(*param):
 	return(os.path.join(*param))
 
-def loadChatConfig(conference):
+def loadConferenceConfig(conference):
 	fileName = getConfigPath(conference, CONFIG_FILE)
 	createFile(fileName, "{}")
 	gConfig[conference] = eval(readFile(fileName))
 
-def saveChatConfig(conference):
+def saveConferenceConfig(conference):
 	fileName = getConfigPath(conference, CONFIG_FILE)
 	writeFile(fileName, str(gConfig[conference]))
 
@@ -337,14 +337,14 @@ def setConfigKey(conference, key, value):
 def joinConferences(conferences):
 	for conference in conferences:
 		joinConference(conference, getBotNick(conference), getConfigKey(conference, "password"))
-		saveChatConfig(conference)
+		saveConferenceConfig(conference)
 	printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
 def addConference(conference):
 	gConferences[conference] = {}
 	gIsJoined[conference] = False
 	writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
-	loadChatConfig(conference)
+	loadConferenceConfig(conference)
 	for process in gEventHandlers[ADDCONF]:
 		process(conference)
 
@@ -399,8 +399,8 @@ def setBotStatus(conference, status, show):
 	prs.addChild(node=gClient.getCapsNode())
 	gClient.send(prs)
 
-def setRole(conference, nick, role, reason=None):
-	iq = xmpp.Iq("set")
+def setMUCRole(conference, nick, role, reason=None):
+	iq = xmpp.Iq(xmpp.TYPE_SET)
 	iq.setTo(conference)
 	query = xmpp.Node("query", {"xmlns": xmpp.NS_MUC_ADMIN})
 	if(nick.count("@")):
@@ -412,8 +412,8 @@ def setRole(conference, nick, role, reason=None):
 	iq.addChild(node=query)
 	gClient.send(iq)
 
-def setAffiliation(conference, nick, aff, reason=None):
-	iq = xmpp.Iq("set")
+def setMUCAffiliation(conference, nick, aff, reason=None):
+	iq = xmpp.Iq(xmpp.TYPE_SET)
 	iq.setTo(conference)
 	query = xmpp.Node("query", {"xmlns": xmpp.NS_MUC_ADMIN})
 	if(nick.count("@")):

@@ -26,12 +26,12 @@ def loadAutoModerators(conference):
 	createFile(fileName, "[]")
 	gModerators[conference] = eval(readFile(fileName))
 
-def unloadAutoModerators(conference):
+def freeAutoModerators(conference):
 	del(gModerators[conference])
 
 def setAutoModerator(conference, nick, trueJid, aff, role):
 	if(trueJid in gModerators[conference]):
-		setRole(conference, nick, xmpp.ROLE_MODERATOR, u"автомодератор")
+		setMUCRole(conference, nick, xmpp.ROLE_MODERATOR, u"автомодератор")
 
 def addAutoModerator(msgType, conference, nick, param):
 	user = param
@@ -53,7 +53,7 @@ def addAutoModerator(msgType, conference, nick, param):
 		saveAutoModerators(conference)
 		sendMsg(msgType, conference, nick, u"добавила")
 		if(setModeratorRole):
-			setRole(conference, user, xmpp.ROLE_MODERATOR)
+			setMUCRole(conference, user, xmpp.ROLE_MODERATOR)
 	else:
 		sendMsg(msgType, conference, nick, u"%s уже есть в списке" % (param))
 
@@ -77,7 +77,7 @@ def delAutoModerator(msgType, conference, nick, param):
 		saveAutoModerators(conference)
 		sendMsg(msgType, conference, nick, u"удалила")
 		if(setParticipantRole):
-			setRole(conference, user, xmpp.ROLE_PARTICIPANT)
+			setMUCRole(conference, user, xmpp.ROLE_PARTICIPANT)
 	else:
 		sendMsg(msgType, conference, nick, u"а %s итак нет в списке" % (param))
 
@@ -90,7 +90,7 @@ def showAutoModerators(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"список автомодераторов пуст")
 
 registerEvent(loadAutoModerators, ADDCONF)
-registerEvent(unloadAutoModerators, DELCONF)
+registerEvent(freeAutoModerators, DELCONF)
 registerJoinHandler(setAutoModerator)
 
 registerCommand(addAutoModerator, u"модер+", 20, 

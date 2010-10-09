@@ -15,7 +15,7 @@
 
 def setBotNick(msgType, conference, nick, param):
 	joinConference(conference, param, getConfigKey(conference, "password"))
-	saveChatConfig(conference)
+	saveConferenceConfig(conference)
 	sendMsg(msgType, conference, nick, u"запомнила")
 
 registerCommand(setBotNick, u"ботник", 30,

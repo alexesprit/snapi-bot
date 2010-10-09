@@ -70,18 +70,18 @@ def saveTurnMessage(stanza, msgType, conference, nick, trueJid, body):
 			time.sleep(TURN_TIMEOUT)
 			gTurnMsgCache[conference][trueJid] = body
 
-def createTurnCache(conference):
+def initTurnCache(conference):
 	gTurnMsgCache[conference] = {}
 
-def deleteTurnCache(conference):
+def freeTurnCache(conference):
 	del(gTurnMsgCache[conference])
 
 def clearTurnCache(conference, nick, trueJid, reason, code):
 	if(trueJid in gTurnMsgCache[conference]):
 		del(gTurnMsgCache[conference][trueJid])
 
-registerEvent(createTurnCache, ADDCONF)
-registerEvent(deleteTurnCache, DELCONF)
+registerEvent(initTurnCache, ADDCONF)
+registerEvent(freeTurnCache, DELCONF)
 registerLeaveHandler(clearTurnCache)
 registerMessageHandler(saveTurnMessage, CHAT)
 

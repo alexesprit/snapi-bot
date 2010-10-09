@@ -16,14 +16,14 @@
 
 SEND_FILE = "send.txt"
 
-gSend = {}
+gSendCache = {}
 
 def loadSendBase(conference):
 	fileName = getConfigPath(conference, SEND_FILE)
-	gSend[conference] = database.DataBase(fileName)
+	gSendCache[conference] = database.DataBase(fileName)
 
 def freeSendBase(conference):
-	del(gSend[conference])
+	del(gSendCache[conference])
 
 def addToSendBase(msgType, conference, nick, param):
 	param = param.split(None, 1)
@@ -36,7 +36,7 @@ def addToSendBase(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"передала")
 		elif(nickInConference(conference, userNick)):
 			trueJid = getTrueJid(conference, userNick)
-			base = gSend[conference]
+			base = gSendCache[conference]
 			if(trueJid not in base):
 				base[trueJid] = []
 			base[trueJid].append(message)
@@ -46,7 +46,7 @@ def addToSendBase(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"а это кто?")
 
 def checkSendBase(conference, nick, trueJid, aff, role):
-	base = gSend[conference]
+	base = gSendCache[conference]
 	if(trueJid in base):
 		for message in base[trueJid]:
 			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message)

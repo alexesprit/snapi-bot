@@ -16,7 +16,7 @@
 
 TVCODES_FILE = "channels.txt"
 
-def getChannelCode(channelName):
+def getTVChannelCode(channelName):
 	if(channelName.isdigit()):
 		return(channelName)
 	else:
@@ -25,13 +25,13 @@ def getChannelCode(channelName):
 			if(x.lower() in channelName):
 				return(gChannels[x])
 
-def loadChannels():
+def loadTVChannels():
 	global gChannels
 	fileName = getFilePath(RESOURCE_DIR, TVCODES_FILE)
 	gChannels = eval(readFile(fileName, "utf-8"))
 
-def showTvProgramm(msgType, conference, nick, param):
-	channelCode = getChannelCode(param)
+def showTVProgram(msgType, conference, nick, param):
+	channelCode = getTVChannelCode(param)
 	program = ""
 	if(channelCode):
 		url = "http://tv.yandex.ru/?mode=print&channel=%s" % (channelCode)
@@ -44,21 +44,21 @@ def showTvProgramm(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"нету на сегодня программы")
 
-def showTvList(msgType, conference, nick, parameters):
+def showTVList(msgType, conference, nick, parameters):
 	if(xmpp.TYPE_PUBLIC == msgType):
 		sendMsg(msgType, conference, nick, u"скинула в приват")
 	tvList = [u"%s - %s" % (gChannels[x], x) for x in gChannels]
 	tvList.sort()
 	sendMsg(xmpp.TYPE_PRIVATE, conference, nick, u"список каналов:\n%s" % ("\n".join(tvList)))
 
-registerEvent(loadChannels, STARTUP)
+registerEvent(loadTVChannels, STARTUP)
 
-registerCommand(showTvProgramm, u"тв", 10, 
+registerCommand(showTVProgram, u"тв", 10, 
 				u"Показать телепрограму для определённого канала", 
 				u"тв <название>", 
 				(u"тв первый", ), 
 				ANY | PARAM)
-registerCommand(showTvList, u"твлист", 10, 
+registerCommand(showTVList, u"твлист", 10, 
 				u"Просмотреть список каналов, доступных для просмотра программы", 
 				None, 
 				(u"твлист", ), 

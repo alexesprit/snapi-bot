@@ -18,9 +18,9 @@ import gc
 
 COLLECT_TIMEOUT = 300
 		
-def startCollecting():
+def collectGarbage():
 	sys.exc_clear()
 	gc.collect()
-	startTimer(COLLECT_TIMEOUT, startCollecting)
+	startTimer(COLLECT_TIMEOUT, collectGarbage)
 
-registerEvent(startCollecting, INIT_2)
+registerEvent(collectGarbage, INIT_2)

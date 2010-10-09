@@ -23,7 +23,7 @@ def joinConf(msgType, conference, nick, param):
 			password = (len(param) == 2) and param[1] or None
 			addConference(conf)
 			joinConference(conf, gBotNick, getConfigKey(conf, "password"))
-			saveChatConfig(conf)
+			saveConferenceConfig(conf)
 			sendMsg(msgType, conference, nick, u"зашла")
 
 def leaveConf(msgType, conference, nick, param):

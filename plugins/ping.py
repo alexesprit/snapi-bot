@@ -17,14 +17,14 @@
 
 PING_ID = "ping_id"
 
-replicsForOther = (
+REPLICS_FOR_OTHER = (
 	u"понг от %s составляет", 
 	u"скорость отклика сервера для %s равна", 
 	u"скорость отправки пакетов от %s составляет", 
 	u"опа! что я откопала! это же понг от %s:"
 )
 
-replicsForMe = (
+REPLICS_FOR_ME = (
 	u"твой понг составляет", 
 	u"скорость отклика сервера для тебя равна", 
 	u"скорость отправки твоих пакетов равна", 
@@ -35,9 +35,9 @@ def _showPing(stanza, t0, msgType, conference, nick, param):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		ping = time.time() - t0
 		if(param):
-			message = random.choice(replicsForOther) % (param);  
+			message = random.choice(REPLICS_FOR_OTHER) % (param);  
 		else:
-			message = random.choice(replicsForMe)
+			message = random.choice(REPLICS_FOR_ME)
 		message += u" %s сек." % (str(round(ping , 3)))
 		sendMsg(msgType, conference, nick, message)
 	else:

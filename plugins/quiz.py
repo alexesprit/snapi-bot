@@ -184,11 +184,11 @@ def loadQuizScores(conference):
 	gQuizScores[conference] = database.DataBase(fileName)
 	gQuizEnable[conference] = False
 
-def unloadQuizScores(conference):
+def freeQuizScores(conference):
 	del(gQuizScores[conference])
 
 registerEvent(loadQuizScores, ADDCONF)
-registerEvent(unloadQuizScores, DELCONF)
+registerEvent(freeQuizScores, DELCONF)
 registerMessageHandler(quizAnswerListener, CHAT)
 
 registerCommand(startQuiz, u"старт", 10, 

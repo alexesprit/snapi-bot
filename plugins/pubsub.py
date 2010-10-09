@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def setMood(msgType, jid, resource, param):
+def setBotMood(msgType, jid, resource, param):
 	if(param == u"сброс" or param.count("|")):
 		iq = xmpp.Iq("set")
 		iq.setType(xmpp.TYPE_HEADLINE)
@@ -34,7 +34,7 @@ def setMood(msgType, jid, resource, param):
 	else:
 		sendMsg(msgType, jid, resource, u"читай справку по команде")
 
-def setActivity(msgType, jid, resource, param):
+def setBoAtctivity(msgType, jid, resource, param):
 	if(param == u"сброс" or param.count("|")):
 		iq = xmpp.Iq("set")
 		iq.setType(xmpp.TYPE_HEADLINE)
@@ -57,12 +57,12 @@ def setActivity(msgType, jid, resource, param):
 	else:
 		sendMsg(msgType, jid, resource, u"читай справку по команде")
 
-registerCommand(setActivity, u"активность", 100, 
+registerCommand(setBoAtctivity, u"активность", 100, 
 				u"Устанавливает активность для бота. \"Cброс\" в кач-ве параметра сбрасывает активность", 
 				u"активность <осн.|доп.|текст>", 
 				(u"активность doing_chores|doing_maintenance|ололо", ), 
 				ROSTER | PARAM)
-registerCommand(setMood, u"настроение", 100, 
+registerCommand(setBotMood, u"настроение", 100, 
 				u"Устанавливает настроение для бота. \"Cброс\" в кач-ве параметра сбрасывает настроение", 
 				u"настроение <название|текст>", 
 				(u"настроение calm|ололо", ), 

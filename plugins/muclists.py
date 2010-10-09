@@ -15,7 +15,7 @@
 
 MUC_ID = "muc_id"
 
-def _showSomeList(stanza, msgType, conference, nick):
+def _showMUCList(stanza, msgType, conference, nick):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		items = [u"%d) %s" % (i + 1, p.getAttrs()["jid"]) for i, p in enumerate(stanza.getQueryChildren())]
 		if(items):
@@ -28,40 +28,40 @@ def _showSomeList(stanza, msgType, conference, nick):
 	else:
 		sendMsg(msgType, conference, nick, u"не получается :(")
 
-def showSomeList(msgType, conference, nick, aff):
+def showMUCList(msgType, conference, nick, aff):
 	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_MUC_ADMIN, payload = [xmpp.Node("item", {"affiliation": aff})])
 	iq.setTo(conference)
 	iq.setID(getUniqueID(MUC_ID))
-	gClient.SendAndCallForResponse(iq, _showSomeList, (msgType, conference, nick, ))
+	gClient.SendAndCallForResponse(iq, _showMUCList, (msgType, conference, nick, ))
 
-def showBanList(msgType, conference, nick, param):
-	showSomeList(msgType, conference, nick, xmpp.AFF_OUTCAST)
+def showOutcastsList(msgType, conference, nick, param):
+	showMUCList(msgType, conference, nick, xmpp.AFF_OUTCAST)
 
-def showMemberList(msgType, conference, nick, param):
-	showSomeList(msgType, conference, nick, xmpp.AFF_MEMBER)
+def showMembersList(msgType, conference, nick, param):
+	showMUCList(msgType, conference, nick, xmpp.AFF_MEMBER)
 
-def showAdminList(msgType, conference, nick, param):
-	showSomeList(msgType, conference, nick, xmpp.AFF_ADMIN)
+def showAdminsList(msgType, conference, nick, param):
+	showMUCList(msgType, conference, nick, xmpp.AFF_ADMIN)
 
-def showOwnerList(msgType, conference, nick, param):
-	showSomeList(msgType, conference, nick, xmpp.AFF_OWNER)
+def showOwnersList(msgType, conference, nick, param):
+	showMUCList(msgType, conference, nick, xmpp.AFF_OWNER)
 
-registerCommand(showBanList, u"банлист", 20, 
+registerCommand(showOutcastsList, u"банлист", 20, 
 				u"Показывает список забаненных", 
 				None, 
 				(u"банлист", ), 
 				CHAT | NONPARAM)
-registerCommand(showMemberList, u"мемберлист", 20, 
+registerCommand(showMembersList, u"мемберлист", 20, 
 				u"Показывает список мемберов", 
 				None, 
 				(u"мемберлист", ), 
 				CHAT | NONPARAM)
-registerCommand(showAdminList, u"админлист", 20, 
+registerCommand(showAdminsList, u"админлист", 20, 
 				u"Показывает список админов", 
 				None, 
 				(u"админлист", ), 
 				CHAT | NONPARAM)
-registerCommand(showOwnerList, u"овнерлист", 20, 
+registerCommand(showOwnersList, u"овнерлист", 20, 
 				u"Показывает список овнеров", 
 				None, 
 				(u"овнерлист", ), 

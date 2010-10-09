@@ -17,11 +17,11 @@
 SAVE_COUNT = 20
 TALKERS_FILE = "talkers.txt"
 
-gTalkers = {}
+gTalkersCache = {}
 gMsgCount = {}
 
-def showTopTalkers(msgType, conference, nick):
-	base = gTalkers[conference]
+def showTopTalkersInfo(msgType, conference, nick):
+	base = gTalkersCache[conference]
 	if(base.isEmpty()):
 		sendMsg(msgType, conference, nick, u"база болтунов пуста")
 	else:
@@ -42,11 +42,11 @@ def showTopTalkers(msgType, conference, nick):
 		items = [topListLine % (i + 1, x[4], x[0], x[1], x[2], x[3]) for i, x in enumerate(topList)]
 		sendMsg(msgType, conference, nick, replic + "\n".join(items))
 
-def clearStatistic(msgType, conference, nick):
+def clearTalkersInfo(msgType, conference, nick):
 	conference = source[1]
 	trueJid = getTrueJid(conference, nick)
 	if(getAccess(conference, trueJid) >= 20):
-		base = gTalkers[conference]
+		base = gTalkersCache[conference]
 		base.clear()
 		base.save()
 		sendMsg(msgType, conference, nick, u"база данных очищена")
@@ -55,9 +55,9 @@ def clearStatistic(msgType, conference, nick):
 
 def showTalkerInfo(msgType, conference, nick, param):
 	if(param == u"топ"):
-		showTopTalkers(msgType, conference, nick)
+		showTopTalkersInfo(msgType, conference, nick)
 	elif(param == u"сброс"):
-		clearStatistic(msgType, conference, nick)
+		clearTalkersInfo(msgType, conference, nick)
 	else:
 		if(not param):
 			trueJid = getTrueJid(conference, nick)
@@ -65,7 +65,7 @@ def showTalkerInfo(msgType, conference, nick, param):
 			trueJid = getTrueJid(conference, param)
 		else:
 			return
-		base = gTalkers[conference]
+		base = gTalkersCache[conference]
 		if(trueJid in base):
 			statistic = base[trueJid]
 			statisticLine = u"Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f"
@@ -79,9 +79,9 @@ def showTalkerInfo(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"твоя статистика отсутствует")
 
-def updateStatistic(stanza, msgType, conference, nick, trueJid, body):
+def updateTalkersInfo(stanza, msgType, conference, nick, trueJid, body):
 	if(trueJid != gJid and msgType == xmpp.TYPE_PUBLIC and nick):
-		base = gTalkers[conference]
+		base = gTalkersCache[conference]
 		if(trueJid in base):
 			base[trueJid]["nick"] = nick
 		else:
@@ -97,18 +97,17 @@ def updateStatistic(stanza, msgType, conference, nick, trueJid, body):
 		else:
 			gMsgCount[conference] += 1
 
-def loadTalkCache(conference):
+def loadTalkersBase(conference):
 	fileName = getConfigPath(conference, TALKERS_FILE)
-	gTalkers[conference] = database.DataBase(fileName)
+	gTalkersCache[conference] = database.DataBase(fileName)
 	gMsgCount[conference] = 0
 
-def unloadTalkCache(conference):
-	del(gTalkers[conference])
+def freeTalkersBase(conference):
+	del(gTalkersCache[conference])
 
-registerEvent(loadTalkCache, ADDCONF)
-registerEvent(unloadTalkCache, DELCONF)
-
-registerMessageHandler(updateStatistic, CHAT)
+registerEvent(loadTalkersBase, ADDCONF)
+registerEvent(freeTalkersBase, DELCONF)
+registerMessageHandler(updateTalkersInfo, CHAT)
 
 registerCommand(showTalkerInfo, u"болтун", 10, 
 				u"Показывает статистику болтливости указанного пользователя", 

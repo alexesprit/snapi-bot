@@ -15,9 +15,13 @@
 
 NOTE_FILE = "notepad.txt"
 
-gNotes = {}
+gUserNotes = {}
 
-def addNote(msgType, conference, nick, param):
+def loadUserNotes():
+	global gNotes
+	gNotes = database.DataBase(getConfigPath(NOTE_FILE))
+
+def addUserNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick)
 	if(trueJid not in gNotes):
 		gNotes[trueJid] = []
@@ -26,7 +30,7 @@ def addNote(msgType, conference, nick, param):
 	gNotes.save()
 	sendMsg(msgType, conference, nick, u"записала")
 
-def delNote(msgType, conference, nick, param):
+def delUserNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick)
 	if(trueJid in gNotes):
 		if(param.isdigit()):
@@ -44,7 +48,7 @@ def delNote(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"в твоём блокноте пусто")
 
-def showNotes(msgType, conference, nick, param):
+def showUserNotes(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick)
 	if(param == u"сброс"):
 		if(trueJid in gNotes):
@@ -61,23 +65,19 @@ def showNotes(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"в твоём блокноте пусто")
 
-def loadNotes():
-	global gNotes
-	gNotes = database.DataBase(getConfigPath(NOTE_FILE))
+registerEvent(loadUserNotes, STARTUP)
 
-registerEvent(loadNotes, STARTUP)
-
-registerCommand(addNote, u"заметка+", 10, 
+registerCommand(addUserNote, u"заметка+", 10, 
 				u"Добавляет запись в ваш блокнот", 
 				u"заметка+ <что-то>", 
 				(u"заметка+ ы", ), 
 				ANY | PARAM)
-registerCommand(delNote, u"заметка-", 10, 
+registerCommand(delUserNote, u"заметка-", 10, 
 				u"Удаляет запись из вашего блокнота", 
 				u"заметка- <номер>", 
 				(u"заметка- 2", ), 
 				ANY | PARAM)
-registerCommand(showNotes, u"заметки", 10, 
+registerCommand(showUserNotes, u"заметки", 10, 
 				u"Показывает все записи из вашего блокнота. Указав \"сброс\" в кач-ве параметра, вы можете очистить ваши заметки", 
 				u"заметки [параметры]", 
 				(u"заметки", u"заметки сброс"))

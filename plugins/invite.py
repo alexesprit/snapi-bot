@@ -20,11 +20,11 @@ def sendInvite(msgType, conference, nick, param):
 	if(not user.count("@")):
 		if(nickInConference(conference, user)):
 			trueJid = getTrueJid(conference, user)
-			reason = (len(param) == 2) and param[1] or None
 		else:
 			return
 	else:
-		trueJid = param
+		trueJid = user
+	reason = (len(param) == 2) and param[1] or None
 	msg = xmpp.Message(to=conference)
 	x = xmpp.Node("x")
 	x.setNamespace(xmpp.NS_MUC_USER)

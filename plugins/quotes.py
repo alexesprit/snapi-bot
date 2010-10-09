@@ -14,9 +14,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showBashOrgRu(msgType, conference, nick, param):
+def showBashQuote(msgType, conference, nick, param):
 	if(param and param.isdigit()):
-		req = "http://bash.org.ru/quote/" + param
+		req = "http://bash.org.ru/quote/%s" % (param)
 	else:
 		req = "http://bash.org.ru/random"
 	rawHTML = urllib.urlopen(req).read()
@@ -27,7 +27,7 @@ def showBashOrgRu(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"не могу :(")
 
-def showBashOrgRuAbyss(msgType, conference, nick, param):
+def showAbyssQuote(msgType, conference, nick, param):
 	rawHTML = urllib.urlopen("http://bash.org.ru/abysstop").read()
 	items = re.findall("<div class=\"vote\">(.+?)<div>(.+?)</div>", rawHTML, re.DOTALL)
 	if(items):
@@ -38,7 +38,7 @@ def showBashOrgRuAbyss(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"не могу :(")
 
-def showItHappens(msgType, conference, nick, param):
+def showItHappensQuote(msgType, conference, nick, param):
 	if(param and param.isdigit()):
 		url = "http://ithappens.ru/%s" % (param)
 	else:
@@ -51,7 +51,7 @@ def showItHappens(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"не могу")
 
-def showJQuote(msgType, conference, nick, param):
+def showJabberQuote(msgType, conference, nick, param):
 	if(param and param.isdigit()):
 		url = "http://jabber-quotes.ru/id%s" % (param)
 	else:
@@ -67,20 +67,20 @@ def showJQuote(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"не могу :(")
 
-registerCommand(showBashOrgRuAbyss, u"борб", 10, 
+registerCommand(showAbyssQuote, u"борб", 10, 
 				u"Показывает случайную цитату из бездны bash.org.ru", 
 				None, 
 				(u"борб", ), 
 				ANY | NONPARAM)
-registerCommand(showBashOrgRu, u"бор", 10, 
+registerCommand(showBashQuote, u"бор", 10, 
 				u"Показывает случайную/указанную цитату c bash.org.ru", 
 				u"бор [номер]", 
 				(u"бор", u"бор 143498"))
-registerCommand(showItHappens, u"ит", 10, 
+registerCommand(showItHappensQuote, u"ит", 10, 
 				u"Показывает случайную/указанную цитату c ithappens.ru", 
 				u"ит [номер]", 
 				(u"ит", u"ит 2691"))
-registerCommand(showJQuote, u"жк", 10, 
+registerCommand(showJabberQuote, u"жк", 10, 
 				u"Показывает случайную/указанную цитату с jabber-quotes.ru", 
 				u"жк [номер]", 
 				(u"жк", u"жк 204"));

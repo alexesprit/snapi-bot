@@ -13,7 +13,11 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def prefixControl(msgType, conference, nick, param):
+def setDefPrefixValue(conference):
+	if(getConfigKey(conference, "prefix") is None):
+		setConfigKey(conference, "prefix", "")
+
+def managePrefixControl(msgType, conference, nick, param):
 	if(param):
 		if(param.lower() != "none"):
 			setConfigKey(conference, "prefix", param)
@@ -21,7 +25,7 @@ def prefixControl(msgType, conference, nick, param):
 		else:
 			setConfigKey(conference, "prefix", "")
 			sendMsg(msgType, conference, nick, u"префикс для команд отключен")
-		saveChatConfig(conference)
+		saveConferenceConfig(conference)
 	else:
 		prefixValue = getConfigKey(conference, "prefix")
 		if(prefixValue):
@@ -29,13 +33,8 @@ def prefixControl(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"префикс не установлен")
 
-def setDefaultPrefix(conference):
-	if(getConfigKey(conference, "prefix") is None):
-		setConfigKey(conference, "prefix", "")
-
-registerEvent(setDefaultPrefix, ADDCONF)
-
-registerCommand(prefixControl, u"префикс", 30, 
+registerEvent(setDefPrefixValue, ADDCONF)
+registerCommand(managePrefixControl, u"префикс", 30, 
 				u"Устанавливает или отключает (если указать None) префикс для команд. Без параметра покажет текущее значение", 
 				u"префикс [что-то]", 
 				(u"префикс _", u"префикс None"), 
