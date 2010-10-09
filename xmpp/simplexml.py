@@ -30,24 +30,15 @@ UNESCAPE_MAP = {
 	"&mdash;": "-"	
 }
 
-ESCAPE_MAP = {
-	"&": "&amp;",
-	"<": "&lt;",
-	">": "&gt;",
-	"\"": "&quot;",
-	"'": "&apos;"
-}
 
 def XMLEscape(xml):
 	"""Returns provided string with symbols & < > " replaced by their respective XML entities."""
-	for char, esc in ESCAPE_MAP.items():
-		xml = xml.replace(char, esc)
-	return(xml)	
-	
+	return xml.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
 def XMLUnescape(xml):
 	for esc, char in UNESCAPE_MAP.items():
 		xml = xml.replace(esc, char)
-	return(xml)
+	return xml
 
 def ustr(text):
 	"""Converts object "text" to unicode string using it's own __str__ method if accessible or unicode method otherwise."""
@@ -58,7 +49,7 @@ def ustr(text):
 	except AttributeError:
 		text = str(text)
 	if not isinstance(text, unicode):
-		return unicode(text, 'utf-8')
+		return unicode(text, "utf-8")
 	return text
 
 class Node(object):
