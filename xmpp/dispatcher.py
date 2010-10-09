@@ -49,7 +49,6 @@ class Dispatcher(PlugIn):
 			self.waitForResponse,
 			self.send,
 			self.disconnect,
-			self.clearExpectedIDs,
 			self.sendAndCallForResponse
 		]
 
@@ -323,9 +322,6 @@ class Dispatcher(PlugIn):
 		stanza.setNamespace(self._owner.Namespace)
 		self._owner_send(stanza)
 		return(stanzaID)
-
-	def clearExpectedIDs(self):
-		self._expected = {}
 
 	def disconnect(self):
 		""" Send a stream terminator and and handle all incoming stanzas before stream closure. """
