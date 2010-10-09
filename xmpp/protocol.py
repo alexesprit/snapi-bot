@@ -467,15 +467,16 @@ class Presence(Protocol):
 		""" Sets the status string of the message. """
 		self.setTagData('status',val)
 
-	def _muc_getItemAttr(self,tag,attr):
-		for xtag in self.getTags('x'):
+	def _muc_getItemAttr(self, tag, attr):
+		for xtag in self.getTags('x', {}, NS_MUC_USER):
 			for child in xtag.getTags(tag):
 				return child.getAttr(attr)
-	def _muc_getSubTagDataAttr(self,tag,attr):
-		for xtag in self.getTags('x'):
+
+	def _muc_getSubTagDataAttr(self, tag, attr):
+		for xtag in self.getTags('x', {}, NS_MUC_USER):
 			for child in xtag.getTags('item'):
 				for cchild in child.getTags(tag):
-					return cchild.getData(),cchild.getAttr(attr)
+					return cchild.getData(), cchild.getAttr(attr)
 		return None,None
 	
 	def getRole(self):

@@ -27,7 +27,7 @@ def freeClientsCache(conference):
 
 def showClients(msgType, conference, nick, param):
 	userNick = param or nick
-	if(nickIsOnline(conference, userNick)):
+	if(nickInConference(conference, userNick)):
 		trueJid = getTrueJid(conference, userNick)
 		if(trueJid in gClients[conference]):
 			clients = gClients[conference][trueJid]
