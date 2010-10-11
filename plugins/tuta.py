@@ -59,8 +59,13 @@ def loadHereBase(conference):
 def freeHereBase(conference):
 	del(gHereTime[conference])
 
+def saveAllHereBases():
+	for conference in getConferences():
+		gHereTime[conference].save()
+
 registerEvent(loadHereBase, ADDCONF)
 registerEvent(freeHereBase, DELCONF)
+registerEvent(saveAllHereBases, SHUTDOWN)
 
 registerJoinHandler(updateJoinStatistic)
 registerLeaveHandler(updateLeaveStatistic)

@@ -63,6 +63,7 @@ ADDCONF = 0x1
 DELCONF = 0x2
 STARTUP = 0x3
 INIT_2 = 0x4
+SHUTDOWN = 0x5
 
 CHAT = 1 << 1
 ROSTER = 1 << 2
@@ -132,7 +133,13 @@ gLeaveHandlers = []
 gIqHandlers = []
 gCmdHandlers = {}
 
-gEventHandlers = {ADDCONF: [], DELCONF: [], STARTUP: [], INIT_2: []}
+gEventHandlers = {
+	ADDCONF: [], 
+	DELCONF: [], 
+	STARTUP: [], 
+	INIT_2: [], 
+	SHUTDOWN: []
+}
 gPresenceHandlers = {ROSTER: [], CHAT: []}
 gMessageHandlers = {ROSTER: [], CHAT: []}
 
@@ -754,6 +761,7 @@ def detectMultiLaunch():
 
 def shutdown(restart=False):
 	gClient.disconnected()
+	callEventHandlers(SHUTDOWN)
 	if(restart):
 		printf("Restarting...")
 		time.sleep(RECONNECT_DELAY)

@@ -105,8 +105,13 @@ def loadTalkersBase(conference):
 def freeTalkersBase(conference):
 	del(gTalkersCache[conference])
 
+def saveAllTalkersBases():
+	for conference in getConferences():
+		gTalkersCache[conference].save()
+
 registerEvent(loadTalkersBase, ADDCONF)
 registerEvent(freeTalkersBase, DELCONF)
+registerEvent(saveAllTalkersBases, SHUTDOWN)
 registerMessageHandler(updateTalkersInfo, CHAT)
 
 registerCommand(showTalkerInfo, u"болтун", 10, 
