@@ -24,7 +24,7 @@ def serviceDiscovery(msgType, conference, nick, param):
 	searchKey = None
 	maxCount = (xmpp.TYPE_PUBLIC == msgType) and 10 or 50
 	if(len(param) > 1):
-		count = args[1]
+		count = param[1]
 		if(count.isdigit()):
 			count = int(count)
 			if(xmpp.TYPE_PUBLIC == msgType):

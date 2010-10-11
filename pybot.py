@@ -345,8 +345,8 @@ def addConference(conference):
 	gIsJoined[conference] = False
 	writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
 	loadConferenceConfig(conference)
-	for process in gEventHandlers[ADDCONF]:
-		process(conference)
+	for function in gEventHandlers[ADDCONF]:
+		function(conference)
 
 def delConference(conference):
 	for function in gEventHandlers[DELCONF]:
@@ -443,7 +443,7 @@ def getNicks(conference):
 def getOnlineNicks(conference):
 	return([x for x in gConferences[conference] if(getNickKey(conference, x, NICK_HERE))])
 
-def getJidList(conference, offline = False):
+def getJidList(conference, offline=False):
 	nicks = offline and getNicks(conference) or getOnlineNicks(conference)
 	jidList = tuple(set([getTrueJid(conference,  nick) for nick in nicks]))
 	return(jidList)
@@ -459,7 +459,7 @@ def getTrueJid(jid, resource=None):
 			jid = getNickKey(jid, resource, "jid")
 	return(jid)
 
-def getNickByJid(conference, trueJid, offline = False):
+def getNickByJid(conference, trueJid, offline=False):
 	nicks = offline and getNicks(conference) or getOnlineNicks(conference)
 	for nick in nicks:
 		if(getNickKey(conference, nick, NICK_JID) == trueJid):
@@ -679,15 +679,16 @@ def presenceHandler(session, stanza):
 			setTempAccess(conference, trueJid, roleAccess + affAccess)
 			setNickKey(conference, nick, NICK_MODER, role == xmpp.ROLE_MODERATOR)
 		elif(xmpp.PRS_OFFLINE == prsType):
-			code = stanza.getStatusCode()
-			reason = stanza.getReason() or stanza.getStatus()
-			setNickKey(conference, nick, NICK_HERE, False)
-			if(not getNickByJid(conference, trueJid)):
-				setTempAccess(conference, trueJid)
-			for key in (NICK_IDLE, NICK_MODER, NICK_STATUS, NICK_SHOW):
-				if(key in gConferences[conference][nick]):
-					del(gConferences[conference][nick][key])
-			callLeaveHandlers(conference, nick, trueJid, reason, code)
+			if nickIsOnline(conference, nick):
+				code = stanza.getStatusCode()
+				reason = stanza.getReason() or stanza.getStatus()
+				setNickKey(conference, nick, NICK_HERE, False)
+				if(not getNickByJid(conference, trueJid)):
+					setTempAccess(conference, trueJid)
+				for key in (NICK_IDLE, NICK_MODER, NICK_STATUS, NICK_SHOW):
+					if(key in gConferences[conference][nick]):
+						del(gConferences[conference][nick][key])
+				callLeaveHandlers(conference, nick, trueJid, reason, code)
 		elif(prsType == ERROR):
 			errorCode = stanza.getErrorCode()
 			if(errorCode == "409"):

@@ -113,7 +113,7 @@ registerCommand(setLocalKey, u"!!!", 20,
 				CHAT | PARAM)
 registerCommand(searchLocalKey, u"???поиск", 10, 
 				u"Поиск по базе", 
-				"???поиск <запрос>", 
+				u"???поиск <запрос>", 
 				(u"???поиск что-то", ), 
 				CHAT | PARAM)
 registerCommand(showAllLocalKeys, u"???все", 10, 

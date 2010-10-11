@@ -98,7 +98,7 @@ def writeUserLeave(conference, nick, trueJid, reason, code):
 			if(reason):
 				writeLog(xmpp.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили (%s)" % (nick, reason))
 			else:
-				writeLog(xmpp.TYPE_PUBLIC, conference, "@$$ban$$@", "@$$userban$$@");	
+				writeLog(xmpp.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили" % (nick));	
 		elif("303" != code):
 			if(reason):
 				writeLog(xmpp.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s вышел из комнаты (%s)" % (nick, reason))
@@ -141,7 +141,7 @@ if(gLogDir):
 	registerMessageHandler(writeMessage, CHAT)
 registerEvent(setDefLoggingValue, ADDCONF);		
 registerCommand(manageLoggingValue, u"логирование", 30, 
-				"Отключает (0) или включает (1) ведение логов. Без параметра покажет текущее значение", 
-				"логирование [0|1]", 
-				("логирование", "логирование 0"), 
+				u"Отключает (0) или включает (1) ведение логов. Без параметра покажет текущее значение", 
+				u"логирование [0|1]", 
+				(u"логирование", u"логирование 0"), 
 				CHAT)

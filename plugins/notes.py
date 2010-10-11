@@ -15,31 +15,29 @@
 
 NOTE_FILE = "notepad.txt"
 
-gUserNotes = {}
-
 def loadUserNotes():
-	global gNotes
-	gNotes = database.DataBase(getConfigPath(NOTE_FILE))
+	global gUserNotes
+	gUserNotes = database.DataBase(getConfigPath(NOTE_FILE))
 
 def addUserNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick)
-	if(trueJid not in gNotes):
-		gNotes[trueJid] = []
+	if(trueJid not in gUserNotes):
+		gUserNotes[trueJid] = []
 	text = u"%s\n%s" % (time.strftime("[%d.%m.%y, %H:%M]"), param)
-	gNotes[trueJid].append(text)
-	gNotes.save()
+	gUserNotes[trueJid].append(text)
+	gUserNotes.save()
 	sendMsg(msgType, conference, nick, u"записала")
 
 def delUserNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick)
-	if(trueJid in gNotes):
+	if(trueJid in gUserNotes):
 		if(param.isdigit()):
 			param = int(param) - 1
-			if(param < len(gNotes[trueJid])):
-				del(gNotes[trueJid][param])
-				if(not gNotes[trueJid]):
-					del(gNotes[trueJid])
-				gNotes.save()
+			if(param < len(gUserNotes[trueJid])):
+				del(gUserNotes[trueJid][param])
+				if(not gUserNotes[trueJid]):
+					del(gUserNotes[trueJid])
+				gUserNotes.save()
 				sendMsg(msgType, conference, nick, u"удалила")
 			else:
 				sendMsg(msgType, conference, nick, u"нет такого пункта")
@@ -51,16 +49,16 @@ def delUserNote(msgType, conference, nick, param):
 def showUserNotes(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick)
 	if(param == u"сброс"):
-		if(trueJid in gNotes):
-			del(gNotes[trueJid])
-			gNotes.save()
+		if(trueJid in gUserNotes):
+			del(gUserNotes[trueJid])
+			gUserNotes.save()
 			sendMsg(msgType, conference, nick, u"удалила")
 		else:
 			sendMsg(msgType, conference, nick, u"а у тебя и так ничего нет :P")
 	elif(not param):
-		if(trueJid in gNotes):
+		if(trueJid in gUserNotes):
 			message = u"твои заметки:\n"
-			items = [u"%d) %s" % (i + 1, x) for i, x in enumerate(gNotes[trueJid])]
+			items = [u"%d) %s" % (i + 1, x) for i, x in enumerate(gUserNotes[trueJid])]
 			sendMsg(msgType, conference, nick, message + "\n".join(items))
 		else:
 			sendMsg(msgType, conference, nick, u"в твоём блокноте пусто")

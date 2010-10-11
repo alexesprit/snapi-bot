@@ -19,7 +19,6 @@ gSeenCache = {}
 
 def loadSeenBase(conference):
 	fileName = getConfigPath(conference, SEEN_FILE)
-	createFile(fileName, "{}")
 	gSeenCache[conference] = database.DataBase(fileName)
 
 def freeSeenBase(conference):
