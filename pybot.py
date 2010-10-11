@@ -689,7 +689,7 @@ def presenceHandler(session, stanza):
 					if(key in gConferences[conference][nick]):
 						del(gConferences[conference][nick][key])
 				callLeaveHandlers(conference, nick, trueJid, reason, code)
-		elif(prsType == ERROR):
+		elif(prsType == xmpp.TYPE_ERROR):
 			errorCode = stanza.getErrorCode()
 			if(errorCode == "409"):
 				newNick = getBotNick(conference) + "."

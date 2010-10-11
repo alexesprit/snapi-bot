@@ -16,9 +16,9 @@
 LOGCSS_FILE = "logger.css"
 
 def writeHeader(fp, jid, (year, month, day)):
-	date = u"%.2i.%.2i.%.2i" % (day, month, year)
+	date = "%.2i.%.2i.%.2i" % (day, month, year)
 	cssData = readFile(getFilePath(CSS_DIR, LOGCSS_FILE))
-	fp.write(u"""<!DOCTYPE html xmpp.TYPE_PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
+	header = """<!DOCTYPE html xmpp.TYPE_PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dt\">
 <head>
 <title>%s</title>
@@ -30,18 +30,21 @@ def writeHeader(fp, jid, (year, month, day)):
 <body>
 <h1>%s<br>%s</h1>
 <tt>
-""" % (u" - ".join([jid, date]), cssData, jid, date))
+""" % (" - ".join([jid, date]), cssData, jid, date)
+	fp.write(header.encode("utf-8"))
 
 def getLogFile(msgType, jid, (year, month, day)):
-	fileName = u"%s/%s/%d/%02d/%02d.html" % (gLogDir, jid, year, month, day)
-	fileName = fileName.encode("utf-8")
-	if(os.path.exists(fileName)):
-		fp = file(fileName, "a")
+	path = u"%s/%s/%d/%02d/%02d.html" % (gLogDir, jid, year, month, day)
+	path = path.encode("utf-8")
+	if(os.path.exists(path)):
+		f = file(path, "a")
 	else:
-		createFile(fileName, "")
-		fp = file(fileName, "w")
-		writeHeader(fp, jid, (year, month, day))
-	return(fp)
+		dirName = os.path.dirname(path)
+		if(not os.path.exists(dirName)):
+			os.makedirs(dirName)
+		f = file(path, "w")
+		writeHeader(f, jid, (year, month, day))
+	return f
 
 def regexUrl(matchobj):
 	return("<a href=\"" + matchobj.group(0) + "\">" + matchobj.group(0) + "</a>")
