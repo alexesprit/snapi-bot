@@ -21,33 +21,34 @@ def getTVChannelCode(channelName):
 		return(channelName)
 	else:
 		channelName = channelName.lower()
-		for x in gChannels:
+		for x in gTVChannels:
 			if(x.lower() in channelName):
-				return(gChannels[x])
+				return(gTVChannels[x])
 
 def loadTVChannels():
-	global gChannels
+	global gTVChannels
 	fileName = getFilePath(RESOURCE_DIR, TVCODES_FILE)
-	gChannels = eval(readFile(fileName, "utf-8"))
+	gTVChannels = eval(readFile(fileName, "utf-8"))
 
 def showTVProgram(msgType, conference, nick, param):
 	channelCode = getTVChannelCode(param)
 	program = ""
 	if(channelCode):
 		url = "http://tv.yandex.ru/?mode=print&channel=%s" % (channelCode)
-		lines = urllib.urlopen(url).readlines()
-		for x in lines:
-			if(x.startswith("<div>")):
-				program += decode(x)
+		rawHTML = urllib.urlopen(url)
+		for line in rawHTML:
+			if(line.startswith("<div>")):
+				program += decode(line)
 	if(program):
-		sendMsg(msgType, conference, nick, unicode(program, "utf-8"))
+		message = u"вот, что я нашла:\n%s" % (unicode(program, "utf-8"))
+		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"нету на сегодня программы")
 
 def showTVList(msgType, conference, nick, parameters):
 	if(xmpp.TYPE_PUBLIC == msgType):
 		sendMsg(msgType, conference, nick, u"скинула в приват")
-	tvList = [u"%s - %s" % (gChannels[x], x) for x in gChannels]
+	tvList = [u"%s - %s" % (code, name) for name, code in gTVChannels.items()]
 	tvList.sort()
 	sendMsg(xmpp.TYPE_PRIVATE, conference, nick, u"список каналов:\n%s" % ("\n".join(tvList)))
 

@@ -142,57 +142,108 @@ def isErrorNode(node):
 class NodeProcessed(Exception):
 	""" Exception that should be raised by handler when the handling should be stopped. """
 	pass
+
 class StreamError(Exception):
 	""" Base exception class for stream errors."""
-class BadFormat(StreamError): pass
-class BadNamespacePrefix(StreamError): pass
-class Conflict(StreamError): pass
-class ConnectionTimeout(StreamError): pass
-class HostGone(StreamError): pass
-class HostUnknown(StreamError): pass
-class ImproperAddressing(StreamError): pass
-class InternalServerError(StreamError): pass
-class InvalidFrom(StreamError): pass
-class InvalidID(StreamError): pass
-class InvalidNamespace(StreamError): pass
-class InvalidXML(StreamError): pass
-class NotAuthorized(StreamError): pass
-class PolicyViolation(StreamError): pass
-class RemoteConnectionFailed(StreamError): pass
-class ResourceConstraint(StreamError): pass
-class RestrictedXML(StreamError): pass
-class SeeOtherHost(StreamError): pass
-class SystemShutdown(StreamError): pass
-class UndefinedCondition(StreamError): pass
-class UnsupportedEncoding(StreamError): pass
-class UnsupportedStanzaType(StreamError): pass
-class UnsupportedVersion(StreamError): pass
-class XMLNotWellFormed(StreamError): pass
 
-streamExceptions = {'bad-format': BadFormat,
-					 'bad-namespace-prefix': BadNamespacePrefix,
-					 'conflict': Conflict,
-					 'connection-timeout': ConnectionTimeout,
-					 'host-gone': HostGone,
-					 'host-unknown': HostUnknown,
-					 'improper-addressing': ImproperAddressing,
-					 'internal-server-error': InternalServerError,
-					 'invalid-from': InvalidFrom,
-					 'invalid-id': InvalidID,
-					 'invalid-namespace': InvalidNamespace,
-					 'invalid-xml': InvalidXML,
-					 'not-authorized': NotAuthorized,
-					 'policy-violation': PolicyViolation,
-					 'remote-connection-failed': RemoteConnectionFailed,
-					 'resource-constraint': ResourceConstraint,
-					 'restricted-xml': RestrictedXML,
-					 'see-other-host': SeeOtherHost,
-					 'system-shutdown': SystemShutdown,
-					 'undefined-condition': UndefinedCondition,
-					 'unsupported-encoding': UnsupportedEncoding,
-					 'unsupported-stanza-type': UnsupportedStanzaType,
-					 'unsupported-version': UnsupportedVersion,
-					 'xml-not-well-formed': XMLNotWellFormed}
+class BadFormat(StreamError):
+	pass
+
+class BadNamespacePrefix(StreamError):
+	pass
+
+class Conflict(StreamError):
+	pass
+
+class ConnectionTimeout(StreamError):
+	pass
+
+class HostGone(StreamError):
+	pass
+
+class HostUnknown(StreamError):
+	pass
+
+class ImproperAddressing(StreamError):
+	pass
+
+class InternalServerError(StreamError):
+	pass
+
+class InvalidFrom(StreamError):
+	pass
+
+class InvalidID(StreamError):
+	pass
+
+class InvalidNamespace(StreamError):
+	pass
+
+class InvalidXML(StreamError):
+	pass
+
+class NotAuthorized(StreamError):
+	pass
+
+class PolicyViolation(StreamError):
+	pass
+
+class RemoteConnectionFailed(StreamError):
+	pass
+
+class ResourceConstraint(StreamError):
+	pass
+
+class RestrictedXML(StreamError):
+	pass
+
+class SeeOtherHost(StreamError):
+	pass
+
+class SystemShutdown(StreamError):
+	pass
+
+class UndefinedCondition(StreamError):
+	pass
+
+class UnsupportedEncoding(StreamError):
+	pass
+
+class UnsupportedStanzaType(StreamError):
+	pass
+
+class UnsupportedVersion(StreamError):
+	pass
+
+class XMLNotWellFormed(StreamError):
+	pass
+
+streamExceptions = {
+	'bad-format': BadFormat,
+	'bad-namespace-prefix': BadNamespacePrefix,
+	'conflict': Conflict,
+	'connection-timeout': ConnectionTimeout,
+	'host-gone': HostGone,
+	'host-unknown': HostUnknown,
+	'improper-addressing': ImproperAddressing,
+	'internal-server-error': InternalServerError,
+	'invalid-from': InvalidFrom,
+	'invalid-id': InvalidID,
+	'invalid-namespace': InvalidNamespace,
+	'invalid-xml': InvalidXML,
+	'not-authorized': NotAuthorized,
+	'policy-violation': PolicyViolation,
+	'remote-connection-failed': RemoteConnectionFailed,
+	'resource-constraint': ResourceConstraint,
+	'restricted-xml': RestrictedXML,
+	'see-other-host': SeeOtherHost,
+	'system-shutdown': SystemShutdown,
+	'undefined-condition': UndefinedCondition,
+	'unsupported-encoding': UnsupportedEncoding,
+	'unsupported-stanza-type': UnsupportedStanzaType,
+	'unsupported-version': UnsupportedVersion,
+	'xml-not-well-formed': XMLNotWellFormed
+}
 
 class JID:
 	""" JID object. JID can be built from string, modified, compared, serialised into string. """
@@ -200,7 +251,7 @@ class JID:
 		""" Constructor. JID can be specified as string (jid argument) or as separate parts.
 			Examples:
 			JID('node@domain/resource')
-			JID(node='node',domain='domain.org')
+			JID(node='node', domain='domain.org')
 		"""
 		if not jid and not domain:
 			raise ValueError('JID must contain at least domain name')
@@ -277,6 +328,7 @@ class JID:
 	def __hash__(self):
 		""" Produce hash of the JID, Allows to use JID objects as keys of the dictionary. """
 		return hash(self.__str__())
+
 class Protocol(Node):
 	""" A "stanza" object class. Contains methods that are common for presences, iqs and messages. """
 	def __init__(self, name=None, to=None, typ=None, frm=None, attrs=None, payload=None, timestamp=None, xmlns=None, node=None):
@@ -477,35 +529,31 @@ class Presence(Protocol):
 			for child in xtag.getTags('item'):
 				for cchild in child.getTags(tag):
 					return cchild.getData(), cchild.getAttr(attr)
-		return None,None
+		return None, None
 	
 	def getRole(self):
 		"""Returns the presence role (for groupchat)"""
-		return self._muc_getItemAttr('item','role')
+		return self._muc_getItemAttr('item', 'role')
 	
 	def getAffiliation(self):
 		"""Returns the presence affiliation (for groupchat)"""
-		return self._muc_getItemAttr('item','affiliation')
+		return self._muc_getItemAttr('item', 'affiliation')
 	
 	def getNick(self):
 		"""Returns the nick value (for nick change in groupchat)"""
-		return self._muc_getItemAttr('item','nick')
+		return self._muc_getItemAttr('item', 'nick')
 	
 	def getJid(self):
 		"""Returns the presence jid (for groupchat)"""
-		return self._muc_getItemAttr('item','jid')
+		return self._muc_getItemAttr('item', 'jid')
 	
 	def getReason(self):
 		"""Returns the reason of the presence (for groupchat)"""
-		return self._muc_getSubTagDataAttr('reason','')[0]
-	
-	def getActor(self):
-		"""Returns the reason of the presence (for groupchat)"""
-		return self._muc_getSubTagDataAttr('actor','jid')[1]
+		return self._muc_getSubTagDataAttr('reason', '')[0]
 	
 	def getStatusCode(self):
 		"""Returns the status code of the presence (for groupchat)"""
-		return self._muc_getItemAttr('status','code')
+		return self._muc_getItemAttr('status', 'code')
 
 class Iq(Protocol): 
 	""" XMPP Iq object - get/set dialog mechanism. """

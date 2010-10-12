@@ -341,12 +341,6 @@ def getConfigKey(conference, key):
 def setConfigKey(conference, key, value):
 	gConfig[conference][key] = value
 
-def joinConferences(conferences):
-	for conference in conferences:
-		joinConference(conference, getBotNick(conference), getConfigKey(conference, "password"))
-		saveConferenceConfig(conference)
-	printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
-
 def addConference(conference):
 	gConferences[conference] = {}
 	gIsJoined[conference] = False
@@ -813,7 +807,9 @@ def start():
 	if(conferences):
 		for conference in conferences:
 			addConference(conference)
-		startThread(joinConferences, (conferences, ))
+			joinConference(conference, getBotNick(conference), getConfigKey(conference, "password"))
+			saveConferenceConfig(conference)
+	printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
 	callEventHandlers(INIT_2)
 	while(1):

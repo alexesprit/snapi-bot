@@ -15,14 +15,15 @@
 # $Id: transports.py,v 1.35 2009/04/07 08:34:09 snakeru Exp $
 
 """
-This module contains the low-level implementations of xmpppy connect methods or
-(in other words) transports for xmpp-stanzas.
-Currently here is three transports:
-direct TCP connect - TCPSocket class
-proxied TCP connect - HTTPProxySocket class (CONNECT proxies)
-TLS connection - TLS class. Can be used for SSL connections also.
+	This module contains the low-level implementations of xmpppy connect methods or
+	(in other words) transports for xmpp-stanzas.
+	Currently here is three transports:
+	direct TCP connect - TCPSocket class
+	proxied TCP connect - HTTPProxySocket class (CONNECT proxies)
+	TLS connection - TLS class. Can be used for SSL connections also.
 
-Transports are stackable so you - f.e. TLS use HTPPROXYsocket or TCPSocket as more low-level transport.
+	Transports are stackable so you - f.e. TLS use HTPPROXYsocket or TCPSocket 
+	as more low-level transport.
 """
 
 import base64
@@ -113,7 +114,7 @@ class TCPSocket(PlugIn):
 			self.printf("Successfully connected to remote host %s:%s" % (server[0], server[1]), 'start')
 			return 'ok'
 		except socket.error, (errno, strerror): 
-			self.printf("Failed to connect to remote host %s: %s (%s)" % (server, strerror, errno), 'error')
+			self.printf("Failed to connect to remote host %s: %s (%s)" % (server[0], strerror, errno), 'error')
 		except Exception:
 			pass
 
@@ -176,7 +177,7 @@ class TCPSocket(PlugIn):
 			self.printf("Socket error while sending data", 'error')
 			self._owner.disconnected()
 
-	def pending_data(self, timeout = 0):
+	def pending_data(self, timeout=0):
 		""" Returns true if there is a data ready to be read. """
 		return select.select([self._sock], [], [], timeout)[0]
 
@@ -263,10 +264,7 @@ class TLS(PlugIn):
 		PlugIn.PlugIn(self, owner)
 		if startSSL:
 			return self._startSSL()
-		try:
-			self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
-		except NodeProcessed:
-			pass
+		self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
 		self.state = None
 
 	def plugout(self):
@@ -276,15 +274,15 @@ class TLS(PlugIn):
 
 	def FeaturesHandler(self, conn, feats):
 		""" Used to analyse server <features/> tag for TLS support.
-			If TLS is supported starts the encryption negotiation. Used internally"""
+			If TLS is supported starts the encryption negotiation. Used internally
+		"""
 		if not feats.getTag("starttls", namespace=NS_TLS):
-			self.printf("TLS unsupported by remote server.", 'warn')
+			self.printf("TLS unsupported by remote server", 'warn')
 			return
-		self.printf("TLS supported by remote server. Requesting TLS start.", 'ok')
+		self.printf("TLS supported by remote server. Requesting TLS start", 'ok')
 		self._owner.registerHandler("proceed", self.StartTLSHandler, xmlns=NS_TLS)
 		self._owner.registerHandler("failure", self.StartTLSHandler, xmlns=NS_TLS)
 		self._owner.Connection.send("<starttls xmlns=\"%s\"/>" % (NS_TLS))
-		raise NodeProcessed
 
 	def pending_data(self, timeout=0):
 		""" Returns true if there possible is a data ready to be read. """
