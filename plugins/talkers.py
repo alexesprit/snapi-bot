@@ -18,7 +18,6 @@ SAVE_COUNT = 20
 TALKERS_FILE = "talkers.txt"
 
 gTalkersCache = {}
-gMsgCount = {}
 
 def showTopTalkersInfo(msgType, conference, nick):
 	base = gTalkersCache[conference]
@@ -91,16 +90,10 @@ def updateTalkersInfo(stanza, msgType, conference, nick, trueJid, body):
 		else:
 			base[trueJid]["messages"] += 1
 		base[trueJid]["words"] += len(body.split())
-		if(gMsgCount[conference] >= SAVE_COUNT):
-			base.save()
-			gMsgCount[conference] = 0
-		else:
-			gMsgCount[conference] += 1
 
 def loadTalkersBase(conference):
 	fileName = getConfigPath(conference, TALKERS_FILE)
 	gTalkersCache[conference] = database.DataBase(fileName)
-	gMsgCount[conference] = 0
 
 def freeTalkersBase(conference):
 	del(gTalkersCache[conference])

@@ -24,10 +24,13 @@ def loadSeenBase(conference):
 def freeSeenBase(conference):
 	del(gSeenCache[conference])
 
+def saveAllSeenBases():
+	for conference in getConferences():
+		gSeenCache[conference].save()
+
 def updateSeenTime(conference, nick, trueJid, reason, code):
 	if("303" != code):
 		gSeenCache[conference][trueJid] = time.time()
-		gSeenCache[conference].save()
 
 def showSeenTime(msgType, conference, nick, param):
 	userNick = param or nick
@@ -50,6 +53,7 @@ registerLeaveHandler(updateSeenTime)
 
 registerEvent(loadSeenBase, ADDCONF)
 registerEvent(freeSeenBase, DELCONF)
+registerEvent(saveAllSeenBases, SHUTDOWN)
 
 registerCommand(showSeenTime, u"когдабыл", 10, 
 				u"Показывает, сколько времени назад пользователь вышел из чата", 

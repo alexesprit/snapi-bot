@@ -17,6 +17,14 @@ HERE_FILE = "tuta.txt"
 
 gHereTime = {}
 
+def updateHereTimeInfo(conference, nick, trueJid):
+	base = gHereTime[conference]
+	joinTime = getNickKey(conference, nick, "joined")
+	if(trueJid in base):
+		hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
+		base[trueJid]["here"] += hereTime
+		base[trueJid]["record"] = max(base[trueJid]["record"], hereTime)
+
 def showHereStatistic(msgType, conference, nick, param):
 	userNick = param or nick
 	if(nickIsOnline(conference, userNick)):
@@ -41,16 +49,9 @@ def updateJoinStatistic(conference, nick, trueJid, aff, role):
 	if(trueJid not in base):
 		base[trueJid] = {"record": 0, "count": 0, "here": 0}
 	base[trueJid]["count"] += 1
-	base.save()
 
 def updateLeaveStatistic(conference, nick, trueJid, reason, code):
-	base = gHereTime[conference]
-	joinTime = getNickKey(conference, nick, "joined")
-	if(trueJid in base):
-		hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
-		base[trueJid]["here"] += hereTime
-		base[trueJid]["record"] = max(base[trueJid]["record"], hereTime)
-		base.save()
+	updateHereTimeInfo(conference, nick, trueJid)
 
 def loadHereBase(conference):
 	fileName = getConfigPath(conference, HERE_FILE)
@@ -61,6 +62,9 @@ def freeHereBase(conference):
 
 def saveAllHereBases():
 	for conference in getConferences():
+		for nick in getOnlineNicks(conference):
+			trueJid = getTrueJid(conference, nick)
+			updateHereTimeInfo(conference, nick, trueJid)
 		gHereTime[conference].save()
 
 registerEvent(loadHereBase, ADDCONF)

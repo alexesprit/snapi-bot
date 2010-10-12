@@ -62,10 +62,14 @@ def _saveUserClient(stanza, conference, trueJid):
 				client = p.getData()
 				if(not client in base[trueJid]):
 					base[trueJid].append(client)
-					base.save()
+
+def saveAllClientsBases():
+	for conference in getConferences():
+		gUserClients[conference].save()
 
 registerEvent(loadClientsCache, ADDCONF)
 registerEvent(freeClientsCache, DELCONF)
+registerEvent(saveAllClientsBases, SHUTDOWN)
 
 registerJoinHandler(saveUserClient)
 
