@@ -15,7 +15,7 @@
 # $Id: auth.py, v 1.41 2008/09/13 21:45:21 normanr Exp $
 
 """
-	Provides library with all Non-SASL and SASL authentication mechanisms.
+	Provides library with all SASL authentication mechanisms.
 	Can be used both for client and transport authentication.
 """
 
@@ -41,13 +41,12 @@ DBG_BIND = "bind"
 
 AUTH_FAILURE = 0x0
 AUTH_WAITING = 0x1
-AUTH_NONSASL = 0x2
-AUTH_SUCCESS = 0x3
+AUTH_SUCCESS = 0x2
 
-BIND_WAITING = 0x4
-BIND_BINDING = 0x5
-BIND_FAILURE = 0x6
-BIND_SUCCESS = 0x7
+BIND_FAILURE = 0x0
+BIND_WAITING = 0x1
+BIND_BINDING = 0x2
+BIND_SUCCESS = 0x3
 
 class SASL(PlugIn):
 	""" Implements SASL authentication. """
@@ -55,7 +54,7 @@ class SASL(PlugIn):
 		PlugIn.__init__(self)
 		self.username = username
 		self.password = password
-		self.DBG_LINE = DBG_AUTH
+		self.debugFlag = DBG_AUTH
 		self.state = None
 
 	def auth(self):
@@ -170,18 +169,18 @@ class Bind(PlugIn):
 	""" Bind some JID to the current connection to allow router know of our location."""
 	def __init__(self):
 		PlugIn.__init__(self)
-		self.DBG_LINE = DBG_BIND
+		self.debugFlag = DBG_BIND
 		self.bound = BIND_WAITING
 
 	def plugin(self, owner):
 		""" Start resource binding,  if allowed at this time. Used internally. """
-		self._owner.registerHandler("features", self.FeaturesHandler, xmlns=NS_STREAMS)
+		self._owner.registerHandler("features", self.featuresHandler, xmlns=NS_STREAMS)
 
 	def plugout(self):
 		""" Remove Bind handler from owner's dispatcher. Used internally. """
-		self._owner.unregisterHandler("features", self.FeaturesHandler, xmlns=NS_STREAMS)
+		self._owner.unregisterHandler("features", self.featuresHandler, xmlns=NS_STREAMS)
 
-	def FeaturesHandler(self, conn, feats):
+	def featuresHandler(self, conn, feats):
 		""" Determine if server supports resource binding and set some internal attributes accordingly. """
 		if not feats.getTag("bind", namespace=NS_BIND):
 			self.bound = BIND_FAILURE
@@ -189,7 +188,7 @@ class Bind(PlugIn):
 			return
 		self.bound = BIND_BINDING
 
-	def Bind(self, resource=None):
+	def bindResource(self, resource=None):
 		""" Perform binding. Use provided resource name or random (if not provided). """
 		while self.bound == BIND_WAITING and self._owner.process(1):
 			pass

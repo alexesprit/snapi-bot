@@ -29,12 +29,13 @@ import dispatcher
 import roster
 import transports
 
-debug.Debug.colors['socket'] = debug.colorDarkGray
-debug.Debug.colors['proxy'] = debug.colorDarkGray
-debug.Debug.colors['dispatcher'] = debug.colorGreen
-debug.Debug.colors['roster'] = debug.colorMagenta
 debug.Debug.colors['auth'] = debug.colorYellow
 debug.Debug.colors['bind'] = debug.colorBrown
+debug.Debug.colors['dispatcher'] = debug.colorGreen
+debug.Debug.colors['proxy'] = debug.colorDarkGray
+debug.Debug.colors['roster'] = debug.colorMagenta
+debug.Debug.colors['socket'] = debug.colorDarkGray
+debug.Debug.colors['tls'] = debug.colorDarkGray
 
 debug.Debug.colors['ok'] = debug.colorBrown
 debug.Debug.colors['warn'] = debug.colorYellow
@@ -108,10 +109,11 @@ class CommonClient:
 		self.connected = C_TCP
 		if (SSLMode == SSL_AUTO and self.Connection.getPort() in (5223, 443)) or SSLMode == SSL_FORCE:
 			try:			   # FIXME. This should be done in transports.py
-				transports.TLS().PlugIn(self, startSSL=True)
+				transports.TLS().PlugIn(self, forceSSL=True)
 				self.connected = C_SSL
 			except socket.sslerror:
-				pass
+				self.TLS.PlugOut()
+				return False
 		dispatcher.Dispatcher().PlugIn(self)
 		while self.Dispatcher.Stream._document_attrs is None:
 			if not self.process(1):
@@ -132,7 +134,7 @@ class Client(CommonClient):
 			If you want to force SSL start (i.e. if port 5223 or 443 is remapped to some non-standard port) then set it to SSL_FORCE.
 			If you want to disable tls/ssl support completely, set it to SSL_DISABLE.
 			Example: connect(('192.168.5.5', 5222), {'host':'proxy.my.net', 'port':8080, 'user':'me', 'password':'secret'})
-			Returns '' or 'TCP' or 'TLS', depending on the result.
+			Returns False or "TCP", "SSL" "TLS", depending on the result.
 		"""
 		if(not CommonClient.connect(self, server, proxy, SSLMode, useResolver)):
 			return False
@@ -142,15 +144,14 @@ class Client(CommonClient):
 				# If we get version 1.0 stream the features tag MUST BE presented
 				while not self.Dispatcher.Stream.features and self.process(1):
 					pass
-				# TLS not supported by server
-				if not self.Dispatcher.Stream.features.getTag('starttls'):
+				if transports.TLS_UNSUPPORTED == self.TLS.state:
 					self.TLS.PlugOut()
 					return self.connected
 				while not self.TLS.state and self.process(1):
 					pass
 				if self.TLS.state != transports.TLS_SUCCESS:
 					self.TLS.PlugOut()
-					return self.connected
+					return False
 				self.connected = C_TLS
 		return self.connected
 
@@ -172,7 +173,7 @@ class Client(CommonClient):
 		if auth.AUTH_SUCCESS == self.SASL.state:
 			self.SASL.PlugOut()
 			auth.Bind().PlugIn(self)
-			if auth.BIND_SUCCESS == self.Bind.Bind(resource):
+			if auth.BIND_SUCCESS == self.Bind.bindResource(resource):
 				self.Bind.PlugOut()
 				return auth.AUTH_SUCCESS
 		else:

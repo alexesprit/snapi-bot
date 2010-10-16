@@ -9,7 +9,7 @@ gHost = "server.tld"
 gPort = 5222
 
 # xmpp.SSL_DISABLE - отключить SSL
-# xmpp.SSL_AUTO - автоопределение (порт 443 или 5223)
+# xmpp.SSL_AUTO - автоопределение (SSL, если порт 443, 5223, иначе TLS)
 # xmpp.SSL_FORCE - форсировать (нестандартный порт)
 gSSLMode = xmpp.SSL_DISABLE
 gUseResolver = False
@@ -41,11 +41,12 @@ gCoreDebug = ["info", "error", "success", "warning"]
 # auth - авторизация
 # bind - назначение ресурса
 # dispatcher - обработка станз
-# proxy - подклчение через прокси
+# proxy - подключение через прокси
 # roster - работа с ростером
 # socket - передаваемые данные
-# tls - TLS/SSL-подключение
+# tls - включение TLS/SSL
 gXMPPDebug = []
+
 # расскоментируйте, чтобы отключить логирование действий
 # лог ошибок по прежнему можно будет посмотреть в syslogs
 #xmpp.debug.Debug = xmpp.debug.NoDebug

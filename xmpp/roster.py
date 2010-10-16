@@ -22,7 +22,7 @@
 from protocol import *
 from plugin import PlugIn
 
-ROSTER_DBG_LINE = 'roster'
+DBG_ROSTER = "roster"
 
 ROSTER_EMPTY = 0x0
 ROSTER_REQUESTING = 0x1
@@ -34,11 +34,12 @@ class Roster(PlugIn):
 		account that every JID can have multiple resources connected. Does not
 		currently support 'error' presences.
 		You can also use mapping interface for access to the internal representation of
-		contacts in roster.	"""
+		contacts in roster.
+	"""
 	def __init__(self):
 		""" Init internal variables. """
 		PlugIn.__init__(self)
-		self.ROSTER_DBG_LINE = 'roster'
+		self.debugFlag = DBG_ROSTER
 		self.rosterData = {}
 		self.state = ROSTER_EMPTY
 		self._exportedMethods = [self.getRoster]
@@ -46,14 +47,15 @@ class Roster(PlugIn):
 	def plugin(self, owner):
 		""" Register presence and subscription trackers in the owner's dispatcher.
 			Also request roster from server if the 'request' argument is set.
-			Used internally. """
-		self._owner.registerHandler('iq', self.rosterIqHandler, TYPE_RESULT, NS_ROSTER)
-		self._owner.registerHandler('iq', self.rosterIqHandler, TYPE_SET, NS_ROSTER)
+			Used internally.
+		"""
+		self._owner.registerHandler("iq", self.rosterIqHandler, namespace=NS_ROSTER)
 		self._owner.registerHandler('presence', self.presenceHandler)
 
 	def requestRoster(self):
 		""" Request roster from server if it were not yet requested 
-			(or if the 'force' argument is set). """
+			(or if the 'force' argument is set).
+		"""
 		if(self.state == ROSTER_LOADED):
 			return
 		self.state = ROSTER_REQUESTING
@@ -70,7 +72,8 @@ class Roster(PlugIn):
 
 	def rosterIqHandler(self, dis, stanza):
 		""" Subscription tracker. Used internally for setting items state in
-			internal roster representation. """
+			internal roster representation.
+		"""
 		for item in stanza.getTag('query').getTags('item'):
 			jid = item.getAttr('jid')
 			if(item.getAttr('subscription') == 'remove'):
@@ -92,7 +95,8 @@ class Roster(PlugIn):
 
 	def presenceHandler(self, dis, stanza):
 		""" Presence tracker. Used internally for setting items' resources state in
-			internal roster representation. """
+			internal roster representation.
+		"""
 		fullJid = JID(stanza.getFrom())
 		bareJid = fullJid.getStripped()
 		if(bareJid in self.rosterData):
@@ -206,21 +210,22 @@ class Roster(PlugIn):
 
 	def delItem(self, jid):
 		""" Delete contact 'jid' from roster. """
-		self._owner.send(Iq('set', NS_ROSTER, payload = [Node('item', {'jid': jid,'subscription': 'remove'})]))
+		self._owner.send(Iq(TYPE_SET, NS_ROSTER, payload=[Node('item', {'jid': jid,'subscription': 'remove'})]))
 		
 	def subscribe(self, jid):
 		""" Send subscription request to JID 'jid'. """
-		self._owner.send(Presence(jid, 'subscribe'))
+		self._owner.send(Presence(jid, PRS_SUBSCRIBE))
 
 	def unsubscribe(self, jid):
 		""" Ask for removing our subscription for JID 'jid'. """
-		self._owner.send(Presence(jid, 'unsubscribe'))
+		self._owner.send(Presence(jid, PRS_UNSUBSCRIBE))
 
 	def authorize(self, jid):
 		""" Authorise JID 'jid'. Works only if these JID requested auth previously. """
-		self._owner.send(Presence(jid, 'subscribed'))
+		self._owner.send(Presence(jid, PRS_SUBSCRIBED))
 
 	def unauthorize(self, jid):
 		""" Unauthorise JID 'jid'. Use for declining authorisation request 
-			or for removing existing authorization. """
-		self._owner.send(Presence(jid, 'unsubscribed'))
+			or for removing existing authorization.
+		"""
+		self._owner.send(Presence(jid, PRS_UNSUBSCRIBED))

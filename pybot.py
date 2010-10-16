@@ -112,7 +112,9 @@ CMD_SYNTAX = 0x3
 CMD_EXAMPLE = 0x4
 CMD_TYPE = 0x5
 
-os.chdir(os.path.dirname(sys.argv[0]))
+gCurrentDir = os.path.dirname(sys.argv[0])
+if gCurrentDir:
+	os.chdir(gCurrentDir)
 execfile(BOTCONFIG_FILE) in globals()
 
 gUserName, gServer = gJid.split("@")
@@ -234,10 +236,14 @@ def callCommandHandlers(command, cmdType, jid, resource, param):
 
 def startThread(func, param=None):
 	gInfo["thr"] += 1
-	if(param):
-		threading.Thread(None, execute, func.__name__, (func, param)).start()
-	else:
-		threading.Thread(None, execute, func.__name__, (func, )).start()
+	threading.Thread(None, execute, func.__name__, (func, param)).start()
+
+def startTimer(timeout, func, param=None):
+	gInfo["tmr"] += 1
+	timer = threading.Timer(timeout, execute, (func, param))
+	timer.setName(func.__name__)
+	timer.start()
+	return(timer)
 
 def execute(function, param=None):
 	try:
@@ -249,16 +255,6 @@ def execute(function, param=None):
 				function()
 	except(Exception):
 		saveException(function.__name__)
-		
-def startTimer(timeout, func, param=None):
-	gInfo["tmr"] += 1
-	if(param):
-		timer = threading.Timer(timeout, func, param)
-	else:
-		timer = threading.Timer(timeout, func)
-	timer.setName(func.__name__)
-	timer.start()
-	return(timer)
 
 def getUsedMemory():
 	if(os.name == "posix"):
@@ -277,16 +273,17 @@ def time2str(time):
 	minutes, seconds = divmod(time, 60)
 	hours, minutes = divmod(minutes, 60)
 	days, hours = divmod(hours, 24)
-	rep = ""
+	timeString = ""
+
 	if(seconds):
 		rep = u"%d сек." % (seconds)
 	if(minutes):
-		rep = u"%d мин. %s" % (minutes, rep)
+		rep = u"%d мин. %s" % (minutes, timeString)
 	if(hours):
-		rep = u"%d ч. %s" % (hours, rep)
+		rep = u"%d ч. %s" % (hours, timeString)
 	if(days):
-		rep = u"%d дн. %s" % (days, rep)
-	return(rep)
+		rep = u"%d дн. %s" % (days, timeString)
+	return timeString
 
 def decode(text):
 	text = gTagPattern.sub("", text.replace("<br />","\n").replace("<br>","\n"))
@@ -658,8 +655,7 @@ def presenceHandler(session, stanza):
 			trueJid = xmpp.JID(trueJid).getStripped()
 		if(not prsType):
 			if(not trueJid):
-				sendToConference(conference, u"Без прав модератора работа невозможна!")
-				leaveConference(conference)
+				leaveConference(conference, u"Без прав модератора работа невозможна!")
 				return
 			aff = stanza.getAffiliation()
 			role = stanza.getRole()
@@ -799,8 +795,6 @@ def start():
 	gRoster = gClient.getRoster()
 	gClient.setStatus(None, None, gPriority)
 
-	printf("Now I am ready to work :)")
-
 	fileName = getConfigPath(CONF_FILE)
 	createFile(fileName, "[]")
 	conferences = eval(readFile(fileName))
@@ -812,6 +806,8 @@ def start():
 	printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
 	callEventHandlers(INIT_2)
+	
+	printf("Now I am ready to work :)")
 	while(1):
 		gClient.process(10)
 

@@ -119,7 +119,9 @@ PRS_DND = "dnd"
 PRS_NA = "xa"
 
 PRS_SUBSCRIBE = "subscribe"
+PRS_SUBSCRIBED = "subscribed"
 PRS_UBSUBSCRIBE = "unsubscribe"
+PRS_UBSUBSCRIBED = "unsubscribed"
 
 ROLE_NONE = "none"
 ROLE_VISITOR = "visitor"

@@ -28,15 +28,19 @@ def showStatistic(msgType, conference, nick, param):
 
 def botMessageUpdate(msgType, conference, text):
 	if(xmpp.TYPE_PUBLIC == msgType and text):
-		gStats[conference]["mymsg"] += 1
+		try:
+			gStats[conference]["mymsg"] += 1
+		except(Exception):
+			printf(msgType)
+			printf(conference)
+			printf(text)
 
 def messageUpdate(stanza, msgType, conference, nick, trueJid, text):
 	if(nick != getBotNick(conference)):
-		gStats[conference][msgType] += 1
-		if conference is None or msgType is None:
-			print conference
-			print msgType
-			print text
+		try:
+			gStats[conference][msgType] += 1
+		except(Exception):
+			printf(stanza)
 
 def joinUpdate(conference, nick, trueJid, aff, role):
 	if(not trueJid in gJoined[conference]):

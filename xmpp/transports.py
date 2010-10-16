@@ -51,6 +51,7 @@ DBG_TLS = "tls"
 
 TLS_SUCCESS = 0x1
 TLS_FAILURE = 0x2
+TLS_UNSUPPORTED = 0x3
 
 class TCPSocket(PlugIn):
 	""" This class defines direct TCP connection method. """
@@ -61,7 +62,7 @@ class TCPSocket(PlugIn):
 			server instead
 		"""
 		PlugIn.__init__(self)
-		self.DBG_LINE = DBG_SOCKET
+		self.debugFlag = DBG_SOCKET
 		self._exportedMethods = [self.send, self.disconnect]
 		self._server, self.useResolver = server, useResolver
 
@@ -81,7 +82,8 @@ class TCPSocket(PlugIn):
 	def plugin(self, owner):
 		""" Fire up connection. Return non-empty string on success.
 			Also registers self.disconnected method in the owner's dispatcher.
-			Called internally. """
+			Called internally.
+		"""
 		if not self._server:
 			self._server = (self._owner.Server, 5222)
 		if self.useResolver:
@@ -143,11 +145,11 @@ class TCPSocket(PlugIn):
 		except Exception:
 			received = ''
 
-		while self.pending_data(0):
+		while self.hasPendingData(0):
 			try:
 				add = self._recv(BUFLEN)
 			except Exception:
-				add = ''
+				add = ""
 			received += add
 			if not add:
 				break
@@ -177,7 +179,7 @@ class TCPSocket(PlugIn):
 			self.printf("Socket error while sending data", 'error')
 			self._owner.disconnected()
 
-	def pending_data(self, timeout=0):
+	def hasPendingData(self, timeout=0):
 		""" Returns true if there is a data ready to be read. """
 		return select.select([self._sock], [], [], timeout)[0]
 
@@ -196,7 +198,7 @@ class HTTPProxySocket(TCPSocket):
 			and optional keys 'user' and 'password' to use for authentication.
 			'server' argument is a tuple of host and port - just like TCPSocket uses. """
 		TCPSocket.__init__(self, server, useResolver)
-		self.DBG_LINE = DBG_PROXY
+		self.debugFlag = DBG_PROXY
 		self._proxy = proxy
 
 	def plugin(self, owner):
@@ -252,7 +254,7 @@ class HTTPProxySocket(TCPSocket):
 
 class TLS(PlugIn):
 	""" TLS connection used to encrypts already estabilished tcp connection."""
-	def PlugIn(self, owner, startSSL=False):
+	def PlugIn(self, owner, forceSSL=False):
 		""" If the 'startSSL' argument is true then starts using encryption immidiatedly.
 			If 'startSSL' is false then starts encryption as soon as TLS feature is
 			declared by the server (if it were already declared - it is ok).
@@ -260,28 +262,31 @@ class TLS(PlugIn):
 		# Already enabled
 		if hasattr(owner, 'TLS'):
 			return
-		self.DBG_LINE = DBG_TLS
+		self.debugFlag = DBG_TLS
 		PlugIn.PlugIn(self, owner)
-		if startSSL:
+		self.forceSSL = forceSSL
+		if forceSSL:
 			return self._startSSL()
-		self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
 		self.state = None
+		self.featuresHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
 
 	def plugout(self):
 		""" Unregisters TLS handler's from owner's dispatcher. """
-		self._owner.unregisterHandler("proceed", self.StartTLSHandler, xmlns=NS_TLS)
-		self._owner.unregisterHandler("failure", self.StartTLSHandler, xmlns=NS_TLS)
+		if not self.forceSSL:
+			self._owner.unregisterHandler("proceed", self.startTLSHandler, xmlns=NS_TLS)
+			self._owner.unregisterHandler("failure", self.startTLSHandler, xmlns=NS_TLS)
 
-	def FeaturesHandler(self, conn, feats):
+	def featuresHandler(self, conn, feats):
 		""" Used to analyse server <features/> tag for TLS support.
 			If TLS is supported starts the encryption negotiation. Used internally
 		"""
 		if not feats.getTag("starttls", namespace=NS_TLS):
+			self.state = TLS_UNSUPPORTED
 			self.printf("TLS unsupported by remote server", 'warn')
 			return
 		self.printf("TLS supported by remote server. Requesting TLS start", 'ok')
-		self._owner.registerHandler("proceed", self.StartTLSHandler, xmlns=NS_TLS)
-		self._owner.registerHandler("failure", self.StartTLSHandler, xmlns=NS_TLS)
+		self._owner.registerHandler("proceed", self.startTLSHandler, xmlns=NS_TLS)
+		self._owner.registerHandler("failure", self.startTLSHandler, xmlns=NS_TLS)
 		self._owner.Connection.send("<starttls xmlns=\"%s\"/>" % (NS_TLS))
 
 	def pending_data(self, timeout=0):
@@ -303,14 +308,12 @@ class TLS(PlugIn):
 		tcpsock.pending_data = self.pending_data
 		tcpsock._sock.setblocking(0)
 
-		self.state = 'success'
+		self.state = TLS_SUCCESS
 
-	def StartTLSHandler(self, conn, stanza):
+	def startTLSHandler(self, conn, stanza):
 		""" Handle server reply if TLS is allowed to process. Behaves accordingly.
 			Used internally.
 		"""
-		if stanza.getNamespace() != NS_TLS:
-			return
 		if stanza.getName() == "failure":
 			self.state = TLS_FAILURE
 			self.printf("Got starttls response: %s" % (self.state), "error")

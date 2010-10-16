@@ -13,23 +13,25 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-QUOTES_COUNT = 38
+CINEMAQUOTES_COUNT = 38
 
-def showQuote(msgType, conference, nick, param):
-	pageNum = random.randrange(1, QUOTES_COUNT + 1)
+def showCinemaQuote(msgType, conference, nick, param):
+	pageNum = random.randrange(1, CINEMAQUOTES_COUNT + 1)
 	url = "http://skio.ru/afofilms/kino%d.php" % (pageNum)
 	rawHTML = urllib.urlopen(url).read()
 	items = re.search("<ul type=\"circle\"(.+?)</ul>", rawHTML, re.DOTALL)
 	if(items):
 		rawHTML = items.group(0)
-		items = re.findall("<li>(.+?)</li>", rawHTML, re.DOTALL)
+		items = re.findall("<li>(.+?)<li>", rawHTML, re.DOTALL)
+		if not items:
+			print pageNum
 		quote = random.choice(items)
 		quote = decode(quote)
 		sendMsg(msgType, conference, nick, unicode(quote, "cp1251"))
 	else:
 		sendMsg(msgType, conference, nick, u"не получается")
 
-registerCommand(showQuote, u"киноцитата", 10, 
+registerCommand(showCinemaQuote, u"киноцитата", 10, 
 				u"Показывает случайную цитату из кино", 
 				None, 
 				(u"киноцитата", ), 

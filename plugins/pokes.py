@@ -26,19 +26,18 @@ def pokeUser(msgType, conference, nick, param):
 	if(msgType == xmpp.TYPE_PUBLIC):
 		if(param):
 			botNick = getBotNick(conference)
-			if(param != botNick):
-				if(param == u"всех"):
-					for userNick in getOnlineNicks(conference):
-						if(userNick != botNick and userNick != nick):
-							message = random.choice(gPokes)
-							sendToConference(conference, u"/me " + message % (userNick))
-				elif(nickIsOnline(conference, param)):
-					message = random.choice(gPokes)
-					sendToConference(conference, u"/me " + message % (param))
-				else:
-					sendMsg(msgType, conference, nick, u"а это кто?")
+			if(param == u"всех"):
+				for userNick in getOnlineNicks(conference):
+					if(userNick != botNick and userNick != nick):
+						message = random.choice(gPokes)
+						sendToConference(conference, u"/me " + message % (userNick))
+			elif(nickIsOnline(conference, param)):
+				if param == botNick:
+					param = nick
+				message = random.choice(gPokes)
+				sendToConference(conference, u"/me " + message % (param))
 			else:
-				sendMsg(msgType, conference, nick, u"шибко умный, да? ]:->")
+				sendMsg(msgType, conference, nick, u"а это кто?")
 		else:
 			sendMsg(msgType, conference, nick, u"мазохист? :D")
 	else:

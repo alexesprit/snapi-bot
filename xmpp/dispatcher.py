@@ -38,7 +38,7 @@ class Dispatcher(PlugIn):
 		Can be plugged out/in to restart these headers (used for SASL f.e.). """
 	def __init__(self):
 		PlugIn.__init__(self)
-		self.DBG_LINE = DBG_DISPATCHER
+		self.debugFlag = DBG_DISPATCHER
 		self.handlers = {}
 		self._expected = {}
 		self._exportedMethods = [
@@ -118,7 +118,7 @@ class Dispatcher(PlugIn):
 			Take note that in case of disconnection detect during process() call
 			disconnect handlers are called automatically.
 		"""
-		if self._owner.Connection.pending_data(timeout):
+		if self._owner.Connection.hasPendingData(timeout):
 			try:
 				data = self._owner.Connection.receive()
 			except IOError:
@@ -148,7 +148,7 @@ class Dispatcher(PlugIn):
 		self.printf('Registering protocol "%s" as %s (%s)' % (tagName, protocol, xmlns), order)
 		self.handlers[xmlns][tagName] = {"type": protocol, "default": []}
 
-	def registerHandler(self, name, handler, htype="", namespace="", xmlns=None, isOnce=False):
+	def registerHandler(self, name, handler, htype="", namespace="", xmlns=None):
 		"""	Register user callback as stanzas handler of declared type. Callback must take
 			arguments: dispatcher instance (for replying), incomed return of previous handlers.
 			The callback must raise xmpp.NodeProcessed just before return if it want preven
@@ -205,7 +205,8 @@ class Dispatcher(PlugIn):
 
 	def dispatch(self, stanza, session=None):
 		""" Main procedure that performs XMPP stanza recognition and calling apppropriate handlers for it.
-			Called internally. """
+			Called internally.
+		"""
 		if(not session):
 			session = self
 		session.Stream._mini_dom = None

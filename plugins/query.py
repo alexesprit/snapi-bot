@@ -15,17 +15,17 @@
 # GNU General Public License for more details.
 
 BOT_FEATURES = (
-				xmpp.NS_DISCO_INFO,
-				xmpp.NS_DISCO_ITEMS,
-				xmpp.NS_MUC,
-				xmpp.NS_MOOD,
-				xmpp.NS_CAPS,
-				xmpp.NS_RECEIPTS,
-				xmpp.NS_ACTIVITY,
-				xmpp.NS_PING,
-				xmpp.NS_VERSION,
-				xmpp.NS_VCARD,
-				xmpp.NS_ENTITY_TIME
+	xmpp.NS_DISCO_INFO,
+	xmpp.NS_DISCO_ITEMS,
+	xmpp.NS_MUC,
+	xmpp.NS_CAPS,
+	xmpp.NS_RECEIPTS,
+	xmpp.NS_MOOD,
+	xmpp.NS_ACTIVITY,
+	xmpp.NS_PING,
+	xmpp.NS_VERSION,
+	xmpp.NS_VCARD,
+	xmpp.NS_ENTITY_TIME
 )
 
 def processIqStanzas(stanza, jid, resource):
@@ -54,13 +54,13 @@ def processIqStanzas(stanza, jid, resource):
 		elif(stanza.getTags("query", {}, xmpp.NS_DISCO_INFO)):
 			iq = stanza.buildReply(xmpp.TYPE_RESULT)
 			query = iq.addChild("query", {}, [], xmpp.NS_DISCO_ITEMS)
-			query.addChild("identity", {"category": "client", "msgType": "phone", "name": "Jimm"})
+			query.addChild("identity", {"category": "client", "type": "phone", "name": "Jimm"})
 			for feat in BOT_FEATURES:
 				query.addChild("feature", {"var": feat})
 		else:
 			iq = stanza.buildReply(xmpp.TYPE_ERROR)
 			error = iq.addChild("error", {"msgType": "cancel"})
-			error.addChild("feature-not-implemented", {}, [], "urn:ietf:params:xml:ns:xmpp-stanzas")
+			error.addChild("feature-not-implemented", {}, [], xmpp.NS_STANZAS)
 		gClient.send(iq)
 
 registerIqHandler(processIqStanzas)

@@ -16,13 +16,13 @@ class PlugIn:
 	""" Common xmpppy plugins infrastructure: plugging in/out, printfging. """
 	def __init__(self):
 		self._exportedMethods = []
-		self.DBG_LINE = self.__class__.__name__.lower()
+		self.debugFlag = self.__class__.__name__.lower()
 
 	def PlugIn(self, owner):
 		""" Attach to main instance and register ourself and all our staff in it. """
 		self._owner = owner
-		if self.DBG_LINE not in owner.debugFlags:
-			owner.debugFlags.append(self.DBG_LINE)
+		if self.debugFlag not in owner.debugFlags:
+			owner.debugFlags.append(self.debugFlag)
 		className = self.__class__.__name__
 		if not hasattr(owner, className):
 			self.printf('Plugging %s into %s' % (self, self._owner), 'start')
@@ -43,7 +43,7 @@ class PlugIn:
 		self.printf('Plugging %s out of %s' % (self, self._owner), 'stop')
 		if hasattr(self, 'plugout'):
 			self.plugout()
-		self._owner.debugFlags.remove(self.DBG_LINE)
+		self._owner.debugFlags.remove(self.debugFlag)
 		for method in self._exportedMethods:
 			delattr(self._owner, method.__name__)
 		for method in self._oldMethods:
@@ -52,4 +52,4 @@ class PlugIn:
 
 	def printf(self, text, severity='info'):
 		""" Feed a provided printf line to main instance's printf facility along with our ID string. """
-		self._owner.printf(text, self.DBG_LINE, severity)
+		self._owner.printf(text, self.debugFlag, severity)
