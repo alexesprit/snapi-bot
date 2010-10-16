@@ -145,7 +145,7 @@ class TCPSocket(PlugIn):
 		except Exception:
 			received = ''
 
-		while self.hasPendingData(0):
+		while self.pending_data(0):
 			try:
 				add = self._recv(BUFLEN)
 			except Exception:
@@ -179,7 +179,7 @@ class TCPSocket(PlugIn):
 			self.printf("Socket error while sending data", 'error')
 			self._owner.disconnected()
 
-	def hasPendingData(self, timeout=0):
+	def pending_data(self, timeout=0):
 		""" Returns true if there is a data ready to be read. """
 		return select.select([self._sock], [], [], timeout)[0]
 

@@ -85,8 +85,10 @@ class CommonClient:
 		self.connected = False
 		for instance in self.disconnectHandlers:
 			instance()
-		if hasattr(self, C_TLS):
+		if hasattr(self, "TLS"):
 			self.TLS.PlugOut()
+		if hasattr(self, "Dispatcher"):
+			self.Dispatcher.PlugOut()
 
 	def isConnected(self):
 		""" Returns connection state. F.e.: None / 'tls' / 'tcp+non_sasl' . """

@@ -276,13 +276,13 @@ def time2str(time):
 	timeString = ""
 
 	if(seconds):
-		rep = u"%d сек." % (seconds)
+		timeString = u"%d сек." % (seconds)
 	if(minutes):
-		rep = u"%d мин. %s" % (minutes, timeString)
+		timeString = u"%d мин. %s" % (minutes, timeString)
 	if(hours):
-		rep = u"%d ч. %s" % (hours, timeString)
+		timeString = u"%d ч. %s" % (hours, timeString)
 	if(days):
-		rep = u"%d дн. %s" % (days, timeString)
+		timeString = u"%d дн. %s" % (days, timeString)
 	return timeString
 
 def decode(text):

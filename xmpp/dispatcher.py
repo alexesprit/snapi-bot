@@ -1,4 +1,4 @@
-# transports.py
+# dispatcher.py
 
 # Copyright (C) 2003-2005 Alexey "Snake" Nezhdanov
 
@@ -118,7 +118,7 @@ class Dispatcher(PlugIn):
 			Take note that in case of disconnection detect during process() call
 			disconnect handlers are called automatically.
 		"""
-		if self._owner.Connection.hasPendingData(timeout):
+		if self._owner.Connection.pending_data(timeout):
 			try:
 				data = self._owner.Connection.receive()
 			except IOError:
