@@ -59,8 +59,6 @@ FEATURES = {
 	xmpp.NS_JINGLE:			"XEP-0234: Jingle File Transfer",
 }
 
-gFeatList = FEATURES.keys()
-
 def showFeatures(msgType, conference, nick, param):
 	if(param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
@@ -77,18 +75,17 @@ def showFeatures(msgType, conference, nick, param):
 
 def _showFeatures(stanza, msgType, conference, nick, param):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
-		featList = set()
-		for p in stanza.getQueryChildren():
-			attr = p.getAttrs()
-			if("var" in attr):
-				for feat in attr["var"].split():
-					for y in FEATURES:
-						if(feat.count(y)):
-							featList.add(FEATURES[y])
-		if(featList):
-			featList = list(featList)
-			featList.sort()
-			answer = u"вот, что я узнала:\n%s" % ("\n".join(featList))
+		featureList = set()
+		for child in stanza.getQueryChildren():
+			feature = child.getAttr("var")
+			if feature:
+				for knownFeature in FEATURES:
+					if(feature.count(knownFeature)):
+						featureList.add(FEATURES[knownFeature])
+		if(featureList):
+			featureList = list(featureList)
+			featureList.sort()
+			answer = u"вот, что я узнала:\n%s" % ("\n".join(featureList))
 			if(xmpp.TYPE_PUBLIC == msgType):
 				sendMsg(msgType, conference, nick, u"ушли")
 			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, answer)
