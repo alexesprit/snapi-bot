@@ -53,8 +53,11 @@ def showServerInfo(msgType, conference, nick, param):
 def _showServerUptime(stanza, msgType, conference, nick, server):
 	if(xmpp.TYPE_RESULT == stanza.getType()):
 		child = stanza.getFirstChild()
-		seconds = child.getAttr("seconds")
-		sendMsg(msgType, conference, nick, u"%s работает уже %s" % (server, time2str(int(seconds))))
+		seconds = int(child.getAttr("seconds"))
+		if seconds:
+			sendMsg(msgType, conference, nick, u"%s работает уже %s" % (server, time2str(seconds)))
+		else:
+			sendMsg(msgType, conference, nick, u"нет информации")
 	else:
 		sendMsg(msgType, conference, nick, u"не получается :(")
 

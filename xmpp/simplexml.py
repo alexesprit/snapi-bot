@@ -30,7 +30,6 @@ UNESCAPE_MAP = {
 	"&mdash;": "-"	
 }
 
-
 def XMLEscape(xml):
 	"""Returns provided string with symbols & < > " replaced by their respective XML entities."""
 	return xml.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
@@ -149,17 +148,12 @@ class Node(object):
 			val = ustr(self.attrs[key])
 			s = s + ' %s="%s"' % (key, XMLEscape(val))
 		s = s + ">"
-		cnt = 0
-		dataLen = len(self.data)
 		if self.children:
 			for child in self.children:
-				if(dataLen - 1) >= cnt:
-					s += XMLEscape(self.data[cnt].strip())
 				if child:
 					s += ustr(child)
-				cnt += 1
-		if (dataLen - 1) >= cnt:
-			s = s + XMLEscape(self.data[cnt].strip())
+		if self.data:
+			s += XMLEscape(self.getData().strip())
 		if not self.children and not self.data:
 			s = s[:-1] + " />"
 		else:
@@ -177,13 +171,11 @@ class Node(object):
 		if namespace:
 			newnode.setNamespace(namespace)
 		self.children.append(newnode)
-		self.data.append(u'')
 		return newnode
 
 	def addData(self, data):
 		""" Adds some CDATA to node. """
 		self.data.append(ustr(data))
-		self.children.append(None)
 
 	def clearData(self):
 		""" Removes all CDATA from the node. """
@@ -199,7 +191,7 @@ class Node(object):
 		"""
 		if not isinstance(node, Node):
 			node = self.getTag(node,attrs)
-		self.children[self.children.index(node)] = None
+		del self.children[self.children.index(node)]
 		return node
 
 	def getAttrs(self):

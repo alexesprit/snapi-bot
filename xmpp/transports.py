@@ -323,3 +323,5 @@ class TLS(PlugIn):
 		self._startSSL()
 		self._owner.Dispatcher.PlugOut()
 		dispatcher.Dispatcher().PlugIn(self._owner)
+		print self._owner.__class__.__name__
+		print self._owner.__dict__.keys()

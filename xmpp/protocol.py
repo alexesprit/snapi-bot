@@ -576,23 +576,15 @@ class Iq(Protocol):
 		if tag:
 			return tag.getNamespace()
 
-	def getQueryNode(self):
-		""" Return the 'node' attribute value of the 'query' child element """
-		return self.getTagAttr('query', 'node')
+	def setQueryNS(self, namespace):
+		""" Set the namespace of the 'query' child element """
+		self.setTag('query').setNamespace(namespace)
 
 	def getQueryChildren(self):
 		""" Return the 'query' child element child nodes """
 		tag = self.getTag('query')
 		if tag:
 			return tag.getChildren()
-
-	def setQueryNS(self, namespace):
-		""" Set the namespace of the 'query' child element """
-		self.setTag('query').setNamespace(namespace)
-
-	def setQueryNode(self, node):
-		""" Set the 'node' attribute value of the 'query' child element """
-		self.setTagAttr('query', 'node', node)
 
 	def setQueryPayload(self, payload):
 		""" Set the 'query' child element payload """

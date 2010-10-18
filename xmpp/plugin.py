@@ -34,7 +34,7 @@ class PlugIn:
 				setattr(owner, methodName, method)
 			setattr(owner, className, self)
 			if hasattr(self, 'plugin'):
-				return self.plugin(owner)			
+				return self.plugin(owner)
 		else:
 			self.printf('Another %s is already plugged' % (self), 'error')
  
@@ -51,5 +51,7 @@ class PlugIn:
 		delattr(self._owner, self.__class__.__name__)
 
 	def printf(self, text, severity='info'):
-		""" Feed a provided printf line to main instance's printf facility along with our ID string. """
+		""" Feed a provided printf line to main instance's printf 
+			facility along with our ID string. 
+		"""
 		self._owner.printf(text, self.debugFlag, severity)

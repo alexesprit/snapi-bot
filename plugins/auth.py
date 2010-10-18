@@ -58,7 +58,7 @@ def authAnswerListener(stanza, msgType, conference, nick, trueJid, body):
 				setMUCRole(conference, nick, xmpp.ROLE_PARTICIPANT, u"авторизация пройдена")
 				del(gAuthAnswer[conference][trueJid])
 			else:
-				sendMsg(msgType, conference, nick, u"неправильный ответ. подумай или заюзай гугл")
+				sendMsg(msgType, conference, nick, u"неправильный ответ")
 
 def manageAuthValue(msgType, conference, nick, param):
 	if(param):
