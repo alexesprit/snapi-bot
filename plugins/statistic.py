@@ -13,62 +13,54 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-gStats = {}
-gJoined = {}
-gLeaved = {}
-gKicked = {}
-gBanned = {}
+gConferenceStats = {}
+gStatsJoined = {}
+gStatsLeaved = {}
+gStatsKicked = {}
+gStatsBanned = {}
 
-def showStatistic(msgType, conference, nick, param):
+def showConferenceStatistic(msgType, conference, nick, param):
 	text = u"за время, проведённое мной в конфе, вы запостили %(groupchat)d мессаг в чат и %(chat)d мессаг мне в личку, "
 	text += u"я же запостила %(mymsg)d сообщений. Всего сюда заходили %(join)d человек, из них %(moderator)d модеров, "
 	text += u"%(participant)d участников и %(visitor)d посетителей. Вышло же %(leave)d человек; модеры выгнали %(kick)d человек и "
 	text += u"забанили %(ban)d. Также ники сменили %(nick)d раз, статусами нафлудили %(status)d раз."
-	sendMsg(msgType, conference, nick, text % (gStats[conference]))
+	sendMsg(msgType, conference, nick, text % (gConferenceStats[conference]))
 
-def botMessageUpdate(msgType, conference, text):
+def updateBotMessageStatistic(msgType, conference, text):
 	if(xmpp.TYPE_PUBLIC == msgType and text):
-		try:
-			gStats[conference]["mymsg"] += 1
-		except(Exception):
-			printf(msgType)
-			printf(conference)
-			printf(text)
+		gConferenceStats[conference]["mymsg"] += 1
 
-def messageUpdate(stanza, msgType, conference, nick, trueJid, text):
+def updateMessageStatistic(stanza, msgType, conference, nick, trueJid, text):
 	if(nick != getBotNick(conference)):
-		try:
-			gStats[conference][msgType] += 1
-		except(Exception):
-			printf(stanza)
+		gConferenceStats[conference][msgType] += 1
 
-def joinUpdate(conference, nick, trueJid, aff, role):
-	if(not trueJid in gJoined[conference]):
-		gJoined[conference].append(trueJid)
-		gStats[conference]["join"] += 1
-		gStats[conference][role] += 1
+def updateJoinStatistic(conference, nick, trueJid, aff, role):
+	if(not trueJid in gStatsJoined[conference]):
+		gStatsJoined[conference].append(trueJid)
+		gConferenceStats[conference]["join"] += 1
+		gConferenceStats[conference][role] += 1
 
-def leaveUpdate(conference, nick, trueJid, reason, code):
-	if(not trueJid in gLeaved[conference]):
-		gLeaved[conference].append(trueJid)
-		gStats[conference]["leave"] += 1
-	if(code == "307" and not trueJid in gKicked[conference]):
-		gStats[conference]["kick"] += 1
-		gKicked[conference].append(trueJid)
-	elif(code == "301" and not trueJid in gBanned[conference]):
-		gStats[conference]["ban"] += 1
-		gBanned[conference].append(trueJid)
+def updateLeaveStatistic(conference, nick, trueJid, reason, code):
+	if(not trueJid in gStatsLeaved[conference]):
+		gStatsLeaved[conference].append(trueJid)
+		gConferenceStats[conference]["leave"] += 1
+	if(code == "307" and not trueJid in gStatsKicked[conference]):
+		gConferenceStats[conference]["kick"] += 1
+		gStatsKicked[conference].append(trueJid)
+	elif(code == "301" and not trueJid in gStatsBanned[conference]):
+		gConferenceStats[conference]["ban"] += 1
+		gStatsBanned[conference].append(trueJid)
 
-def presenceUpdate(stanza, conference, nick, trueJid):
+def updatePresenceStatistic(stanza, conference, nick, trueJid):
 	if("303" == stanza.getStatusCode()):
-		gStats[conference]["nick"] += 1
+		gConferenceStats[conference]["nick"] += 1
 	else:
 		msgType = stanza.getType()
 		if(msgType != xmpp.PRS_OFFLINE):
-			gStats[conference]["status"] += 1
+			gConferenceStats[conference]["status"] += 1
 	
 def initStatistic(conference):
-	gStats[conference] = {
+	gConferenceStats[conference] = {
 			"nick": 0, 
 			"status": 0, 
 			"kick": 0, 
@@ -82,27 +74,27 @@ def initStatistic(conference):
 			xmpp.ROLE_PARTICIPANT: 0, 
 			xmpp.ROLE_VISITOR: 0
 	}
-	gJoined[conference] = []
-	gLeaved[conference] = []
-	gKicked[conference] = []
-	gBanned[conference] = []
+	gStatsJoined[conference] = []
+	gStatsLeaved[conference] = []
+	gStatsKicked[conference] = []
+	gStatsBanned[conference] = []
 
 def freeStatistic(conference):
-	del(gStats[conference])
-	del(gJoined[conference])
-	del(gLeaved[conference])
-	del(gKicked[conference])
-	del(gBanned[conference])
+	del(gConferenceStats[conference])
+	del(gStatsJoined[conference])
+	del(gStatsLeaved[conference])
+	del(gStatsKicked[conference])
+	del(gStatsBanned[conference])
 
-registerEvent(initStatistic, ADDCONF)
-registerEvent(freeStatistic, DELCONF)
-registerLeaveHandler(leaveUpdate)
-registerJoinHandler(joinUpdate)
-registerPresenceHandler(presenceUpdate, CHAT)
-registerMessageHandler(messageUpdate, CHAT)
-registerBotMessageHandler(botMessageUpdate)
+registerEvent(initConferenceStatistic, ADDCONF)
+registerEvent(freeConferenceStatistic, DELCONF)
+registerJoinHandler(updateJoinStatistic)
+registerLeaveHandler(updateLeaveStatistic)
+registerPresenceHandler(updatePresenceStatistic, CHAT)
+registerMessageHandler(updateMessageStatistic, CHAT)
+registerBotMessageHandler(updateBotMessageStatistic)
 
-registerCommand(showStatistic, u"статистика", 10, 
+registerCommand(showConferenceStatistic, u"статистика", 10, 
 				u"Статистика текущей конференции", 
 				None, 
 				(u"статистика", ), 

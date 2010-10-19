@@ -19,7 +19,7 @@
 """
 
 import xml.parsers.expat
-from utils.utils import unescapeXML, ustr
+from utils.utils import escapeXML, ustr
 
 class Node(object):
 	""" Node class describes syntax of separate XML Node. It have a constructor that permits node creation
@@ -116,14 +116,14 @@ class Node(object):
 					s = s + ' xmlns="%s"' % (self.namespace)
 		for key in self.attrs.keys():
 			val = ustr(self.attrs[key])
-			s = s + ' %s="%s"' % (key, unescapeXML(val))
+			s = s + ' %s="%s"' % (key, escapeXML(val))
 		s = s + ">"
 		if self.children:
 			for child in self.children:
 				if child:
 					s += ustr(child)
 		if self.data:
-			s += unescapeXML(self.getData().strip())
+			s += escapeXML(self.getData().strip())
 		if not self.children and not self.data:
 			s = s[:-1] + " />"
 		else:
