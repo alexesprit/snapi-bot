@@ -13,20 +13,21 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-'''
+"""
 	Простая "база данных" для плагинов. Написана исключительно для того, 
 	чтобы поддерживать базы в чистом состоянии.
-'''
+"""
 
-import os, time
-import __main__
+import os
+import time
+import utils.utils as util
 
 class DataBase:
 	def __init__(self, path):
-		__main__.createFile(path, '{}')
-		__main__.createFile(path + '.db', '{}')
-		self.base = eval(__main__.readFile(path))
-		self.changes = eval(__main__.readFile(path + '.db'))
+		util.createFile(path, '{}')
+		util.createFile(path + '.db', '{}')
+		self.base = eval(util.readFile(path))
+		self.changes = eval(util.readFile(path + '.db'))
 		self.path = path
 	
 	def __contains__(self, key):
@@ -61,8 +62,8 @@ class DataBase:
 		self.changes = {}
 	
 	def save(self):
-		__main__.writeFile(self.path, str(self.base))
-		__main__.writeFile(self.path + '.db', str(self.changes))
+		util.writeFile(self.path, str(self.base))
+		util.writeFile(self.path + '.db', str(self.changes))
 		
 	def isEmpty(self):
 		return not self.base

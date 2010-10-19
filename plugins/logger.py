@@ -17,7 +17,7 @@ LOGCSS_FILE = "logger.css"
 
 def writeHeader(fp, jid, (year, month, day)):
 	date = "%.2i.%.2i.%.2i" % (day, month, year)
-	cssData = readFile(getFilePath(CSS_DIR, LOGCSS_FILE))
+	cssData = util.readFile(util.getFilePath(CSS_DIR, LOGCSS_FILE))
 	header = """<!DOCTYPE html xmpp.TYPE_PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dt\">
 <head>
@@ -52,7 +52,7 @@ def regexUrl(matchobj):
 def writeLog(msgType, jid, nick, body, aff = 0):
 	decimal = str(int(math.modf(time.time())[0] * 100000))
 	(year, month, day, hour, minute, second, weekday, yearday, daylightsavings) = time.localtime()
-	body = xmpp.simplexml.XMLEscape(body)
+	body = utils.utils.escapeXML(body)
 	body = re.sub("(http|ftp)(\:\/\/[^\s<]+)", regexUrl, body)
 	body = body.replace("\n", "<br/>")
 	body = body.encode("utf-8")

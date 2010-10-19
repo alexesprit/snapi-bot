@@ -52,14 +52,14 @@ def translateText(msgType, conference, nick, param):
 							sendMsg(msgType, conference, nick, u"не могу перевести")
 				text = getTranslatedText(text, src, target)
 				if(text):
-					sendMsg(msgType, conference, nick, xmpp.simplexml.XMLUnescape(text))
+					sendMsg(msgType, conference, nick, util.unescapeHTML(text))
 				else:
 					sendMsg(msgType, conference, nick, u"не могу перевести")
 
 def getTranslatedText(text, src, target):
 	try:
 		query = urllib.urlencode({"q" : text.encode("utf-8")})
-		req = urllib.urlopen("http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&%s&langpair=%s%s" % (query, src + "%7C", target))
+		req = urllib.urlopen("http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&%s&langpair=%s%%7C%s" % (query, src, target))
 		answer = simplejson.load(req)
 		if(answer["responseData"]):
 			return(answer["responseData"]["translatedText"])

@@ -140,15 +140,15 @@ def showLocalAccesses(msgType, conference, nick, param):
 def loadGlobalAccesses():
 	global gGlobalAccess
 	fileName = getConfigPath(ACCESS_FILE)
-	createFile(fileName, "{}")
-	gGlobalAccess = eval(readFile(fileName))
+	util.createFile(fileName, "{}")
+	gGlobalAccess = eval(util.readFile(fileName))
 	for jid in gAdmins:
 		gGlobalAccess[jid] = 100
 
 def loadLocalAccesses(conference):
 	fileName = getConfigPath(conference, ACCESS_FILE)
-	createFile(fileName, "{}")
-	gPermAccess[conference] = eval(readFile(fileName))
+	util.createFile(fileName, "{}")
+	gPermAccess[conference] = eval(util.readFile(fileName))
 	gTempAccess[conference] = {}
 
 def freeLocalAccesses(conference):

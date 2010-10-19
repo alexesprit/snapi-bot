@@ -19,12 +19,12 @@ gModerators = {}
 
 def saveAutoModerators(conference):
 	fileName = getConfigPath(conference, MODERATORS_FILE)
-	writeFile(fileName, str(gModerators[conference]))
+	util.writeFile(fileName, str(gModerators[conference]))
 
 def loadAutoModerators(conference):
 	fileName = getConfigPath(conference, MODERATORS_FILE)
-	createFile(fileName, "[]")
-	gModerators[conference] = eval(readFile(fileName))
+	util.createFile(fileName, "[]")
+	gModerators[conference] = eval(util.readFile(fileName))
 
 def freeAutoModerators(conference):
 	del(gModerators[conference])

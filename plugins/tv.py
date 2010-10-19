@@ -22,13 +22,13 @@ def getTVChannelCode(channelName):
 	else:
 		channelName = channelName.lower()
 		for x in gTVChannels:
-			if(x.lower() in channelName):
+			if(channelName == x.lower()):
 				return(gTVChannels[x])
 
 def loadTVChannels():
 	global gTVChannels
-	fileName = getFilePath(RESOURCE_DIR, TVCODES_FILE)
-	gTVChannels = eval(readFile(fileName, "utf-8"))
+	fileName = util.getFilePath(RESOURCE_DIR, TVCODES_FILE)
+	gTVChannels = eval(util.readFile(fileName, "utf-8"))
 
 def showTVProgram(msgType, conference, nick, param):
 	channelCode = getTVChannelCode(param)

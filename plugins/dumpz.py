@@ -44,8 +44,8 @@ def uploadToDumpz(msgType, conference, nick, param):
 
 def loadDumpzLanguages():
 	global DUMPZ_LANGS
-	fileName = getFilePath(RESOURCE_DIR, DUMPZ_LANGS_FILE)
-	DUMPZ_LANGS = eval(readFile(fileName))
+	fileName = util.getFilePath(RESOURCE_DIR, DUMPZ_LANGS_FILE)
+	DUMPZ_LANGS = eval(util.readFile(fileName))
 
 registerEvent(loadDumpzLanguages, STARTUP)
 

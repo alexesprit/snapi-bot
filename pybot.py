@@ -37,6 +37,8 @@ import macros
 import simplejson
 import xmpp
 
+import utils.utils as util
+
 CSS_DIR = "css"
 CONFIG_DIR = "config"
 PLUGIN_DIR = "plugins"
@@ -96,8 +98,8 @@ AFFILIATIONS = {
 }
 
 FORBIDDEN_TYPES = (
-		xmpp.TYPE_NORMAL,
-		xmpp.TYPE_HEADLINE
+	xmpp.TYPE_NORMAL,
+	xmpp.TYPE_HEADLINE
 )
 
 IDLE_TIMEOUT = 600
@@ -151,7 +153,7 @@ gPermAccess = {}
 
 gCommands = {}
 gCmdOff = {}
-gMacros = macros.Macros()
+gMacros = macros.Macros(CONFIG_DIR)
 
 gConferences = {}
 gIsJoined = {}
@@ -285,52 +287,21 @@ def time2str(time):
 		timeString = u"%d дн. %s" % (days, timeString)
 	return timeString
 
-def decode(text):
-	text = gTagPattern.sub("", text.replace("<br />","\n").replace("<br>","\n"))
-	return(xmpp.simplexml.XMLUnescape(text))
-
-def createFile(path, data):
-	path = path.encode("utf-8")
-	if(not os.access(path, os.F_OK)):
-		dirName = os.path.dirname(path)
-		if(not os.path.exists(dirName)):
-			os.makedirs(dirName)
-		printf("Create: %s" % path, FLAG_WRITE)
-		f = file(path, "w")
-		f.write(data)
-		f.close()
-
-def readFile(path, encoding=None):
-	path = path.encode("utf-8")
-	printf("Read: %s" % (path), FLAG_READ)
-	f = file(path)
-	data = f.read()
-	f.close()
-	if(encoding):
-		data = data.decode(encoding)
-	return(data)
-
-def writeFile(path, data, mode="w"):
-	path = path.encode("utf-8")
-	printf("Write: %s" % (path), FLAG_WRITE)
-	f = file(path, mode)
-	f.write(data)
-	f.close()
-
 def getConfigPath(*param):
 	return(os.path.join(CONFIG_DIR, *param))
 
-def getFilePath(*param):
-	return(os.path.join(*param))
+def decode(text):
+	text = gTagPattern.sub("", text.replace("<br />","\n").replace("<br>","\n"))
+	return(util.unescapeXML(text))
 
 def loadConferenceConfig(conference):
 	fileName = getConfigPath(conference, CONFIG_FILE)
-	createFile(fileName, "{}")
-	gConfig[conference] = eval(readFile(fileName))
+	util.createFile(fileName, "{}")
+	gConfig[conference] = eval(util.readFile(fileName))
 
 def saveConferenceConfig(conference):
 	fileName = getConfigPath(conference, CONFIG_FILE)
-	writeFile(fileName, str(gConfig[conference]))
+	util.writeFile(fileName, str(gConfig[conference]))
 
 def getConfigKey(conference, key):
 	return(gConfig[conference].get(key))
@@ -341,7 +312,7 @@ def setConfigKey(conference, key, value):
 def addConference(conference):
 	gConferences[conference] = {}
 	gIsJoined[conference] = False
-	writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
+	util.writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
 	loadConferenceConfig(conference)
 	for function in gEventHandlers[ADDCONF]:
 		function(conference)
@@ -352,7 +323,7 @@ def delConference(conference):
 	del(gIsJoined[conference])
 	del(gConfig[conference])
 	del(gConferences[conference])
-	writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
+	util.writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
 
 def joinConference(conference, nick, password):
 	setConfigKey(conference, "nick", nick)
@@ -496,11 +467,11 @@ def setPermAccess(conference, jid, level=0):
 		gPermAccess[conference][jid] = level
 	else:
 		del(gPermAccess[conference][jid])
-	writeFile(fileName, str(gPermAccess[conference]))
+	util.writeFile(fileName, str(gPermAccess[conference]))
 
 def setPermGlobalAccess(jid, level=0):
 	fileName = getConfigPath(ACCESS_FILE)
-	tempAccess = eval(readFile(fileName))
+	tempAccess = eval(util.readFile(fileName))
 	tempAccess[jid] = None
 	gGlobalAccess[jid] = None
 	if(level):
@@ -509,7 +480,7 @@ def setPermGlobalAccess(jid, level=0):
 	else:
 		del(tempAccess[jid])
 		del(gGlobalAccess[jid])
-	writeFile(fileName, str(tempAccess))
+	util.writeFile(fileName, str(tempAccess))
 
 def setTempGlobalAccess(jid, level=0):
 	gGlobalAccess[jid] = None
@@ -717,8 +688,8 @@ def iqHandler(session, stanza):
 def saveException(funcName):
 	gInfo["err"] += 1
 	printf("Exception in %s function" % (funcName), FLAG_ERROR)
-	fileName = getFilePath(SYSLOG_DIR, time.strftime(ERROR_FILE))
-	writeFile(fileName, traceback.format_exc() + "\n", "a")
+	fileName = util.getFilePath(SYSLOG_DIR, time.strftime(ERROR_FILE))
+	util.writeFile(fileName, traceback.format_exc() + "\n", "a")
 
 def loadPlugins():
 	printf("Loading plugins...")
@@ -742,11 +713,11 @@ def loadPlugins():
 def detectMultiLaunch():
 	if(os.name == "posix"):
 		try:
-			pid = int(readFile(PID_FILE))
+			pid = int(util.readFile(PID_FILE))
 			os.getsid(pid)
 			return(pid)
 		except(OSError, IOError):
-			writeFile(PID_FILE, str(os.getpid()))
+			util.writeFile(PID_FILE, str(os.getpid()))
 	return(None)
 
 def shutdown(restart=False):
@@ -796,14 +767,14 @@ def start():
 	gClient.setStatus(None, None, gPriority)
 
 	fileName = getConfigPath(CONF_FILE)
-	createFile(fileName, "[]")
-	conferences = eval(readFile(fileName))
+	util.createFile(fileName, "[]")
+	conferences = eval(util.readFile(fileName))
 	if(conferences):
 		for conference in conferences:
 			addConference(conference)
 			joinConference(conference, getBotNick(conference), getConfigKey(conference, "password"))
 			saveConferenceConfig(conference)
-	printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
+		printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
 	callEventHandlers(INIT_2)
 	
@@ -833,8 +804,8 @@ if(__name__ == "__main__"):
 		shutdown()
 	except(Exception):
 		printf("Exception in main thread", FLAG_ERROR)
-		fileName = getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE))
-		writeFile(fileName, traceback.format_exc() + "\n", "a");		
+		fileName = util.getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE))
+		util.writeFile(fileName, traceback.format_exc() + "\n", "a")
 		if(gClient.isConnected()):
 			prs = xmpp.Presence(typ=xmpp.PRS_OFFLINE)
 			prs.setStatus(u"что-то сломалось...")

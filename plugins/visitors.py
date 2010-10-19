@@ -19,12 +19,12 @@ gVisitors = {}
 
 def saveAutoVisitors(conference):
 	fileName = getConfigPath(conference, VISITORS_FILE)
-	writeFile(fileName, str(gVisitors[conference]))
+	util.writeFile(fileName, str(gVisitors[conference]))
 
 def loadAutoVisitors(conference):
 	fileName = getConfigPath(conference, VISITORS_FILE)
-	createFile(fileName, "[]")
-	gVisitors[conference] = eval(readFile(fileName))
+	util.createFile(fileName, "[]")
+	gVisitors[conference] = eval(util.readFile(fileName))
 
 def freeAutoVisitors(conference):
 	del(gVisitors[conference])

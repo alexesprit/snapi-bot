@@ -39,8 +39,8 @@ if isPython26:
 import dispatcher
 import dns
 
-from simplexml import ustr
 from plugin import PlugIn
+from utils.utils import ustr
 from protocol import *
 
 BUFLEN = 1024
@@ -63,7 +63,7 @@ class TCPSocket(PlugIn):
 		"""
 		PlugIn.__init__(self)
 		self.debugFlag = DBG_SOCKET
-		self._exportedMethods = [self.send, self.disconnect]
+		self._exportedMethods = (self.send, self.disconnect)
 		self._server, self.useResolver = server, useResolver
 
 	def lookup(self, server):

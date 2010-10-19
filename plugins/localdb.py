@@ -83,12 +83,12 @@ def showAllLocalKeys(msgType, conference, nick, parameters):
 
 def loadLocalBase(conference):
 	fileName = getConfigPath(conference, LOCALDB_FILE)
-	createFile(fileName, "{}")
-	gLocalBase[conference] = eval(readFile(fileName))
+	util.createFile(fileName, "{}")
+	gLocalBase[conference] = eval(util.readFile(fileName))
 
 def saveLocalBase(conference):
 	fileName = getConfigPath(conference, LOCALDB_FILE)
-	writeFile(fileName, str(gLocalBase[conference]))
+	util.writeFile(fileName, str(gLocalBase[conference]))
 
 def freeLocalBase(conference):
 	del(gLocalBase[conference])

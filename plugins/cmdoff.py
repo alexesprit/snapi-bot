@@ -17,12 +17,12 @@ CMDOFF_FILE = "cmdoff.txt"
 
 def loadCommands(conference):
 	fileName = getConfigPath(conference, CMDOFF_FILE)
-	createFile(fileName, "[]")
-	gCmdOff[conference] = eval(readFile(fileName))
+	util.createFile(fileName, "[]")
+	gCmdOff[conference] = eval(util.readFile(fileName))
 
 def saveCommands(conference):
 	fileName = getConfigPath(conference, CMDOFF_FILE)
-	writeFile(fileName, str(gCmdOff[conference]))
+	util.writeFile(fileName, str(gCmdOff[conference]))
 
 def freeCommands(conference):
 	del(gCmdOff[conference])

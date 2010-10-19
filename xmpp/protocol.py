@@ -21,7 +21,7 @@ xmpp-related data structures.
 
 import time
 
-from simplexml import Node, ustr
+from simplexml import Node
 
 NS_DATA							= "jabber:x:data"										# XEP-0004
 NS_RPC							= "jabber:iq:rpc"										# XEP-0009

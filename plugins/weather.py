@@ -45,7 +45,7 @@ CLOUDINESS = {
 
 def getWCodeByName(city):
 	city = city.encode("utf-8")
-	fileName = getFilePath(RESOURCE_DIR, WCODES_FILE)
+	fileName = util.getFilePath(RESOURCE_DIR, WCODES_FILE)
 	for line in open(fileName):
 		if(line.startswith(city)):
 			return(line.split("|"))

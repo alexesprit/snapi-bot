@@ -17,65 +17,66 @@ import os
 import random
 import re
 
-import __main__
-import xmpp
+import utils.utils as util
 
 MACROS_FILE = 'macros.txt'
 MACCESS_FILE = 'macrosaccess.txt'
 
 class Macros:
-	def __init__(self):
+	def __init__(self, path):
 		self.commands = {
 			'rand': self.getRand,
 			'context': self.getContext
 		}
 		self.gMacrosList = {}
 		self.gAccessList = {}
-
 		self.macrosList = {}
 		self.accessList = {}
+		self.path = path
 
-	def loadMacroses(self, conference = None):
+	def loadMacroses(self, conference=None):
 		if(conference):
-			macrosFileName = __main__.getConfigPath(conference, MACROS_FILE)
-			accessFileName = __main__.getConfigPath(conference, MACCESS_FILE)
+			macrosFileName = util.getFilePath(self.path, conference, MACROS_FILE)
+			accessFileName = util.getFilePath(self.path, conference, MACCESS_FILE)
 			
-			__main__.createFile(macrosFileName, '{}')
-			__main__.createFile(accessFileName, '{}')
+			util.createFile(macrosFileName, '{}')
+			util.createFile(accessFileName, '{}')
 
-			self.macrosList[conference] = eval(__main__.readFile(macrosFileName))
-			self.accessList[conference] = eval(__main__.readFile(accessFileName))
+			self.macrosList[conference] = eval(util.readFile(macrosFileName))
+			self.accessList[conference] = eval(util.readFile(accessFileName))
 		else:
-			macrosFileName = __main__.getConfigPath(MACROS_FILE)
-			accessFileName = __main__.getConfigPath(MACCESS_FILE)
+			macrosFileName = util.getFilePath(self.path, MACROS_FILE)
+			accessFileName = util.getFilePath(self.path, MACCESS_FILE)
 
-			__main__.createFile(macrosFileName, '{}')
-			__main__.createFile(accessFileName, '{}')
+			util.createFile(macrosFileName, '{}')
+			util.createFile(accessFileName, '{}')
 
-			self.gMacrosList = eval(__main__.readFile(macrosFileName))
-			self.gAccessList = eval(__main__.readFile(accessFileName))
+			self.gMacrosList = eval(util.readFile(macrosFileName))
+			self.gAccessList = eval(util.readFile(accessFileName))
 
-	def saveMacroses(self, conference = None):
+	def saveMacroses(self, conference=None):
 		if(conference):
-			macrosFileName = __main__.getConfigPath(conference, MACROS_FILE)
-			accessFileName = __main__.getConfigPath(conference, MACCESS_FILE)
-			__main__.writeFile(macrosFileName, str(self.macrosList[conference]))
-			__main__.writeFile(accessFileName, str(self.accessList[conference]))
+			macrosFileName = util.getFilePath(self.path, conference, MACROS_FILE)
+			accessFileName = util.getFilePath(self.path, conference, MACCESS_FILE)
+			util.writeFile(macrosFileName, str(self.macrosList[conference]))
+			util.writeFile(accessFileName, str(self.accessList[conference]))
 		else:
-			__main__.writeFile('config/macros.txt', str(self.gMacrosList))
-			__main__.writeFile('config/macrosaccess.txt', str(self.gAccessList))
+			macrosFileName = util.getFilePath(self.path, MACROS_FILE)
+			accessFileName = util.getFilePath(self.path, MACCESS_FILE)
+			util.writeFile(macrosFileName, str(self.gMacrosList))
+			util.writeFile(accessFileName, str(self.gAccessList))
 			
 	def freeMacroses(self, conference):
 		if(conference in self.macrosList):
 			del(self.macrosList[conference])
 
-	def getMacrosList(self, conference = None):
+	def getMacrosList(self, conference=None):
 		if(conference):
 			return(self.macrosList[conference].keys())
 		else:
 			return(self.gMacrosList.keys())
 
-	def getMacros(self, macros, conference = None):
+	def getMacros(self, macros, conference=None):
 		if(conference):
 			return(self.macrosList[conference].get(macros))
 		else:
@@ -87,26 +88,26 @@ class Macros:
 		else:
 			return(macros in self.gMacrosList)
 			
-	def getAccess(self, macros, conference = None):
+	def getAccess(self, macros, conference=None):
 		if(conference):
 			return(self.accessList[conference].get(macros))
 		else:
 			return(self.gAccessList[macros])
 
-	def setAccess(self, macros, access, conference = None):
+	def setAccess(self, macros, access, conference=None):
 		if(conference):
 			self.accessList[conference][macros] = access
 		else:
 			self.gAccessList[macros] = access
 
-	def add(self, macros, param, access, conference = None):
+	def add(self, macros, param, access, conference=None):
 		if(conference):
 			self.macrosList[conference][macros] = param
 		else:
 			self.gMacrosList[macros] = param
 		self.setAccess(macros, access, conference)
 
-	def remove(self, macros, conference = None):
+	def remove(self, macros, conference=None):
 		if(conference):
 			if(macros in self.macrosList[conference]):
 				del(self.macrosList[conference][macros])
@@ -116,7 +117,7 @@ class Macros:
 				del(self.gMacrosList[macros])
 				del(self.gAccessList[macros])
 
-	def expand(self, message, context, conference = None):
+	def expand(self, message, context, conference=None):
 		macros = None
 		rawBody = message.split(None, 1)
 		command = rawBody[0].lower()

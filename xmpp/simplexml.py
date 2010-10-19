@@ -19,37 +19,7 @@
 """
 
 import xml.parsers.expat
-
-UNESCAPE_MAP = {
-	"&amp;": "&",
-	"&gt;": ">",
-	"&lt;": "<",
-	"&quot;": "\"",
-	"&apos;": "'",
-	"&nbsp;": " ",
-	"&mdash;": "-"	
-}
-
-def XMLEscape(xml):
-	"""Returns provided string with symbols & < > " replaced by their respective XML entities."""
-	return xml.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
-
-def XMLUnescape(xml):
-	for esc, char in UNESCAPE_MAP.items():
-		xml = xml.replace(esc, char)
-	return xml
-
-def ustr(text):
-	"""Converts object "text" to unicode string using it's own __str__ method if accessible or unicode method otherwise."""
-	if isinstance(text, unicode):
-		return text
-	try:
-		text = text.__str__()
-	except AttributeError:
-		text = str(text)
-	if not isinstance(text, unicode):
-		return unicode(text, "utf-8")
-	return text
+from utils.utils import unescapeXML, ustr
 
 class Node(object):
 	""" Node class describes syntax of separate XML Node. It have a constructor that permits node creation
@@ -146,14 +116,14 @@ class Node(object):
 					s = s + ' xmlns="%s"' % (self.namespace)
 		for key in self.attrs.keys():
 			val = ustr(self.attrs[key])
-			s = s + ' %s="%s"' % (key, XMLEscape(val))
+			s = s + ' %s="%s"' % (key, unescapeXML(val))
 		s = s + ">"
 		if self.children:
 			for child in self.children:
 				if child:
 					s += ustr(child)
 		if self.data:
-			s += XMLEscape(self.getData().strip())
+			s += unescapeXML(self.getData().strip())
 		if not self.children and not self.data:
 			s = s[:-1] + " />"
 		else:

@@ -19,8 +19,8 @@ gPokes = []
 
 def loadPokes():
 	global gPokes
-	fileName = getFilePath(RESOURCE_DIR, POKES_FILE)
-	gPokes = eval(readFile(fileName, "utf-8"))
+	fileName = util.getFilePath(RESOURCE_DIR, POKES_FILE)
+	gPokes = eval(util.readFile(fileName, "utf-8"))
 
 def pokeUser(msgType, conference, nick, param):
 	if(msgType == xmpp.TYPE_PUBLIC):
