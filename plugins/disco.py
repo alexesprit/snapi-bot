@@ -37,7 +37,13 @@ def serviceDiscovery(msgType, conference, nick, param):
 			searchKey = param[1]
 	iq = xmpp.Iq(xmpp.TYPE_GET)
 	query = iq.addChild("query", None, None, xmpp.NS_DISCO_ITEMS)
-	iq.setTo(jid)
+	param = jid.split("#")
+	if(len(param) == 2):
+		jid, node = param
+		iq.setTo(jid)
+		query.setAttr("node", node)
+	else:
+		iq.setTo(jid)
 	iq.setID(getUniqueID(DISCO_ID))
 	gClient.sendAndCallForResponse(iq, _serviceDiscovery, (msgType, conference, nick, jid, maxCount, searchKey))
 
@@ -55,7 +61,12 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 				items.append(attrs["jid"])
 			if("node" in attrs):
 				items.append(attrs["node"])
-			if(len(items) == 2):
+			if(len(items) == 3):
+				if(searchKey):
+					if(not items[0].count(searchKey)):
+						continue
+				discoList.append(u"%d) %s (%s)" % (itemCount, items[0], items[2]))
+			elif(len(items) == 2):
 				if(searchKey):
 					if(searchKey.endswith("@")):
 						if(not items[1].startswith(searchKey)):
@@ -72,7 +83,7 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 				if(searchKey):
 					if(not items[0].count(searchKey)):
 						continue
-				discoList.append(u"%d) %s" % (itemCount, items[0]))
+				discoList.append(u"%d) %s" % (itemCount, items[0], itemName))
 		if(discoList):
 			if(0 == maxCount):
 				sendMsg(msgType, conference, nick, u"всего %d пунктов" % (itemCount))
@@ -87,6 +98,6 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 		sendMsg(msgType, conference, nick, u"не могу")
 
 registerCommand(serviceDiscovery, u"диско", 10, 
-				u"Показывает результаты обзора сервисов для указанного жида. Второй или третий (если даётся ограничитель кол-ва) параметр - поиск (ищет заданное слово в жиде и описании элемента диско). Если поисковым словом задать имя конференции до названия сервера (например qwerty@), то покажет место этой конференции в общем рейтинге. В общий чат может дать до 50 результатов, без указания кол-ва - 10. В приват может дать до 250, без указания кол-ва 50.", 
-				u"диско <сервер> [кол-во результатов] [поисковая строка]", 
+				u"Показывает результаты обзора сервисов для указанного жида. Также можно выполнить запрос по узлу (\"жид#узел\") Второй или третий (если даётся ограничитель кол-ва) параметр - поиск (ищет заданное слово в жиде и описании элемента диско). Если поисковым словом задать имя конференции до названия сервера (например qwerty@), то покажет место этой конференции в общем рейтинге. В общий чат может дать до 50 результатов (10 - без указания кол-ва), в приват - 250 (50 - без указания кол-ва)", 
+				u"диско <жид> [кол-во результатов] [поисковая строка]", 
 				(u"диско jabber.aq", u"диско conference.jabber.aq qwerty", u"диско conference.jabber.aq 5 qwerty", u"диско conference.jabber.aq qwerty@"))

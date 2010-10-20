@@ -55,8 +55,6 @@ ERROR_FILE = "%Y.%m.%d_error.txt"
 CRASH_FILE = "%Y.%m.%d_crash.txt"
 
 FLAG_INFO = "info"
-FLAG_READ = "read"
-FLAG_WRITE = "write"
 FLAG_ERROR = "error"
 FLAG_WARNING = "warning"
 FLAG_SUCCESS = "success"
@@ -163,10 +161,8 @@ gJokes = []
 
 gID = 0
 
-gDebug.debugFlags = (FLAG_INFO, FLAG_READ, FLAG_WRITE, FLAG_WARNING, FLAG_SUCCESS)
+gDebug.debugFlags = (FLAG_INFO, FLAG_ERROR, FLAG_WARNING, FLAG_SUCCESS)
 gDebug.colors[FLAG_INFO] = xmpp.debug.colorWhite
-gDebug.colors[FLAG_READ] = xmpp.debug.colorBrightBlue
-gDebug.colors[FLAG_WRITE] = xmpp.debug.colorPurple
 gDebug.colors[FLAG_ERROR] = xmpp.debug.colorBrightRed
 gDebug.colors[FLAG_WARNING] = xmpp.debug.colorYellow
 gDebug.colors[FLAG_SUCCESS] = xmpp.debug.colorBrightCyan

@@ -19,28 +19,28 @@ gStatsLeaved = {}
 gStatsKicked = {}
 gStatsBanned = {}
 
-def showConferenceStatistic(msgType, conference, nick, param):
+def showConferenceStats(msgType, conference, nick, param):
 	text = u"за время, проведённое мной в конфе, вы запостили %(groupchat)d мессаг в чат и %(chat)d мессаг мне в личку, "
 	text += u"я же запостила %(mymsg)d сообщений. Всего сюда заходили %(join)d человек, из них %(moderator)d модеров, "
 	text += u"%(participant)d участников и %(visitor)d посетителей. Вышло же %(leave)d человек; модеры выгнали %(kick)d человек и "
 	text += u"забанили %(ban)d. Также ники сменили %(nick)d раз, статусами нафлудили %(status)d раз."
 	sendMsg(msgType, conference, nick, text % (gConferenceStats[conference]))
 
-def updateBotMessageStatistic(msgType, conference, text):
+def updateBotMessageStats(msgType, conference, text):
 	if(xmpp.TYPE_PUBLIC == msgType and text):
 		gConferenceStats[conference]["mymsg"] += 1
 
-def updateMessageStatistic(stanza, msgType, conference, nick, trueJid, text):
+def updateMessageStats(stanza, msgType, conference, nick, trueJid, text):
 	if(nick != getBotNick(conference)):
 		gConferenceStats[conference][msgType] += 1
 
-def updateJoinStatistic(conference, nick, trueJid, aff, role):
+def updateJoinStats(conference, nick, trueJid, aff, role):
 	if(not trueJid in gStatsJoined[conference]):
 		gStatsJoined[conference].append(trueJid)
 		gConferenceStats[conference]["join"] += 1
 		gConferenceStats[conference][role] += 1
 
-def updateLeaveStatistic(conference, nick, trueJid, reason, code):
+def updateLeaveStats(conference, nick, trueJid, reason, code):
 	if(not trueJid in gStatsLeaved[conference]):
 		gStatsLeaved[conference].append(trueJid)
 		gConferenceStats[conference]["leave"] += 1
@@ -51,7 +51,7 @@ def updateLeaveStatistic(conference, nick, trueJid, reason, code):
 		gConferenceStats[conference]["ban"] += 1
 		gStatsBanned[conference].append(trueJid)
 
-def updatePresenceStatistic(stanza, conference, nick, trueJid):
+def updatePresenceStats(stanza, conference, nick, trueJid):
 	if("303" == stanza.getStatusCode()):
 		gConferenceStats[conference]["nick"] += 1
 	else:
@@ -59,7 +59,7 @@ def updatePresenceStatistic(stanza, conference, nick, trueJid):
 		if(msgType != xmpp.PRS_OFFLINE):
 			gConferenceStats[conference]["status"] += 1
 	
-def initStatistic(conference):
+def initConferenceStats(conference):
 	gConferenceStats[conference] = {
 			"nick": 0, 
 			"status": 0, 
@@ -79,22 +79,22 @@ def initStatistic(conference):
 	gStatsKicked[conference] = []
 	gStatsBanned[conference] = []
 
-def freeStatistic(conference):
+def freeConferenceStats(conference):
 	del(gConferenceStats[conference])
 	del(gStatsJoined[conference])
 	del(gStatsLeaved[conference])
 	del(gStatsKicked[conference])
 	del(gStatsBanned[conference])
 
-registerEvent(initConferenceStatistic, ADDCONF)
-registerEvent(freeConferenceStatistic, DELCONF)
-registerJoinHandler(updateJoinStatistic)
-registerLeaveHandler(updateLeaveStatistic)
-registerPresenceHandler(updatePresenceStatistic, CHAT)
-registerMessageHandler(updateMessageStatistic, CHAT)
-registerBotMessageHandler(updateBotMessageStatistic)
+registerEvent(initConferenceStats, ADDCONF)
+registerEvent(freeConferenceStats, DELCONF)
+registerJoinHandler(updateJoinStats)
+registerLeaveHandler(updateLeaveStats)
+registerPresenceHandler(updatePresenceStats, CHAT)
+registerMessageHandler(updateMessageStats, CHAT)
+registerBotMessageHandler(updateBotMessageStats)
 
-registerCommand(showConferenceStatistic, u"статистика", 10, 
+registerCommand(showConferenceStats, u"статистика", 10, 
 				u"Статистика текущей конференции", 
 				None, 
 				(u"статистика", ), 
