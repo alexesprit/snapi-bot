@@ -83,7 +83,7 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 				if(searchKey):
 					if(not items[0].count(searchKey)):
 						continue
-				discoList.append(u"%d) %s" % (itemCount, items[0], itemName))
+				discoList.append(u"%d) %s" % (itemCount, items[0]))
 		if(discoList):
 			if(0 == maxCount):
 				sendMsg(msgType, conference, nick, u"всего %d пунктов" % (itemCount))

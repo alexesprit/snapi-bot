@@ -52,7 +52,7 @@ def regexUrl(matchobj):
 def writeLog(msgType, jid, nick, body, aff = 0):
 	decimal = str(int(math.modf(time.time())[0] * 100000))
 	(year, month, day, hour, minute, second, weekday, yearday, daylightsavings) = time.localtime()
-	body = utils.utils.escapeXML(body)
+	body = util.escapeXML(body)
 	body = re.sub("(http|ftp)(\:\/\/[^\s<]+)", regexUrl, body)
 	body = body.replace("\n", "<br/>")
 	body = body.encode("utf-8")
