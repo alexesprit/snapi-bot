@@ -161,7 +161,6 @@ gJokes = []
 
 gID = 0
 
-gDebug.debugFlags = (FLAG_INFO, FLAG_ERROR, FLAG_WARNING, FLAG_SUCCESS)
 gDebug.colors[FLAG_INFO] = xmpp.debug.colorWhite
 gDebug.colors[FLAG_ERROR] = xmpp.debug.colorBrightRed
 gDebug.colors[FLAG_WARNING] = xmpp.debug.colorYellow
@@ -288,7 +287,7 @@ def getConfigPath(*param):
 
 def decode(text):
 	text = gTagPattern.sub("", text.replace("<br />","\n").replace("<br>","\n"))
-	return(util.unescapeXML(text))
+	return(util.unescapeHTML(text))
 
 def loadConferenceConfig(conference):
 	fileName = getConfigPath(conference, CONFIG_FILE)

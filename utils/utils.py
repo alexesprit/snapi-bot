@@ -36,9 +36,9 @@ def unescapeXML(xml):
 	return xml
 
 def escapeXML(xml):
+	xml = xml.replace("&", "&amp;")
 	for esc, char in XML_ESC_MAP:
 		xml = xml.replace(char, esc)
-	xml = xml.replace("&", "&amp;")
 	return xml
 
 def getEntityChar(char):
@@ -47,6 +47,7 @@ def getEntityChar(char):
 def unescapeHTML(html):
 	for esc, char in HTML_ESC_MAP:
 		html = html.replace(esc, char)
+	html = html.replace("&amp;", "&")
 	return re.sub("&#(\d+);", getEntityChar, html)
 
 def ustr(text):
