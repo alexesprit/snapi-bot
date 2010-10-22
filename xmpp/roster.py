@@ -22,6 +22,7 @@
 from plugin import PlugIn
 from protocol import Iq, Node, Presence, UserJid
 from protocol import TYPE_GET, TYPE_SET, NS_ROSTER
+from protocol import PRS_SUBSCRIBE, PRS_SUBSCRIBED, PRS_UNSUBSCRIBE, PRS_UNSUBSCRIBED
 
 DBG_ROSTER = "roster"
 

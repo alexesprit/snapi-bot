@@ -120,8 +120,8 @@ PRS_NA = "xa"
 
 PRS_SUBSCRIBE = "subscribe"
 PRS_SUBSCRIBED = "subscribed"
-PRS_UBSUBSCRIBE = "unsubscribe"
-PRS_UBSUBSCRIBED = "unsubscribed"
+PRS_UNSUBSCRIBE = "unsubscribe"
+PRS_UNSUBSCRIBED = "unsubscribed"
 
 ROLE_NONE = "none"
 ROLE_VISITOR = "visitor"
