@@ -27,8 +27,8 @@ def getTVChannelCode(channelName):
 
 def loadTVChannels():
 	global gTVChannels
-	fileName = util.getFilePath(RESOURCE_DIR, TVCODES_FILE)
-	gTVChannels = eval(util.readFile(fileName, "utf-8"))
+	fileName = utils.getFilePath(RESOURCE_DIR, TVCODES_FILE)
+	gTVChannels = eval(utils.readFile(fileName, "utf-8"))
 
 def showTVProgram(msgType, conference, nick, param):
 	channelCode = getTVChannelCode(param)
@@ -46,11 +46,11 @@ def showTVProgram(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"нету на сегодня программы")
 
 def showTVList(msgType, conference, nick, parameters):
-	if(xmpp.TYPE_PUBLIC == msgType):
+	if(protocol.TYPE_PUBLIC == msgType):
 		sendMsg(msgType, conference, nick, u"скинула в приват")
 	tvList = [u"%s - %s" % (code, name) for name, code in gTVChannels.items()]
 	tvList.sort()
-	sendMsg(xmpp.TYPE_PRIVATE, conference, nick, u"список каналов:\n%s" % ("\n".join(tvList)))
+	sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"список каналов:\n%s" % ("\n".join(tvList)))
 
 registerEvent(loadTVChannels, STARTUP)
 

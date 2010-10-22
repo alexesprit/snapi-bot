@@ -19,19 +19,19 @@ gVisitors = {}
 
 def saveAutoVisitors(conference):
 	fileName = getConfigPath(conference, VISITORS_FILE)
-	util.writeFile(fileName, str(gVisitors[conference]))
+	utils.writeFile(fileName, str(gVisitors[conference]))
 
 def loadAutoVisitors(conference):
 	fileName = getConfigPath(conference, VISITORS_FILE)
-	util.createFile(fileName, "[]")
-	gVisitors[conference] = eval(util.readFile(fileName))
+	utils.createFile(fileName, "[]")
+	gVisitors[conference] = eval(utils.readFile(fileName))
 
 def freeAutoVisitors(conference):
 	del(gVisitors[conference])
 
 def setAutoVisitor(conference, nick, trueJid, aff, role):
 	if(trueJid in gVisitors[conference]):
-		setMUCRole(conference, nick, xmpp.ROLE_VISITOR, u"автовизитор")
+		setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"автовизитор")
 
 def addAutoVisitor(msgType, conference, nick, param):
 	user = param
@@ -53,7 +53,7 @@ def addAutoVisitor(msgType, conference, nick, param):
 		saveAutoVisitors(conference)
 		sendMsg(msgType, conference, nick, u"добавила")
 		if(setVisitorRole):
-			setMUCRole(conference, user, xmpp.ROLE_VISITOR)
+			setMUCRole(conference, user, protocol.ROLE_VISITOR)
 	else:
 		sendMsg(msgType, conference, nick, u"%s уже есть в списке" % (param))
 
@@ -77,7 +77,7 @@ def delAutoVisitort(msgType, conference, nick, param):
 		saveAutoVisitors(conference)
 		sendMsg(msgType, conference, nick, u"удалила")
 		if(setParticipantRole):
-			setMUCRole(conference, user, xmpp.ROLE_PARTICIPANT)
+			setMUCRole(conference, user, protocol.ROLE_PARTICIPANT)
 	else:
 		sendMsg(msgType, conference, nick, u"а %s итак нет в списке" % (param))
 

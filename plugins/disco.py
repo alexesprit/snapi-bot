@@ -22,12 +22,12 @@ def serviceDiscovery(msgType, conference, nick, param):
 	param = param.split(None, 2)
 	jid = param[0]
 	searchKey = None
-	maxCount = (xmpp.TYPE_PUBLIC == msgType) and 10 or 50
+	maxCount = (protocol.TYPE_PUBLIC == msgType) and 10 or 50
 	if(len(param) > 1):
 		count = param[1]
 		if(count.isdigit()):
 			count = int(count)
-			if(xmpp.TYPE_PUBLIC == msgType):
+			if(protocol.TYPE_PUBLIC == msgType):
 				maxCount = min(50, count)
 			else:
 				maxCount = min(250, count);	
@@ -35,8 +35,8 @@ def serviceDiscovery(msgType, conference, nick, param):
 				searchKey = param[2]
 		else:		
 			searchKey = param[1]
-	iq = xmpp.Iq(xmpp.TYPE_GET)
-	query = iq.addChild("query", None, None, xmpp.NS_DISCO_ITEMS)
+	iq = protocol.Iq(protocol.TYPE_GET)
+	query = iq.addChild("query", None, None, protocol.NS_DISCO_ITEMS)
 	param = jid.split("#")
 	if(len(param) == 2):
 		jid, node = param
@@ -48,7 +48,7 @@ def serviceDiscovery(msgType, conference, nick, param):
 	gClient.sendAndCallForResponse(iq, _serviceDiscovery, (msgType, conference, nick, jid, maxCount, searchKey))
 
 def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKey):
-	if(xmpp.TYPE_RESULT == stanza.getType()):
+	if(protocol.TYPE_RESULT == stanza.getType()):
 		discoList = []
 		itemCount = 0
 		for x in stanza.getQueryChildren():

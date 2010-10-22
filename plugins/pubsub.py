@@ -15,14 +15,14 @@
 
 def setBotMood(msgType, jid, resource, param):
 	if(param == u"сброс" or param.count("|")):
-		iq = xmpp.Iq("set")
-		iq.setType(xmpp.TYPE_HEADLINE)
-		pubsub = iq.addChild("pubsub", {}, [], xmpp.NS_PUBSUB)
-		pubNode = xmpp.Node("publish", {"node": xmpp.NS_MOOD})
-		moodNode = xmpp.Node("mood", {"xmlns": xmpp.NS_MOOD})
+		iq = protocol.Iq("set")
+		iq.setType(protocol.TYPE_HEADLINE)
+		pubsub = iq.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
+		pubNode = protocol.Node("publish", {"node": protocol.NS_MOOD})
+		moodNode = protocol.Node("mood", {"xmlns": protocol.NS_MOOD})
 		if(param.count("|")):
 			param = param.split("|")
-			moodNode.addChild(node = xmpp.Node(param[0]))
+			moodNode.addChild(node = protocol.Node(param[0]))
 			moodNode.setTagData("text", param[1])
 		pubNode.addChild("item", {}, [moodNode], "")
 		pubsub.addChild(node = pubNode)
@@ -36,16 +36,16 @@ def setBotMood(msgType, jid, resource, param):
 
 def setBoAtctivity(msgType, jid, resource, param):
 	if(param == u"сброс" or param.count("|")):
-		iq = xmpp.Iq("set")
-		iq.setType(xmpp.TYPE_HEADLINE)
-		pubsub = iq.addChild("pubsub", {}, [], xmpp.NS_PUBSUB)
-		pubNode = xmpp.Node("publish", {"node": xmpp.NS_ACTIVITY})
-		actNode = xmpp.Node("activity", {"xmlns": xmpp.NS_ACTIVITY})
+		iq = protocol.Iq("set")
+		iq.setType(protocol.TYPE_HEADLINE)
+		pubsub = iq.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
+		pubNode = protocol.Node("publish", {"node": protocol.NS_ACTIVITY})
+		actNode = protocol.Node("activity", {"xmlns": protocol.NS_ACTIVITY})
 		if(param.count("|")):
 			param = param.split("|")
-			act = actNode.addChild(node = xmpp.Node(param[0]))
+			act = actNode.addChild(node = protocol.Node(param[0]))
 			if(param[1]):
-				act.addChild(node = xmpp.Node(param[1]))
+				act.addChild(node = protocol.Node(param[1]))
 			actNode.setTagData("text", param[2])
 		pubNode.addChild("item", {}, [actNode], "")
 		pubsub.addChild(node = pubNode)

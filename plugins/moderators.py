@@ -19,19 +19,19 @@ gModerators = {}
 
 def saveAutoModerators(conference):
 	fileName = getConfigPath(conference, MODERATORS_FILE)
-	util.writeFile(fileName, str(gModerators[conference]))
+	utils.writeFile(fileName, str(gModerators[conference]))
 
 def loadAutoModerators(conference):
 	fileName = getConfigPath(conference, MODERATORS_FILE)
-	util.createFile(fileName, "[]")
-	gModerators[conference] = eval(util.readFile(fileName))
+	utils.createFile(fileName, "[]")
+	gModerators[conference] = eval(utils.readFile(fileName))
 
 def freeAutoModerators(conference):
 	del(gModerators[conference])
 
 def setAutoModerator(conference, nick, trueJid, aff, role):
 	if(trueJid in gModerators[conference]):
-		setMUCRole(conference, nick, xmpp.ROLE_MODERATOR, u"автомодератор")
+		setMUCRole(conference, nick, protocol.ROLE_MODERATOR, u"автомодератор")
 
 def addAutoModerator(msgType, conference, nick, param):
 	user = param
@@ -53,7 +53,7 @@ def addAutoModerator(msgType, conference, nick, param):
 		saveAutoModerators(conference)
 		sendMsg(msgType, conference, nick, u"добавила")
 		if(setModeratorRole):
-			setMUCRole(conference, user, xmpp.ROLE_MODERATOR)
+			setMUCRole(conference, user, protocol.ROLE_MODERATOR)
 	else:
 		sendMsg(msgType, conference, nick, u"%s уже есть в списке" % (param))
 
@@ -77,7 +77,7 @@ def delAutoModerator(msgType, conference, nick, param):
 		saveAutoModerators(conference)
 		sendMsg(msgType, conference, nick, u"удалила")
 		if(setParticipantRole):
-			setMUCRole(conference, user, xmpp.ROLE_PARTICIPANT)
+			setMUCRole(conference, user, protocol.ROLE_PARTICIPANT)
 	else:
 		sendMsg(msgType, conference, nick, u"а %s итак нет в списке" % (param))
 

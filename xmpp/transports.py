@@ -37,11 +37,10 @@ if isPython26:
 	import ssl
 
 import dispatcher
-import dns
 
 from plugin import PlugIn
+from protocol import NS_TLS
 from utils.utils import ustr
-from protocol import *
 
 BUFLEN = 1024
 
@@ -68,11 +67,12 @@ class TCPSocket(PlugIn):
 
 	def lookup(self, server):
 		" SRV resolver. Takes server=(host, port) as argument. Returns new (host, port) pair "
+		import dns
 		host, port  =  server
 		query = '_xmpp-client._tcp.%s' % (host)
 		# ensure we haven't cached an old configuration
 		dns.DiscoverNameServers()
-		response = dns.Request().req(query, qtype='SRV')
+		response = dns.DnsRequest().req(query, qtype='SRV')
 		if response.answers:
 			port, host = response.answers[0]['data'][2:4]
 			port = int(port)

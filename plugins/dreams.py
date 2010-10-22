@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # dreams.py
-# Initial Copyright (c) Avinar <avinar@xmpp.ru>
+# Initial Copyright (c) Avinar <avinar@protocol.ru>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@ def showDreamInfo(msgType, conference, nick, param):
 	rawHTML = urllib.urlopen(url).read()
 	items = re.search(r"<div id=\"mntxt\">(.+?)</p>", rawHTML, re.DOTALL)
 	message = decode(items.group(0))
-	if(xmpp.TYPE_PUBLIC == msgType):
+	if(protocol.TYPE_PUBLIC == msgType):
 		sendMsg(msgType, conference, nick, u"ушло в приват")
-	sendMsg(xmpp.TYPE_PRIVATE, conference, nick, unicode(message, "cp1251"))
+	sendMsg(protocol.TYPE_PRIVATE, conference, nick, unicode(message, "cp1251"))
 
 registerCommand(showDreamInfo, u"сонник", 10, 
 				u"Толкователь снов", 

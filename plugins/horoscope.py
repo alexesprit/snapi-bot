@@ -35,9 +35,9 @@ def showHoroscope(msgType, conference, nick, param):
 		items = re.search(r"<td class=stext>(.+?)</td>", rawHTML, re.DOTALL)
 		if(items):
 			message = decode(items.group(0))
-			if(xmpp.TYPE_PUBLIC == msgType):
+			if(protocol.TYPE_PUBLIC == msgType):
 				sendMsg(msgType, conference, nick, u"ушёл в приват")
-			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, unicode(message, "cp1251"))
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, unicode(message, "cp1251"))
 		else:
 			sendMsg(msgType, conference, nick, u"не могу :(")
 

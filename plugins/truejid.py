@@ -15,10 +15,10 @@
 
 def showTrueJid(msgType, conference, nick, param):
 	if(nickInConference(conference, param)):
-		if(xmpp.TYPE_PUBLIC == msgType):
+		if(protocol.TYPE_PUBLIC == msgType):
 			sendMsg(msgType, conference, nick, u"смотри в привате")
 		trueJid = getTrueJid(conference, param)
-		sendMsg(xmpp.TYPE_PRIVATE, conference, nick, u"реальный жид %s: %s" % (param, trueJid))
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"реальный жид %s: %s" % (param, trueJid))
 	else:
 		sendMsg(msgType, conference, nick, u"а это кто?")
 

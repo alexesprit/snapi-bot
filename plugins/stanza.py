@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def sendStanza(source, conference, nick, param):
-	stanza = xmpp.simplexml.XML2Node(param)
+	stanza = simplexml.XML2Node(param)
 	gClient.send(stanza)
 
 registerCommand(sendStanza, u"станза", 100, 

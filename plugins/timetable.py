@@ -65,9 +65,9 @@ def showTrainTable(msgType, conference, nick, param):
 			if(tableList):
 				for i, table in enumerate(tableList):
 					message.append(msgText % (i + 1, table[0], table[1], table[2], table[3], table[4], table[5], table[6]))
-				if(xmpp.TYPE_PUBLIC == msgType):
+				if(protocol.TYPE_PUBLIC == msgType):
 					sendMsg(msgType, conference, nick, u"ушло")
-				sendMsg(xmpp.TYPE_PRIVATE, conference, nick, "\n".join(message))
+				sendMsg(protocol.TYPE_PRIVATE, conference, nick, "\n".join(message))
 			else:
 				sendMsg(msgType, conference, nick, u"не найдено")
 		else:

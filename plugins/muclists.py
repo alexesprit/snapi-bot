@@ -16,35 +16,35 @@
 MUC_ID = "muc_id"
 
 def _showMUCList(stanza, msgType, conference, nick):
-	if(xmpp.TYPE_RESULT == stanza.getType()):
+	if(protocol.TYPE_RESULT == stanza.getType()):
 		items = [u"%d) %s" % (i + 1, p.getAttrs()["jid"]) for i, p in enumerate(stanza.getQueryChildren())]
 		if(items):
 			message = u"смотри, что я нашла:\n"
-			if(msgType == xmpp.TYPE_PUBLIC):
+			if(msgType == protocol.TYPE_PUBLIC):
 				sendMsg(msgType, conference, nick, u"смотри в привате")
-			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message + "\n".join(items))
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message + "\n".join(items))
 		else:
 			sendMsg(msgType, conference, nick, u"список пуст")
 	else:
 		sendMsg(msgType, conference, nick, u"не получается :(")
 
 def showMUCList(msgType, conference, nick, aff):
-	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_MUC_ADMIN, payload = [xmpp.Node("item", {"affiliation": aff})])
+	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_MUC_ADMIN, payload = [protocol.Node("item", {"affiliation": aff})])
 	iq.setTo(conference)
 	iq.setID(getUniqueID(MUC_ID))
 	gClient.sendAndCallForResponse(iq, _showMUCList, (msgType, conference, nick, ))
 
 def showOutcastsList(msgType, conference, nick, param):
-	showMUCList(msgType, conference, nick, xmpp.AFF_OUTCAST)
+	showMUCList(msgType, conference, nick, protocol.AFF_OUTCAST)
 
 def showMembersList(msgType, conference, nick, param):
-	showMUCList(msgType, conference, nick, xmpp.AFF_MEMBER)
+	showMUCList(msgType, conference, nick, protocol.AFF_MEMBER)
 
 def showAdminsList(msgType, conference, nick, param):
-	showMUCList(msgType, conference, nick, xmpp.AFF_ADMIN)
+	showMUCList(msgType, conference, nick, protocol.AFF_ADMIN)
 
 def showOwnersList(msgType, conference, nick, param):
-	showMUCList(msgType, conference, nick, xmpp.AFF_OWNER)
+	showMUCList(msgType, conference, nick, protocol.AFF_OWNER)
 
 registerCommand(showOutcastsList, u"банлист", 20, 
 				u"Показывает список забаненных", 

@@ -21,7 +21,7 @@ def playRoulette(msgType, conference, nick, param):
 		else:
 			sendToConference(conference, u"/me выстрелила в %s" % (nick))
 			time.sleep(0.5)
-			setMUCRole(conference, nick, xmpp.ROLE_NONE, u"ПЫЩЩЬ-ПТЫДЫЩЬ!")
+			setMUCRole(conference, nick, protocol.ROLE_NONE, u"ПЫЩЩЬ-ПТЫДЫЩЬ!")
 	else:
 		sendMsg(msgType, conference, nick, u"не могу я в модера стрелять :(")
 

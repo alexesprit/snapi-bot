@@ -16,13 +16,13 @@
 LAST_ID = "last_id"
 
 def showOnlineTime(msgType, jid, resource, param):
-	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_LAST)
+	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_LAST)
 	iq.setTo(jid)
 	iq.setID(getUniqueID(LAST_ID))
 	gClient.sendAndCallForResponse(iq, _showOnlineTime, (msgType, jid, resource, ))
 
 def _showOnlineTime(stanza, msgType, jid, resource):
-	if(xmpp.TYPE_RESULT == stanza.getType()):
+	if(protocol.TYPE_RESULT == stanza.getType()):
 		child = stanza.getFirstChild()
 		seconds = child.getAttr("seconds")
 		sendMsg(msgType, jid, resource, u"ты в сети уже %s" % (time2str(int(seconds))))

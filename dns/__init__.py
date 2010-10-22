@@ -11,15 +11,11 @@
 
 __version__ = '2.3.4'
 
-import Type,Opcode,Status,Class
-from Base import DnsRequest, DNSError
+import Class
+import Type, Opcode, Status, Class
+from Base import DiscoverNameServers, DnsRequest, DNSError
 from Lib import DnsResult
-from Base import *
-from Lib import *
-Error=DNSError
-from lazy import *
-Request = DnsRequest
-Result = DnsResult
+#from Lib import LABEL_UTF8, LABEL_ENCODING
 
 #
 # $Log: __init__.py,v $

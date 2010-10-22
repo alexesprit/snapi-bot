@@ -39,11 +39,11 @@ def freeAuthCache(conference):
 
 def askAuthQuestion(conference, nick, trueJid, aff, role):
 	if(getConfigKey(conference, "auth")):
-		if(aff == xmpp.AFF_NONE):
+		if(aff == protocol.AFF_NONE):
 			question, answer = random.choice(AUTH_QUESTIONS)
-			setMUCRole(conference, nick, xmpp.ROLE_VISITOR, u"неавторизованый участник")
+			setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"неавторизованый участник")
 			message = u"Чтобы получить голос, реши пример: %s. Как решишь, напиши мне ответ" % (question)
-			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message)
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 			gAuthAnswer[conference][trueJid] = answer
 
 def clearAuthCache(conference, nick, trueJid, reason, code):
@@ -51,11 +51,11 @@ def clearAuthCache(conference, nick, trueJid, reason, code):
 		del(gAuthAnswer[conference][trueJid])
 
 def authAnswerListener(stanza, msgType, conference, nick, trueJid, body):
-	if(xmpp.TYPE_PRIVATE == msgType):
+	if(protocol.TYPE_PRIVATE == msgType):
 		if(trueJid in gAuthAnswer[conference]):
 			if(gAuthAnswer[conference][trueJid] == body):
 				sendMsg(msgType, conference, nick, u"ок, признаю - ты не бот =)")
-				setMUCRole(conference, nick, xmpp.ROLE_PARTICIPANT, u"авторизация пройдена")
+				setMUCRole(conference, nick, protocol.ROLE_PARTICIPANT, u"авторизация пройдена")
 				del(gAuthAnswer[conference][trueJid])
 			else:
 				sendMsg(msgType, conference, nick, u"неправильный ответ")

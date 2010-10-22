@@ -17,7 +17,7 @@
 QUIZ_FILE = "questions.txt"
 QUIZ_SCORES_FILE = "quiz.txt"
 
-QUIZ_TOTAL_LINES = sum(1 for i in open(util.getFilePath(RESOURCE_DIR, QUIZ_FILE), "r"))
+QUIZ_TOTAL_LINES = sum(1 for i in open(utils.getFilePath(RESOURCE_DIR, QUIZ_FILE), "r"))
 QUIZ_TIME_LIMIT = 180
 QUIZ_IDLE_LIMIT = 3
 QUIZ_COEF = 3
@@ -55,7 +55,7 @@ def resetQuizTimer(conference):
 
 def getQuizQuestion():
 	questionNum = random.randrange(0, QUIZ_TOTAL_LINES)
-	fp = file(util.getFilePath(RESOURCE_DIR, QUIZ_FILE))
+	fp = file(utils.getFilePath(RESOURCE_DIR, QUIZ_FILE))
 	for i in xrange(QUIZ_TOTAL_LINES):
 		if(i == questionNum):
 			(question, answer) = fp.readline().decode("utf-8").strip().split("|", 1)
@@ -88,7 +88,7 @@ def quizStop(conference):
 	if(isQuizTimerEnabled(conference)):
 		gQuizTimer[conference].cancel()
 		del(gQuizTimer[conference])
-	showScoreList(xmpp.TYPE_PUBLIC, conference)
+	showScoreList(protocol.TYPE_PUBLIC, conference)
 
 def checkQuizAnswer(conference, nick, trueJid, answer):
 	rightAnswer = gQuizAnswer[conference].lower()

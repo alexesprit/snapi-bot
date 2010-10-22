@@ -26,7 +26,10 @@ import re
 
 import dispatcher
 
-from protocol import *
+from protocol import Node, NodeProcessed, Stanza, UserJid
+from protocol import NS_BIND, NS_SASL, NS_SESSION, NS_STREAMS
+from protocol import TYPE_RESULT, TYPE_SET
+
 from plugin import PlugIn
 
 def HH(some):
@@ -166,7 +169,7 @@ class SASL(PlugIn):
 		raise NodeProcessed
 
 class Bind(PlugIn):
-	""" Bind some JID to the current connection to allow router know of our location."""
+	""" Bind some UserJid to the current connection to allow router know of our location."""
 	def __init__(self):
 		PlugIn.__init__(self)
 		self.debugFlag = DBG_BIND
@@ -196,15 +199,15 @@ class Bind(PlugIn):
 			resource = [Node("resource", payload=[resource])]
 		else:
 			resource = []
-		stanza = self._owner.sendAndWaitForResponse(Protocol("iq", typ=TYPE_SET, payload=[Node("bind", attrs={"xmlns":NS_BIND}, payload=resource)]))
+		stanza = self._owner.sendAndWaitForResponse(Stanza("iq", typ=TYPE_SET, payload=[Node("bind", attrs={"xmlns": NS_BIND}, payload=resource)]))
 		stanzaType = stanza.getType()
 		if stanzaType == TYPE_RESULT:
 			resource = stanza.getTag("bind").getTagData("jid")
 			self.printf("Successfully bound %s" % (resource), "ok")
-			jid = JID(stanza.getTag("bind").getTagData("jid"))
+			jid = UserJid(stanza.getTag("bind").getTagData("jid"))
 			self._owner.User = jid.getNode()
 			self._owner.Resource = jid.getResource()
-			stanza = self._owner.sendAndWaitForResponse(Protocol("iq", typ=TYPE_SET, payload=[Node("session", attrs={"xmlns":NS_SESSION})]))
+			stanza = self._owner.sendAndWaitForResponse(Stanza("iq", typ=TYPE_SET, payload=[Node("session", attrs={"xmlns": NS_SESSION})]))
 			stanzaType = stanza.getType()
 			if stanzaType == TYPE_RESULT:
 				self.printf("Successfully opened session", "ok")

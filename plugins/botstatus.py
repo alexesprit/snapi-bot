@@ -14,10 +14,10 @@
 # GNU General Public License for more details.
 
 STATUSES = (
-	xmpp.PRS_AWAY, 
-	xmpp.PRS_NA, 
-	xmpp.PRS_DND, 
-	xmpp.PRS_CHAT
+	protocol.PRS_AWAY, 
+	protocol.PRS_NA, 
+	protocol.PRS_DND, 
+	protocol.PRS_CHAT
 )
 
 def setDefBotStatusValue(conference):

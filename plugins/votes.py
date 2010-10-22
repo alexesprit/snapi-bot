@@ -163,9 +163,9 @@ def showOpinions(msgType, conference, nick, param):
 				voteText.append(u"%d) %s" % (i + 1, getVoteText(vote, flags)))
 			else:
 				voteText.append(u"%d) %s\nРезультаты недоступны" % (i + 1, getVoteText(vote)))
-		if(xmpp.TYPE_PUBLIC == msgType):
+		if(protocol.TYPE_PUBLIC == msgType):
 			sendMsg(msgType, conference, nick, u"ушли в приват")
-		sendMsg(xmpp.TYPE_PRIVATE, conference, nick, u"Результаты голосований:\n%s" % ("\n\n".join(voteText)))
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Результаты голосований:\n%s" % ("\n\n".join(voteText)))
 	else:
 		sendMsg(msgType, conference, nick, u"голосований нет")
 
@@ -225,7 +225,7 @@ def sendNewVotes(conference, nick, trueJid, role, aff):
 			if(trueJid not in vote[VOTE_VOTED]):
 				voteText = u"Голосование\n%s" % (getVoteText(vote, VOTE_OPINIONS))
 				voteText += u"\nЧтобы проголосовать напишите \"мнение %d <номер_мнения>\"" % (voteID)
-				sendMsg(xmpp.TYPE_PRIVATE, conference, nick, voteText)
+				sendMsg(protocol.TYPE_PRIVATE, conference, nick, voteText)
 
 def loadVotes(conference):
 	fileName = getConfigPath(conference, VOTES_FILE)

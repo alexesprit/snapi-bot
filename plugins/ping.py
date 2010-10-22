@@ -32,7 +32,7 @@ REPLICS_FOR_ME = (
 )
 
 def _showPing(stanza, t0, msgType, conference, nick, param):
-	if(xmpp.TYPE_RESULT == stanza.getType()):
+	if(protocol.TYPE_RESULT == stanza.getType()):
 		ping = time.time() - t0
 		if(param):
 			message = random.choice(REPLICS_FOR_OTHER) % (param);  
@@ -51,7 +51,7 @@ def showPing(msgType, conference, nick, param):
 			jid = param
 	else:
 		jid = conference + "/" + nick
-	iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_VERSION)
+	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_VERSION)
 	iq.setTo(jid)
 	iq.setID(getUniqueID(PING_ID))
 	t0 = time.time()

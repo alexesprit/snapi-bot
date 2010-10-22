@@ -29,6 +29,9 @@ import dispatcher
 import roster
 import transports
 
+from protocol import Node, Presence
+from protocol import NS_CAPS, NS_CLIENT
+
 debug.Debug.colors['auth'] = debug.colorYellow
 debug.Debug.colors['bind'] = debug.colorBrown
 debug.Debug.colors['dispatcher'] = debug.colorGreen
@@ -60,7 +63,7 @@ class CommonClient:
 			the printf IDs that will go into printf output. You can either specifiy an "include"
 			or "exclude" list. The latter is done via adding "always" pseudo-ID to the list.
 		"""
-		self.Namespace = dispatcher.NS_CLIENT
+		self.Namespace = NS_CLIENT
 		self.defaultNamespace = self.Namespace
 		self.disconnectHandlers = []
 		self.Server = server
@@ -181,8 +184,8 @@ class Client(CommonClient):
 			return auth.AUTH_FAILURE
 
 	def getCapsNode(self):
-		caps = dispatcher.Node("c")
-		caps.setNamespace(dispatcher.NS_CAPS)
+		caps = Node("c")
+		caps.setNamespace(NS_CAPS)
 		caps.setAttr("node", "http://jimm.net.ru/caps")
 		caps.setAttr("ver", "Nz009boXYEIrmRWk1N/Vsw==")
 		caps.setAttr("hash", "md5")
@@ -196,7 +199,7 @@ class Client(CommonClient):
 		return self.Roster.getRoster()
 
 	def setStatus(self, show, status, priority):
-		prs = dispatcher.Presence(priority=priority)
+		prs = Presence(priority=priority)
 		if(status):
 			prs.setStatus(status)
 		if(show):

@@ -37,7 +37,7 @@ def turnMessage(text):
 	return(text)
 
 def turnLastMessage(msgType, conference, nick, param):
-	if(not msgType == xmpp.TYPE_PUBLIC):
+	if(not msgType == protocol.TYPE_PUBLIC):
 		sendMsg(msgType, conference, nick, u"тока в чате")
 		return
 	if(param):
@@ -65,7 +65,7 @@ def turnLastMessage(msgType, conference, nick, param):
 				sendMsg(msgType, conference, nick, turnMessage(savedMsg))
 
 def saveTurnMessage(stanza, msgType, conference, nick, trueJid, body):
-	if(msgType == xmpp.TYPE_PUBLIC):
+	if(msgType == protocol.TYPE_PUBLIC):
 		if(trueJid != gJid and trueJid != conference):
 			time.sleep(TURN_TIMEOUT)
 			gTurnMsgCache[conference][trueJid] = body

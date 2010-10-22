@@ -19,6 +19,6 @@ def checkNick(stanza, conference, nick, trueJid):
 	if(nick.strip()):
 		command = nick.split()[0].strip().lower()
 		if(isCommand(command) or gMacros.hasMacros(command, conference) or gMacros.hasMacros(command)):
-			setMUCRole(conference, nick, xmpp.ROLE_NONE, u"меняй ник!!!")
+			setMUCRole(conference, nick, protocol.ROLE_NONE, u"меняй ник!!!")
 
 registerPresenceHandler(checkNick, CHAT)

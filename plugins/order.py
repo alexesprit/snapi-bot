@@ -28,31 +28,31 @@ def setUserAffiliation(msgType, conference, nick, user, aff):
 		sendMsg(msgType, conference, nick, u"а это кто?")
 
 def setOutcast(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, xmpp.AFF_OUTCAST)
+	setUserAffiliation(msgType, conference, nick, param, protocol.AFF_OUTCAST)
 
 def setNone(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, xmpp.AFF_NONE)
+	setUserAffiliation(msgType, conference, nick, param, protocol.AFF_NONE)
 
 def setMember(msgType, conference, nick, param): 
-	setUserAffiliation(msgType, conference, nick, param, xmpp.AFF_MEMBER)
+	setUserAffiliation(msgType, conference, nick, param, protocol.AFF_MEMBER)
 
 def setAdmin(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, xmpp.AFF_ADMIN)
+	setUserAffiliation(msgType, conference, nick, param, protocol.AFF_ADMIN)
 
 def setOwner(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, xmpp.AFF_OWNER)
+	setUserAffiliation(msgType, conference, nick, param, protocol.AFF_OWNER)
 	
 def setKick(msgType, conference, nick, param):
-	setUserRole(msgType, conference, nick, param, xmpp.ROLE_NONE)
+	setUserRole(msgType, conference, nick, param, protocol.ROLE_NONE)
 		
 def setVisitor(msgType, conference, nick, param):
-	setUserRole(msgType, conference, nick, param, xmpp.ROLE_VISITOR)
+	setUserRole(msgType, conference, nick, param, protocol.ROLE_VISITOR)
 
 def setParticipant(msgType, conference, nick, param):
-	setUserRole(msgType, conference, nick, param, xmpp.ROLE_PARTICIPANT)
+	setUserRole(msgType, conference, nick, param, protocol.ROLE_PARTICIPANT)
 
 def setModerator(msgType, conference, nick, param):
-	setUserRole(msgType, conference, nick, param, xmpp.ROLE_MODERATOR)
+	setUserRole(msgType, conference, nick, param, protocol.ROLE_MODERATOR)
 
 registerCommand(setOutcast, u"бан", 20, 
 				u"Банит пользователя", 

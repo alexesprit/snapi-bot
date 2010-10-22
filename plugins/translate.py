@@ -52,7 +52,7 @@ def translateText(msgType, conference, nick, param):
 							sendMsg(msgType, conference, nick, u"не могу перевести")
 				text = getTranslatedText(text, src, target)
 				if(text):
-					sendMsg(msgType, conference, nick, util.unescapeHTML(text))
+					sendMsg(msgType, conference, nick, utils.unescapeHTML(text))
 				else:
 					sendMsg(msgType, conference, nick, u"не могу перевести")
 

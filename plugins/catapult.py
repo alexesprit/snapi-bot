@@ -15,7 +15,7 @@
 
 def runCatapult(msgType, conference, nick, param):
 	if(not getNickKey(conference, nick, NICK_MODER)):
-		setMUCRole(conference, nick, xmpp.ROLE_NONE, u"КАТАПУЛЬТИРУЮСЬ!")
+		setMUCRole(conference, nick, protocol.ROLE_NONE, u"КАТАПУЛЬТИРУЮСЬ!")
 	else:
 		sendMsg(msgType, conference, nick, u"не могу :(")
 

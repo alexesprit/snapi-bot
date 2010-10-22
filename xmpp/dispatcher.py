@@ -25,8 +25,10 @@ import time
 import sys
 
 import simplexml
-from protocol import *
+
 from plugin import PlugIn
+from protocol import Node, Iq, Message, NodeProcessed, Presence, Stanza
+from protocol import NS_STREAMS, NS_XMPP_STREAMS
 
 DEFAULT_TIMEOUT = 25
 gID = 0
@@ -136,7 +138,7 @@ class Dispatcher(PlugIn):
 		"""
 		self.printf('Registering namespace "%s"' % (xmlns), order)
 		self.handlers[xmlns] = {}
-		self.registerProtocol("default", Protocol, xmlns=xmlns)
+		self.registerProtocol("default", Stanza, xmlns=xmlns)
 
 	def registerProtocol(self, tagName, protocol, xmlns=None, order="info"):
 		""" Used to declare some top-level stanza name to dispatcher.
@@ -168,7 +170,7 @@ class Dispatcher(PlugIn):
 		if xmlns not in self.handlers:
 			self.registerNamespace(xmlns, 'warn')
 		if name not in self.handlers[xmlns]:
-			self.registerProtocol(name, Protocol, xmlns, 'warn')
+			self.registerProtocol(name, Stanza, xmlns, 'warn')
 		key = htype + namespace
 		if key not in self.handlers[xmlns][name]:
 			self.handlers[xmlns][name][key] = []
@@ -309,7 +311,7 @@ class Dispatcher(PlugIn):
 		"""
 		if(isinstance(stanza, basestring)):
 			return self._owner_send(stanza)
-		if(not isinstance(stanza, Protocol)): 
+		if(not isinstance(stanza, Stanza)): 
 			stanzaID = None
 		elif(not stanza.getID()):
 			global gID

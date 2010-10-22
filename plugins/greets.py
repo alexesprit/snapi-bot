@@ -19,8 +19,8 @@ gGreets = {}
 
 def loadGreetings(conference):
 	fileName = getConfigPath(conference, GREET_FILE)
-	util.createFile(fileName, "{}")
-	gGreets[conference] = eval(util.readFile(fileName))
+	utils.createFile(fileName, "{}")
+	gGreets[conference] = eval(utils.readFile(fileName))
 
 def freeGreetings(conference):
 	del(gGreets[conference])
@@ -43,12 +43,12 @@ def setUserGreeting(msgType, conference, nick, param):
 		else:
 			gGreets[conference][trueJid] = greet
 		fileName = getConfigPath(conference, GREET_FILE)
-		util.writeFile(fileName, str(gGreets[conference]))
+		utils.writeFile(fileName, str(gGreets[conference]))
 		sendMsg(msgType, conference, nick, u"запомнила")
 
 def sendUserGreeting(conference, nick, trueJid, aff, role):
 	if(trueJid in gGreets[conference]):
-		sendMsg(xmpp.TYPE_PUBLIC, conference, nick, gGreets[conference][trueJid])
+		sendMsg(protocol.TYPE_PUBLIC, conference, nick, gGreets[conference][trueJid])
 
 registerEvent(loadGreetings, ADDCONF)
 registerEvent(freeGreetings, DELCONF)

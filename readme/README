@@ -4,7 +4,7 @@ _____________________________________________________________________________
  Snapi-Snup is fork of Talisman-bot (jabber bot for conferences and roster).
 _____________________________________________________________________________
 2) LAUNCHING
- 1. Fill config.py
+ 1. Rename _config.py to config.py and fill it
  2. Launch pybot.py
 _____________________________________________________________________________
 3) LICENSING

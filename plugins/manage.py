@@ -24,6 +24,7 @@ def joinConf(msgType, conference, nick, param):
 			addConference(conf)
 			joinConference(conf, gBotNick, getConfigKey(conf, "password"))
 			saveConferenceConfig(conf)
+			saveConferences()
 			sendMsg(msgType, conference, nick, u"зашла")
 
 def leaveConf(msgType, conference, nick, param):
@@ -33,6 +34,7 @@ def leaveConf(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"ушла")
 		myNick = (conferenceInList(conference)) and nick or conference.split("@")[0]
 		leaveConference(conf, u"меня уводит %s" % (myNick))
+		saveConferences()
 	else:
 		sendMsg(msgType, conference, nick, u"а меня там нету")
 

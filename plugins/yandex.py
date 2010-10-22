@@ -19,7 +19,7 @@ def searchInYandex(msgType, conference, nick, param):
 	rawHTML = unicode(rawHTML, "utf-8")
 	items = re.findall("<li>(.+?)<div class=\"www\">(.+?)</li>", rawHTML, re.DOTALL)
 	if(items):
-		if(xmpp.TYPE_PUBLIC == msgType):
+		if(protocol.TYPE_PUBLIC == msgType):
 			text = items[0][0].strip()
 			url = items[0][1]
 			message = u"%shttp://%s" % (text, url)

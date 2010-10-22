@@ -15,8 +15,8 @@
 # $Id: protocol.py,v 1.60 2009/04/07 11:14:28 snakeru Exp $
 
 """
-Protocol module contains tools that is needed for processing of 
-xmpp-related data structures.
+	Protocol module contains tools that is needed for processing of 
+	xmpp-related data structures.
 """
 
 import time
@@ -134,13 +134,6 @@ AFF_MEMBER = "member"
 AFF_ADMIN = "admin"
 AFF_OWNER = "owner"
 
-def isResultNode(node):
-	""" Returns true if the node is a positive reply. """
-	return node and node.getType()=='result'
-def isErrorNode(node):
-	""" Returns true if the node is a negative reply. """
-	return node and node.getType()=='error'
-
 class NodeProcessed(Exception):
 	""" Exception that should be raised by handler when the handling should be stopped. """
 	pass
@@ -247,17 +240,17 @@ streamExceptions = {
 	'xml-not-well-formed': XMLNotWellFormed
 }
 
-class JID:
-	""" JID object. JID can be built from string, modified, compared, serialised into string. """
+class UserJid:
+	""" UserJid object. UserJid can be built from string, modified, compared, serialised into string. """
 	def __init__(self, jid=None, node='', domain='', resource=''):
-		""" Constructor. JID can be specified as string (jid argument) or as separate parts.
+		""" Constructor. UserJid can be specified as string (jid argument) or as separate parts.
 			Examples:
-			JID('node@domain/resource')
-			JID(node='node', domain='domain.org')
+			UserJid('node@domain/resource')
+			UserJid(node='node', domain='domain.org')
 		"""
 		if not jid and not domain:
-			raise ValueError('JID must contain at least domain name')
-		elif isinstance(jid, JID):
+			raise ValueError('UserJid must contain at least domain name')
+		elif isinstance(jid, UserJid):
 			self.node = jid.node
 			self.domain = jid.domain
 			self.resource= jid.resource
@@ -274,51 +267,51 @@ class JID:
 				self.domain, self.resource = jid, ''
 
 	def getNode(self):
-		""" Return the node part of the JID """
+		""" Return the node part of the UserJid """
 		return self.node
 
 	def setNode(self,node):
-		""" Set the node part of the JID to new value. Specify None to remove the node part."""
+		""" Set the node part of the UserJid to new value. Specify None to remove the node part."""
 		self.node = node.lower()
 
 	def getDomain(self):
-		""" Return the domain part of the JID """
+		""" Return the domain part of the UserJid """
 		return self.domain
 
 	def setDomain(self,domain):
-		""" Set the domain part of the JID to new value."""
+		""" Set the domain part of the UserJid to new value."""
 		self.domain = domain.lower()
 
 	def getResource(self):
-		""" Return the resource part of the JID """
+		""" Return the resource part of the UserJid """
 		return self.resource
 
 	def setResource(self,resource):
-		""" Set the resource part of the JID to new value. Specify None to remove the resource part."""
+		""" Set the resource part of the UserJid to new value. Specify None to remove the resource part."""
 		self.resource = resource
 
 	def getStripped(self):
-		""" Return the bare representation of JID. I.e. string value w/o resource. """
+		""" Return the bare representation of UserJid. I.e. string value w/o resource. """
 		return self.__str__(0)
 
 	def __eq__(self, other):
-		""" Compare the JID to another instance or to string for equality. """
+		""" Compare the UserJid to another instance or to string for equality. """
 		try:
-			other = JID(other)
+			other = UserJid(other)
 		except ValueError:
 			return False
 		return self.__str__() == other.__str__()
 
 	def __ne__(self, other):
-		""" Compare the JID to another instance or to string for non-equality. """
+		""" Compare the UserJid to another instance or to string for non-equality. """
 		return not self.__eq__(other)
 
 	def bareMatch(self, other):
-		""" Compare the node and domain parts of the JID's for equality. """
-		return self.__str__(False) == JID(other).__str__(False)
+		""" Compare the node and domain parts of the UserJid's for equality. """
+		return self.__str__(False) == UserJid(other).__str__(False)
 
 	def __str__(self, showResource=True):
-		""" Serialise JID into string. """
+		""" Serialise UserJid into string. """
 		if self.node:
 			jid = self.node+'@'+self.domain
 		else:
@@ -328,10 +321,10 @@ class JID:
 		return jid
 
 	def __hash__(self):
-		""" Produce hash of the JID, Allows to use JID objects as keys of the dictionary. """
+		""" Produce hash of the UserJid, Allows to use UserJid objects as keys of the dictionary. """
 		return hash(self.__str__())
 
-class Protocol(Node):
+class Stanza(Node):
 	""" A "stanza" object class. Contains methods that are common for presences, iqs and messages. """
 	def __init__(self, name=None, to=None, typ=None, frm=None, attrs=None, payload=None, timestamp=None, xmlns=None, node=None):
 		""" Constructor, name is the name of the stanza i.e. 'message' or 'presence' or 'iq'.
@@ -388,7 +381,7 @@ class Protocol(Node):
 	
 	def setTo(self,val):
 		""" Set the value of the 'to' attribute. """
-		self.setAttr('to', JID(val))
+		self.setAttr('to', UserJid(val))
 	
 	def getType(self):
 		""" Return the value of the 'type' attribute. """
@@ -396,7 +389,7 @@ class Protocol(Node):
 	
 	def setFrom(self,val):
 		""" Set the value of the 'from' attribute. """
-		self.setAttr('from', JID(val))
+		self.setAttr('from', UserJid(val))
 	
 	def setType(self,val):
 		""" Set the value of the 'type' attribute. """
@@ -436,16 +429,17 @@ class Protocol(Node):
 	
 	def __setitem__(self,item,val):
 		""" Set the item 'item' to the value 'val'."""
-		if item in ['to','from']: val=JID(val)
+		if item in ['to','from']:
+			val = UserJid(val)
 		return self.setAttr(item,val)
 
-class Message(Protocol):
+class Message(Stanza):
 	""" XMPP Message stanza - "push" mechanism."""
 	def __init__(self, to=None, body=None, typ=None, subject=None, attrs=None, frm=None, payload=None, timestamp=None, xmlns=None, node=None):
 		""" Create message object. You can specify recipient, text of message, type of message
 			any additional attributes, sender of the message, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
 			Alternatively you can pass in the other XML object as the 'node' parameted to replicate it as message. """
-		Protocol.__init__(self, 'message', to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
+		Stanza.__init__(self, 'message', to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
 		if body:
 			self.setBody(body)
 		if subject:
@@ -484,13 +478,13 @@ class Message(Protocol):
 			msg.setThread(thr)
 		return msg
 
-class Presence(Protocol):
+class Presence(Stanza):
 	""" XMPP Presence object."""
 	def __init__(self, to=None, typ=None, priority=None, show=None, status=None, attrs=None, frm=None, timestamp=None, payload=None, xmlns=None, node=None):
 		""" Create presence object. You can specify recipient, type of message, priority, show and status values
 			any additional attributes, sender of the presence, timestamp, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
 			Alternatively you can pass in the other XML object as the 'node' parameted to replicate it as presence. """
-		Protocol.__init__(self, 'presence', to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
+		Stanza.__init__(self, 'presence', to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
 		if priority:
 			self.setPriority(priority)
 		if show:
@@ -557,14 +551,14 @@ class Presence(Protocol):
 		"""Returns the status code of the presence (for groupchat)"""
 		return self._muc_getItemAttr('status', 'code')
 
-class Iq(Protocol): 
+class Iq(Stanza): 
 	""" XMPP Iq object - get/set dialog mechanism. """
 	def __init__(self, typ=None, queryNS=None, attrs=None, to=None, frm=None, payload=None, xmlns=None, node=None):
 		""" Create Iq object. You can specify type, query namespace
 			any additional attributes, recipient of the iq, sender of the iq, any additional payload (f.e. jabber:x:data node) and namespace in one go.
 			Alternatively you can pass in the other XML object as the 'node' parameted to replicate it as an iq
 		"""
-		Protocol.__init__(self, 'iq', to=to, typ=typ, attrs=attrs, frm=frm, xmlns=xmlns, node=node)
+		Stanza.__init__(self, 'iq', to=to, typ=typ, attrs=attrs, frm=frm, xmlns=xmlns, node=node)
 		if payload:
 			self.setQueryPayload(payload)
 		if queryNS:

@@ -37,7 +37,8 @@ import macros
 import simplejson
 import xmpp
 
-import utils.utils as util
+from xmpp import client, debug, protocol, simplexml
+from utils import utils
 
 CSS_DIR = "css"
 CONFIG_DIR = "config"
@@ -81,23 +82,23 @@ NICK_SHOW = "show"
 NICK_STATUS = "status"
 
 ROLES = {
-	xmpp.ROLE_NONE: 0, 
-	xmpp.ROLE_VISITOR: 0, 
-	xmpp.ROLE_PARTICIPANT: 10, 
-	xmpp.ROLE_MODERATOR: 15
+	protocol.ROLE_NONE: 0, 
+	protocol.ROLE_VISITOR: 0, 
+	protocol.ROLE_PARTICIPANT: 10, 
+	protocol.ROLE_MODERATOR: 15
 }
 
 AFFILIATIONS = {
-	xmpp.AFF_OUTCAST: 0, 
-	xmpp.AFF_NONE: 0, 
-	xmpp.AFF_MEMBER: 1, 
-	xmpp.AFF_ADMIN: 5, 
-	xmpp.AFF_OWNER: 15
+	protocol.AFF_OUTCAST: 0, 
+	protocol.AFF_NONE: 0, 
+	protocol.AFF_MEMBER: 1, 
+	protocol.AFF_ADMIN: 5, 
+	protocol.AFF_OWNER: 15
 }
 
 FORBIDDEN_TYPES = (
-	xmpp.TYPE_NORMAL,
-	xmpp.TYPE_HEADLINE
+	protocol.TYPE_NORMAL,
+	protocol.TYPE_HEADLINE
 )
 
 IDLE_TIMEOUT = 600
@@ -118,9 +119,9 @@ if gCurrentDir:
 execfile(BOTCONFIG_FILE) in globals()
 
 gUserName, gServer = gJid.split("@")
-gClient = xmpp.Client(server=gServer, port=gPort, debugFlags=gXMPPDebug)
+gClient = client.Client(server=gServer, port=gPort, debugFlags=gXMPPDebug)
 gRoster = None
-gDebug = xmpp.debug.Debug(gCoreDebug, timeStamp=0, validateFlags=False, \
+gDebug = debug.Debug(gCoreDebug, timeStamp=0, validateFlags=False, \
 							showFlags=False, prefix="", welcomeMsg=False)
 gTagPattern = re.compile("<(.*?)>")
 
@@ -161,10 +162,10 @@ gJokes = []
 
 gID = 0
 
-gDebug.colors[FLAG_INFO] = xmpp.debug.colorWhite
-gDebug.colors[FLAG_ERROR] = xmpp.debug.colorBrightRed
-gDebug.colors[FLAG_WARNING] = xmpp.debug.colorYellow
-gDebug.colors[FLAG_SUCCESS] = xmpp.debug.colorBrightCyan
+gDebug.colors[FLAG_INFO] = debug.colorWhite
+gDebug.colors[FLAG_ERROR] = debug.colorBrightRed
+gDebug.colors[FLAG_WARNING] = debug.colorYellow
+gDebug.colors[FLAG_SUCCESS] = debug.colorBrightCyan
 
 def registerMessageHandler(function, msgType):
 	gMessageHandlers[msgType].append(function)
@@ -287,16 +288,19 @@ def getConfigPath(*param):
 
 def decode(text):
 	text = gTagPattern.sub("", text.replace("<br />","\n").replace("<br>","\n"))
-	return(util.unescapeHTML(text))
+	return(utils.unescapeHTML(text))
+
+def saveConferences():
+	utils.writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
 
 def loadConferenceConfig(conference):
 	fileName = getConfigPath(conference, CONFIG_FILE)
-	util.createFile(fileName, "{}")
-	gConfig[conference] = eval(util.readFile(fileName))
+	utils.createFile(fileName, "{}")
+	gConfig[conference] = eval(utils.readFile(fileName))
 
 def saveConferenceConfig(conference):
 	fileName = getConfigPath(conference, CONFIG_FILE)
-	util.writeFile(fileName, str(gConfig[conference]))
+	utils.writeFile(fileName, str(gConfig[conference]))
 
 def getConfigKey(conference, key):
 	return(gConfig[conference].get(key))
@@ -307,7 +311,6 @@ def setConfigKey(conference, key, value):
 def addConference(conference):
 	gConferences[conference] = {}
 	gIsJoined[conference] = False
-	util.writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
 	loadConferenceConfig(conference)
 	for function in gEventHandlers[ADDCONF]:
 		function(conference)
@@ -318,12 +321,11 @@ def delConference(conference):
 	del(gIsJoined[conference])
 	del(gConfig[conference])
 	del(gConferences[conference])
-	util.writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
 
 def joinConference(conference, nick, password):
 	setConfigKey(conference, "nick", nick)
 	setConfigKey(conference, "password", password)
-	prs = xmpp.Presence(conference + "/" + nick, priority = gPriority)
+	prs = protocol.Presence(conference + "/" + nick, priority = gPriority)
 	status = getConfigKey(conference, "status")
 	show = getConfigKey(conference, "show")
 	if(status):
@@ -331,14 +333,14 @@ def joinConference(conference, nick, password):
 	if(show):
 		prs.setShow(show)
 	prs.addChild(node=gClient.getCapsNode())
-	mucTag = prs.setTag("x", namespace=xmpp.NS_MUC)
+	mucTag = prs.setTag("x", namespace=protocol.NS_MUC)
 	mucTag.addChild("history", {"maxchars": "0"})
 	if(password):
 		mucTag.setTagData("password", password)
 	gClient.send(prs)
 
 def leaveConference(conference, status=None):
-	prs = xmpp.Presence(conference, xmpp.PRS_OFFLINE)
+	prs = protocol.Presence(conference, protocol.PRS_OFFLINE)
 	if(status):
 		prs.setStatus(status)
 	gClient.send(prs)
@@ -355,7 +357,7 @@ def getUniqueID(text):
 	return("%s_%d" % (text, gID))
 
 def setBotStatus(conference, status, show):
-	prs = xmpp.Presence(conference, priority=gPriority)
+	prs = protocol.Presence(conference, priority=gPriority)
 	if(status):
 		prs.setStatus(status)
 	if(show):
@@ -364,9 +366,9 @@ def setBotStatus(conference, status, show):
 	gClient.send(prs)
 
 def setMUCRole(conference, nick, role, reason=None):
-	iq = xmpp.Iq(xmpp.TYPE_SET)
+	iq = protocol.Iq(protocol.TYPE_SET)
 	iq.setTo(conference)
-	query = xmpp.Node("query", {"xmlns": xmpp.NS_MUC_ADMIN})
+	query = protocol.Node("query", {"xmlns": protocol.NS_MUC_ADMIN})
 	if(nick.count("@")):
 		role = query.addChild("item", {"jid": nick, "role": role})
 	else:
@@ -377,9 +379,9 @@ def setMUCRole(conference, nick, role, reason=None):
 	gClient.send(iq)
 
 def setMUCAffiliation(conference, nick, aff, reason=None):
-	iq = xmpp.Iq(xmpp.TYPE_SET)
+	iq = protocol.Iq(protocol.TYPE_SET)
 	iq.setTo(conference)
-	query = xmpp.Node("query", {"xmlns": xmpp.NS_MUC_ADMIN})
+	query = protocol.Node("query", {"xmlns": protocol.NS_MUC_ADMIN})
 	if(nick.count("@")):
 		aff = query.addChild("item", {"jid": nick, "affiliation": aff})
 	else:
@@ -413,7 +415,7 @@ def getJidList(conference, offline=False):
 	return(jidList)
 	
 def getTrueJid(jid, resource=None):
-	if(isinstance(jid, xmpp.JID)):
+	if(isinstance(jid, protocol.UserJid)):
 		jid = unicode(jid)
 	if(not resource):
 		if(jid.find("/") > -1):
@@ -462,11 +464,11 @@ def setPermAccess(conference, jid, level=0):
 		gPermAccess[conference][jid] = level
 	else:
 		del(gPermAccess[conference][jid])
-	util.writeFile(fileName, str(gPermAccess[conference]))
+	utils.writeFile(fileName, str(gPermAccess[conference]))
 
 def setPermGlobalAccess(jid, level=0):
 	fileName = getConfigPath(ACCESS_FILE)
-	tempAccess = eval(util.readFile(fileName))
+	tempAccess = eval(utils.readFile(fileName))
 	tempAccess[jid] = None
 	gGlobalAccess[jid] = None
 	if(level):
@@ -475,7 +477,7 @@ def setPermGlobalAccess(jid, level=0):
 	else:
 		del(tempAccess[jid])
 		del(gGlobalAccess[jid])
-	util.writeFile(fileName, str(tempAccess))
+	utils.writeFile(fileName, str(tempAccess))
 
 def setTempGlobalAccess(jid, level=0):
 	gGlobalAccess[jid] = None
@@ -497,7 +499,7 @@ def getAccess(conference, jid):
 	return(0)
 
 def sendTo(msgType, jid, text):
-	message = xmpp.Message(jid)
+	message = protocol.Message(jid)
 	message.setType(msgType)
 	text = text.strip()
 	if(text):
@@ -506,10 +508,10 @@ def sendTo(msgType, jid, text):
 	callBotMessageHandlers(msgType, jid, text)
 
 def sendToConference(conference, text):
-	sendTo(xmpp.TYPE_PUBLIC, conference, text)
+	sendTo(protocol.TYPE_PUBLIC, conference, text)
 		
 def sendMsg(msgType, conference, nick, text, force=False):
-	if(xmpp.TYPE_PUBLIC == msgType and not force):
+	if(protocol.TYPE_PUBLIC == msgType and not force):
 		fools = getConfigKey(conference, "jokes")
 		if(fools and not random.randrange(0, 30)):
 			text = random.choice(gJokes)
@@ -517,8 +519,8 @@ def sendMsg(msgType, conference, nick, text, force=False):
 			msgLimit = getConfigKey(conference, "msg")
 			if(msgLimit and len(text) > msgLimit):
 				sendMsg(msgType, conference, nick, u"смотри в привате (лимит %d символов)" % (msgLimit), True)
-				msgType = xmpp.TYPE_PRIVATE
-	if(xmpp.TYPE_PUBLIC == msgType):
+				msgType = protocol.TYPE_PRIVATE
+	if(protocol.TYPE_PUBLIC == msgType):
 		text = u"%s: %s" % (nick, text)
 		jid = conference
 	else:
@@ -532,35 +534,35 @@ def messageHandler(session, stanza):
 	fullJid = stanza.getFrom()
 	conference = fullJid.getStripped()
 	isConference = conferenceInList(conference)
-	if(xmpp.TYPE_PUBLIC == msgType and not isConference):
+	if(protocol.TYPE_PUBLIC == msgType and not isConference):
 		return
 	trueJid = getTrueJid(fullJid)
 	if(getAccess(conference, trueJid) == -100):
 		return
 	message = stanza.getBody() or ""
 	message = message.strip()
-	if(xmpp.TYPE_ERROR == msgType):
+	if(protocol.TYPE_ERROR == msgType):
 		errorCode = stanza.getErrorCode()
 		if(errorCode == u"500"):
 			time.sleep(1)
-			sendTo(xmpp.TYPE_PUBLIC, fullJid, message)
+			sendTo(protocol.TYPE_PUBLIC, fullJid, message)
 		elif(errorCode == "406"):
 			addConference(conference)
 			joinConference(conference, gBotNick, getConfigKey(conference, "password"))
 			time.sleep(0.5)
-			sendTo(xmpp.TYPE_PUBLIC, fullJid, message)
+			sendTo(protocol.TYPE_PUBLIC, fullJid, message)
 		return
 	if(not message):
 		return
 	nick = fullJid.getResource()
-	if(xmpp.TYPE_PUBLIC == msgType):
+	if(protocol.TYPE_PUBLIC == msgType):
 		if(nickInConference(conference, nick)):
 			setNickKey(conference, nick, NICK_IDLE, time.time())
 	else:
 		if(stanza.getTags("request")):
-			reportMsg = xmpp.Message(fullJid)
+			reportMsg = protocol.Message(fullJid)
 			reportMsg.setID(stanza.getID())
-			reportMsg.addChild("received", None, None, xmpp.NS_RECEIPTS)
+			reportMsg.addChild("received", None, None, protocol.NS_RECEIPTS)
 			gClient.send(reportMsg)
 	cmdType = isConference and CHAT or ROSTER
 	callMessageHandlers(msgType, stanza, cmdType, conference, nick, trueJid, message)
@@ -577,7 +579,7 @@ def messageHandler(session, stanza):
 		if(prefix):
 			if(message.startswith(prefix)):
 				message = message[len(prefix):].strip()
-			elif(xmpp.TYPE_PUBLIC == msgType):
+			elif(protocol.TYPE_PUBLIC == msgType):
 				return
 		if(not message):
 			return
@@ -618,7 +620,7 @@ def presenceHandler(session, stanza):
 		trueJid = stanza.getJid()
 		nick = fullJid.getResource()
 		if(trueJid):
-			trueJid = xmpp.JID(trueJid).getStripped()
+			trueJid = protocol.UserJid(trueJid).getStripped()
 		if(not prsType):
 			if(not trueJid):
 				leaveConference(conference, u"Без прав модератора работа невозможна!")
@@ -640,8 +642,8 @@ def presenceHandler(session, stanza):
 			roleAccess = ROLES[role]
 			affAccess = AFFILIATIONS[aff]
 			setTempAccess(conference, trueJid, roleAccess + affAccess)
-			setNickKey(conference, nick, NICK_MODER, role == xmpp.ROLE_MODERATOR)
-		elif(xmpp.PRS_OFFLINE == prsType):
+			setNickKey(conference, nick, NICK_MODER, role == protocol.ROLE_MODERATOR)
+		elif(protocol.PRS_OFFLINE == prsType):
 			if nickIsOnline(conference, nick):
 				code = stanza.getStatusCode()
 				reason = stanza.getReason() or stanza.getStatus()
@@ -652,7 +654,7 @@ def presenceHandler(session, stanza):
 					if(key in gConferences[conference][nick]):
 						del(gConferences[conference][nick][key])
 				callLeaveHandlers(conference, nick, trueJid, reason, code)
-		elif(prsType == xmpp.TYPE_ERROR):
+		elif(prsType == protocol.TYPE_ERROR):
 			errorCode = stanza.getErrorCode()
 			if(errorCode == "409"):
 				newNick = getBotNick(conference) + "."
@@ -660,6 +662,7 @@ def presenceHandler(session, stanza):
 				joinConference(conference, newNick, password)
 			elif(errorCode == "404"):
 				delConference(conference)
+				saveConferences()
 			elif(errorCode == "503"):
 				botNick = getBotNick(conference)
 				password = getConfigKey(conference, "password")
@@ -683,8 +686,8 @@ def iqHandler(session, stanza):
 def saveException(funcName):
 	gInfo["err"] += 1
 	printf("Exception in %s function" % (funcName), FLAG_ERROR)
-	fileName = util.getFilePath(SYSLOG_DIR, time.strftime(ERROR_FILE))
-	util.writeFile(fileName, traceback.format_exc() + "\n", "a")
+	fileName = utils.getFilePath(SYSLOG_DIR, time.strftime(ERROR_FILE))
+	utils.writeFile(fileName, traceback.format_exc() + "\n", "a")
 
 def loadPlugins():
 	printf("Loading plugins...")
@@ -708,11 +711,11 @@ def loadPlugins():
 def detectMultiLaunch():
 	if(os.name == "posix"):
 		try:
-			pid = int(util.readFile(PID_FILE))
+			pid = int(utils.readFile(PID_FILE))
 			os.getsid(pid)
 			return(pid)
 		except(OSError, IOError):
-			util.writeFile(PID_FILE, str(os.getpid()))
+			utils.writeFile(PID_FILE, str(os.getpid()))
 	return(None)
 
 def shutdown(restart=False):
@@ -762,8 +765,8 @@ def start():
 	gClient.setStatus(None, None, gPriority)
 
 	fileName = getConfigPath(CONF_FILE)
-	util.createFile(fileName, "[]")
-	conferences = eval(util.readFile(fileName))
+	utils.createFile(fileName, "[]")
+	conferences = eval(utils.readFile(fileName))
 	if(conferences):
 		for conference in conferences:
 			addConference(conference)
@@ -787,22 +790,22 @@ if(__name__ == "__main__"):
 			printf("Another instance is running (pid: %s)" % (pid), FLAG_ERROR)
 	except(KeyboardInterrupt):
 		if(gClient.isConnected()):
-			prs = xmpp.Presence(typ=xmpp.PRS_OFFLINE)
+			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
 			prs.setStatus(u"выключаюсь (CTRL+C)")
 			gClient.send(prs)
 		shutdown()
-	except(xmpp.SystemShutdown):
+	except(protocol.SystemShutdown):
 		printf("Remote server was switched off", FLAG_WARNING)
 		shutdown()
-	except(xmpp.Conflict):
+	except(protocol.Conflict):
 		printf("Resource conflict", FLAG_WARNING)
 		shutdown()
 	except(Exception):
 		printf("Exception in main thread", FLAG_ERROR)
-		fileName = util.getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE))
-		util.writeFile(fileName, traceback.format_exc() + "\n", "a")
+		fileName = utils.getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE))
+		utils.writeFile(fileName, traceback.format_exc() + "\n", "a")
 		if(gClient.isConnected()):
-			prs = xmpp.Presence(typ=xmpp.PRS_OFFLINE)
+			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
 			prs.setStatus(u"что-то сломалось...")
 			gClient.send(prs)
 		shutdown(gRestart)

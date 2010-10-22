@@ -45,7 +45,7 @@ CLOUDINESS = {
 
 def getWCodeByName(city):
 	city = city.encode("utf-8")
-	fileName = util.getFilePath(RESOURCE_DIR, WCODES_FILE)
+	fileName = utils.getFilePath(RESOURCE_DIR, WCODES_FILE)
 	for line in open(fileName):
 		if(line.startswith(city)):
 			return(line.split("|"))
@@ -63,7 +63,7 @@ def showWeather(msgType, conference, nick, param):
 		city, code = rawData
 		url = "http://informer.gismeteo.ru/xml/%s.xml" % (code.strip())
 		rawXML = urllib.urlopen(url).read()
-		node = xmpp.simplexml.XML2Node(rawXML)
+		node = simplexml.XML2Node(rawXML)
 		node = node.getTag("REPORT").getTag("TOWN")
 		message = u"Погода в городе %s:\n" % (city.decode("utf-8"))
 		for forecast in node.getTags("FORECAST"):
@@ -102,9 +102,9 @@ def showWeather(msgType, conference, nick, param):
 			if(windValue):
 				message += u"Ветер: %d м/с (%s)\n" % (windValue, WINDDIRECTION[wind["direction"]])
 			message += "\n"
-		if(xmpp.TYPE_PUBLIC == msgType):
+		if(protocol.TYPE_PUBLIC == msgType):
 			sendMsg(msgType, conference, nick, u"ушла в приват")
-		sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message)
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"не могу :(")
 

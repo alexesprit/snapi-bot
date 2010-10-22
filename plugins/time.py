@@ -24,14 +24,14 @@ def showUserTime(msgType, conference, nick, param):
 			jid = param
 	else:
 		jid = conference + "/" + nick
-	iq = xmpp.Iq(xmpp.TYPE_GET)
-	iq.addChild("time", {}, [], xmpp.NS_ENTITY_TIME)
+	iq = protocol.Iq(protocol.TYPE_GET)
+	iq.addChild("time", {}, [], protocol.NS_ENTITY_TIME)
 	iq.setTo(jid)
 	iq.setID(getUniqueID(TIME_ID))
 	gClient.sendAndCallForResponse(iq, _showUserTime, (msgType, conference, nick, param))
 
 def _showUserTime(stanza, msgType, conference, nick, param):
-	if(xmpp.TYPE_RESULT == stanza.getType()):
+	if(protocol.TYPE_RESULT == stanza.getType()):
 		tzo, utc = None, None
 		for p in stanza.getChildren():
 			tzo = p.getTagData("tzo")

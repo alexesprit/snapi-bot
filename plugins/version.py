@@ -27,13 +27,13 @@ def showVersion(msgType, conference, nick, param):
 				jid = param
 		else:
 			jid = conference + "/" + nick
-		iq = xmpp.Iq(xmpp.TYPE_GET, xmpp.NS_VERSION)
+		iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_VERSION)
 		iq.setTo(jid)
 		iq.setID(getUniqueID(VER_ID))
 		gClient.sendAndCallForResponse(iq, _showVersion, (msgType, conference, nick, param, ))
 
 def _showVersion(stanza, msgType, conference, nick, param):
-	if(xmpp.TYPE_RESULT == stanza.getType()):
+	if(protocol.TYPE_RESULT == stanza.getType()):
 		name, ver, os = "", "", ""
 		for child in stanza.getQueryChildren():
 			if(child.getName() == "name"):

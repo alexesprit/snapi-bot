@@ -19,8 +19,9 @@
 	mass-renaming of contacts.
 """
 
-from protocol import *
 from plugin import PlugIn
+from protocol import Iq, Node, Presence, UserJid
+from protocol import TYPE_GET, TYPE_SET, NS_ROSTER
 
 DBG_ROSTER = "roster"
 
@@ -30,8 +31,8 @@ ROSTER_LOADED = 0x2
 
 class Roster(PlugIn):
 	""" Defines a plenty of methods that will allow you to manage roster.
-		Also automatically track presences from remote JIDs taking into 
-		account that every JID can have multiple resources connected. Does not
+		Also automatically track presences from remote jids taking into 
+		account that every jid can have multiple resources connected. Does not
 		currently support 'error' presences.
 		You can also use mapping interface for access to the internal representation of
 		contacts in roster.
@@ -97,7 +98,7 @@ class Roster(PlugIn):
 		""" Presence tracker. Used internally for setting items' resources state in
 			internal roster representation.
 		"""
-		fullJid = JID(stanza.getFrom())
+		fullJid = UserJid(stanza.getFrom())
 		bareJid = fullJid.getStripped()
 		if(bareJid in self.rosterData):
 			prsType = stanza.getType()
@@ -115,12 +116,12 @@ class Roster(PlugIn):
 
 	def _getItemData(self, jid, field):
 		""" Return specific jid's representation in internal format. Used internally. """
-		jid = JID(jid).getStripped()
+		jid = UserJid(jid).getStripped()
 		return(self.rosterData[jid][field])
 
 	def _getResourceData(self, jid, field):
 		""" Return specific jid's resource representation in internal format. Used internally. """
-		fullJid = JID(jid)
+		fullJid = UserJid(jid)
 		bareJid = fullJid.getStripped()
 		resource = fullJid.getResource()
 		if(resource):
@@ -148,7 +149,7 @@ class Roster(PlugIn):
 		return self._getItemData(jid, 'name')
 
 	def getPriority(self, jid):
-		""" Returns priority of contact 'jid'. 'jid' should be a full (not bare) JID."""
+		""" Returns priority of contact 'jid'. 'jid' should be a full (not bare) UserJid."""
 		return self._getResourceData(jid, 'priority')
 
 	def getRawRoster(self):
@@ -157,16 +158,16 @@ class Roster(PlugIn):
 
 	def getRawItem(self, jid):
 		""" Returns roster item 'jid' representation in internal format. """
-		fullJid = JID(jid)
+		fullJid = UserJid(jid)
 		bareJid = fullJid.getStripped()
 		return(self.rosterData[bareJid])
 
 	def getShow(self, jid):
-		""" Returns 'show' value of contact 'jid'. 'jid' should be a full (not bare) JID. """
+		""" Returns 'show' value of contact 'jid'. 'jid' should be a full (not bare) UserJid. """
 		return(self._getResourceData(jid, 'show'))
 
 	def getStatus(self, jid):
-		""" Returns 'status' value of contact 'jid'. 'jid' should be a full (not bare) JID. """
+		""" Returns 'status' value of contact 'jid'. 'jid' should be a full (not bare) UserJid. """
 		return(self._getResourceData(jid, 'status'))
 
 	def getSubscription(self, jid):
@@ -175,7 +176,7 @@ class Roster(PlugIn):
 
 	def getResources(self, jid):
 		""" Returns list of connected resources of contact 'jid'."""
-		fullJid = JID(jid)
+		fullJid = UserJid(jid)
 		bareJid = fullJid.getStripped()
 		return(self.rosterData[bareJid]['resources'].keys())
 
@@ -188,11 +189,11 @@ class Roster(PlugIn):
 			attrs['name'] = name
 		item = query.setTag('item', attrs)
 		for group in groups: 
-			item.addChild(node = Node('group', payload = [group]))
+			item.addChild(node=Node('group', payload = [group]))
 		self._owner.send(iq)
 
 	def getItems(self):
-		""" Return list of all [bare] JIDs that the roster is currently tracks. """
+		""" Return list of all [bare] UserJids that the roster is currently tracks. """
 		return(self.rosterData.keys())
 
 	def keys(self):
@@ -200,11 +201,11 @@ class Roster(PlugIn):
 		return(self.rosterData.keys())
 
 	def __getitem__(self, item):
-		""" Get the contact in the internal format. Raises KeyError if JID 'item' is not in roster. """
+		""" Get the contact in the internal format. Raises KeyError if UserJid 'item' is not in roster. """
 		return(self.rosterData[item])
 
 	def getItem(self, item):
-		""" Get the contact in the internal format (or None if JID 'item' is not in roster). """
+		""" Get the contact in the internal format (or None if UserJid 'item' is not in roster). """
 		if(item in self.rosterData):
 			return(self.rosterData[item])
 
@@ -213,19 +214,19 @@ class Roster(PlugIn):
 		self._owner.send(Iq(TYPE_SET, NS_ROSTER, payload=[Node('item', {'jid': jid,'subscription': 'remove'})]))
 		
 	def subscribe(self, jid):
-		""" Send subscription request to JID 'jid'. """
+		""" Send subscription request to UserJid 'jid'. """
 		self._owner.send(Presence(jid, PRS_SUBSCRIBE))
 
 	def unsubscribe(self, jid):
-		""" Ask for removing our subscription for JID 'jid'. """
+		""" Ask for removing our subscription for UserJid 'jid'. """
 		self._owner.send(Presence(jid, PRS_UNSUBSCRIBE))
 
 	def authorize(self, jid):
-		""" Authorise JID 'jid'. Works only if these JID requested auth previously. """
+		""" Authorise UserJid 'jid'. Works only if these UserJid requested auth previously. """
 		self._owner.send(Presence(jid, PRS_SUBSCRIBED))
 
 	def unauthorize(self, jid):
-		""" Unauthorise JID 'jid'. Use for declining authorisation request 
+		""" Unauthorise UserJid 'jid'. Use for declining authorisation request 
 			or for removing existing authorization.
 		"""
 		self._owner.send(Presence(jid, PRS_UNSUBSCRIBED))

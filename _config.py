@@ -8,9 +8,9 @@ gPassword = "secret"
 gHost = "server.tld"
 gPort = 5222
 
-# xmpp.SSL_DISABLE - отключить SSL
-# xmpp.SSL_AUTO - автоопределение (SSL, если порт 443, 5223, иначе TLS)
-# xmpp.SSL_FORCE - форсировать (нестандартный порт)
+# client.SSL_DISABLE - отключить SSL
+# client.SSL_AUTO - автоопределение (SSL, если порт 443, 5223, иначе TLS)
+# client.SSL_FORCE - форсировать (нестандартный порт)
 gSSLMode = xmpp.SSL_DISABLE
 gUseResolver = False
 

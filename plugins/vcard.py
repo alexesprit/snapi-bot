@@ -45,14 +45,14 @@ def showVCard(msgType, conference, nick, param):
 			jid = param
 	else:
 		jid = conferenceInList(conference) and (conference + "/" + nick) or conference
-	iq = xmpp.Iq(xmpp.TYPE_GET)
-	iq.addChild("vCard", {}, [], xmpp.NS_VCARD)
+	iq = protocol.Iq(protocol.TYPE_GET)
+	iq.addChild("vCard", {}, [], protocol.NS_VCARD)
 	iq.setTo(jid)
 	iq.setID(getUniqueID(VCARD_ID))
 	gClient.sendAndCallForResponse(iq, _showVCard, (msgType, conference, nick, param, ))
 
 def _showVCard(stanza, msgType, conference, nick, param):
-	if(xmpp.TYPE_RESULT == stanza.getType()):
+	if(protocol.TYPE_RESULT == stanza.getType()):
 		queryNode = stanza.getChildren()
 		if(queryNode):
 			rawVCard = {}

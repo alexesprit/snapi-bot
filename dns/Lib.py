@@ -23,13 +23,14 @@
 # ------------------------------------------------------------------------
 
 
-import string, types
+import string
+import types
 
 import Type
 import Class
 import Opcode
 import Status
-import dns
+#import dns
 
 from Base import DNSError
 
@@ -115,16 +116,16 @@ class Packer:
         buf = ''
         offset = len(self.buf)
         index = []
-        if dns.LABEL_UTF8:
+        if LABEL_UTF8:
           enc = 'utf8'
         else:
-          enc = dns.LABEL_ENCODING
+          enc = LABEL_ENCODING
         for j in range(i):
             label = list[j]
             try:
                 label = label.encode(enc)
             except UnicodeEncodeError:
-                if not dns.LABEL_UTF8: raise
+                if not LABEL_UTF8: raise
                 if not label.startswith('\ufeff'):
                     label = '\ufeff'+label
                 label = label.encode(enc)

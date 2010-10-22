@@ -25,9 +25,9 @@ def sendInvite(msgType, conference, nick, param):
 	else:
 		trueJid = user
 	reason = (len(param) == 2) and param[1] or None
-	msg = xmpp.Message(to=conference)
-	x = xmpp.Node("x")
-	x.setNamespace(xmpp.NS_MUC_USER)
+	msg = protocol.Message(to=conference)
+	x = protocol.Node("x")
+	x.setNamespace(protocol.NS_MUC_USER)
 	inv = x.addChild("invite", {"to": trueJid})
 	if reason:
 		inv.setTagData("reason", reason)

@@ -79,7 +79,7 @@ def showTalkerInfo(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"твоя статистика отсутствует")
 
 def updateTalkersInfo(stanza, msgType, conference, nick, trueJid, body):
-	if(trueJid != gJid and msgType == xmpp.TYPE_PUBLIC and nick):
+	if(trueJid != gJid and msgType == protocol.TYPE_PUBLIC and nick):
 		base = gTalkersCache[conference]
 		if(trueJid in base):
 			base[trueJid]["nick"] = nick

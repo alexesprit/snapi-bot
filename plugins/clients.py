@@ -48,14 +48,14 @@ def saveUserClient(conference, nick, trueJid, aff, role):
 	base = gUserClients[conference]
 	if(trueJid not in base):
 		base[trueJid] = []
-	iq = xmpp.Iq(xmpp.TYPE_GET)
-	iq.addChild("query", {}, [], xmpp.NS_VERSION)
+	iq = protocol.Iq(protocol.TYPE_GET)
+	iq.addChild("query", {}, [], protocol.NS_VERSION)
 	iq.setTo(conference + "/" + nick)
 	iq.setID(getUniqueID(CLIENTS_ID))
 	gClient.sendAndCallForResponse(iq, _saveUserClient, (conference, trueJid, ))
 
 def _saveUserClient(stanza, conference, trueJid):
-	if(xmpp.TYPE_RESULT == stanza.getType()):
+	if(protocol.TYPE_RESULT == stanza.getType()):
 		base = gUserClients[conference]
 		for p in stanza.getQueryChildren():
 			if(p.getName() == "name"):

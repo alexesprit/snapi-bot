@@ -30,7 +30,7 @@ def bombMarked(conference, trueJid):
 	return(trueJid in gBombAnswer[conference])
 
 def giveBomb(msgType, conference, nick, param):
-	if(xmpp.TYPE_PRIVATE == msgType):
+	if(protocol.TYPE_PRIVATE == msgType):
 		sendMsg(msgType, conference, nick, u"ага, хочешь без палева кинуть??? ]:->")
 		return
 	userNick = param or random.choice(getOnlineNicks(conference))
@@ -80,11 +80,11 @@ def bombDetonate(msgType, conference, nick):
 	if(num < 1 or getNickKey(conference, nick, NICK_MODER)):
 		sendMsg(msgType, conference, nick, u"бомба глюкнула...")
 	elif(num < 7):
-		setMUCRole(conference, nick, xmpp.ROLE_NONE, u"бабах!!!")
+		setMUCRole(conference, nick, protocol.ROLE_NONE, u"бабах!!!")
 	else:
-		setMUCRole(conference, nick, xmpp.ROLE_VISITOR, u"бабах!!!")
+		setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"бабах!!!")
 		timeout = random.randrange(100, 501)
-		startTimer(timeout, setMUCRole, (conference, nick, xmpp.ROLE_PARTICIPANT))
+		startTimer(timeout, setMUCRole, (conference, nick, protocol.ROLE_PARTICIPANT))
 
 def initBombCache(conference):
 	gBombColors[conference] = {}

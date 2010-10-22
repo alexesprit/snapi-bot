@@ -17,15 +17,15 @@ KEEP_ID = "keep_id"
 KEEPALIVE_TIMEOUT = 300
 
 def _sendKeepAlivePacket(stanza, conference):
-	if(xmpp.TYPE_ERROR == stanza.getType()):
+	if(protocol.TYPE_ERROR == stanza.getType()):
 		if(stanza.getErrorCode() == "503"):
 			startTimer(REJOIN_TIMEOUT, joinConference, (conference, getBotNick(conference), getChatKey(conference, "password")))
 	
 def sendKeepAlivePacket():
 	for conference in getConferences():
-		iq = xmpp.Iq(xmpp.TYPE_GET)
+		iq = protocol.Iq(protocol.TYPE_GET)
 		iq.setID(getUniqueID(KEEP_ID))
-		iq.addChild("ping", {}, [], xmpp.NS_PING)
+		iq.addChild("ping", {}, [], protocol.NS_PING)
 		iq.setTo(conference + "/" + getBotNick(conference))
 		gClient.sendAndCallForResponse(iq, _sendKeepAlivePacket, (conference, ))
 	startKeepAliveTimer()

@@ -27,7 +27,7 @@ def showConferenceStats(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, text % (gConferenceStats[conference]))
 
 def updateBotMessageStats(msgType, conference, text):
-	if(xmpp.TYPE_PUBLIC == msgType and text):
+	if(protocol.TYPE_PUBLIC == msgType and text):
 		gConferenceStats[conference]["mymsg"] += 1
 
 def updateMessageStats(stanza, msgType, conference, nick, trueJid, text):
@@ -56,7 +56,7 @@ def updatePresenceStats(stanza, conference, nick, trueJid):
 		gConferenceStats[conference]["nick"] += 1
 	else:
 		msgType = stanza.getType()
-		if(msgType != xmpp.PRS_OFFLINE):
+		if(msgType != protocol.PRS_OFFLINE):
 			gConferenceStats[conference]["status"] += 1
 	
 def initConferenceStats(conference):
@@ -68,11 +68,11 @@ def initConferenceStats(conference):
 			"join": 0, 
 			"leave": 0, 
 			"mymsg": 0, 
-			xmpp.TYPE_PRIVATE: 0, 
-			xmpp.TYPE_PUBLIC: 0, 
-			xmpp.ROLE_MODERATOR: 0, 
-			xmpp.ROLE_PARTICIPANT: 0, 
-			xmpp.ROLE_VISITOR: 0
+			protocol.TYPE_PRIVATE: 0, 
+			protocol.TYPE_PUBLIC: 0, 
+			protocol.ROLE_MODERATOR: 0, 
+			protocol.ROLE_PARTICIPANT: 0, 
+			protocol.ROLE_VISITOR: 0
 	}
 	gStatsJoined[conference] = []
 	gStatsLeaved[conference] = []

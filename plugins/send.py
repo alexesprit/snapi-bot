@@ -32,7 +32,7 @@ def addToSendBase(msgType, conference, nick, param):
 		message = param[1]
 		message = u"%s попросил меня передать тебе следующее:\n%s" % (nick, message)
 		if(nickIsOnline(conference, userNick)):
-			sendMsg(xmpp.TYPE_PRIVATE, conference, userNick, message)
+			sendMsg(protocol.TYPE_PRIVATE, conference, userNick, message)
 			sendMsg(msgType, conference, nick, u"передала")
 		elif(nickInConference(conference, userNick)):
 			trueJid = getTrueJid(conference, userNick)
@@ -49,7 +49,7 @@ def checkSendBase(conference, nick, trueJid, aff, role):
 	base = gSendCache[conference]
 	if(trueJid in base):
 		for message in base[trueJid]:
-			sendMsg(xmpp.TYPE_PRIVATE, conference, nick, message)
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 			time.sleep(0.5)
 		del(base[trueJid])
 		base.save()

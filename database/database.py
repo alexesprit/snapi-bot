@@ -20,14 +20,15 @@
 
 import os
 import time
-import utils.utils as util
+
+from utils import utils
 
 class DataBase:
 	def __init__(self, path):
-		util.createFile(path, '{}')
-		util.createFile(path + '.db', '{}')
-		self.base = eval(util.readFile(path))
-		self.changes = eval(util.readFile(path + '.db'))
+		utils.createFile(path, '{}')
+		utils.createFile(path + '.db', '{}')
+		self.base = eval(utils.readFile(path))
+		self.changes = eval(utils.readFile(path + '.db'))
 		self.path = path
 	
 	def __contains__(self, key):
@@ -62,8 +63,8 @@ class DataBase:
 		self.changes = {}
 	
 	def save(self):
-		util.writeFile(self.path, str(self.base))
-		util.writeFile(self.path + '.db', str(self.changes))
+		utils.writeFile(self.path, str(self.base))
+		utils.writeFile(self.path + '.db', str(self.changes))
 		
 	def isEmpty(self):
 		return not self.base

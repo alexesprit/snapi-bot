@@ -38,9 +38,9 @@ def getLocalKeyToPrivate(msgType, conference, nick, param):
 		key = param[0].lower()
 	if(confJid):
 		if(key in gLocalBase[conference]):
-			if(xmpp.TYPE_PUBLIC == msgType):
+			if(protocol.TYPE_PUBLIC == msgType):
 				sendMsg(msgType, conference, nick, u"ушло")
-			sendTo(xmpp.TYPE_PRIVATE, confJid, u"про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key]))
+			sendTo(protocol.TYPE_PRIVATE, confJid, u"про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key]))
 		else:
 			sendMsg(msgType, conference, nick, u"я хз что такое %s :(" % key)
 	else:
@@ -83,12 +83,12 @@ def showAllLocalKeys(msgType, conference, nick, parameters):
 
 def loadLocalBase(conference):
 	fileName = getConfigPath(conference, LOCALDB_FILE)
-	util.createFile(fileName, "{}")
-	gLocalBase[conference] = eval(util.readFile(fileName))
+	utils.createFile(fileName, "{}")
+	gLocalBase[conference] = eval(utils.readFile(fileName))
 
 def saveLocalBase(conference):
 	fileName = getConfigPath(conference, LOCALDB_FILE)
-	util.writeFile(fileName, str(gLocalBase[conference]))
+	utils.writeFile(fileName, str(gLocalBase[conference]))
 
 def freeLocalBase(conference):
 	del(gLocalBase[conference])

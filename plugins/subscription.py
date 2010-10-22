@@ -16,10 +16,10 @@
 def processSubscriptions(stanza, conference, nick, trueJid):
 	jid = stanza.getFrom().getStripped()
 	prsType = stanza.getType()
-	if(xmpp.PRS_SUBSCRIBE == prsType):
+	if(protocol.PRS_SUBSCRIBE == prsType):
 		gRoster.authorize(jid)
 		gRoster.subscribe(jid)
-	elif(xmpp.PRS_UBSUBSCRIBE == prsType):
+	elif(protocol.PRS_UBSUBSCRIBE == prsType):
 		gRoster.unauthorize(jid)
 		gRoster.delItem(jid)
 

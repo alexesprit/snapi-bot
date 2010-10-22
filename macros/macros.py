@@ -17,7 +17,7 @@ import os
 import random
 import re
 
-import utils.utils as util
+from utils import utils
 
 MACROS_FILE = 'macros.txt'
 MACCESS_FILE = 'macrosaccess.txt'
@@ -36,35 +36,35 @@ class Macros:
 
 	def loadMacroses(self, conference=None):
 		if(conference):
-			macrosFileName = util.getFilePath(self.path, conference, MACROS_FILE)
-			accessFileName = util.getFilePath(self.path, conference, MACCESS_FILE)
+			macrosFileName = utils.getFilePath(self.path, conference, MACROS_FILE)
+			accessFileName = utils.getFilePath(self.path, conference, MACCESS_FILE)
 			
-			util.createFile(macrosFileName, '{}')
-			util.createFile(accessFileName, '{}')
+			utils.createFile(macrosFileName, '{}')
+			utils.createFile(accessFileName, '{}')
 
-			self.macrosList[conference] = eval(util.readFile(macrosFileName))
-			self.accessList[conference] = eval(util.readFile(accessFileName))
+			self.macrosList[conference] = eval(utils.readFile(macrosFileName))
+			self.accessList[conference] = eval(utils.readFile(accessFileName))
 		else:
-			macrosFileName = util.getFilePath(self.path, MACROS_FILE)
-			accessFileName = util.getFilePath(self.path, MACCESS_FILE)
+			macrosFileName = utils.getFilePath(self.path, MACROS_FILE)
+			accessFileName = utils.getFilePath(self.path, MACCESS_FILE)
 
-			util.createFile(macrosFileName, '{}')
-			util.createFile(accessFileName, '{}')
+			utils.createFile(macrosFileName, '{}')
+			utils.createFile(accessFileName, '{}')
 
-			self.gMacrosList = eval(util.readFile(macrosFileName))
-			self.gAccessList = eval(util.readFile(accessFileName))
+			self.gMacrosList = eval(utils.readFile(macrosFileName))
+			self.gAccessList = eval(utils.readFile(accessFileName))
 
 	def saveMacroses(self, conference=None):
 		if(conference):
-			macrosFileName = util.getFilePath(self.path, conference, MACROS_FILE)
-			accessFileName = util.getFilePath(self.path, conference, MACCESS_FILE)
-			util.writeFile(macrosFileName, str(self.macrosList[conference]))
-			util.writeFile(accessFileName, str(self.accessList[conference]))
+			macrosFileName = utils.getFilePath(self.path, conference, MACROS_FILE)
+			accessFileName = utils.getFilePath(self.path, conference, MACCESS_FILE)
+			utils.writeFile(macrosFileName, str(self.macrosList[conference]))
+			utils.writeFile(accessFileName, str(self.accessList[conference]))
 		else:
-			macrosFileName = util.getFilePath(self.path, MACROS_FILE)
-			accessFileName = util.getFilePath(self.path, MACCESS_FILE)
-			util.writeFile(macrosFileName, str(self.gMacrosList))
-			util.writeFile(accessFileName, str(self.gAccessList))
+			macrosFileName = utils.getFilePath(self.path, MACROS_FILE)
+			accessFileName = utils.getFilePath(self.path, MACCESS_FILE)
+			utils.writeFile(macrosFileName, str(self.gMacrosList))
+			utils.writeFile(accessFileName, str(self.gAccessList))
 			
 	def freeMacroses(self, conference):
 		if(conference in self.macrosList):
