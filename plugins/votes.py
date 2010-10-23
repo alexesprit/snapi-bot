@@ -26,9 +26,9 @@ VOTE_VOTED = 0x2
 VOTE_CREATOR = 0x3
 VOTE_OPINIONS = 0x4
 
-VOTE_OPINIONS = 0x1
-VOTE_FIRSTONLY = 0x2
-VOTE_SCORES = 0x4
+VOTE_SHOW_OPINIONS = 0x1
+VOTE_SHOW_FIRSTONLY = 0x2
+VOTE_SHOW_SCORES = 0x4
 
 voteTemplate = u"голосование создано! Чтобы показать его, напишите \"голосование %d\". \
 Чтобы проголосовать напишите \"мнение %d <номер_мнения>\". \
@@ -55,17 +55,17 @@ def getOpinionScores(vote):
 
 def getVoteText(vote, flags=0x0):
 	voteText = vote[VOTE_TEXT]
-	if(flags & VOTE_OPINIONS):
-		if(flags & VOTE_SCORES):
+	if(flags & VOTE_SHOW_OPINIONS):
+		if(flags & VOTE_SHOW_SCORES):
 			voteOpinions = sorted(vote[VOTE_OPINIONS])
 			voteOpinions.reverse()
 		else:
 			voteOpinions = vote[VOTE_OPINIONS]
-		if(flags & VOTE_FIRSTONLY):
+		if(flags & VOTE_SHOW_FIRSTONLY):
 			voteOpinions = voteOpinions[:1]
 		for opinion in voteOpinions:
 			scores, text = opinion
-			if(flags & VOTE_SCORES):
+			if(flags & VOTE_SHOW_SCORES):
 				voteText += u"\n * %s (%s голосов)" % (text, scores)
 			else:
 				voteText += u"\n * %s" % (text)
@@ -79,14 +79,18 @@ def showVotes(msgType, conference, nick, param):
 		except(KeyError):
 			sendMsg(msgType, conference, nick, u"такого голосования нет!")
 			return
-		sendMsg(msgType, conference, nick, getVoteText(vote, VOTE_OPINIONS))
+		if vote[VOTE_STATE] != VOTE_FINISHED:
+			hint = u"Чтобы проголосовать, напишите \"мнение %d <номер>\", например \"мнение %d 1\"" % (voteID, voteID)
+		else:
+			hint = u"Это голосование уже завершено"
+		sendMsg(msgType, conference, nick, u"%s\n\n%s" % (getVoteText(vote, VOTE_SHOW_OPINIONS), hint))
 	elif(not param):
 		if(not gVotes[conference].isEmpty()):
 			voteText = u"Текущие голосования:\n"
-			for i, vote in enumerate(gVotes[conference]):
-				vote = gVotes[conference][vote]
+			for i, voteID in enumerate(gVotes[conference]):
+				vote = gVotes[conference][voteID]
 				voteText += u"%d) %s" % (i + 1, getVoteText(vote))
-				if(vote[VOTE_STATE] == VOTE_STARTED):
+				if(vote[VOTE_STATE] != VOTE_FINISHED):
 					voteText += u"\nНе завершено, голосов: %d\n\n" \
 								% (getOpinionScores(vote))
 				else:
@@ -147,13 +151,13 @@ def showOpinions(msgType, conference, nick, param):
 			try:
 				vote = gVotes[conference][voteID]
 				votes = [vote]
-				flags = VOTE_OPINIONS | VOTE_SCORES
+				flags = VOTE_SHOW_OPINIONS | VOTE_SHOW_SCORES
 			except(KeyError):
 				sendMsg(msgType, conference, nick, u"такого голосования нет!")
 				return
 		else:
 			votes = [gVotes[conference][i] for i in gVotes[conference]]
-			flags = VOTE_OPINIONS | VOTE_FIRSTONLY | VOTE_SCORES
+			flags = VOTE_SHOW_OPINIONS | VOTE_SHOW_FIRSTONLY | VOTE_SHOW_SCORES
 		voteText = []
 		userJid = getTrueJid(conference, nick)
 		for i, vote in enumerate(votes):
@@ -177,14 +181,17 @@ def vote(msgType, conference, nick, param):
 			opinionNum = int(param[1]) - 1
 			trueJid = getTrueJid(conference, nick)
 			vote = gVotes[conference][voteID]
-			if(trueJid not in vote[VOTE_VOTED]):
-				opinion = vote[VOTE_OPINIONS][opinionNum]
-				opinion[0] += 1
-				vote[VOTE_VOTED].append(trueJid)
-				gVotes[conference].save()
-				sendMsg(msgType, conference, nick, u"поняла")
+			if vote[VOTE_STATE] != VOTE_FINISHED:
+				if(trueJid not in vote[VOTE_VOTED]):
+					opinion = vote[VOTE_OPINIONS][opinionNum]
+					opinion[0] += 1
+					vote[VOTE_VOTED].append(trueJid)
+					gVotes[conference].save()
+					sendMsg(msgType, conference, nick, u"поняла")
+				else:
+					sendMsg(msgType, conference, nick, u"ты и так уже голосовал :-P")
 			else:
-				sendMsg(msgType, conference, nick, u"ты и так уже голосовал :-P")
+				sendMsg(msgType, conference, nick, u"это голосование завершено")
 		except(KeyError, IndexError, ValueError):
 			sendMsg(msgType, conference, nick, u"читай справку по команде")
 
@@ -203,7 +210,7 @@ def endVote(msgType, conference, nick, param):
 						del(vote[VOTE_VOTED])
 						gVotes[conference].save()
 
-						flags = VOTE_OPINIONS | VOTE_SCORES
+						flags = VOTE_SHOW_OPINIONS | VOTE_SHOW_SCORES
 						message = u"Результаты:\n%s" % (getVoteText(vote, flags))
 						sendMsg(msgType, conference, nick, message)
 					else:
@@ -224,7 +231,7 @@ def sendNewVotes(conference, nick, trueJid, role, aff):
 		if(vote[VOTE_STATE] != VOTE_FINISHED):
 			if(trueJid not in vote[VOTE_VOTED]):
 				voteText = u"Голосование\n%s" % (getVoteText(vote, VOTE_OPINIONS))
-				voteText += u"\nЧтобы проголосовать напишите \"мнение %d <номер_мнения>\"" % (voteID)
+				voteText += u"\n\nЧтобы проголосовать напишите \"мнение %d <номер_мнения>\"" % (voteID)
 				sendMsg(protocol.TYPE_PRIVATE, conference, nick, voteText)
 
 def loadVotes(conference):

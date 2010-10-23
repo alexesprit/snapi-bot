@@ -30,6 +30,7 @@ def deleteFromConfig(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, u"удалено %d папок и %d файлов" % (dirs, files))
 	
 def deleteFile(path):
+	path = path.encode("utf-8")
 	if(os.path.exists(path)):
 		if(os.path.isdir(path)):
 			shutil.rmtree(path)

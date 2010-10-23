@@ -19,7 +19,7 @@ def processSubscriptions(stanza, conference, nick, trueJid):
 	if(protocol.PRS_SUBSCRIBE == prsType):
 		gRoster.authorize(jid)
 		gRoster.subscribe(jid)
-	elif(protocol.PRS_UBSUBSCRIBE == prsType):
+	elif(protocol.PRS_UNSUBSCRIBE == prsType):
 		gRoster.unauthorize(jid)
 		gRoster.delItem(jid)
 
