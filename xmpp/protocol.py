@@ -134,6 +134,9 @@ AFF_MEMBER = "member"
 AFF_ADMIN = "admin"
 AFF_OWNER = "owner"
 
+ITEM_JID = "jid"
+ITEM_NICK = "nick"
+
 class NodeProcessed(Exception):
 	""" Exception that should be raised by handler when the handling should be stopped. """
 	pass

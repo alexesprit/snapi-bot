@@ -40,7 +40,7 @@ def addAutoVisitor(msgType, conference, nick, param):
 		trueJid = getTrueJid(conference, user)
 		if(getNickKey(conference, user, NICK_HERE)):
 			setVisitorRole = True
-	elif(param.count("@")):
+	elif(isJid(user)):
 		trueJid = user
 		user = getNickByJid(conference, trueJid)
 		if(user):
@@ -64,7 +64,7 @@ def delAutoVisitort(msgType, conference, nick, param):
 		trueJid = getTrueJid(conference, user)
 		if(getNickKey(conference, user, NICK_HERE)):
 			setParticipantRole = True
-	elif(param.count("@")):
+	elif(isJid(user)):
 		trueJid = user
 		user = getNickByJid(conference, trueJid)
 		if(user):

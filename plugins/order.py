@@ -14,18 +14,27 @@
 # GNU General Public License for more details.
 
 def setUserRole(msgType, conference, nick, user, role):
-	if(user.count("@") or nickInConference(conference, user)):
-		setMUCRole(conference, user, role)
-		sendMsg(msgType, conference, nick, u"сделала")
+	if(nickInConference(conference, user)):
+		iq = getMUCSetRoleStanza(conference, user, role)
+		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
-	
+		sendMsg(msgType, conference, nick, u"чего?")
+
 def setUserAffiliation(msgType, conference, nick, user, aff):
-	if(user.count("@") or nickInConference(conference, user)):
-		setMUCAffiliation(conference, user, aff)
+	if isJid(user) or isServer(user):
+		iq = getMUCSetAffiliationStanza(conference, user, protocol.ITEM_JID, aff)
+		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
+	elif nickInConference(conference, user):
+		iq = getMUCSetAffiliationStanza(conference, user, protocol.ITEM_NICK, aff)
+		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
+	else:
+		sendMsg(msgType, conference, nick, u"чего?")
+
+def setMUCItem_(stanza, msgType, conference, nick):
+	if protocol.TYPE_RESULT == stanza.getType():
 		sendMsg(msgType, conference, nick, u"сделала")
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"не могу :(")
 
 def setOutcast(msgType, conference, nick, param):
 	setUserAffiliation(msgType, conference, nick, param, protocol.AFF_OUTCAST)

@@ -123,7 +123,9 @@ gClient = client.Client(server=gServer, port=gPort, debugFlags=gXMPPDebug)
 gRoster = None
 gDebug = debug.Debug(gCoreDebug, timeStamp=0, validateFlags=False, \
 							showFlags=False, prefix="", welcomeMsg=False)
-gTagPattern = re.compile("<(.*?)>")
+gTagPtrn = re.compile(r"<(.*?)>")
+gJidPtrn = re.compile(r"(\w+)@(\w+)\.(\w+)", re.UNICODE)
+gSrvPtrn = re.compile(r"(\w+)\.(\w+)", re.UNICODE)
 
 gSemaphore = threading.BoundedSemaphore(30)
 
@@ -287,7 +289,7 @@ def getConfigPath(*param):
 	return(os.path.join(CONFIG_DIR, *param))
 
 def decode(text):
-	text = gTagPattern.sub("", text.replace("<br />","\n").replace("<br>","\n"))
+	text = gTagPtrn.sub("", text.replace("<br />","\n").replace("<br>","\n"))
 	return(utils.unescapeHTML(text))
 
 def saveConferences():
@@ -365,31 +367,45 @@ def setBotStatus(conference, status, show):
 	prs.addChild(node=gClient.getCapsNode())
 	gClient.send(prs)
 
-def setMUCRole(conference, nick, role, reason=None):
+def getMUCSetRoleStanza(conference, user, role, reason=None):
 	iq = protocol.Iq(protocol.TYPE_SET)
 	iq.setTo(conference)
 	query = protocol.Node("query", {"xmlns": protocol.NS_MUC_ADMIN})
-	if(nick.count("@")):
-		role = query.addChild("item", {"jid": nick, "role": role})
-	else:
-		role = query.addChild("item", {"nick": nick, "role": role})
-	if(reason):
+	role = query.addChild("item", {"nick": user, "role": role})
+	if reason:
 		role.setTagData("reason", reason)
 	iq.addChild(node=query)
+	return iq
+
+def setMUCRole(conference, user, role, reason=None):
+	iq = getMUCSetRoleStanza(conference, user, role, reason)
 	gClient.send(iq)
 
-def setMUCAffiliation(conference, nick, aff, reason=None):
+def getMUCSetAffiliationStanza(conference, user, itemType, aff, reason=None):
 	iq = protocol.Iq(protocol.TYPE_SET)
 	iq.setTo(conference)
 	query = protocol.Node("query", {"xmlns": protocol.NS_MUC_ADMIN})
-	if(nick.count("@")):
-		aff = query.addChild("item", {"jid": nick, "affiliation": aff})
-	else:
-		aff = query.addChild("item", {"nick": nick, "affiliation": aff})
-	if(reason):
+	aff = query.addChild("item", {itemType: user, "affiliation": aff})
+	if reason:
 		aff.setTagData("reason", reason)
 	iq.addChild(node=query)
+	return iq
+
+def setMUCAffiliation(conference, user, itemType, aff, reason=None):
+	iq = getMUCSetAffiliationStanza(conference, user, itemType, aff, reason)
 	gClient.send(iq)
+
+def isJid(jid):
+	if not jid.count(" "):
+		if gJidPtrn.search(jid):
+			return True
+	return False
+
+def isServer(server):
+	if not server.count(" "):
+		if gSrvPtrn.search(server):
+			return True	
+	return False
 
 def isAdmin(jid):
 	return(jid in gAdmins)

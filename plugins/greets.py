@@ -28,12 +28,12 @@ def freeGreetings(conference):
 def setUserGreeting(msgType, conference, nick, param):
 	rawGreet = param.split("=", 1)
 	if(len(rawGreet) == 2):
-		userNick = rawGreet[0].strip()
+		user = rawGreet[0].strip()
 		greet = rawGreet[1].strip()
-		if(userNick.count("@")):
-			trueJid = userNick
-		elif(userNick in getNicks(conference)):
-			trueJid = getTrueJid(conference, userNick)
+		if(isJid(user)):
+			trueJid = user
+		elif(user in getNicks(conference)):
+			trueJid = getTrueJid(conference, user)
 		else:
 			sendMsg(msgType, conference, nick, u"а это кто?")
 			return

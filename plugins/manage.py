@@ -15,7 +15,7 @@
 
 def joinConf(msgType, conference, nick, param):
 	param = param.split()
-	if(param and param[0].count("@")):
+	if(param and isJid(param[0])):
 		conf = param[0]
 		if(conferenceInList(conf)):
 			sendMsg(msgType, conference, nick, u"я уже там!")

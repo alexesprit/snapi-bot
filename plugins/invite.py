@@ -17,7 +17,7 @@ def sendInvite(msgType, conference, nick, param):
 	#reason = ""
 	param = param.split(None, 1)
 	user = param[0]
-	if(not user.count("@")):
+	if(not isJid(user)):
 		if(nickInConference(conference, user)):
 			trueJid = getTrueJid(conference, user)
 		else:

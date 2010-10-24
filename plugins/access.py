@@ -92,16 +92,16 @@ def setGlobalAccess(msgType, conference, nick, param):
 	if(len(param) < 1 or len(param) > 2):
 		sendMsg(msgType, conference, nick, u"ошибочный запрос")
 		return
-	userNick = param[0].strip()
+	user = param[0].strip()
 	if(conferenceInList(conference)):
-		if(nickInConference(conference, userNick)):
-			trueJid = getTrueJid(conference, userNick)
+		if(nickInConference(conference, user)):
+			trueJid = getTrueJid(conference, user)
 		else:
 			sendMsg(msgType, conference, nick, u"а это кто?")
 			return
 	else:
-		if(userNick.count("@")):
-			trueJid = userNick
+		if(isJid(user)):
+			trueJid = user
 		else:
 			sendMsg(msgType, conference, nick, u"а это кто?")
 			return
