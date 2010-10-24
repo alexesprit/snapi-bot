@@ -34,10 +34,10 @@ def showHoroscope(msgType, conference, nick, param):
 		rawHTML = urllib.urlopen(url).read()
 		items = re.search(r"<td class=stext>(.+?)</td>", rawHTML, re.DOTALL)
 		if(items):
-			message = decode(items.group(0))
+			message = decode(items.group(0), "cp1251")
 			if(protocol.TYPE_PUBLIC == msgType):
 				sendMsg(msgType, conference, nick, u"ушёл в приват")
-			sendMsg(protocol.TYPE_PRIVATE, conference, nick, unicode(message, "cp1251"))
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 		else:
 			sendMsg(msgType, conference, nick, u"не могу :(")
 

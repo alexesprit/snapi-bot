@@ -20,12 +20,13 @@ def showBashQuote(msgType, conference, nick, param):
 	else:
 		req = "http://bash.org.ru/random"
 	rawHTML = urllib.urlopen(req).read()
-	items = re.search("<div class=\"vote\">(.+?)<div>(.+?)</div>", rawHTML, re.DOTALL)
+	items = re.search("quote/(\d+).+?<div>(.+?)</div>", rawHTML, re.DOTALL)
 	if(items):
-		message = decode(items.group(2))
-		sendMsg(msgType, conference, nick, unicode(message, "cp1251"))
+		url = "http://bash.org.ru/quote/%s" % (items.group(1))
+		quote = decode(items.group(2), "cp1251")
+		sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
 	else:
-		sendMsg(msgType, conference, nick, u"не могу :(")
+		sendMsg(msgType, conference, nick, u"не найдено!")
 
 def showAbyssQuote(msgType, conference, nick, param):
 	rawHTML = urllib.urlopen("http://bash.org.ru/abysstop").read()
@@ -40,14 +41,29 @@ def showAbyssQuote(msgType, conference, nick, param):
 
 def showItHappensQuote(msgType, conference, nick, param):
 	if(param and param.isdigit()):
-		url = "http://ithappens.ru/%s" % (param)
+		url = "http://ithappens.ru/story/%s" % (param)
 	else:
 		url = "http://ithappens.ru/random"
 	rawHTML = urllib.urlopen(url).read()
-	items = re.search(r"<p class=\"text\">(.+?)</p>", rawHTML, re.DOTALL)
+	items = re.search(r"<div class.+?#(\d+).+?<p class=\"text\">(.+?)</p>", rawHTML, re.DOTALL)
 	if(items):
-		text = decode(items.group(0))
-		sendMsg(msgType, conference, nick, unicode(text, "cp1251"))
+		url = "http://ithappens.ru/story/%s/" % (items.group(1))
+		quote = decode(items.group(2), "cp1251")
+		sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
+	else:
+		sendMsg(msgType, conference, nick, u"не могу")
+
+def showIBashQuote(msgType, conference, nick, param):
+	if(param and param.isdigit()):
+		url = "http://ibash.org.ru/quote.php?id=%s" % (param)
+	else:
+		url = "http://ibash.org.ru/random.php"
+	rawHTML = urllib.urlopen(url).read()
+	items = re.search(r"<b>#(\d+).+?<div class=\"quotbody\">(.+?)</div>", rawHTML, re.DOTALL)
+	if(items):
+		url = "http://ibash.org.ru/quote.php?id=%s" % (items.group(1))
+		quote = decode(items.group(2), "cp1251")
+		sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
 	else:
 		sendMsg(msgType, conference, nick, u"не могу")
 
@@ -57,13 +73,13 @@ def showJabberQuote(msgType, conference, nick, param):
 	else:
 		url = "http://jabber-quotes.ru/random"
 	rawHTML = urllib.urlopen(url).read()
-	items = re.findall(r"<blockquote>(.*?)</blockquote>", rawHTML)
+	items = re.search(r"#(\d+).+?<blockquote>(.+?)</blockquote>", rawHTML)
 	if(items):
-		message = random.choice(items)
-		message = message.replace("<br><br>", "<br>")
-		message = decode(message)
-		message = unicode(message, "cp1251")
-		sendMsg(msgType, conference, nick, message)
+		quote = unicode(items.group(2), "cp1251")
+		quote = quote.replace("<br><br>", "\n")
+		quote = decode(quote)
+		url = "http://jabber-quotes.ru/id%s/" % (items.group(1))
+		sendMsg(msgType, conference, nick, u"%s\n\n%s" % (quote, url))
 	else:
 		sendMsg(msgType, conference, nick, u"не могу :(")
 
@@ -76,6 +92,10 @@ registerCommand(showBashQuote, u"бор", 10,
 				u"Показывает случайную/указанную цитату c bash.org.ru", 
 				u"бор [номер]", 
 				(u"бор", u"бор 143498"))
+registerCommand(showIBashQuote, u"айбаш", 10, 
+				u"Показывает случайную/указанную цитату c ibash.org.ru", 
+				u"айбаш [номер]", 
+				(u"айбаш", u"айбаш 3619"))
 registerCommand(showItHappensQuote, u"ит", 10, 
 				u"Показывает случайную/указанную цитату c ithappens.ru", 
 				u"ит [номер]", 

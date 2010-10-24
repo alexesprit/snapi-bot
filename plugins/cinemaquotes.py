@@ -26,8 +26,8 @@ def showCinemaQuote(msgType, conference, nick, param):
 		if not items:
 			print pageNum
 		quote = random.choice(items)
-		quote = decode(quote)
-		sendMsg(msgType, conference, nick, unicode(quote, "cp1251"))
+		quote = decode(quote, "cp1251")
+		sendMsg(msgType, conference, nick, quote)
 	else:
 		sendMsg(msgType, conference, nick, u"не получается")
 

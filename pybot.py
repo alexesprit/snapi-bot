@@ -288,7 +288,9 @@ def time2str(time):
 def getConfigPath(*param):
 	return(os.path.join(CONFIG_DIR, *param))
 
-def decode(text):
+def decode(text, encoding=None):
+	if encoding:
+		text = unicode(text, encoding)
 	text = gTagPtrn.sub("", text.replace("<br />","\n").replace("<br>","\n"))
 	return(utils.unescapeHTML(text))
 

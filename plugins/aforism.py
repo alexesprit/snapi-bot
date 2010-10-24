@@ -46,8 +46,8 @@ def showAforism(msgType, conference, nick, param):
 	rawHTML = urllib.urlopen(url).read()
 	items = gAforPattern.search(rawHTML)
 	if(items):
-		aforism = decode(items.group(0))
-		sendMsg(msgType, conference, nick, unicode(aforism, "cp1251"))
+		aforism = decode(items.group(0), "cp1251")
+		sendMsg(msgType, conference, nick, aforism)
 	else:
 		sendMsg(msgType, conference, nick, u"не получается")
 

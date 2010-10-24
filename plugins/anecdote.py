@@ -20,8 +20,8 @@ def showAnecdote(msgType, conference, nick, param):
 	rawHTML = urllib.urlopen(url).read()
 	items = gAnecdotePattern.search(rawHTML)
 	if(items):
-		anecdote = decode(items.group(0))
-		sendMsg(msgType, conference, nick, unicode(anecdote, "cp1251"))
+		anecdote = decode(items.group(0), "cp1251")
+		sendMsg(msgType, conference, nick, anecdote)
 	else:
 		sendMsg(msgType, conference, nick, u"не получается")
 
