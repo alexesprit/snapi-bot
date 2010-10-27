@@ -14,19 +14,20 @@
 # GNU General Public License for more details.
 
 def searchInYandex(msgType, conference, nick, param):
-	query = urllib.urlencode({"s": "all", "query": param.encode("utf-8")})
+	query = urllib.urlencode({"query": param.encode("utf-8")})
 	rawHTML = urllib.urlopen("http://yandex.ru/msearch?s=all&%s" % (query)).read()
 	rawHTML = unicode(rawHTML, "utf-8")
-	items = re.findall("<li>(.+?)<div class=\"www\">(.+?)</li>", rawHTML, re.DOTALL)
+	#print rawHTML
+	items = re.findall("<li>\n(.+?)<p class=\"b-phone\">.+?<div class=\"www\">(.+?)</div>", rawHTML, re.DOTALL)
 	if(items):
+		print items[0]
 		if(protocol.TYPE_PUBLIC == msgType):
 			text = items[0][0].strip()
 			url = items[0][1]
-			message = u"%shttp://%s" % (text, url)
+			message = u"%s\nhttp://%s" % (text, url)
 		else:
-			items = [u"%shttp://%s" % (item[0].strip(), item[1]) for item in items[:5]]
-			message = "\n".join(items)
-		message = message.replace("...", "")
+			items = [u"%s\nhttp://%s" % (item[0].strip(), item[1]) for item in items[:5]]
+			message = "\n\n".join(items)
 		sendMsg(msgType, conference, nick, decode(message));	
 	else:
 		sendMsg(msgType, conference, nick, u"по вашему запросу ничего не найдено")

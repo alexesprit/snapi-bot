@@ -82,9 +82,6 @@ class Dispatcher(PlugIn):
 			if method.__name__ == 'send':
 				self._owner_send = method
 				break
-		self._owner.lastErrNode = None
-		self._owner.lastErr = None
-		self._owner.lastErrCode = None
 		self.initStream()
 
 	def plugout(self):
@@ -209,25 +206,25 @@ class Dispatcher(PlugIn):
 		""" Main procedure that performs XMPP stanza recognition and calling apppropriate handlers for it.
 			Called internally.
 		"""
-		if(not session):
+		if not session:
 			session = self
 		session.Stream._mini_dom = None
 		name = stanza.getName()
-		if(name == 'features'):
+		if name == 'features':
 			session.Stream.features = stanza
 
 		xmlns = stanza.getNamespace()
-		if(xmlns not in self.handlers):
+		if xmlns not in self.handlers:
 			self.printf("Unknown namespace: %s" % (xmlns), 'warn')
 			xmlns = "default"
-		if(name not in self.handlers[xmlns]):
+		if name not in self.handlers[xmlns]:
 			self.printf("Unknown stanza: %s" % (name), 'warn')
 			name = "default"
 		else:
 			self.printf("Got %s/%s stanza" % (xmlns, name), 'ok')
 
-		if(isinstance(stanza, Node)):
-			stanza = self.handlers[xmlns][name]['type'](node = stanza)
+		if isinstance(stanza, Node):
+			stanza = self.handlers[xmlns][name]['type'](node=stanza)
 
 		stanzaType = stanza.getType()
 		stanzaID = stanza.getID()
@@ -236,10 +233,10 @@ class Dispatcher(PlugIn):
 		stanzaProps = stanza.getProperties()
 		session.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID), 'ok')
 
-		if(stanzaID in session._expected):
-			if(isinstance(session._expected[stanzaID], tuple)):
+		if stanzaID in session._expected:
+			if isinstance(session._expected[stanzaID], tuple):
 				function, args = session._expected[stanzaID]
-				del(self._expected[stanzaID])
+				del self._expected[stanzaID]
 				session.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), 'ok')
 				try:
 					function(stanza, *args)
@@ -250,17 +247,17 @@ class Dispatcher(PlugIn):
 				session._expected[stanzaID] = stanza
 		else:
 			handlerList = ['default']
-			if(stanzaType in self.handlers[xmlns][name]):
+			if stanzaType in self.handlers[xmlns][name]:
 				handlerList.append(stanzaType)
 			for prop in stanzaProps:
-				if(prop in self.handlers[xmlns][name]):
+				if prop in self.handlers[xmlns][name]:
 					handlerList.append(prop)
-				if(stanzaType and (stanzaType + prop) in self.handlers[xmlns][name]):
+				if stanzaType and (stanzaType + prop) in self.handlers[xmlns][name]:
 					handlerList.append(stanzaType + prop)
 
 			chain = self.handlers[xmlns]['default']['default']
 			for key in handlerList:
-				if(key):
+				if key:
 					chain = chain + self.handlers[xmlns][name][key]
 			for handler in chain:
 				try:
@@ -271,27 +268,18 @@ class Dispatcher(PlugIn):
 	def waitForResponse(self, id, timeout=DEFAULT_TIMEOUT):
 		""" Block and wait until stanza with specific "id" attribute will come.
 			If no such stanza is arrived within timeout, return None.
-			If operation failed for some reason then owner's attributes
-			lastErrNode, lastErr and lastErrCode are set accordingly.
 		"""
 		self._expected[id] = None
-		timedOut = 0
 		abortTime = time.time() + timeout
 		self.printf("Waiting for ID %s with timeout %s..." % (id, timeout), 'wait')
-		while(not self._expected[id]):
-			if(not self.process(0.1)):
-				self._owner.lastErr = "Disconnect"
-				return(None)
-			if(time.time() > abortTime):
-				self._owner.lastErr = "Timeout"
-				return(None)
+		while not self._expected[id]:
+			if not self.process(0.1):
+				return None 
+			if time.time() > abortTime:
+				return None 
 		response = self._expected[id]
-		del(self._expected[id])
-		if(response.getErrorCode()):
-			self._owner.lastErrNode = response
-			self._owner.lastErr = response.getError()
-			self._owner.lastErrCode = response.getErrorCode()
-		return(response)
+		del self._expected[id]
+		return response 
 
 	def sendAndWaitForResponse(self, stanza, timeout=DEFAULT_TIMEOUT):
 		""" Put stanza on the wire and wait for recipient's response to it. """
@@ -301,7 +289,7 @@ class Dispatcher(PlugIn):
 		""" Put stanza on the wire and call back when recipient replies.
 			Additional callback arguments can be specified in args.
 		"""
-		if(not args):
+		if not args:
 			args = {}
 		self._expected[self.send(stanza)] = (func, args)
 
@@ -309,9 +297,9 @@ class Dispatcher(PlugIn):
 		""" Serialise stanza and put it on the wire. Assign an unique ID to it before send.
 			Returns assigned ID.
 		"""
-		if(isinstance(stanza, basestring)):
+		if isinstance(stanza, basestring):
 			return self._owner_send(stanza)
-		if(not isinstance(stanza, Stanza)): 
+		if not isinstance(stanza, Stanza): 
 			stanzaID = None
 		elif(not stanza.getID()):
 			global gID
@@ -324,10 +312,10 @@ class Dispatcher(PlugIn):
 			stanza.setAttr('from', self._owner._registeredName)
 		stanza.setNamespace(self._owner.Namespace)
 		self._owner_send(stanza)
-		return(stanzaID)
+		return stanzaID
 
 	def disconnect(self):
 		""" Send a stream terminator and and handle all incoming stanzas before stream closure. """
 		self._owner_send('</stream:stream>')
-		while(self.process(1)):
+		while self.process(1):
 			pass

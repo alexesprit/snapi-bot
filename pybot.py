@@ -121,8 +121,7 @@ execfile(BOTCONFIG_FILE) in globals()
 gUserName, gServer = gJid.split("@")
 gClient = client.Client(server=gServer, port=gPort, debugFlags=gXMPPDebug)
 gRoster = None
-gDebug = debug.Debug(gCoreDebug, timeStamp=0, validateFlags=False, \
-							showFlags=False, prefix="", welcomeMsg=False)
+gDebug = debug.Debug(gCoreDebug, validateFlags=False, showFlags=False, prefix="", welcomeMsg=False)
 gTagPtrn = re.compile(r"<(.*?)>")
 gJidPtrn = re.compile(r"(\w+)@(\w+)\.(\w+)", re.UNICODE)
 gSrvPtrn = re.compile(r"(\w+)\.(\w+)", re.UNICODE)

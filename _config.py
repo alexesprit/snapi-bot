@@ -11,7 +11,7 @@ gPort = 5222
 # client.SSL_DISABLE - отключить SSL
 # client.SSL_AUTO - автоопределение (SSL, если порт 443, 5223, иначе TLS)
 # client.SSL_FORCE - форсировать (нестандартный порт)
-gSSLMode = xmpp.SSL_DISABLE
+gSSLMode = client.SSL_DISABLE
 gUseResolver = False
 
 # ресурс и приоритет

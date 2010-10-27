@@ -125,7 +125,8 @@ def showGlobalAccesses(msgType, conference, nick, param):
 	else:
 		if(protocol.TYPE_PUBLIC == msgType):
 			sendMsg(msgType, conference, nick, u"ушли")
-		items = [u"%s [%d]" % (jid, gGlobalAccess[jid]) for jid in gGlobalAccess]
+		items = [u"%s [%d]" % (jid, access) 
+				for jid, access in gGlobalAccess.items()]
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"вот, что я нашла\n" + "\n".join(items))
 
 def showLocalAccesses(msgType, conference, nick, param):
@@ -134,7 +135,8 @@ def showLocalAccesses(msgType, conference, nick, param):
 	else:
 		if(protocol.TYPE_PUBLIC == msgType):
 			sendMsg(msgType, conference, nick, u"ушли")
-		items = [u"\n%s [%d]" % (jid, gPermAccess[conference][jid]) for jid in gPermAccess[conference]]
+		items = [u"%s [%d]" % (jid, access) 
+				for jid, access in gPermAccess[conference].items()]
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"вот, что я нашла\n" + "\n".join(items))
 
 def loadGlobalAccesses():

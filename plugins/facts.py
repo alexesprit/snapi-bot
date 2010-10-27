@@ -19,9 +19,9 @@ def showFact(msgType, conference, nick, param):
 	pageNum = random.randrange(1, FACTS_COUNT + 1)
 	url = "http://skio.ru/facts/fact%d.php" % (pageNum)
 	rawHTML = urllib.urlopen(url).read()
-	items = re.search("<div style=(.+?)<ul>(.+?)</ul>", rawHTML, re.DOTALL)
+	items = re.search("<div style=.+?<ul>(.+?)</ul>", rawHTML, re.DOTALL)
 	if(items):
-		rawHTML = items.group(2)
+		rawHTML = items.group(1)
 		items = re.findall("<li>(.+?)</li>", rawHTML, re.DOTALL)
 		fact = random.choice(items)
 		fact = decode(fact)
