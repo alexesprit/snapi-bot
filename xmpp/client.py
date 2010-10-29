@@ -32,32 +32,16 @@ import transports
 from protocol import Node, Presence
 from protocol import NS_CAPS, NS_CLIENT
 
-debug.Debug.colors['auth'] = debug.colorYellow
-debug.Debug.colors['bind'] = debug.colorBrown
-debug.Debug.colors['dispatcher'] = debug.colorGreen
-debug.Debug.colors['proxy'] = debug.colorDarkGray
-debug.Debug.colors['roster'] = debug.colorMagenta
-debug.Debug.colors['socket'] = debug.colorDarkGray
-debug.Debug.colors['tls'] = debug.colorDarkGray
-
-debug.Debug.colors['ok'] = debug.colorBrown
-debug.Debug.colors['warn'] = debug.colorYellow
-debug.Debug.colors['error'] = debug.colorRed
-debug.Debug.colors['start'] = debug.colorDarkGray
-debug.Debug.colors['stop'] = debug.colorDarkGray
-debug.Debug.colors['sent'] = debug.colorYellow
-debug.Debug.colors['got'] = debug.colorBrightCyan
-
-SSL_AUTO = 0x0
-SSL_FORCE = 0x1
-SSL_DISABLE = 0x2
+SECURE_AUTO = 0x0
+SECURE_FORCE = 0x1
+SECURE_DISABLE = 0x2
 
 C_TCP = "TCP"
 C_TLS = "TLS"
 C_SSL = "SSL"
 
 class CommonClient:
-	""" Base for Client and Component classes."""
+	""" Base for Client class."""
 	def __init__(self, server, port=5222, debugFlags=None):
 		""" Caches server name and (optionally) port to connect to. "printf" parameter specifies
 			the printf IDs that will go into printf output. You can either specifiy an "include"
@@ -66,20 +50,41 @@ class CommonClient:
 		self.Namespace = NS_CLIENT
 		self.defaultNamespace = self.Namespace
 		self.disconnectHandlers = []
+
 		self.Server = server
 		self.Port = port
-		self._debug = debug.Debug(debugFlags, validateFlags=False, welcomeMsg=False, prefix='', showFlags=False)
+
+		self._debug = debug.Debug(debugFlags, showFlags=False)
 		self.printf = self._debug.show
 		self.debugFlags = self._debug.debugFlags
+		self.initDebugColors()
+
 		self._owner = self
 		self._registeredName = None
 		self.connected = False
+	
+	def initDebugColors(self):
+		self._debug.colors["auth"] = debug.colorYellow
+		self._debug.colors["bind"] = debug.colorBrown
+		self._debug.colors["dispatcher"] = debug.colorGreen
+		self._debug.colors["proxy"] = debug.colorDarkGray
+		self._debug.colors["roster"] = debug.colorMagenta
+		self._debug.colors["socket"] = debug.colorBrightRed
+		self._debug.colors["tls"] = debug.colorBrightRed
 
-	def RegisterDisconnectHandler(self, handler):
+		self._debug.colors["ok"] = debug.colorBrightCyan
+		self._debug.colors["got"] = debug.colorBlue
+		self._debug.colors["sent"] = debug.colorBrown
+		self._debug.colors["stop"] = debug.colorDarkGray
+		self._debug.colors["warn"] = debug.colorYellow
+		self._debug.colors["error"] = debug.colorRed
+		self._debug.colors["start"] = debug.colorDarkGray
+	
+	def registerDisconnectHandler(self, handler):
 		""" Register handler that will be called on disconnect."""
 		self.disconnectHandlers.append(handler)
 
-	def UnregisterDisconnectHandler(self, handler):
+	def unregisterDisconnectHandler(self, handler):
 		""" Unregister handler that is called on disconnect."""
 		self.disconnectHandlers.remove(handler)
 
@@ -92,10 +97,10 @@ class CommonClient:
 			self.TLS.PlugOut()
 
 	def isConnected(self):
-		""" Returns connection state. F.e.: None / 'tls' / 'tcp+non_sasl' . """
+		""" Returns connection state. F.e.: None | TCP | TLS | SSL """
 		return self.connected
 
-	def connect(self, server=None, proxy=None, SSLMode=False, useResolver=True):
+	def connect(self, server=None, proxy=None, SecureMode=SECURE_DISABLE, useResolver=True):
 		""" Make a tcp/ip connection, protect it with tls/ssl if possible and start XMPP stream.
 			Returns None or C_TCP or C_TLS, depending on the result."""
 		if not server:
@@ -110,8 +115,9 @@ class CommonClient:
 			return False
 		self._Server, self._Proxy = server, proxy
 		self.connected = C_TCP
-		if (SSLMode == SSL_AUTO and self.Connection.getPort() in (5223, 443)) or SSLMode == SSL_FORCE:
-			try:			   # FIXME. This should be done in transports.py
+		if (SecureMode == SECURE_AUTO and self.Connection.getPort() in (5223, 443)) or SecureMode == SECURE_FORCE:
+			# FIXME. This should be done in transports.py
+			try:
 				transports.TLS().PlugIn(self, forceSSL=True)
 				self.connected = C_SSL
 			except socket.sslerror:
@@ -122,28 +128,28 @@ class CommonClient:
 			if not self.process(1):
 				return False
 		# If we get version 1.0 stream the features tag MUST BE presented
-		if(self.Dispatcher.Stream._document_attrs.get('version') == '1.0'):
+		if(self.Dispatcher.Stream._document_attrs.get("version") == "1.0"):
 			while not self.Dispatcher.Stream.features and self.process(1):
 				pass	  
 		return self.connected
 
 class Client(CommonClient):
 	""" Example client class, based on CommonClient. """
-	def connect(self, server=None, proxy=None, SSLMode=SSL_DISABLE, useResolver=True):
+	def connect(self, server=None, proxy=None, SecureMode=SECURE_DISABLE, useResolver=True):
 		""" Connect to jabber server. If you want to specify different ip/port to connect to you can
 			pass it as tuple as first parameter. If there is HTTP proxy between you and server 
 			specify it's address and credentials (if needed) in the second argument.
 			If you want ssl/tls support to be discovered and enable automatically, set third argument as SSL_AUTO. (ssl will be autodetected only if port is 5223 or 443)
 			If you want to force SSL start (i.e. if port 5223 or 443 is remapped to some non-standard port) then set it to SSL_FORCE.
 			If you want to disable tls/ssl support completely, set it to SSL_DISABLE.
-			Example: connect(('192.168.5.5', 5222), {'host':'proxy.my.net', 'port':8080, 'user':'me', 'password':'secret'})
+			Example: connect(("192.168.5.5", 5222), {"host":"proxy.my.net", "port":8080, "user":"me", "password":"secret"})
 			Returns False or "TCP", "SSL" "TLS", depending on the result.
 		"""
-		if(not CommonClient.connect(self, server, proxy, SSLMode, useResolver)):
+		if(not CommonClient.connect(self, server, proxy, SecureMode, useResolver)):
 			return False
-		if(SSLMode != SSL_DISABLE and not hasattr(self, C_TLS)):
+		if(SecureMode != SECURE_DISABLE and not hasattr(self, C_TLS)):
 			transports.TLS().PlugIn(self)
-			if(self.Dispatcher.Stream._document_attrs.get('version') == '1.0'):
+			if(self.Dispatcher.Stream._document_attrs.get("version") == "1.0"):
 				# If we get version 1.0 stream the features tag MUST BE presented
 				while not self.Dispatcher.Stream.features and self.process(1):
 					pass
@@ -166,7 +172,7 @@ class Client(CommonClient):
 		while not self.Dispatcher.Stream._document_attrs and self.process(1):
 			pass
 		# If we get version 1.0 stream the features tag MUST BE presented
-		if(self.Dispatcher.Stream._document_attrs.get('version') == '1.0'):
+		if(self.Dispatcher.Stream._document_attrs.get("version") == "1.0"):
 			while not self.Dispatcher.Stream.features and self.process(1):
 				pass
 		auth.SASL(user, password).PlugIn(self)
@@ -194,7 +200,7 @@ class Client(CommonClient):
 	def getRoster(self):
 		""" Return the Roster instance, previously plugging it in and
 			requesting roster from server if needed. """
-		if(not hasattr(self, 'Roster')):
+		if(not hasattr(self, "Roster")):
 			roster.Roster().PlugIn(self)
 		return self.Roster.getRoster()
 

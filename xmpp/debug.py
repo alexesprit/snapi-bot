@@ -14,33 +14,33 @@
 
 _version_ = '1.4.0'
 
-'''
-Generic debug class
+"""
+	Generic debug class
 
-Other modules can always define extra debug flags for local usage, as long as
-they make sure they append them to debugFlags
+	Other modules can always define extra debug flags for local usage, as long as
+	they make sure they append them to debugFlags
 
-Also its always a good thing to prefix local flags with something, to reduce risk
-of coliding flags. Nothing breaks if two flags would be identical, but it might 
-activate unintended debugging.
+	Also its always a good thing to prefix local flags with something, to reduce risk
+	of coliding flags. Nothing breaks if two flags would be identical, but it might 
+	activate unintended debugging.
 
-flags can be numeric, but that makes analysing harder, on creation its
-not obvious what is activated, and when flag_show is given, output isnt
-really meaningfull.
+	flags can be numeric, but that makes analysing harder, on creation its
+	not obvious what is activated, and when flag_show is given, output isnt
+	really meaningfull.
 
-This Debug class can either be initialized and used on app level, or used independantly
-by the individual classes.
+	This Debug class can either be initialized and used on app level, or used independantly
+	by the individual classes.
 
-For samples of usage, see samples subdir in distro source, and selftest
-in this code
-'''
+	For samples of usage, see samples subdir in distro source, and selftest
+	in this code
+"""
 
 import os
 import sys
 import time
 import traceback
 
-useColors = ('TERM' in os.environ)
+useColors = ("TERM" in os.environ)
 
 colorNone			= chr(27) + "[0m"
 colorBlack			= chr(27) + "[30m"
@@ -60,41 +60,34 @@ colorPurple			= chr(27) + "[35;1m"
 colorBrightCyan		= chr(27) + "[36;1m"
 colorWhite			= chr(27) + "[37;1m"
 
-'''
-Define your flags in yor modules like this:
+"""
+	Define your flags in yor modules like this:
 
-from debug import *
+		from debug import Debug
 
-DBG_INIT = 'init'                ; debugFlags.append( DBG_INIT )
-DBG_CONNECTION = 'connection'    ; debugFlags.append( DBG_CONNECTION )
+		DBG_INIT = "init"
+		DBG_CONNECTION = "connection"
+		dbgFlags = (DBG_INIT, DBG_CONNECTION)
 
-The reason for having a double statement wis so we can validate params
-and catch all undefined debug flags
+	The reason for having a double statement wis so we can validate params
+	and catch all undefined debug flags
 
-This gives us control over all used flags, and makes it easier to allow
-global debugging in your code, just do something like
+	This gives us control over all used flags, and makes it easier to allow
+	global debugging in your code, just do something like
 
-foo = Debug(debugFlags)
+		foo = Debug(dbgFlags)
 
-group flags, that is a flag in it self containing multiple flags should be
-defined without the debugFlags.append() sequence, since the parts are already
-in the list, also they must of course be defined after the flags they depend on ;)
-example:
+	NoDebug
+	-------
+	To speed code up, typically for product releases or such
+	use this class instead if you globaly want to disable debugging
+"""
 
-DBG_MULTI = [DBG_INIT, DBG_CONNECTION]
-
-NoDebug
--------
-To speed code up, typically for product releases or such
-use this class instead if you globaly want to disable debugging
-'''
-
-DBG_ALWAYS = 'always'
+DBG_ALWAYS = "always"
 
 class NoDebug:
-	colors = {}
-
-	def __init__(self, *args, **kwargs ):
+	def __init__(self, *args, **kwargs):
+		self.colors = {}
 		self.debugFlags = []
 
 	def show(self,  *args, **kwargs):
@@ -104,125 +97,122 @@ class NoDebug:
 		pass
 
 	def setActiveFlags(self, activeFlags=None):
-		return(0)
+		return 0
 
 class Debug:  
 	colors = {}
     
-	def __init__(self, activeFlags=None, logFile=sys.stderr, \
-				prefix="DEBUG: ", suffix="\n", timeStamp=0,
-				showFlags=True, validateFlags=True, welcomeMsg=True):
+	def __init__(self, activeFlags=None, logFile=sys.stderr, 
+				prefix="", suffix="\n", timeStamp=0,
+				showFlags=True, validateFlags=False, welcomeMsg=False):
 		"""
 			prefix and suffix:
-			prefix and sufix can either be set globaly or per call.
-			personally I use this to color code debug statements
-			with prefix = chr(27) + '[34m'
-				 suffix = chr(27) + '[37;1m\n'
+				prefix and sufix can either be set globaly or per call.
+				personally I use this to color code debug statements
+				with prefix = chr(27) + "[34m"
+					 suffix = chr(27) + "[37;1m\n"
 			
 			timeStamp:
-			0 - disables timestamps
-			1 - before prefix, good when prefix is a string
-			2 - after prefix, good when prefix is a color
+				0 - disables timestamps
+				1 - before prefix, good when prefix is a string
+				2 - after prefix, good when prefix is a color
 		
 		"""
-		if(isinstance(activeFlags, tuple) or isinstance(activeFlags, list)):
+		if isinstance(activeFlags, tuple) or isinstance(activeFlags, list):
 			self.debugFlags = activeFlags
 		else:
-			raise(TypeError("debugFlags must be list or tuple!"))
-		if(welcomeMsg):
+			raise TypeError("activeFlags must be list or tuple!")
+		if welcomeMsg:
 			welcomeMsg = activeFlags and 1 or 0
-		if(logFile):
-			if(isinstance(logFile, str)):
+		if logFile:
+			if isinstance(logFile, str):
 				try:
-					self._fh = open(logFile, 'w')
-				except:
-					print('ERROR: can open %s for writing')
+					self._fh = open(logFile, "w")
+				except (IOError):
+					raise IOError("Unable to open %s for writing" % (logFile))
 					sys.exit(0)
 			else:
 				self._fh = logFile
 		else:
 			self._fh = sys.stdout
 		
-		if(timeStamp not in (0, 1, 2)):
-			raise('Invalid timeStamp param', timeStamp)
+		if timeStamp not in (0, 1, 2):
+			raise TypeError("Invalid timeStamp param", timeStamp)
 		self.prefix = prefix
 		self.suffix = suffix
 		self.timeStamp = timeStamp
 		self.validateFlags = validateFlags
 		self.showFlags = showFlags
+		self.colors = {}
 
 		self.setActiveFlags(activeFlags)
-		if(welcomeMsg):
+		if welcomeMsg:
 			caller = sys._getframe(1)
 			try:
-				modName = ':%s' % (caller.f_locals['__name__'])
+				modName = ":%s" % (caller.f_locals["__name__"])
 			except NameError:
-				modName = ''
-			self.show('Debug created for %s%s' % (caller.f_code.co_filename, modName))
-			self.show('Flags defined: %s' % ', '.join(self.activeFlags))
+				modName = ""
+			self.show("Debug created for %s%s" % (caller.f_code.co_filename, modName))
+			self.show("Flags defined: %s" % ", ".join(self.activeFlags))
 
 	def setActiveFlags(self, activeFlags=None):
 		validFlags = []
-		if(not activeFlags):
+		if not activeFlags:
 			self.activeFlags = []
 			return
-		elif(isinstance(activeFlags, tuple) or isinstance(activeFlags, list)):
+		elif isinstance(activeFlags, tuple) or isinstance(activeFlags, list):
 			for flag in activeFlags:
 				self._validateFlag(flag)
 				validFlags.append(flag)
 			self.activeFlags = validFlags
-		self._removeDuplicates()
-	
-	def getActiveFlags(self):
-		return self.active
+			self._removeDuplicates()
+		else:
+			raise TypeError("activeFlags must be list or tuple!")
 
-	def show(self, msg, flag=None, prefix=''):
-		if(flag and self.validateFlags):
+	def getActiveFlags(self):
+		return self.activeFlags
+
+	def show(self, msg, flag=None, prefix=None):
+		if flag and self.validateFlags:
 			self._validateFlag(flag)
-		if(not flag or self.isActive(flag)):
-			if(not isinstance(msg, basestring)):
+		if not flag or self.isActive(flag):
+			if not isinstance(msg, basestring):
 				msg = unicode(msg)
-			prefixcolor = ''
-			if(useColors and prefix in self.colors):
-				msg = self.colors[prefix] + msg + colorNone
-				if(flag):
-					prefixcolor = self.colors[flag]
-			if(prefix == 'error'):
-				exception = sys.exc_info()
-				if(exception[0]):
-					msg += '\n' + traceback.format_exc().rstrip()
-			prefix = prefixcolor + self.prefix
-			if(flag and self.showFlags):
-				prefix += '[%s] ' % (flag)
-			if(self.timeStamp == 2):
-				output = '%s%s ' % (prefix, time.strftime('[%H:%M:%S]', time.localtime()))
-			elif(self.timeStamp == 1):
-				output = '%s %s' % (time.strftime('[%H:%M:%S]', time.localtime()), prefix)
-			else:
-				output = prefix
-			output = '%s%s%s' % (output, msg, self.suffix)
+			prefixColor = ""
+			if useColors and prefix in self.colors:
+				prefixColor = self.colors[prefix]
+				msg = prefixColor + msg + colorNone
+				if flag:
+					flagColor = self.colors[flag]
+			if prefix == "error":
+				if sys.exc_info()[0]:
+					msg += "\n" + traceback.format_exc().rstrip()
+			prefix = self.prefix
+			if self.showFlags and flag:
+				prefix += "%s[%s]%s " % (flagColor, flag, colorNone)
+			if self.timeStamp == 2:
+				prefix = "%s%s " % (prefix, time.strftime("[%H:%M:%S]"))
+			elif self.timeStamp == 1:
+				prefix = "%s %s" % (time.strftime("[%H:%M:%S]"), prefix)
+			output = "%s%s%s" % (prefix, msg, self.suffix)
 			try:
 				self._fh.write(output)
 			except:
-				if(os.name == 'posix'):
-					self._fh.write(output.encode('utf-8'))
-				elif(os.name == 'nt'):
-					self._fh.write(output.encode('cp866'))
+				if os.name == "posix":
+					self._fh.write(output.encode("utf-8"))
+				elif os.name == "nt":
+					self._fh.write(output.encode("cp866"))
 			self._fh.flush()
 
 	def isActive(self, flag):
-		if(self.activeFlags): 
-			if(not flag or flag in self.activeFlags or DBG_ALWAYS in self.activeFlags):
-				return(True)
-		return(False)
+		if self.activeFlags: 
+			if not flag or flag in self.activeFlags or DBG_ALWAYS in self.activeFlags:
+				return True
+		return False
 
 	def _validateFlag(self, flag):
-		if(flag and not flag in self.debugFlags):
-			raise(Exception('Invalid debug flag given: %s' % flag))
+		if flag and not flag in self.debugFlags:
+			raise KeyError("Invalid debug flag given: %s" % flag)
 
 	def _removeDuplicates(self):
-		uniqueFlags = []
-		for f in self.debugFlags:
-			if(f not in uniqueFlags):
-				uniqueFlags.append(f)
-		self.debugFlags = uniqueFlags
+		self.debugFlags = list(set(self.debugFlags))

@@ -13,19 +13,29 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+def getGoogleSearchQuery(text, lang=None):
+	param = {
+		"v": "1.0",
+		"q": text.encode("utf-8")
+	}
+	if lang:
+		param["lr"] = lang
+	query = urllib.urlencode(param)
+	return query
+
 def searchInGoogleAll(msgType, conference, nick, text):
-	query = urllib.urlencode({"q" : text.encode("utf-8")})
-	url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&hl=ru&%s" % (query)
+	query = getGoogleSearchQuery(text)
+	url = "http://ajax.googleapis.com/ajax/services/search/web?%s" % (query)
 	searchInGoogle(msgType, conference, nick, url)
 
 def searchInGoogleEN(msgType, conference, nick, text):
-	query = urllib.urlencode({"q" : text.encode("utf-8")})
-	url = "http://ajax.googleapis.com/ajax/services/search/web?hl=en&v=1.0&%s&lr=lang_en" % (query)
+	query = getGoogleSearchQuery(text, "lang_en")
+	url = "http://ajax.googleapis.com/ajax/services/search/web?%s" % (query)
 	searchInGoogle(msgType, conference, nick, url)
 
 def searchInGoogleRU(msgType, conference, nick, text):
-	query = urllib.urlencode({"q" : text.encode("utf-8")})
-	url = "http://ajax.googleapis.com/ajax/services/search/web?hl=ru&v=1.0&%s&lr=lang_ru" % (query)
+	query = getGoogleSearchQuery(text, "lang_ru")
+	url = "http://ajax.googleapis.com/ajax/services/search/web?%s" % (query)
 	searchInGoogle(msgType, conference, nick, url)
 
 def searchInGoogle(msgType, conference, nick, url):

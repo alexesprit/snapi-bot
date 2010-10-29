@@ -13,8 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 		
-def processSubscriptions(stanza, conference, nick, trueJid):
-	jid = stanza.getFrom().getStripped()
+def processSubscriptions(stanza, jid, resource, trueJid):
 	prsType = stanza.getType()
 	if(protocol.PRS_SUBSCRIBE == prsType):
 		gRoster.authorize(jid)

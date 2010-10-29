@@ -17,7 +17,7 @@ def showBotUptime(msgType, conference, nick, parameters):
 	uptime = int(time.time() - gInfo["start"])
 	message = u"я работаю уже %s, " % (time2str(uptime))
 	message += u"получено %(msg)d сообщений, обработано %(prs)d презенсов и %(iq)d iq-запросов, а также выполнено %(cmd)d команд. " % (gInfo)
-	memUsage = getUsedMemory()
+	memUsage = getUsedMemorySize()
 	if(memUsage): 
 		message += u"мной съедено %0.2f МБ памяти, " % (memUsage)
 	(user, system) = os.times()[:2]

@@ -19,7 +19,7 @@ KEEPALIVE_TIMEOUT = 300
 def _sendKeepAlivePacket(stanza, conference):
 	if(protocol.TYPE_ERROR == stanza.getType()):
 		if(stanza.getErrorCode() == "503"):
-			startTimer(REJOIN_TIMEOUT, joinConference, (conference, getBotNick(conference), getChatKey(conference, "password")))
+			startTimer(REJOIN_DELAY, joinConference, (conference, getBotNick(conference), getChatKey(conference, "password")))
 	
 def sendKeepAlivePacket():
 	for conference in getConferences():

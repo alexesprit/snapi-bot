@@ -59,7 +59,7 @@ def processIqStanzas(stanza, jid, resource):
 				query.addChild("feature", {"var": feat})
 		else:
 			iq = stanza.buildReply(protocol.TYPE_ERROR)
-			error = iq.addChild("error", {"msgType": "cancel"})
+			error = iq.addChild("error", {"type": "cancel"})
 			error.addChild("feature-not-implemented", {}, [], protocol.NS_STANZAS)
 		gClient.send(iq)
 

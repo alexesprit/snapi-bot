@@ -25,7 +25,7 @@ class PlugIn:
 			owner.debugFlags.append(self.debugFlag)
 		className = self.__class__.__name__
 		if not hasattr(owner, className):
-			self.printf('Plugging %s into %s' % (self, self._owner), 'start')
+			self.printf("Plugging %s into %s" % (self, self._owner), "start")
 			self._oldMethods = []
 			for method in self._exportedMethods:
 				methodName = method.__name__
@@ -33,15 +33,15 @@ class PlugIn:
 					self._oldMethods.append(getattr(owner, methodName))
 				setattr(owner, methodName, method)
 			setattr(owner, className, self)
-			if hasattr(self, 'plugin'):
+			if hasattr(self, "plugin"):
 				return self.plugin(owner)
 		else:
-			self.printf('Another %s is already plugged' % (self), 'error')
+			self.printf("Another %s is already plugged" % (self), "error")
  
 	def PlugOut(self):
 		""" Unregister all our staff from main instance and detach from it. """
-		self.printf('Plugging %s out of %s' % (self, self._owner), 'stop')
-		if hasattr(self, 'plugout'):
+		self.printf("Plugging %s out of %s" % (self, self._owner), "stop")
+		if hasattr(self, "plugout"):
 			self.plugout()
 		self._owner.debugFlags.remove(self.debugFlag)
 		for method in self._exportedMethods:
@@ -50,8 +50,8 @@ class PlugIn:
 			setattr(self._owner, method.__name__, method)
 		delattr(self._owner, self.__class__.__name__)
 
-	def printf(self, text, severity='info'):
-		""" Feed a provided printf line to main instance's printf 
+	def printf(self, text, severity="info"):
+		""" Feed a provided debug line to main instance's printf 
 			facility along with our ID string. 
 		"""
 		self._owner.printf(text, self.debugFlag, severity)

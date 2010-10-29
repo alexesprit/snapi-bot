@@ -7,7 +7,7 @@
 		* protocol: jabber-objects (I.e. JID and different stanzas and sub-stanzas) 
 		  handling routines.
 		* debug - Jacob Lundquist's debugging module. Very handy if you like colored debug.
-		* auth - Non-SASL and SASL stuff. You will need it to auth as a client or transport.
+		* auth - SASL stuff. You will need it to auth as a client or transport.
 		* transports - low level connection handling. TCP and TLS currently. HTTP support planned.
 		* roster - simple roster for use in clients.
 		* dispatcher - decision-making logic. Handles all hooks. The first who takes control 

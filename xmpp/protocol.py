@@ -23,83 +23,83 @@ import time
 
 from simplexml import Node
 
-NS_DATA							= "jabber:x:data"										# XEP-0004
-NS_RPC							= "jabber:iq:rpc"										# XEP-0009
-NS_LAST							= "jabber:iq:last"										# XEP-0012
-NS_OFFLINE						= "http://jabber.org/protocol/offline"					# XEP-0013
-NS_PRIVACY						= "jabber:iq:privacy"									# XEP-0016
-NS_FEATURE						= "http://jabber.org/protocol/feature-neg"				# XEP-0020
-NS_EVENT						= "jabber:x:event"										# XEP-0022 (obsolete)
-NS_ENCRYPTED					= "jabber:x:encrypted"									# XEP-0027
-NS_DISCO						= "http://jabber.org/protocol/disco"					# XEP-0030
-NS_DISCO_INFO				 	= "http://jabber.org/protocol/disco#info"				# XEP-0030
-NS_DISCO_ITEMS					= "http://jabber.org/protocol/disco#items"				# XEP-0030
-NS_ADDRESS		  				= "http://jabber.org/protocol/address"					# XEP-0033
-NS_MUC							= "http://jabber.org/protocol/muc"						# XEP-0045
-NS_MUC_ADMIN					= "http://jabber.org/protocol/muc#admin"				# XEP-0045
-NS_MUC_USER						= "http://jabber.org/protocol/muc#user"					# XEP-0045
-NS_IBB							= "http://jabber.org/protocol/ibb"						# XEP-0047
-NS_PRIVATE						= "jabber:iq:private"									# XEP-0049
-NS_COMMANDS						= "http://jabber.org/protocol/commands"					# XEP-0050
-NS_VCARD						= "vcard-temp"											# XEP-0054
-NS_RSM							= "http://jabber.org/protocol/rsm"						# XEP-0059
-NS_PUBSUB						= "http://jabber.org/protocol/pubsub"					# XEP-0060
-NS_BYTESTREAM					= "http://jabber.org/protocol/bytestreams"				# XEP-0065
-NS_OOB							= "jabber:x:oob"										# XEP-0065
-NS_XHTML_IM						= "http://jabber.org/protocol/xhtml-im"					# XEP-0071
-NS_EVIL							= "http://jabber.org/protocol/evil"						# XEP-0076
-NS_AUTH							= "jabber:iq:auth"										# XEP-0078
-NS_AMP			  				= "http://jabber.org/protocol/amp"						# XEP-0079
-NS_GEOLOC						= "http://jabber.org/protocol/geoloc"					# XEP-0080
-NS_AVATAR						= "urn:xmpp:avatar"										# XEP-0084
-NS_CHATSTATES					= "http://jabber.org/protocol/chatstates"				# XEP-0085
-NS_TIME							= "jabber:iq:time"										# XEP-0090 (deprecated)
-NS_DELAY						= "jabber:x:delay"										# XEP-0091 (deprecated)
-NS_VERSION						= "jabber:iq:version"									# XEP-0092
-NS_SI							= "http://jabber.org/protocol/si"						# XEP-0096
-NS_MOOD							= "http://jabber.org/protocol/mood"						# XEP-0107
-NS_ACTIVITY		 				= "http://jabber.org/protocol/activity"					# XEP-0108
-NS_PHYSLOC						= "http://jabber.org/protocol/physloc"					# XEP-0112
-NS_COMPONENT_ACCEPT				= "jabber:component:accept"								# XEP-0114
-NS_CAPS							= "http://jabber.org/protocol/caps"						# XEP-0115
-NS_TUNE							= "http://jabber.org/protocol/tune"						# XEP-0118
-NS_WAITINGLIST					= "http://jabber.org/protocol/waitinglist"				# XEP-0130
-NS_SHIM							= "http://jabber.org/protocol/shim"						# XEP-0131
-NS_COMPRESS						= "http://jabber.org/protocol/compress"					# XEP-0138
-NS_ROSTERX						= "http://jabber.org/protocol/rosterx"					# XEP-0144
-NS_RECEIPTS						= "urn:xmpp:receipts"									# XEP-0184
-NS_PING							= "urn:xmpp:ping"										# XEP-0199
-NS_ENTITY_TIME					= "urn:xmpp:time"										# XEP-0202
-NS_ATTENTION					= "urn:xmpp:attention:0"								# XEP-0224
-NS_JINGLE						= "urn:xmpp:jingle:1"									# XEP-0224
-NS_BIND							= "urn:ietf:params:xml:ns:xmpp-bind"					# RFC 3920
-NS_SASL							= "urn:ietf:params:xml:ns:xmpp-sasl"					# RFC 3920
-NS_STANZAS						= "urn:ietf:params:xml:ns:xmpp-stanzas"					# RFC 3920
-NS_STREAMS						= "http://etherx.jabber.org/streams"					# RFC 3920
-NS_TLS							= "urn:ietf:params:xml:ns:xmpp-tls"						# RFC 3920
-NS_XMPP_STREAMS					= "urn:ietf:params:xml:ns:xmpp-streams"					# RFC 3920
-NS_CLIENT						= "jabber:client"										# RFC 3921
-NS_ROSTER						= "jabber:iq:roster"									# RFC 3921
-NS_SESSION						= "urn:ietf:params:xml:ns:xmpp-session"					# RFC 3921
-NS_IQ							= "iq"													# Jabberd2
-NS_MESSAGE						= "message"												# Jabberd2
-NS_PRESENCE						= "presence"											# Jabberd2
-NS_STATS						= "http://jabber.org/protocol/stats"					# ??? ????
+NS_DATA							= "jabber:x:data"								#XEP-0004
+NS_RPC							= "jabber:iq:rpc"								#XEP-0009
+NS_LAST							= "jabber:iq:last"								#XEP-0012
+NS_OFFLINE						= "http://jabber.org/protocol/offline"			#XEP-0013
+NS_PRIVACY						= "jabber:iq:privacy"							#XEP-0016
+NS_FEATURE						= "http://jabber.org/protocol/feature-neg"		#XEP-0020
+NS_EVENT						= "jabber:x:event"								#XEP-0022 (obsolete)
+NS_ENCRYPTED					= "jabber:x:encrypted"							#XEP-0027
+NS_DISCO						= "http://jabber.org/protocol/disco"			#XEP-0030
+NS_DISCO_INFO				 	= "http://jabber.org/protocol/disco#info"		#XEP-0030
+NS_DISCO_ITEMS					= "http://jabber.org/protocol/disco#items"		#XEP-0030
+NS_ADDRESS		  				= "http://jabber.org/protocol/address"			#XEP-0033
+NS_MUC							= "http://jabber.org/protocol/muc"				#XEP-0045
+NS_MUC_ADMIN					= "http://jabber.org/protocol/muc#admin"		#XEP-0045
+NS_MUC_USER						= "http://jabber.org/protocol/muc#user"			#XEP-0045
+NS_IBB							= "http://jabber.org/protocol/ibb"				#XEP-0047
+NS_PRIVATE						= "jabber:iq:private"							#XEP-0049
+NS_COMMANDS						= "http://jabber.org/protocol/commands"			#XEP-0050
+NS_VCARD						= "vcard-temp"									#XEP-0054
+NS_RSM							= "http://jabber.org/protocol/rsm"				#XEP-0059
+NS_PUBSUB						= "http://jabber.org/protocol/pubsub"			#XEP-0060
+NS_BYTESTREAM					= "http://jabber.org/protocol/bytestreams"		#XEP-0065
+NS_OOB							= "jabber:x:oob"								#XEP-0065
+NS_XHTML_IM						= "http://jabber.org/protocol/xhtml-im"			#XEP-0071
+NS_EVIL							= "http://jabber.org/protocol/evil"				#XEP-0076
+NS_AUTH							= "jabber:iq:auth"								#XEP-0078
+NS_AMP			  				= "http://jabber.org/protocol/amp"				#XEP-0079
+NS_GEOLOC						= "http://jabber.org/protocol/geoloc"			#XEP-0080
+NS_AVATAR						= "urn:xmpp:avatar"								#XEP-0084
+NS_CHATSTATES					= "http://jabber.org/protocol/chatstates"		#XEP-0085
+NS_TIME							= "jabber:iq:time"								#XEP-0090 (deprecated)
+NS_DELAY						= "jabber:x:delay"								#XEP-0091 (deprecated)
+NS_VERSION						= "jabber:iq:version"							#XEP-0092
+NS_SI							= "http://jabber.org/protocol/si"				#XEP-0096
+NS_MOOD							= "http://jabber.org/protocol/mood"				#XEP-0107
+NS_ACTIVITY		 				= "http://jabber.org/protocol/activity"			#XEP-0108
+NS_PHYSLOC						= "http://jabber.org/protocol/physloc"			#XEP-0112
+NS_COMPONENT_ACCEPT				= "jabber:component:accept"						#XEP-0114
+NS_CAPS							= "http://jabber.org/protocol/caps"				#XEP-0115
+NS_TUNE							= "http://jabber.org/protocol/tune"				#XEP-0118
+NS_WAITINGLIST					= "http://jabber.org/protocol/waitinglist"		#XEP-0130
+NS_SHIM							= "http://jabber.org/protocol/shim"				#XEP-0131
+NS_COMPRESS						= "http://jabber.org/protocol/compress"			#XEP-0138
+NS_ROSTERX						= "http://jabber.org/protocol/rosterx"			#XEP-0144
+NS_RECEIPTS						= "urn:xmpp:receipts"							#XEP-0184
+NS_PING							= "urn:xmpp:ping"								#XEP-0199
+NS_ENTITY_TIME					= "urn:xmpp:time"								#XEP-0202
+NS_ATTENTION					= "urn:xmpp:attention:0"						#XEP-0224
+NS_JINGLE						= "urn:xmpp:jingle:1"							#XEP-0224
+NS_BIND							= "urn:ietf:params:xml:ns:xmpp-bind"			#RFC 3920
+NS_SASL							= "urn:ietf:params:xml:ns:xmpp-sasl"			#RFC 3920
+NS_STANZAS						= "urn:ietf:params:xml:ns:xmpp-stanzas"			#RFC 3920
+NS_STREAMS						= "http://etherx.jabber.org/streams"			#RFC 3920
+NS_TLS							= "urn:ietf:params:xml:ns:xmpp-tls"				#RFC 3920
+NS_XMPP_STREAMS					= "urn:ietf:params:xml:ns:xmpp-streams"			#RFC 3920
+NS_CLIENT						= "jabber:client"								#RFC 3921
+NS_ROSTER						= "jabber:iq:roster"							#RFC 3921
+NS_SESSION						= "urn:ietf:params:xml:ns:xmpp-session"			#RFC 3921
+NS_IQ							= "iq"											#Jabberd2
+NS_MESSAGE						= "message"										#Jabberd2
+NS_PRESENCE						= "presence"									#Jabberd2
+NS_STATS						= "http://jabber.org/protocol/stats"			#??? ????
 
 _errorCodes = {
-				"400": "bad-request",
-				"401": "not-authorized",
-				"402": "payment-required",
-				"403": "forbidden",
-				"404": "item-not-found",
-				"405": "not-allowed",
-				"406": "not-acceptable",
-				"407": "registration-required",
-				"409": "conflict",
-				"500": "resource-constraint",
-				"501": "feature-not-implemented",
-				"503": "service-unavailable",
-				"504": "remote-server-timeout",
+	"400": "bad-request",
+	"401": "not-authorized",
+	"402": "payment-required",
+	"403": "forbidden",
+	"404": "item-not-found",
+	"405": "not-allowed",
+	"406": "not-acceptable",
+	"407": "registration-required",
+	"409": "conflict",
+	"500": "resource-constraint",
+	"501": "feature-not-implemented",
+	"503": "service-unavailable",
+	"504": "remote-server-timeout",
 }
 
 TYPE_PRIVATE = "chat"
@@ -217,42 +217,42 @@ class XMLNotWellFormed(StreamError):
 	pass
 
 streamExceptions = {
-	'bad-format': BadFormat,
-	'bad-namespace-prefix': BadNamespacePrefix,
-	'conflict': Conflict,
-	'connection-timeout': ConnectionTimeout,
-	'host-gone': HostGone,
-	'host-unknown': HostUnknown,
-	'improper-addressing': ImproperAddressing,
-	'internal-server-error': InternalServerError,
-	'invalid-from': InvalidFrom,
-	'invalid-id': InvalidID,
-	'invalid-namespace': InvalidNamespace,
-	'invalid-xml': InvalidXML,
-	'not-authorized': NotAuthorized,
-	'policy-violation': PolicyViolation,
-	'remote-connection-failed': RemoteConnectionFailed,
-	'resource-constraint': ResourceConstraint,
-	'restricted-xml': RestrictedXML,
-	'see-other-host': SeeOtherHost,
-	'system-shutdown': SystemShutdown,
-	'undefined-condition': UndefinedCondition,
-	'unsupported-encoding': UnsupportedEncoding,
-	'unsupported-stanza-type': UnsupportedStanzaType,
-	'unsupported-version': UnsupportedVersion,
-	'xml-not-well-formed': XMLNotWellFormed
+	"bad-format": BadFormat,
+	"bad-namespace-prefix": BadNamespacePrefix,
+	"conflict": Conflict,
+	"connection-timeout": ConnectionTimeout,
+	"host-gone": HostGone,
+	"host-unknown": HostUnknown,
+	"improper-addressing": ImproperAddressing,
+	"internal-server-error": InternalServerError,
+	"invalid-from": InvalidFrom,
+	"invalid-id": InvalidID,
+	"invalid-namespace": InvalidNamespace,
+	"invalid-xml": InvalidXML,
+	"not-authorized": NotAuthorized,
+	"policy-violation": PolicyViolation,
+	"remote-connection-failed": RemoteConnectionFailed,
+	"resource-constraint": ResourceConstraint,
+	"restricted-xml": RestrictedXML,
+	"see-other-host": SeeOtherHost,
+	"system-shutdown": SystemShutdown,
+	"undefined-condition": UndefinedCondition,
+	"unsupported-encoding": UnsupportedEncoding,
+	"unsupported-stanza-type": UnsupportedStanzaType,
+	"unsupported-version": UnsupportedVersion,
+	"xml-not-well-formed": XMLNotWellFormed
 }
 
 class UserJid:
 	""" UserJid object. UserJid can be built from string, modified, compared, serialised into string. """
-	def __init__(self, jid=None, node='', domain='', resource=''):
+	def __init__(self, jid=None, node="", domain="", resource=""):
 		""" Constructor. UserJid can be specified as string (jid argument) or as separate parts.
 			Examples:
-			UserJid('node@domain/resource')
-			UserJid(node='node', domain='domain.org')
+			UserJid("node@domain/resource")
+			UserJid(node="node", domain="domain.org")
 		"""
 		if not jid and not domain:
-			raise ValueError('UserJid must contain at least domain name')
+			raise ValueError("UserJid must contain at least domain name")
 		elif isinstance(jid, UserJid):
 			self.node = jid.node
 			self.domain = jid.domain
@@ -260,14 +260,14 @@ class UserJid:
 		elif domain:
 			self.node,self.domain,self.resource=node,domain,resource
 		else:
-			if jid.count('@'):
-				self.node, jid = jid.split('@', 1)
+			if jid.count("@"):
+				self.node, jid = jid.split("@", 1)
 			else:
-				self.node = ''
-			if jid.count('/'):
-				self.domain, self.resource = jid.split('/', 1)
+				self.node = ""
+			if jid.count("/"):
+				self.domain, self.resource = jid.split("/", 1)
 			else:
-				self.domain, self.resource = jid, ''
+				self.domain, self.resource = jid, ""
 
 	def getNode(self):
 		""" Return the node part of the UserJid """
@@ -281,7 +281,7 @@ class UserJid:
 		""" Return the domain part of the UserJid """
 		return self.domain
 
-	def setDomain(self,domain):
+	def setDomain(self, domain):
 		""" Set the domain part of the UserJid to new value."""
 		self.domain = domain.lower()
 
@@ -289,38 +289,22 @@ class UserJid:
 		""" Return the resource part of the UserJid """
 		return self.resource
 
-	def setResource(self,resource):
+	def setResource(self, resource):
 		""" Set the resource part of the UserJid to new value. Specify None to remove the resource part."""
 		self.resource = resource
 
-	def getStripped(self):
+	def getBareJid(self):
 		""" Return the bare representation of UserJid. I.e. string value w/o resource. """
 		return self.__str__(0)
-
-	def __eq__(self, other):
-		""" Compare the UserJid to another instance or to string for equality. """
-		try:
-			other = UserJid(other)
-		except ValueError:
-			return False
-		return self.__str__() == other.__str__()
-
-	def __ne__(self, other):
-		""" Compare the UserJid to another instance or to string for non-equality. """
-		return not self.__eq__(other)
-
-	def bareMatch(self, other):
-		""" Compare the node and domain parts of the UserJid's for equality. """
-		return self.__str__(False) == UserJid(other).__str__(False)
 
 	def __str__(self, showResource=True):
 		""" Serialise UserJid into string. """
 		if self.node:
-			jid = self.node+'@'+self.domain
+			jid = "%s@%s" % (self.node, self.domain)
 		else:
 			jid = self.domain
 		if showResource and self.resource:
-			return jid + '/' + self.resource
+			return "%s/%s" % (jid, self.resource)
 		return jid
 
 	def __hash__(self):
@@ -330,8 +314,8 @@ class UserJid:
 class Stanza(Node):
 	""" A "stanza" object class. Contains methods that are common for presences, iqs and messages. """
 	def __init__(self, name=None, to=None, typ=None, frm=None, attrs=None, payload=None, timestamp=None, xmlns=None, node=None):
-		""" Constructor, name is the name of the stanza i.e. 'message' or 'presence' or 'iq'.
-			to is the value of 'to' attribure, 'typ' - 'type' attribute
+		""" Constructor, name is the name of the stanza i.e. "message" or "presence" or "iq".
+			to is the value of "to" attribure, "typ" - "type" attribute
 			frn - from attribure, attrs - other attributes mapping, payload - same meaning as for simplexml payload definition
 			timestamp - the time value that needs to be stamped over stanza
 			xmlns - namespace of top stanza node
@@ -340,109 +324,97 @@ class Stanza(Node):
 		if attrs is None:
 			attrs = {}
 		if to:
-			attrs['to'] = to
+			attrs["to"] = to
 		if frm:
-			attrs['from'] = frm
+			attrs["from"] = frm
 		if typ:
-			attrs['type'] = typ
+			attrs["type"] = typ
 		Node.__init__(self, tag=name, attrs=attrs, payload=payload, node=node)
 		if not node and xmlns:
 			self.setNamespace(xmlns)
-		if self['to']:
-			self.setTo(self['to'])
-		if self['from']:
-			self.setFrom(self['from'])
+		if self["to"]:
+			self.setTo(self["to"])
+		if self["from"]:
+			self.setFrom(self["from"])
 		self.timestamp = None
-		for x in self.getTags('x',namespace=NS_DELAY):
+		for x in self.getTags("x", namespace=NS_DELAY):
 			try:
-				if not self.getTimestamp() or x.getAttr('stamp') < self.getTimestamp():
-					self.setTimestamp(x.getAttr('stamp'))
+				if not self.getTimestamp() or x.getAttr("stamp") < self.getTimestamp():
+					self.setTimestamp(x.getAttr("stamp"))
 			except:
 				pass
 		if timestamp is not None:
-			self.setTimestamp(timestamp)  # To auto-timestamp stanza just pass timestamp=''
+			self.setTimestamp(timestamp)
 
-	def getTo(self):
-		""" Return value of the 'to' attribute. """
-		try: return self['to']
-		except: return None
-	
+	def setFrom(self,val):
+		""" Set the value of the "from" attribute. """
+		self.setAttr("from", UserJid(val))
+
 	def getFrom(self):
-		""" Return value of the 'from' attribute. """
+		""" Return value of the "from" attribute. """
 		try:
-			return self['from']
+			return self["from"]
 		except:
 			return None
-	
-	def getTimestamp(self):
-		""" Return the timestamp in the 'yyyymmddThhmmss' format. """
-		return self.timestamp
-	
-	def getID(self):
-		""" Return the value of the 'id' attribute. """
-		return self.getAttr('id')
-	
+
+	def getTo(self):
+		""" Return value of the "to" attribute. """
+		try: 
+			return self["to"]
+		except:
+			return None
+
 	def setTo(self,val):
-		""" Set the value of the 'to' attribute. """
-		self.setAttr('to', UserJid(val))
-	
+		""" Set the value of the "to" attribute. """
+		self.setAttr("to", UserJid(val))
+
+	def getID(self):
+		""" Return the value of the "id" attribute. """
+		return self.getAttr("id")
+
+	def setID(self,val):
+		""" Set the value of the "id" attribute. """
+		self.setAttr("id", val)
+
+	def getTimestamp(self):
+		""" Return the timestamp in the "yyyymmddThhmmss" format. """
+		return self.timestamp
+
+	def setTimestamp(self, val=None):
+		"""Set the timestamp. timestamp should be the yyyymmddThhmmss string."""
+		if not val:
+			val = time.strftime("%Y%m%dT%H:%M:%S", time.gmtime())
+		self.timestamp = val
+		self.setTag("x", {"stamp": self.timestamp}, namespace=NS_DELAY)
+
 	def getType(self):
-		""" Return the value of the 'type' attribute. """
-		return self.getAttr('type')
-	
-	def setFrom(self,val):
-		""" Set the value of the 'from' attribute. """
-		self.setAttr('from', UserJid(val))
+		""" Return the value of the "type" attribute. """
+		return self.getAttr("type")
 	
 	def setType(self,val):
-		""" Set the value of the 'type' attribute. """
-		self.setAttr('type', val)
-	
-	def setID(self,val):
-		""" Set the value of the 'id' attribute. """
-		self.setAttr('id', val)
-	
-	def getError(self):
-		""" Return the error-condition (if present) or the textual description of the error (otherwise). """
-		errtag=self.getTag('error')
-		if errtag:
-			for tag in errtag.getChildren():
-				if tag.getName() != 'text':
-					return tag.getName()
-			return errtag.getData()
+		""" Set the value of the "type" attribute. """
+		self.setAttr("type", val)
 
 	def getErrorCode(self):
 		""" Return the error code. Obsolette. """
-		return self.getTagAttr('error','code')
-	
-	def setTimestamp(self,val=None):
-		"""Set the timestamp. timestamp should be the yyyymmddThhmmss string."""
-		if not val:
-			val = time.strftime('%Y%m%dT%H:%M:%S', time.gmtime())
-		self.timestamp = val
-		self.setTag('x', {'stamp': self.timestamp}, namespace=NS_DELAY)
+		return self.getTagAttr("error", "code")
 	
 	def getProperties(self):
 		""" Return the list of namespaces to which belongs the direct childs of element"""
-		props=[]
+		props = []
 		for child in self.getChildren():
-			prop=child.getNamespace()
-			if prop not in props: props.append(prop)
+			prop = child.getNamespace()
+			if prop not in props:
+				props.append(prop)
 		return props
-	
-	def __setitem__(self,item,val):
-		""" Set the item 'item' to the value 'val'."""
-		if item in ['to','from']:
-			val = UserJid(val)
-		return self.setAttr(item,val)
 
 class Message(Stanza):
 	""" XMPP Message stanza - "push" mechanism."""
 	def __init__(self, to=None, body=None, typ=None, subject=None, attrs=None, frm=None, payload=None, timestamp=None, xmlns=None, node=None):
 		""" Create message object. You can specify recipient, text of message, type of message
 			any additional attributes, sender of the message, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
-			Alternatively you can pass in the other XML object as the 'node' parameted to replicate it as message. """
-		Stanza.__init__(self, 'message', to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
+			Alternatively you can pass in the other XML object as the "node" parameted to replicate it as message. """
+		Stanza.__init__(self, "message", to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
 		if body:
 			self.setBody(body)
 		if subject:
@@ -450,29 +422,29 @@ class Message(Stanza):
 	
 	def getBody(self):
 		""" Returns text of the message. """
-		return self.getTagData('body')
-	
+		return self.getTagData("body")
+
+	def setBody(self, body):
+		""" Sets the text of the message. """
+		self.setTagData("body", body)
+
 	def getSubject(self):
 		""" Returns subject of the message. """
-		return self.getTagData('subject')
-	
+		return self.getTagData("subject")
+
+	def setSubject(self, subject):
+		""" Sets the subject of the message. """
+		self.setTagData("subject", subject)
+
 	def getThread(self):
 		""" Returns thread of the message. """
-		return self.getTagData('thread')
-	
-	def setBody(self,val):
-		""" Sets the text of the message. """
-		self.setTagData('body',val)
-	
-	def setSubject(self,val):
-		""" Sets the subject of the message. """
-		self.setTagData('subject',val)
-	
-	def setThread(self,val):
+		return self.getTagData("thread")
+
+	def setThread(self, thr):
 		""" Sets the thread of the message. """
-		self.setTagData('thread',val)
+		self.setTagData("thread", thr)
 	
-	def buildReply(self,text=None):
+	def buildReply(self, body=None):
 		""" Builds and returns another message object with specified text.
 			The to, from and thread properties of new message are pre-set as reply to this message. """
 		msg = Message(to=self.getFrom(), frm=self.getTo(), body=text)
@@ -486,8 +458,8 @@ class Presence(Stanza):
 	def __init__(self, to=None, typ=None, priority=None, show=None, status=None, attrs=None, frm=None, timestamp=None, payload=None, xmlns=None, node=None):
 		""" Create presence object. You can specify recipient, type of message, priority, show and status values
 			any additional attributes, sender of the presence, timestamp, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
-			Alternatively you can pass in the other XML object as the 'node' parameted to replicate it as presence. """
-		Stanza.__init__(self, 'presence', to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
+			Alternatively you can pass in the other XML object as the "node" parameted to replicate it as presence. """
+		Stanza.__init__(self, "presence", to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
 		if priority:
 			self.setPriority(priority)
 		if show:
@@ -497,101 +469,102 @@ class Presence(Stanza):
 	
 	def getPriority(self):
 		""" Returns the priority of the message. """
-		return self.getTagData('priority')
-	
+		return self.getTagData("priority")
+
+	def setPriority(self, priority):
+		""" Sets the priority of the presence. """
+		self.setTagData("priority", priority)
+
 	def getShow(self):
 		""" Returns the show value of the message. """
-		return self.getTagData('show')
+		return self.getTagData("show")
+
+	def setShow(self, show):
+		""" Sets the show value of the message. """
+		self.setTagData("show", show)
+
 	def getStatus(self):
 		""" Returns the status string of the message. """
-		return self.getTagData('status')
-	
-	def setPriority(self,val):
-		""" Sets the priority of the message. """
-		self.setTagData('priority',val)
-	
-	def setShow(self,val):
-		""" Sets the show value of the message. """
-		self.setTagData('show',val)
-	
-	def setStatus(self,val):
+		return self.getTagData("status")
+
+	def setStatus(self, status):
 		""" Sets the status string of the message. """
-		self.setTagData('status',val)
+		self.setTagData("status", status)
 
 	def _muc_getItemAttr(self, tag, attr):
-		for xtag in self.getTags('x', {}, NS_MUC_USER):
+		for xtag in self.getTags("x", {}, NS_MUC_USER):
 			for child in xtag.getTags(tag):
 				return child.getAttr(attr)
 
 	def _muc_getSubTagDataAttr(self, tag, attr):
-		for xtag in self.getTags('x', {}, NS_MUC_USER):
-			for child in xtag.getTags('item'):
+		for xtag in self.getTags("x", {}, NS_MUC_USER):
+			for child in xtag.getTags("item"):
 				for cchild in child.getTags(tag):
 					return cchild.getData(), cchild.getAttr(attr)
 		return None, None
 	
 	def getRole(self):
 		"""Returns the presence role (for groupchat)"""
-		return self._muc_getItemAttr('item', 'role')
+		return self._muc_getItemAttr("item", "role")
 	
 	def getAffiliation(self):
 		"""Returns the presence affiliation (for groupchat)"""
-		return self._muc_getItemAttr('item', 'affiliation')
+		return self._muc_getItemAttr("item", "affiliation")
 	
 	def getNick(self):
 		"""Returns the nick value (for nick change in groupchat)"""
-		return self._muc_getItemAttr('item', 'nick')
+		return self._muc_getItemAttr("item", "nick")
 	
 	def getJid(self):
 		"""Returns the presence jid (for groupchat)"""
-		return self._muc_getItemAttr('item', 'jid')
+		return self._muc_getItemAttr("item", "jid")
 	
 	def getReason(self):
 		"""Returns the reason of the presence (for groupchat)"""
-		return self._muc_getSubTagDataAttr('reason', '')[0]
+		return self._muc_getSubTagDataAttr("reason", "")[0]
 	
 	def getStatusCode(self):
 		"""Returns the status code of the presence (for groupchat)"""
-		return self._muc_getItemAttr('status', 'code')
+		return self._muc_getItemAttr("status", "code")
 
 class Iq(Stanza): 
 	""" XMPP Iq object - get/set dialog mechanism. """
 	def __init__(self, typ=None, queryNS=None, attrs=None, to=None, frm=None, payload=None, xmlns=None, node=None):
 		""" Create Iq object. You can specify type, query namespace
 			any additional attributes, recipient of the iq, sender of the iq, any additional payload (f.e. jabber:x:data node) and namespace in one go.
-			Alternatively you can pass in the other XML object as the 'node' parameted to replicate it as an iq
+			Alternatively you can pass in the other XML object as the "node" parameted to replicate it as an iq
 		"""
-		Stanza.__init__(self, 'iq', to=to, typ=typ, attrs=attrs, frm=frm, xmlns=xmlns, node=node)
+		Stanza.__init__(self, "iq", to=to, typ=typ, attrs=attrs, frm=frm, xmlns=xmlns, node=node)
 		if payload:
 			self.setQueryPayload(payload)
 		if queryNS:
 			self.setQueryNS(queryNS)
 
 	def getQueryNS(self):
-		""" Return the namespace of the 'query' child element """
-		tag=self.getTag('query')
+		""" Return the namespace of the "query" child element """
+		tag=self.getTag("query")
 		if tag:
 			return tag.getNamespace()
 
 	def setQueryNS(self, namespace):
-		""" Set the namespace of the 'query' child element """
-		self.setTag('query').setNamespace(namespace)
+		""" Set the namespace of the "query" child element """
+		self.setTag("query").setNamespace(namespace)
 
 	def getQueryChildren(self):
-		""" Return the 'query' child element child nodes """
-		tag = self.getTag('query')
+		""" Return the "query" child element child nodes """
+		tag = self.getTag("query")
 		if tag:
 			return tag.getChildren()
 
 	def setQueryPayload(self, payload):
-		""" Set the 'query' child element payload """
-		self.setTag('query').setPayload(payload)
+		""" Set the "query" child element payload """
+		self.setTag("query").setPayload(payload)
 
 	def buildReply(self, typ):
 		""" Builds and returns another Iq object of specified type.
 			The to, from and query child node of new Iq are pre-set as reply to this Iq
 		"""
-		iq = Iq(typ, to=self.getFrom(), frm=self.getTo(), attrs={'id': self.getID()})
-		if self.getTag('query'):
+		iq = Iq(typ, to=self.getFrom(), frm=self.getTo(), attrs={"id": self.getID()})
+		if self.getTag("query"):
 			iq.setQueryNS(self.getQueryNS())
 		return iq

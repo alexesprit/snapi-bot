@@ -35,7 +35,6 @@ import chardet
 import database
 import macros
 import simplejson
-import xmpp
 
 from xmpp import client, debug, protocol, simplexml
 from utils import utils
@@ -101,11 +100,9 @@ FORBIDDEN_TYPES = (
 	protocol.TYPE_HEADLINE
 )
 
-IDLE_TIMEOUT = 600
-JOIN_TIMEOUT = 5
-REJOIN_TIMEOUT = 120
-RETRY_TIMEOUT = 15
-RECONNECT_DELAY = 5
+REJOIN_DELAY = 120
+RECONNECT_DELAY = 15
+RESTART_DELAY = 5
 
 CMD_DESC = 0x1
 CMD_ACCESS = 0x2
@@ -121,7 +118,7 @@ execfile(BOTCONFIG_FILE) in globals()
 gUserName, gServer = gJid.split("@")
 gClient = client.Client(server=gServer, port=gPort, debugFlags=gXMPPDebug)
 gRoster = None
-gDebug = debug.Debug(gCoreDebug, validateFlags=False, showFlags=False, prefix="", welcomeMsg=False)
+gDebug = debug.Debug(gCoreDebug, showFlags=False)
 gTagPtrn = re.compile(r"<(.*?)>")
 gJidPtrn = re.compile(r"(\w+)@(\w+)\.(\w+)", re.UNICODE)
 gSrvPtrn = re.compile(r"(\w+)\.(\w+)", re.UNICODE)
@@ -255,15 +252,12 @@ def execute(function, param=None):
 	except(Exception):
 		saveException(function.__name__)
 
-def getUsedMemory():
-	if(os.name == "posix"):
-		try:
-			pr = os.popen("ps -o rss -p %s" % os.getpid())
-			pr.readline()
-			return(float(pr.readline().strip()) / 1024)
-		except(ValueError):
-			pass
-	return(0)
+def getUsedMemorySize():
+	if os.name == "posix":
+		pipe = os.popen("ps -o rss -p %s" % os.getpid())
+		pipe.readline()
+		return float(pipe.readline().strip()) / 1024
+	return 0
 
 def printf(text, flag = FLAG_INFO):
 	gDebug.show(text, flag, flag)
@@ -549,7 +543,7 @@ def messageHandler(session, stanza):
 	if(stanza.timestamp or msgType in FORBIDDEN_TYPES):
 		return
 	fullJid = stanza.getFrom()
-	conference = fullJid.getStripped()
+	conference = fullJid.getBareJid()
 	isConference = conferenceInList(conference)
 	if(protocol.TYPE_PUBLIC == msgType and not isConference):
 		return
@@ -631,13 +625,13 @@ def messageHandler(session, stanza):
 def presenceHandler(session, stanza):
 	fullJid = stanza.getFrom()
 	prsType =  stanza.getType()
-	jid = fullJid.getStripped()
+	jid = fullJid.getBareJid()
 	if(conferenceInList(jid)):
 		conference = jid
 		trueJid = stanza.getJid()
 		nick = fullJid.getResource()
 		if(trueJid):
-			trueJid = protocol.UserJid(trueJid).getStripped()
+			trueJid = protocol.UserJid(trueJid).getBareJid()
 		if(not prsType):
 			if(not trueJid):
 				leaveConference(conference, u"Без прав модератора работа невозможна!")
@@ -683,7 +677,7 @@ def presenceHandler(session, stanza):
 			elif(errorCode == "503"):
 				botNick = getBotNick(conference)
 				password = getConfigKey(conference, "password")
-				startTimer(REJOIN_TIMEOUT, conference, (conference, botNick, password, ))
+				startTimer(REJOIN_DELAY, conference, (conference, botNick, password, ))
 			elif(errorCode in ("401", "403", "405")):
 				leaveConference(conference, u"got %s error code" % errorCode)
 		callPresenceHandlers(stanza, CHAT, conference, nick, trueJid)
@@ -693,7 +687,7 @@ def presenceHandler(session, stanza):
 
 def iqHandler(session, stanza):
 	fullJid = stanza.getFrom()
-	bareJid = fullJid.getStripped()
+	bareJid = fullJid.getBareJid()
 	trueJid = getTrueJid(fullJid)
 	if(getAccess(bareJid, trueJid) == -100):
 		return
@@ -740,7 +734,7 @@ def shutdown(restart=False):
 	callEventHandlers(SHUTDOWN)
 	if(restart):
 		printf("Restarting...")
-		time.sleep(RECONNECT_DELAY)
+		time.sleep(RESTART_DELAY)
 		if(os.path.exists(PID_FILE)):
 			os.remove(PID_FILE)
 		os.execl(sys.executable, sys.executable, sys.argv[0])
@@ -753,13 +747,13 @@ def start():
 	loadPlugins()
 
 	printf("Connecting...")
-	if(gClient.connect(server=(gHost, gPort), SSLMode=gSSLMode, useResolver=gUseResolver)):
+	if(gClient.connect(server=(gHost, gPort), SecureMode=gSecureMode, useResolver=gUseResolver)):
 		printf("Connection established (%s)" % gClient.isConnected(), FLAG_SUCCESS)
 	else:
 		printf("Unable to connect", FLAG_ERROR)
 		if(gRestart):
-			printf("Sleeping for %d seconds..." % RETRY_TIMEOUT)
-			time.sleep(RETRY_TIMEOUT)
+			printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
+			time.sleep(RECONNECT_DELAY)
 			shutdown(True)
 		else:
 			shutdown()
@@ -794,7 +788,7 @@ def start():
 	callEventHandlers(INIT_2)
 	
 	printf("Now I am ready to work :)")
-	while(1):
+	while(True):
 		gClient.process(10)
 
 if(__name__ == "__main__"):

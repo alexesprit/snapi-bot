@@ -8,10 +8,10 @@ gPassword = "secret"
 gHost = "server.tld"
 gPort = 5222
 
-# client.SSL_DISABLE - отключить SSL
-# client.SSL_AUTO - автоопределение (SSL, если порт 443, 5223, иначе TLS)
-# client.SSL_FORCE - форсировать (нестандартный порт)
-gSSLMode = client.SSL_DISABLE
+# client.SECURE_DISABLE - отключить SSL/TLS
+# client.SECURE_AUTO - автоопределение (SSL, если порт 443, 5223, иначе TLS)
+# client.SECURE_FORCE - форсировать (нестандартный порт)
+gSecureMode = client.SECURE_AUTO
 gUseResolver = False
 
 # ресурс и приоритет

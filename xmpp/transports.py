@@ -113,7 +113,7 @@ class TCPSocket(PlugIn):
 			self._sock.connect((server[0], int(server[1])))
 			self._send = self._sock.sendall
 			self._recv = self._sock.recv
-			self.printf("Successfully connected to remote host %s:%s" % (server[0], server[1]), 'start')
+			self.printf("Successfully connected to remote host %s:%s" % (server[0], server[1]), "ok")
 			return 'ok'
 		except socket.error, (errno, strerror): 
 			self.printf("Failed to connect to remote host %s: %s (%s)" % (server[0], strerror, errno), 'error')

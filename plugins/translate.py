@@ -14,21 +14,49 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-LANGUAGES = {u"en": u"английский", u"ja": u"японский", u"ru": u"русский", u"auto": u"Определить язык", u"sq": u"албанский", 
-			u"en": u"английский", u"ar": u"арабский", u"af": u"африкаанс", u"be": u"белорусский", u"bg": u"болгарский", 
-			u"cy": u"валлийский", u"hu": u"венгерский", u"vi": u"вьетнамский", u"gl": u"галисийский", u"nl": u"голландский", 
-			u"el": u"греческий", u"da": u"датский", u"iw": u"иврит", u"yi": u"идиш", u"id": u"индонезийский", u"ga": u"ирландский", 
-			u"is": u"исландский", u"es": u"испанский", u"it": u"итальянский", u"ca": u"каталанский", u"zh-CN": u"китайский", 
-			u"ko": u"корейский", u"lv": u"латышский", u"lt": u"литовский", u"mk": u"македонский", u"ms": u"малайский", 
-			u"mt": u"мальтийский", u"de": u"немецкий", u"no": u"норвежский", u"fa": u"персидский", u"pl": u"польский", 
-			u"pt": u"португальский", u"ro": u"румынский", u"ru": u"русский", u"sr": u"сербский", u"sk": u"словацкий", 
-			u"sl": u"словенский", u"sw": u"суахили", u"tl": u"тагальский", u"th": u"тайский", u"tr": u"турецкий", u"uk": u"украинский", 
-			u"fi": u"финский", u"fr": u"французский", u"hi": u"хинди", u"hr": u"хорватский", u"cs": u"чешский", u"sv": u"шведский", 
-			u"et": u"эстонский"}
+LANGUAGES = {
+	u"en": u"английский", u"ja": u"японский", u"ru": u"русский", u"auto": u"Определить язык", u"sq": u"албанский", 
+	u"en": u"английский", u"ar": u"арабский", u"af": u"африкаанс", u"be": u"белорусский", u"bg": u"болгарский", 
+	u"cy": u"валлийский", u"hu": u"венгерский", u"vi": u"вьетнамский", u"gl": u"галисийский", u"nl": u"голландский", 
+	u"el": u"греческий", u"da": u"датский", u"iw": u"иврит", u"yi": u"идиш", u"id": u"индонезийский", u"ga": u"ирландский", 
+	u"is": u"исландский", u"es": u"испанский", u"it": u"итальянский", u"ca": u"каталанский", u"zh-CN": u"китайский", 
+	u"ko": u"корейский", u"lv": u"латышский", u"lt": u"литовский", u"mk": u"македонский", u"ms": u"малайский", 
+	u"mt": u"мальтийский", u"de": u"немецкий", u"no": u"норвежский", u"fa": u"персидский", u"pl": u"польский", 
+	u"pt": u"португальский", u"ro": u"румынский", u"ru": u"русский", u"sr": u"сербский", u"sk": u"словацкий", 
+	u"sl": u"словенский", u"sw": u"суахили", u"tl": u"тагальский", u"th": u"тайский", u"tr": u"турецкий", u"uk": u"украинский", 
+	u"fi": u"финский", u"fr": u"французский", u"hi": u"хинди", u"hr": u"хорватский", u"cs": u"чешский", u"sv": u"шведский", 
+	u"et": u"эстонский"
+}
+
+def getTranslateQuery(text):
+	param = {
+		"v": "1.0", 
+		"q": text.encode("utf-8")
+	}
+	query = urllib.urlencode(param)
+	return query
+
+def getTranslatedText(text, src, target):
+	query = getTranslateQuery(text)
+	url = "http://ajax.googleapis.com/ajax/services/language/translate?%s&langpair=%s|%s" % (query, src, target)
+	request = urllib.urlopen(url)
+	answer = simplejson.load(request)
+	if answer["responseData"]:
+		return answer["responseData"]["translatedText"]
+	return None
+
+def detectLanguage(text):
+	query = getTranslateQuery(text)
+	url = "http://ajax.googleapis.com/ajax/services/language/detect?%s" % (query)
+	request = urllib.urlopen(url)
+	answer = simplejson.load(request)
+	if answer["responseData"]:
+		return answer["responseData"]["language"]
+	return None
 
 def translateText(msgType, conference, nick, param):
 	if(param == u"языки"):
-		langs = [u"%s - %s" % (lang, name) \
+		langs = [u"%s - %s" % (lang, name)
 				for lang, name in LANGUAGES.items()]
 		langs.sort()
 		message = u"Доступные языки:\n%s" % ("\n".join(langs))
@@ -55,26 +83,6 @@ def translateText(msgType, conference, nick, param):
 					sendMsg(msgType, conference, nick, utils.unescapeHTML(text))
 				else:
 					sendMsg(msgType, conference, nick, u"не могу перевести")
-
-def getTranslatedText(text, src, target):
-	try:
-		query = urllib.urlencode({"q" : text.encode("utf-8")})
-		req = urllib.urlopen("http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&%s&langpair=%s%%7C%s" % (query, src, target))
-		answer = simplejson.load(req)
-		if(answer["responseData"]):
-			return(answer["responseData"]["translatedText"])
-	except(KeyError):
-		return(None)
-
-def detectLanguage(text):
-	try:
-		query = urllib.urlencode({"q" : text.encode("utf-8")})
-		req = urllib.urlopen("http://ajax.googleapis.com/ajax/services/language/detect?v=1.0&%s" % (query))
-		answer = simplejson.load(req)
-		if(answer["responseData"]):
-			return(answer["responseData"]["language"])
-	except(KeyError):
-		return(None)
 
 registerCommand(translateText, u"перевод", 10, 
 				u"Перевод текста с одного языка на другой. Указав \"языки\" в кач-ве параметра можно посмотреть доступные языки для перевода", 
