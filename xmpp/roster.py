@@ -19,10 +19,8 @@
 	mass-renaming of contacts.
 """
 
-from plugin import PlugIn
-from protocol import Iq, Node, Presence, UserJid
-from protocol import TYPE_GET, TYPE_SET, NS_ROSTER
-from protocol import PRS_SUBSCRIBE, PRS_SUBSCRIBED, PRS_UNSUBSCRIBE, PRS_UNSUBSCRIBED
+import plugin
+import protocol
 
 DBG_ROSTER = "roster"
 
@@ -30,7 +28,7 @@ ROSTER_EMPTY = 0x0
 ROSTER_REQUESTING = 0x1
 ROSTER_LOADED = 0x2
 
-class Roster(PlugIn):
+class Roster(plugin.PlugIn):
 	""" Defines a plenty of methods that will allow you to manage roster.
 		Also automatically track presences from remote jids taking into 
 		account that every jid can have multiple resources connected. Does not
@@ -40,7 +38,7 @@ class Roster(PlugIn):
 	"""
 	def __init__(self):
 		""" Init internal variables. """
-		PlugIn.__init__(self)
+		plugin.PlugIn.__init__(self)
 		self.debugFlag = DBG_ROSTER
 		self.rosterData = {}
 		self.state = ROSTER_EMPTY
@@ -51,7 +49,7 @@ class Roster(PlugIn):
 			Also request roster from server if the "request" argument is set.
 			Used internally.
 		"""
-		self._owner.registerHandler("iq", self.rosterIqHandler, namespace=NS_ROSTER)
+		self._owner.registerHandler("iq", self.rosterIqHandler, namespace=protocol.NS_ROSTER)
 		self._owner.registerHandler("presence", self.presenceHandler)
 
 	def requestRoster(self):
@@ -59,7 +57,7 @@ class Roster(PlugIn):
 			(or if the "force" argument is set).
 		"""
 		self.state = ROSTER_REQUESTING
-		self._owner.send(Iq(TYPE_GET, NS_ROSTER))
+		self._owner.send(protocol.Iq(protocol.TYPE_GET, protocol.NS_ROSTER))
 		self.printf("Roster requested from server", "start")
 
 	def getRoster(self):
@@ -114,12 +112,12 @@ class Roster(PlugIn):
 
 	def _getItemData(self, jid, field):
 		""" Return specific jid"s representation in internal format. Used internally. """
-		jid = UserJid(jid).getBareJid()
+		jid = protocol.UserJid(jid).getBareJid()
 		return self.rosterData[jid][field]
 
 	def _getResourceData(self, jid, field):
 		""" Return specific jid"s resource representation in internal format. Used internally. """
-		fullJid = UserJid(jid)
+		fullJid = protocol.UserJid(jid)
 		bareJid = fullJid.getBareJid()
 		resource = fullJid.getResource()
 		if resource:
@@ -143,15 +141,15 @@ class Roster(PlugIn):
 		return self._getItemData(jid, "name")
 
 	def getPriority(self, jid):
-		""" Returns priority of contact "jid". "jid" should be a full (not bare) UserJid."""
+		""" Returns priority of contact "jid". "jid" should be a full (not bare) jid."""
 		return self._getResourceData(jid, "priority")
 
 	def getShow(self, jid):
-		""" Returns "show" value of contact "jid". "jid" should be a full (not bare) UserJid. """
+		""" Returns "show" value of contact "jid". "jid" should be a full (not bare) jid. """
 		return(self._getResourceData(jid, "show"))
 
 	def getStatus(self, jid):
-		""" Returns "status" value of contact "jid". "jid" should be a full (not bare) UserJid. """
+		""" Returns "status" value of contact "jid". "jid" should be a full (not bare) jid. """
 		return(self._getResourceData(jid, "status"))
 
 	def getSubscription(self, jid):
@@ -160,7 +158,7 @@ class Roster(PlugIn):
 
 	def getResources(self, jid):
 		""" Returns list of connected resources of contact "jid"."""
-		fullJid = UserJid(jid)
+		fullJid = protocol.UserJid(jid)
 		bareJid = fullJid.getBareJid()
 		return self.rosterData[bareJid]["resources"].keys()
 
@@ -181,28 +179,35 @@ class Roster(PlugIn):
 		return self.rosterData.keys()
 
 	def getItem(self, item):
-		""" Get the contact in the internal format (or None if UserJid "item" is not in roster). """
+		""" Get the contact in the internal format (or None if jid "item" is not in roster). """
 		if item in self.rosterData:
 			return self.rosterData[item]
 
 	def delItem(self, jid):
 		""" Delete contact "jid" from roster. """
-		self._owner.send(Iq(TYPE_SET, NS_ROSTER, payload=[Node("item", {"jid": jid,"subscription": "remove"})]))
+		iq = protocol.Iq(protocol.TYPE_SET, protocol.NS_ROSTER)
+		itemNode = protocol.Node("item", {"jid": jid,"subscription": "remove"})
+		iq.addChild(node=itemNode)
+		self._owner.send(iq)
 		
 	def subscribe(self, jid):
-		""" Send subscription request to UserJid "jid". """
-		self._owner.send(Presence(jid, PRS_SUBSCRIBE))
+		""" Send subscription request to jid "jid". """
+		prs = protocol.Presence(jid, protocol.PRS_SUBSCRIBE)
+		self._owner.send(prs)
 
 	def unsubscribe(self, jid):
-		""" Ask for removing our subscription for UserJid "jid". """
-		self._owner.send(Presence(jid, PRS_UNSUBSCRIBE))
+		""" Ask for removing our subscription for jid "jid". """
+		prs = protocol.Presence(jid, protocol.PRS_UNSUBSCRIBE)
+		self._owner.send(prs)
 
 	def authorize(self, jid):
-		""" Authorise UserJid "jid". Works only if these UserJid requested auth previously. """
-		self._owner.send(Presence(jid, PRS_SUBSCRIBED))
+		""" Authorise jid "jid". Works only if these jid requested auth previously. """
+		prs = protocol.Presence(jid, protocol.PRS_SUBSCRIBED)
+		self._owner.send(prs)
 
 	def unauthorize(self, jid):
-		""" Unauthorise UserJid "jid". Use for declining authorisation request 
+		""" Unauthorise jid "jid". Use for declining authorisation request 
 			or for removing existing authorization.
 		"""
-		self._owner.send(Presence(jid, PRS_UNSUBSCRIBED))
+		prs = protocol.Presence(jid, protocol.PRS_UNSUBSCRIBED)
+		self._owner.send(prs)

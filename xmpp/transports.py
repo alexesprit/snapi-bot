@@ -37,9 +37,9 @@ if isPython26:
 	import ssl
 
 import dispatcher
+import plugin
+import protocol
 
-from plugin import PlugIn
-from protocol import NS_TLS
 from utils.utils import ustr
 
 BUFLEN = 1024
@@ -52,7 +52,7 @@ TLS_SUCCESS = 0x1
 TLS_FAILURE = 0x2
 TLS_UNSUPPORTED = 0x3
 
-class TCPSocket(PlugIn):
+class TCPSocket(plugin.PlugIn):
 	""" This class defines direct TCP connection method. """
 	def __init__(self, server=None, useResolver=True):
 		""" Cache connection point 'server'. 'server' is the tuple of (host,  port)
@@ -60,7 +60,7 @@ class TCPSocket(PlugIn):
 			('_xmpp-client._tcp.' + host) SRV record in DNS and connect to the found (if it is)
 			server instead
 		"""
-		PlugIn.__init__(self)
+		plugin.PlugIn.__init__(self)
 		self.debugFlag = DBG_SOCKET
 		self._exportedMethods = (self.send, self.disconnect)
 		self._server, self.useResolver = server, useResolver
@@ -252,7 +252,7 @@ class HTTPProxySocket(TCPSocket):
 		"""Overwrites printf tag to allow printf output be presented as "CONNECTproxy"."""
 		return self._owner.printf(DBG_CONNECT_PROXY, text, severity)
 
-class TLS(PlugIn):
+class TLS(plugin.PlugIn):
 	""" TLS connection used to encrypts already estabilished tcp connection."""
 	def PlugIn(self, owner, forceSSL=False):
 		""" If the 'startSSL' argument is true then starts using encryption immidiatedly.
@@ -263,7 +263,7 @@ class TLS(PlugIn):
 		if hasattr(owner, 'TLS'):
 			return
 		self.debugFlag = DBG_TLS
-		PlugIn.PlugIn(self, owner)
+		plugin.PlugIn.PlugIn(self, owner)
 		self.forceSSL = forceSSL
 		if forceSSL:
 			return self._startSSL()
@@ -273,21 +273,21 @@ class TLS(PlugIn):
 	def plugout(self):
 		""" Unregisters TLS handler's from owner's dispatcher. """
 		if not self.forceSSL:
-			self._owner.unregisterHandler("proceed", self.startTLSHandler, xmlns=NS_TLS)
-			self._owner.unregisterHandler("failure", self.startTLSHandler, xmlns=NS_TLS)
+			self._owner.unregisterHandler("proceed", self.startTLSHandler, xmlns=protocol.NS_TLS)
+			self._owner.unregisterHandler("failure", self.startTLSHandler, xmlns=protocol.NS_TLS)
 
 	def featuresHandler(self, conn, feats):
 		""" Used to analyse server <features/> tag for TLS support.
 			If TLS is supported starts the encryption negotiation. Used internally
 		"""
-		if not feats.getTag("starttls", namespace=NS_TLS):
+		if not feats.getTag("starttls", namespace=protocol.NS_TLS):
 			self.state = TLS_UNSUPPORTED
 			self.printf("TLS unsupported by remote server", 'warn')
 			return
 		self.printf("TLS supported by remote server. Requesting TLS start", 'ok')
-		self._owner.registerHandler("proceed", self.startTLSHandler, xmlns=NS_TLS)
-		self._owner.registerHandler("failure", self.startTLSHandler, xmlns=NS_TLS)
-		self._owner.Connection.send("<starttls xmlns=\"%s\"/>" % (NS_TLS))
+		self._owner.registerHandler("proceed", self.startTLSHandler, xmlns=protocol.NS_TLS)
+		self._owner.registerHandler("failure", self.startTLSHandler, xmlns=protocol.NS_TLS)
+		self._owner.Connection.send("<starttls xmlns=\"%s\"/>" % (protocol.NS_TLS))
 
 	def pending_data(self, timeout=0):
 		""" Returns true if there possible is a data ready to be read. """

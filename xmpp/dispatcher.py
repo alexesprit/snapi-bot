@@ -24,22 +24,20 @@
 import time
 import sys
 
+import plugin
+import protocol
 import simplexml
-
-from plugin import PlugIn
-from protocol import Node, Iq, Message, NodeProcessed, Presence, Stanza
-from protocol import NS_STREAMS, NS_XMPP_STREAMS
 
 DEFAULT_TIMEOUT = 25
 gID = 0
 
 DBG_DISPATCHER = "dispatcher"
 
-class Dispatcher(PlugIn):
+class Dispatcher(plugin.PlugIn):
 	""" Ancestor of PlugIn class. Handles XMPP stream, i.e. aware of stream headers.
 		Can be plugged out/in to restart these headers (used for SASL f.e.). """
 	def __init__(self):
-		PlugIn.__init__(self)
+		plugin.PlugIn.__init__(self)
 		self.debugFlag = DBG_DISPATCHER
 		self.handlers = {}
 		self._expected = {}
@@ -55,7 +53,7 @@ class Dispatcher(PlugIn):
 		]
 
 	def dumpHandlers(self):
-		""" Return set of user-registered callbacks in it's internal format.
+		""" Return set of user-registered callbacks in it"s internal format.
 			Used within the library to carry user handlers set over Dispatcher replugins. 
 		"""
 		return self.handlers
@@ -68,18 +66,18 @@ class Dispatcher(PlugIn):
 
 	def _init(self):
 		""" Registers default namespaces/protocols/handlers. Used internally.  """
-		self.registerNamespace(NS_STREAMS)
+		self.registerNamespace(protocol.NS_STREAMS)
 		self.registerNamespace(self._owner.defaultNamespace)
-		self.registerProtocol('iq', Iq)
-		self.registerProtocol('presence', Presence)
-		self.registerProtocol('message', Message)
-		self.registerHandler('error', self.streamErrorHandler, xmlns=NS_STREAMS)
+		self.registerStanza("iq", protocol.Iq)
+		self.registerStanza("presence", protocol.Presence)
+		self.registerStanza("message", protocol.Message)
+		self.registerHandler("error", self.streamErrorHandler, xmlns=protocol.NS_STREAMS)
 
 	def plugin(self, owner):
 		""" Plug the Dispatcher instance into Client class instance and send initial stream header. Used internally."""
 		self._init()
 		for method in self._oldMethods:
-			if method.__name__ == 'send':
+			if method.__name__ == "send":
 				self._owner_send = method
 				break
 		self.initStream()
@@ -97,22 +95,22 @@ class Dispatcher(PlugIn):
 		self.Stream.dispatch = self.dispatch
 		self.Stream.stream_header_received = self._checkStreamStart
 		self.Stream.features = None
-		metastream = Node('stream:stream')
+		metastream = protocol.Node("stream:stream")
 		metastream.setNamespace(self._owner.Namespace)
-		metastream.setAttr('version', '1.0')
-		metastream.setAttr('xmlns:stream', NS_STREAMS)
-		metastream.setAttr('to', self._owner.Server)
-		self._owner.send("<?xml version='1.0'?>%s>" % str(metastream)[:-2])
+		metastream.setAttr("version", "1.0")
+		metastream.setAttr("xmlns:stream", protocol.NS_STREAMS)
+		metastream.setAttr("to", self._owner.Server)
+		self._owner.send("<?xml version=\"1.0\"?>%s>" % str(metastream)[:-2])
 
 	def _checkStreamStart(self, ns, tag, attrs):
-		if ns != NS_STREAMS or tag != 'stream':
-			raise ValueError('Incorrect stream start: (%s, %s). Terminating.' % (tag, ns))
+		if ns != protocol.NS_STREAMS or tag != "stream":
+			raise ValueError("Incorrect stream start: (%s, %s). Terminating." % (tag, ns))
 
 	def process(self, timeout=0):
 		""" Check incoming stream for data waiting. If "timeout" is positive - block for as max. this time.
 			Returns:
 			1) length of processed data if some data were processed
-			2) '0' string if no data were processed but link is alive
+			2) "0" string if no data were processed but link is alive
 			3) 0 (zero) if underlying connection is closed.
 			Take note that in case of disconnection detect during process() call
 			disconnect handlers are called automatically.
@@ -126,78 +124,78 @@ class Dispatcher(PlugIn):
 			if data:
 				return len(data)
 		# It means that nothing is received but link is alive.
-		return '0'
+		return "0"
 		
 	def registerNamespace(self, xmlns, order="info"):
 		""" Creates internal structures for newly registered namespace.
 			You can register handlers for this namespace afterwards. By default one namespace
 			already registered (jabber:client or jabber:component:accept depending on context. 
 		"""
-		self.printf('Registering namespace "%s"' % (xmlns), order)
+		self.printf("Registering namespace %s" % (xmlns), order)
 		self.handlers[xmlns] = {}
-		self.registerProtocol("default", Stanza, xmlns=xmlns)
+		self.registerStanza("default", protocol.Stanza, xmlns=xmlns)
 
-	def registerProtocol(self, tagName, protocol, xmlns=None, order="info"):
+	def registerStanza(self, tagName, stanza, xmlns=None, order="info"):
 		""" Used to declare some top-level stanza name to dispatcher.
 		   Needed to start registering handlers for such stanzas.
-		   Iq, message and presence protocols are registered by default. 
+		   Iq, Message and Presence stanzas are registered by default. 
 		"""
 		if not xmlns:
 			xmlns = self._owner.defaultNamespace
-		self.printf('Registering protocol "%s" as %s (%s)' % (tagName, protocol, xmlns), order)
-		self.handlers[xmlns][tagName] = {"type": protocol, "default": []}
+		self.printf("Registering %s as %s (%s)" % (tagName, stanza, xmlns), order)
+		self.handlers[xmlns][tagName] = {"type": stanza, "default": []}
 
 	def registerHandler(self, name, handler, htype="", namespace="", xmlns=None):
 		"""	Register user callback as stanzas handler of declared type. Callback must take
 			arguments: dispatcher instance (for replying), incomed return of previous handlers.
-			The callback must raise xmpp.NodeProcessed just before return if it want preven
+			The callback must raise xmpp.protocol.NodeProcessed just before return if it want preven
 			callbacks to be called with the same stanza as argument _and_, more importantly
 			library from returning stanza to sender with error set (to be enabled in 0.2 ve
 			Arguments:
 				"name" - name of stanza. F.e. "iq".
 				"handler" - user callback.
-				"htype" - value of stanza's "type" attribute. If not specified any value match
+				"htype" - value of stanza"s "type" attribute. If not specified any value match
 				"namespace" - namespace of child that stanza must contain.
 		"""
 		if not xmlns:
 			xmlns = self._owner.defaultNamespace
-		self.printf('Registering %s for "%s" type: %s, namespace: %s (%s)' % (handler, name, htype, namespace, xmlns), 'info')
+		self.printf("Registering %s for %s type: %s, namespace: %s (%s)" % (handler, name, htype, namespace, xmlns), "info")
 		if not htype and not namespace:
 			htype = "default"
 		if xmlns not in self.handlers:
-			self.registerNamespace(xmlns, 'warn')
+			self.registerNamespace(xmlns, "warn")
 		if name not in self.handlers[xmlns]:
-			self.registerProtocol(name, Stanza, xmlns, 'warn')
+			self.registerStanza(name, protocol.Stanza, xmlns, "warn")
 		key = htype + namespace
 		if key not in self.handlers[xmlns][name]:
 			self.handlers[xmlns][name][key] = []
 		self.handlers[xmlns][name][key].append(handler)
 
-	def unregisterHandler(self, name, handler, htype='', namespace='', xmlns=None):
+	def unregisterHandler(self, name, handler, htype="", namespace="", xmlns=None):
 		""" Unregister handler. "htype" and "namespace" must be specified exactly the same as with registering."""
 		if not xmlns:
 			xmlns = self._owner.defaultNamespace
-		self.printf('Unregistering handler %s for "%s" type: %s, namespace: %s (%s)' % (handler, name, htype, namespace, xmlns), 'stop')
+		self.printf("Unregistering handler %s for %s type: %s, namespace: %s (%s)" % (handler, name, htype, namespace, xmlns), "stop")
 		if xmlns not in self.handlers:
 			return
 		if not htype and not namespace:
 			htype = "default"
 		key = htype + namespace
-		if(handler in self.handlers[xmlns][name][key]):
+		if handler in self.handlers[xmlns][name][key]:
 			self.handlers[xmlns][name][key].remove(handler)
-			if(not self.handlers[xmlns][name][key]):
-				del(self.handlers[xmlns][name])
+			if not self.handlers[xmlns][name][key]:
+				del self.handlers[xmlns][name]
 
 	def streamErrorHandler(self, conn, error):
-		name, text = 'error', error.getData()
+		name, text = "error", error.getData()
 		for tag in error.getChildren():
-			if tag.getNamespace() == NS_XMPP_STREAMS:
-				if tag.getName() == 'text':
+			if tag.getNamespace() == protocol.NS_XMPP_STREAMS:
+				if tag.getName() == "text":
 					text = tag.getData()
 				else:
 					name = tag.getName()
-		if name in streamExceptions:
-			exc = streamExceptions[name]
+		if name in protocol.streamExceptions:
+			exc = protocol.streamExceptions[name]
 		else:
 			exc = StreamError
 		raise exc(name, text)
@@ -210,43 +208,43 @@ class Dispatcher(PlugIn):
 			session = self
 		session.Stream._mini_dom = None
 		name = stanza.getName()
-		if name == 'features':
+		if name == "features":
 			session.Stream.features = stanza
 
 		xmlns = stanza.getNamespace()
 		if xmlns not in self.handlers:
-			self.printf("Unknown namespace: %s" % (xmlns), 'warn')
+			self.printf("Unknown namespace: %s" % (xmlns), "warn")
 			xmlns = "default"
 		if name not in self.handlers[xmlns]:
-			self.printf("Unknown stanza: %s" % (name), 'warn')
+			self.printf("Unknown stanza: %s" % (name), "warn")
 			name = "default"
 		else:
-			self.printf("Got %s/%s stanza" % (xmlns, name), 'ok')
+			self.printf("Got %s/%s stanza" % (xmlns, name), "ok")
 
-		if isinstance(stanza, Node):
-			stanza = self.handlers[xmlns][name]['type'](node=stanza)
+		if isinstance(stanza, protocol.Node):
+			stanza = self.handlers[xmlns][name]["type"](node=stanza)
 
 		stanzaType = stanza.getType()
 		stanzaID = stanza.getID()
 		if(not stanzaType): 
 			stanzaType = ""
 		stanzaProps = stanza.getProperties()
-		session.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID), 'ok')
+		session.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID), "ok")
 
 		if stanzaID in session._expected:
 			if isinstance(session._expected[stanzaID], tuple):
 				function, args = session._expected[stanzaID]
 				del self._expected[stanzaID]
-				session.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), 'ok')
+				session.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), "ok")
 				try:
 					function(stanza, *args)
-				except(NodeProcessed):
+				except(protocol.NodeProcessed):
 					pass
 			else:
-				session.printf("Expected stanza arrived!", 'ok')
+				session.printf("Expected stanza arrived!", "ok")
 				session._expected[stanzaID] = stanza
 		else:
-			handlerList = ['default']
+			handlerList = ["default"]
 			if stanzaType in self.handlers[xmlns][name]:
 				handlerList.append(stanzaType)
 			for prop in stanzaProps:
@@ -255,14 +253,14 @@ class Dispatcher(PlugIn):
 				if stanzaType and (stanzaType + prop) in self.handlers[xmlns][name]:
 					handlerList.append(stanzaType + prop)
 
-			chain = self.handlers[xmlns]['default']['default']
+			chain = self.handlers[xmlns]["default"]["default"]
 			for key in handlerList:
 				if key:
 					chain = chain + self.handlers[xmlns][name][key]
 			for handler in chain:
 				try:
 					handler(session, stanza)
-				except(NodeProcessed):
+				except(protocol.NodeProcessed):
 					return
 
 	def waitForResponse(self, id, timeout=DEFAULT_TIMEOUT):
@@ -271,7 +269,7 @@ class Dispatcher(PlugIn):
 		"""
 		self._expected[id] = None
 		abortTime = time.time() + timeout
-		self.printf("Waiting for ID %s with timeout %s..." % (id, timeout), 'wait')
+		self.printf("Waiting for ID %s with timeout %s..." % (id, timeout), "wait")
 		while not self._expected[id]:
 			if not self.process(0.1):
 				return None 
@@ -299,7 +297,7 @@ class Dispatcher(PlugIn):
 		"""
 		if isinstance(stanza, basestring):
 			return self._owner_send(stanza)
-		if not isinstance(stanza, Stanza): 
+		if not isinstance(stanza, protocol.Stanza): 
 			stanzaID = None
 		elif(not stanza.getID()):
 			global gID
@@ -308,14 +306,14 @@ class Dispatcher(PlugIn):
 			stanza.setID(stanzaID)
 		else:
 			stanzaID = stanza.getID()
-		if(self._owner._registeredName and not stanza.getAttr('from')):
-			stanza.setAttr('from', self._owner._registeredName)
+		if(self._owner._registeredName and not stanza.getAttr("from")):
+			stanza.setAttr("from", self._owner._registeredName)
 		stanza.setNamespace(self._owner.Namespace)
 		self._owner_send(stanza)
 		return stanzaID
 
 	def disconnect(self):
 		""" Send a stream terminator and and handle all incoming stanzas before stream closure. """
-		self._owner_send('</stream:stream>')
+		self._owner_send("</stream:stream>")
 		while self.process(1):
 			pass
