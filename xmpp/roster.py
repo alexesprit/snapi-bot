@@ -78,7 +78,6 @@ class Roster(plugin.PlugIn):
 				if jid in self.rosterData:
 					del self.rosterData[jid]
 					return
-			self.printf("Setting roster item %s" % (jid), "ok")
 			if(not jid in self.rosterData):
 				self.rosterData[jid] = {}
 			self.rosterData[jid]["name"] = item.getAttr("name")
@@ -88,6 +87,7 @@ class Roster(plugin.PlugIn):
 				self.rosterData[jid]["resources"] = {}
 			for group in item.getTags("group"):
 				self.rosterData[jid]["groups"].append(group.getData())
+		self.printf("Roster is loaded (%d items)" % (len(self.rosterData)), "ok")
 		self.state = ROSTER_LOADED
 
 	def presenceHandler(self, dis, stanza):

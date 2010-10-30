@@ -47,7 +47,7 @@ gXMPPDebug = []
 
 # расскоментируйте, чтобы отключить логирование действий
 # лог ошибок по прежнему можно будет посмотреть в syslogs
-#xmpp.debug.Debug = xmpp.debug.NoDebug
+#debug.Debug = debug.NoDebug
 
 # папка для логов конференций
 gLogDir = ""

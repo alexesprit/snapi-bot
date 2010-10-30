@@ -447,7 +447,7 @@ class Message(Stanza):
 	def buildReply(self, body=None):
 		""" Builds and returns another message object with specified text.
 			The to, from and thread properties of new message are pre-set as reply to this message. """
-		msg = Message(to=self.getFrom(), frm=self.getTo(), body=text)
+		msg = Message(to=self.getFrom(), frm=self.getTo(), body=body)
 		thr = self.getThread()
 		if thr:
 			msg.setThread(thr)

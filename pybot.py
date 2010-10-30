@@ -125,7 +125,7 @@ gSrvPtrn = re.compile(r"(\w+)\.(\w+)", re.UNICODE)
 
 gSemaphore = threading.BoundedSemaphore(30)
 
-gInfo = {"start": 0, "msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "tmr": 0}
+gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "tmr": 0}
 gVersion = ("Jimm", "0.6.4v [06.07.2010]", "NokiaE51-1/0.34.011")
 
 gBotMsgHandlers = []
@@ -268,13 +268,13 @@ def time2str(time):
 	days, hours = divmod(hours, 24)
 	timeString = ""
 
-	if(seconds):
+	if seconds:
 		timeString = u"%d сек." % (seconds)
-	if(minutes):
+	if minutes:
 		timeString = u"%d мин. %s" % (minutes, timeString)
-	if(hours):
+	if hours:
 		timeString = u"%d ч. %s" % (hours, timeString)
-	if(days):
+	if days:
 		timeString = u"%d дн. %s" % (days, timeString)
 	return timeString
 
@@ -556,12 +556,14 @@ def messageHandler(session, stanza):
 		errorCode = stanza.getErrorCode()
 		if(errorCode == u"500"):
 			time.sleep(1)
-			sendTo(protocol.TYPE_PUBLIC, fullJid, message)
+			stanza = stanza.buildReply(message)
+			gClient.send(stanza)
 		elif(errorCode == "406"):
 			addConference(conference)
 			joinConference(conference, gBotNick, getConfigKey(conference, "password"))
 			time.sleep(0.5)
-			sendTo(protocol.TYPE_PUBLIC, fullJid, message)
+			stanza = stanza.buildReply(message)
+			gClient.send(stanza)
 		return
 	if(not message):
 		return
