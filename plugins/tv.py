@@ -14,7 +14,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-TVCODES_FILE = "channels.txt"
+TVCODES_FILE = "tvchannels.txt"
 
 def getTVChannelCode(channelName):
 	if(channelName.isdigit()):

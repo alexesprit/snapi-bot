@@ -14,7 +14,7 @@
 
 import urllib2
 
-DUMPZ_LANGS_FILE = "languages.txt"
+DUMPZ_LANGS_FILE = "dumpzlangs.txt"
 
 DUMPZ_LANGS = {}
 

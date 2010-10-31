@@ -31,6 +31,7 @@ def pokeUser(msgType, conference, nick, param):
 					if(userNick != botNick and userNick != nick):
 						message = random.choice(gPokes)
 						sendToConference(conference, u"/me " + message % (userNick))
+						time.sleep(0.5)
 			elif(nickIsOnline(conference, param)):
 				if param == botNick:
 					param = nick

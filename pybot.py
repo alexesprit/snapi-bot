@@ -555,14 +555,15 @@ def messageHandler(session, stanza):
 		errorCode = stanza.getErrorCode()
 		if(errorCode == "500"):
 			time.sleep(1)
-			stanza = stanza.buildReply(message)
-			gClient.send(stanza)
 		elif(errorCode == "406"):
 			addConference(conference)
 			joinConference(conference, gBotNick, getConfigKey(conference, "password"))
 			time.sleep(0.5)
-			stanza = stanza.buildReply(message)
-			gClient.send(stanza)
+		else:
+			return
+		stanza = stanza.buildReply(message)
+		stanza.setType(protocol.TYPE_PUBLIC)
+		gClient.send(stanza)
 		return
 	if(not message):
 		return

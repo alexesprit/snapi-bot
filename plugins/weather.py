@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-WCODES_FILE = "weather.txt"
+WCODES_FILE = "citycodes.txt"
 
 PRECIPITATION = {
 	"4": u"дождь", 
