@@ -18,7 +18,7 @@
 DISCO_ID = "disco_id"
 
 def serviceDiscovery(msgType, conference, nick, param):
-	param = param or gHost
+	param = param or gServer
 	param = param.split(None, 2)
 	jid = param[0]
 	searchKey = None

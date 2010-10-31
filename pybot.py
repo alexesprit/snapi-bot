@@ -119,9 +119,9 @@ gUserName, gServer = gJid.split("@")
 gClient = client.Client(server=gServer, port=gPort, debugFlags=gXMPPDebug)
 gRoster = None
 gDebug = debug.Debug(gCoreDebug, showFlags=False)
-gTagPtrn = re.compile(r"<(.*?)>")
-gJidPtrn = re.compile(r"(\w+)@(\w+)\.(\w+)", re.UNICODE)
-gSrvPtrn = re.compile(r"(\w+)\.(\w+)", re.UNICODE)
+gTagPtrn = re.compile(r"<.+?>")
+gJidPtrn = re.compile(r"\w+@\w+\.\w+", re.UNICODE)
+gSrvPtrn = re.compile(r"\w+\.\w+", re.UNICODE)
 
 gSemaphore = threading.BoundedSemaphore(30)
 
@@ -321,7 +321,7 @@ def delConference(conference):
 def joinConference(conference, nick, password):
 	setConfigKey(conference, "nick", nick)
 	setConfigKey(conference, "password", password)
-	prs = protocol.Presence(conference + "/" + nick, priority = gPriority)
+	prs = protocol.Presence("%s/%s" % (conference, nick), priority=gPriority)
 	status = getConfigKey(conference, "status")
 	show = getConfigKey(conference, "show")
 	if(status):
@@ -432,7 +432,7 @@ def getTrueJid(jid, resource=None):
 			jid, resource = jid.split("/", 1)
 	if(conferenceInList(jid)):
 		if(nickInConference(jid, resource)):
-			jid = getNickKey(jid, resource, "jid")
+			jid = getNickKey(jid, resource, NICK_JID)
 	return(jid)
 
 def getNickByJid(conference, trueJid, offline=False):

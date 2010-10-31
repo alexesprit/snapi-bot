@@ -63,9 +63,6 @@ gValues = {u"AUD": u"Австралийский доллар",
 			u"JPY": u"Японская иена"
 }
 
-gConvPattern = re.compile("<TD><B>(.*?)</B>(.*?)<TD><B>(.*?)</B>(.*?)<TD><B>(.*?)</B></TD>", re.DOTALL)
-gConvUrl = "http://conv.rbc.ru/convert.shtml?mode=calc&source=cb.0&tid_from=%s&commission=1&tid_to=%s&summa=%s&day=%s&month=%s&year=%s"
-
 def convertValues(msgType, conference, nick, param):
 	if(param == u"валюты"):
 		values = ["%s - %s" % (name, desc) \
@@ -83,14 +80,16 @@ def convertValues(msgType, conference, nick, param):
 			frm = param[0]
 			to = param[1]
 			if(frm in gValues and to in gValues):
-				date = tuple(time.localtime())[:3]
-				url = gConvUrl % (frm, to, count, date[2], date[1], date[0])
-				text = unicode(urllib.urlopen(url.replace("RUR", "BASE")).read(), "cp1251")
-				items = gConvPattern.search(text)
+				date = tuple(time.localtime())[1:3]
+				url = "http://conv.rbc.ru/convert.shtml?tid_from=%s&tid_to=%s&summa=%s&day=%s&month=%s"
+				url %= (frm, to, count, date[1], date[0])
+				rawhtml = urllib.urlopen(url.replace("RUR", "BASE")).read()
+				rawhtml = unicode(rawhtml, "cp1251")
+				items = re.search("<TD><B>.+?</B>.+?<TD><B>(.+?)</B>.+?<TD><B>(.+?)</B></TD>", rawhtml, re.DOTALL)
 				if(items):
-					text = u"%s %s = %s %s\n1 %s = %s %s" % (count, frm, items.group(5), to, frm, items.group(3), to)
-					text = text.replace("BASE", "RUR")
-					sendMsg(msgType, conference, nick, decode(text))
+					message = u"%s %s = %s %s\n1 %s = %s %s" % (count, frm, items.group(2), to, frm, items.group(1), to)
+					message = message.replace("BASE", "RUR")
+					sendMsg(msgType, conference, nick, message)
 				else:
 					sendMsg(msgType, conference, nick, u"не получается")
 			else:

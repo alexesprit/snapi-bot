@@ -18,10 +18,10 @@ def showDreamInfo(msgType, conference, nick, param):
 	url = "http://www.sonnik.ru/search.php?%s" % (query)
 	rawHTML = urllib.urlopen(url).read()
 	items = re.search(r"<div id=\"mntxt\">(.+?)</p>", rawHTML, re.DOTALL)
-	message = decode(items.group(0))
+	message = decode(items.group(1), "cp1251")
 	if(protocol.TYPE_PUBLIC == msgType):
 		sendMsg(msgType, conference, nick, u"ушло в приват")
-	sendMsg(protocol.TYPE_PRIVATE, conference, nick, unicode(message, "cp1251"))
+	sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 
 registerCommand(showDreamInfo, u"сонник", 10, 
 				u"Толкователь снов", 

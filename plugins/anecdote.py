@@ -13,14 +13,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-gAnecdotePattern = re.compile("<div style='color: #000000;(.+?)<a href='http://anekdot.odessa.ua/' target='_blank'>", re.DOTALL)
-
 def showAnecdote(msgType, conference, nick, param):
 	url = "http://anekdot.odessa.ua/rand-anekdot.php"
 	rawHTML = urllib.urlopen(url).read()
-	items = gAnecdotePattern.search(rawHTML)
-	if(items):
-		anecdote = decode(items.group(0), "cp1251")
+	items = re.search("color:#FFFFFF'>(.+?)<a href", rawHTML, re.DOTALL)
+	if items:
+		rawtext = items.group(1).replace("<br />", "")
+		anecdote = decode(rawtext, "cp1251")
 		sendMsg(msgType, conference, nick, anecdote)
 	else:
 		sendMsg(msgType, conference, nick, u"не получается")

@@ -13,9 +13,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-gTimePattern = re.compile(r"<strong(.+?)</strong>")
-gNamePattern = re.compile(r"<a href=\"(.+?)>(.+?)</a>", re.DOTALL)
-
 def getTrainTable(cityFrom, cityTo, dateForward):
 	query = urllib.urlencode({"cityFrom" : cityFrom.encode("utf-8"),
 								"cityTo": cityTo.encode("utf-8"),
@@ -32,15 +29,18 @@ def getTrainTable(cityFrom, cityTo, dateForward):
 
 		dispatch, arrive = re.findall(r"<span class=\"point\">(.+?)</span>", info, re.DOTALL)
 		
-		disTime = gTimePattern.search(dispatch)
+		timePtrn = re.compile(r"<strong(.+?)</strong>")
+		namePtrn = re.compile(r"<a href=\".+?>(.+?)</a>", re.DOTALL)
+
+		disTime = timePtrn.search(dispatch)
 		disTime = decode(disTime.group(0)).strip()
-		disName = gNamePattern.search(dispatch)
+		disName = namePtrn.search(dispatch)
 		disName = decode(disName.group(2)).strip()
 		
-		arrTime = gTimePattern.search(arrive)
+		arrTime = timePtrn.search(arrive)
 		arrTime = decode(arrTime.group(0)).strip()
-		arrName = gNamePattern.search(arrive)
-		arrName = decode(arrName.group(2)).strip()
+		arrName = namePtrn.search(arrive)
+		arrName = decode(arrName.group(1)).strip()
 		
 		travelTime = re.search(r"td class=\"{raw:(.+?)>(.+?)</i>(.+?)</td>", info, re.DOTALL)
 		travelTime = decode(travelTime.group(3)).strip()

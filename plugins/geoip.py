@@ -14,15 +14,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-gGeoIPPattern = re.compile("<td class=red>(.+?)</td><td class=blue>(.+?)</td>")
-
 def showGeoIPInfo(msgType, conference, nick, param):
 	host = param or gHost
 	query = urllib.urlencode({"host": host.encode("utf-8")})
 	url = "http://www.and-rey.ru/geoip/ie.php?%s" % (query)
 	rawHTML = urllib.urlopen(url).read()
 	rawHTML = unicode(rawHTML, "cp1251")
-	items = gGeoIPPattern.findall(rawHTML)
+	items = re.findall("<td class=red>(.+?)</td><td class=blue>(.+?)</td>", rawHTML)
 	items = [u"%s %s" % (item[0], item[1]) for item in items]
 	message = u"инфо о %s:\n%s" % (host, decode("\n".join(items)))
 	sendMsg(msgType, conference, nick, message)

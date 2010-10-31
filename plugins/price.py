@@ -19,7 +19,7 @@ def showPrice(msgType, conference, nick, param):
 	rawHTML = urllib.urlopen(url).read()
 	items = re.search(r"<td class=\"value\">(.+?)</td>", rawHTML, re.DOTALL)
 	if(items):
-		cost = unicode(decode(items.group(0)), "utf-8")
+		cost = unicode(items.group(1), "utf-8")
 		cost = cost.split()
 		if(len(cost) == 2):
 			cost = "%s %s" % (cost[1], cost[0])

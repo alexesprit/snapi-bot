@@ -30,13 +30,16 @@ ACCESS_DESC = {
 def login(msgType, conference, nick, param):
 	if(msgType == protocol.TYPE_PRIVATE and param == gAdminPass):
 		trueJid = getTrueJid(conference, nick)
+		gAdmins.append(trueJid)
 		setTempGlobalAccess(trueJid, 100)
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"пароль принят, полный доступ выдан")
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"пароль принят, глобальный доступ выдан")
 
 def logout(msgType, conference, nick, parameters):
 	trueJid = getTrueJid(conference, nick)
-	setTempGlobalAccess(trueJid)
-	sendMsg(msgType, conference, nick, u"глобальный доступ снят")
+	if trueJid in gAdmins:
+		gAdmins.remove(trueJid)
+		setTempGlobalAccess(trueJid)
+		sendMsg(msgType, conference, nick, u"глобальный доступ снят")
 
 def showUserAccess(msgType, conference, nick, param):
 	levelDesc = ""
