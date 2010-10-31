@@ -3,15 +3,14 @@
 """
 	All features of xmpppy library contained within separate modules.
 	At present there are modules:
-		* simplexml: XML handling routines
-		* protocol: jabber-objects (I.e. JID and different stanzas and sub-stanzas) 
-		  handling routines.
-		* debug - Jacob Lundquist's debugging module. Very handy if you like colored debug.
-		* auth - SASL stuff. You will need it to auth as a client or transport.
-		* transports - low level connection handling. TCP and TLS currently. HTTP support planned.
-		* roster - simple roster for use in clients.
+		* auth - SASL stuff. You will need it to auth as a client or transport
+		* debug - Jacob Lundquist's debugging module. Very handy if you like colored debug
 		* dispatcher - decision-making logic. Handles all hooks. The first who takes control 
-		  over fresh stanzas.
+		  over fresh stanzas
+		* protocol: jabber-objects (I.e. UserJid and different stanzas and sub-stanzas)
+		* roster - simple roster for use in clients
+		* simplexml - XML handling routines
+		* transports - low level connection handling. TCP and TLS currently. HTTP support planned
 
 	Most of the classes that is defined in all these modules is an ancestors of 
 	class PlugIn so they share a single set of methods allowing you to compile 

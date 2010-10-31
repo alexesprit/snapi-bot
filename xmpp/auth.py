@@ -48,7 +48,8 @@ BIND_BINDING = 0x2
 BIND_SUCCESS = 0x3
 
 class SASL(plugin.PlugIn):
-	""" Implements SASL authentication. """
+	""" Implements SASL authentication.
+	"""
 	def __init__(self, username, password):
 		plugin.PlugIn.__init__(self)
 		self.username = username
@@ -62,18 +63,22 @@ class SASL(plugin.PlugIn):
 			two Dispatcher.process() calls.
 		"""
 		try:
-			self.FeaturesHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
+			self.featuresHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
 		except protocol.NodeProcessed:
 			pass
 
 	def plugout(self):
-		""" Remove SASL handlers from owner"s dispatcher. Used internally. """
+		""" Remove SASL handlers from owner's dispatcher.
+			Used internally.
+		"""
 		self._owner.unregisterHandler("challenge", self.SASLHandler, xmlns=protocol.NS_SASL)
 		self._owner.unregisterHandler("failure", self.SASLHandler, xmlns=protocol.NS_SASL)
 		self._owner.unregisterHandler("success", self.SASLHandler, xmlns=protocol.NS_SASL)
 
-	def FeaturesHandler(self, conn, feats):
-		""" Used to determine if server supports SASL auth. Used internally. """
+	def featuresHandler(self, conn, feats):
+		""" Used to determine if server supports SASL auth.
+			Used internally.
+		"""
 		if not feats.getTag("mechanisms", namespace=protocol.NS_SASL):
 			self.state = AUTH_FAILURE
 			self.printf("SASL not supported by server", "error")
@@ -100,7 +105,8 @@ class SASL(plugin.PlugIn):
 		self._owner.send(node.__str__())
 
 	def SASLHandler(self, conn, challenge):
-		""" Perform next SASL auth step. Used internally. """
+		""" Perform next SASL auth step. Used internally.
+		"""
 		if challenge.getNamespace() != protocol.NS_SASL:
 			return
 		if challenge.getName() == "failure":
@@ -165,22 +171,26 @@ class SASL(plugin.PlugIn):
 		raise protocol.NodeProcessed
 
 class Bind(plugin.PlugIn):
-	""" Bind some jid to the current connection to allow router know of our location."""
+	""" Bind some jid to the current connection to allow router know of our location.
+	"""
 	def __init__(self):
 		plugin.PlugIn.__init__(self)
 		self.debugFlag = DBG_BIND
 		self.bound = BIND_WAITING
 
 	def plugin(self, owner):
-		""" Start resource binding,  if allowed at this time. Used internally. """
+		""" Start resource binding, if allowed at this time. Used internally.
+		"""
 		self._owner.registerHandler("features", self.featuresHandler, xmlns=protocol.NS_STREAMS)
 
 	def plugout(self):
-		""" Remove Bind handler from owner's dispatcher. Used internally. """
+		""" Remove Bind handler from owner's dispatcher. Used internally.
+		"""
 		self._owner.unregisterHandler("features", self.featuresHandler, xmlns=protocol.NS_STREAMS)
 
 	def featuresHandler(self, conn, feats):
-		""" Determine if server supports resource binding and set some internal attributes accordingly. """
+		""" Determine if server supports resource binding and set some internal attributes accordingly.
+		"""
 		if not feats.getTag("bind", namespace=protocol.NS_BIND):
 			self.bound = BIND_FAILURE
 			self.printf("Server does not requested binding.", "error")
@@ -188,7 +198,8 @@ class Bind(plugin.PlugIn):
 		self.bound = BIND_BINDING
 
 	def bindResource(self, resource=None):
-		""" Perform binding. Use provided resource name or random (if not provided). """
+		""" Perform binding. Use provided resource name or random (if not provided).
+		"""
 		while self.bound == BIND_WAITING and self._owner.process(1):
 			pass
 		if resource:

@@ -108,7 +108,8 @@ class Node(object):
 		return ns
 
 	def __str__(self):
-		""" Method used to dump node into textual representation. """
+		""" Method used to dump node into textual representation.
+		"""
 		s = "<" + self.name
 		if self.namespace:
 			if not self.parent or self.parent.namespace != self.namespace:
@@ -132,7 +133,8 @@ class Node(object):
 
 	def addChild(self, name=None, attrs=None, payload=None, namespace=None, node=None):
 		""" If "node" argument is provided, adds it as child node. Else creates new node from
-			the other arguments' values and adds it as well."""
+			the other arguments' values and adds it as well.
+		"""
 		if node:
 			newnode = node
 			node.parent = self
@@ -143,18 +145,6 @@ class Node(object):
 		self.children.append(newnode)
 		return newnode
 
-	def addData(self, data):
-		""" Adds some CDATA to node. """
-		self.data.append(ustr(data))
-
-	def clearData(self):
-		""" Removes all CDATA from the node. """
-		self.data = []
-
-	def delAttr(self, key):
-		""" Deletes an attribute "key" """
-		del self.attrs[key]
-
 	def delChild(self, node, attrs=None):
 		""" Deletes the "node" from the node's childs list, if "node" is an instance.
 			Else deletes the first node that have specified name and (optionally) attributes.
@@ -164,37 +154,90 @@ class Node(object):
 		del self.children[self.children.index(node)]
 		return node
 
-	def getAttrs(self):
-		""" Returns all node's attributes as dictionary. """
-		return self.attrs
-
-	def getAttr(self, key):
-		""" Returns value of specified attribute. """
-		return self.attrs.get(key)
-
 	def getChildren(self):
-		""" Returns all node's child nodes as list. """
+		""" Returns all node's child nodes as list.
+		"""
 		return self.children
 
 	def getFirstChild(self):
 		if self.children:
 			return self.children[0]
 
+	def getAttrs(self):
+		""" Returns all node's attributes as dictionary.
+		"""
+		return self.attrs
+
+	def delAttr(self, key):
+		""" Deletes an attribute
+		"""
+		del self.attrs[key]
+
+	def getAttr(self, key):
+		""" Returns value of specified attribute.
+		"""
+		return self.attrs.get(key)
+
+	def hasAttr(self, key):
+		""" Checks if node have attribute.
+		"""
+		return key in self.attrs
+
+	def setAttr(self, key, val):
+		""" Sets attribute "key" with the value.
+		"""
+		self.attrs[key] = val
+
+	def addData(self, data):
+		""" Adds some CDATA to node.
+		"""
+		self.data.append(ustr(data))
+
+	def delData(self):
+		""" Removes all CDATA from the node.
+		"""
+		self.data = []
+
 	def getData(self):
-		""" Returns all node CDATA as string (concatenated). """
+		""" Returns all node CDATA as string (concatenated).
+		"""
 		return ''.join(self.data)
 
+	def setData(self, data):
+		""" Sets node's CDATA to provided string. Resets all previous CDATA!
+		"""
+		self.data = [ustr(data)]
+
 	def getName(self):
-		""" Returns the name of node """
+		""" Returns the name of node.
+		"""
 		return self.name
 
+	def setName(self,val):
+		""" Changes the node name.
+		"""
+		self.name = val
+
 	def getNamespace(self):
-		""" Returns the namespace of node """
+		""" Returns the namespace of node.
+		"""
 		return self.namespace
 
+	def setNamespace(self, namespace):
+		""" Changes the node namespace.
+		"""
+		self.namespace=namespace
+
 	def getParent(self):
-		""" Returns the parent of node (if present). """
+		""" Returns the parent of node (if present).
+		"""
 		return self.parent
+
+	def setParent(self, node):
+		""" Sets node's parent to "node". WARNING: do not checks if the parent already present
+			and not removes the node from the list of childs of previous parent.
+		"""
+		self.parent = node
 
 	def getPayload(self):
 		""" Return the payload of node i.e. list of child nodes and CDATA entries.
@@ -202,12 +245,23 @@ class Node(object):
 			['text1', <nodea instance>, <nodeb instance>, ' text2'].
 		"""
 		ret = []
-		for i in range(max(len(self.data),len(self.children))):
+		for i in range(max(len(self.data), len(self.children))):
 			if i < len(self.data) and self.data[i]:
 				ret.append(self.data[i])
 			if i < len(self.children) and self.children[i]:
 				ret.append(self.children[i])
 		return ret
+
+	def setPayload(self, payload, add=False):
+		""" Sets node payload according to the list specified. WARNING: completely replaces all node's
+			previous content. If you wish just to add child or CDATA - use addData or addChild methods.
+		"""
+		if isinstance(payload, basestring):
+			payload = [payload]
+		if add:
+			self.children += payload
+		else:
+			self.children = payload
 
 	def getTag(self, name, attrs=None, namespace=None): 
 		""" Filters all child nodes using specified arguments as filter.
@@ -215,19 +269,50 @@ class Node(object):
 		"""
 		return self.getTags(name, attrs, namespace, one=True)
 
-	def getTagAttr(self,tag,attr):
-		""" Returns attribute value of the child with specified name (or None if no such attribute)."""
+	def setTag(self, name, attrs=None, namespace=None):
+		""" Same as getTag but if the node with specified namespace/attributes not found, creates such
+			node and returns it.
+		"""
+		node = self.getTags(name, attrs, namespace=namespace, one=True)
+		if node:
+			return node
+		else:
+			return self.addChild(name, attrs, namespace=namespace)
+
+	def getTagAttr(self, tag, attr):
+		""" Returns attribute value of the child with specified name 
+			or None if no such attribute.
+		"""
 		try:
 			return self.getTag(tag).attrs[attr]
 		except(AttributeError, KeyError):
 			return None
 
-	def getTagData(self,tag):
-		""" Returns cocatenated CDATA of the child with specified name."""
+	def setTagAttr(self, tag, attr, val):
+		""" Creates new node (if not already present) with name "tag"
+			and sets it's attribute "attr" to value "val".
+		"""
+		try:
+			self.getTag(tag).attrs[attr] = val
+		except AttributeError:
+			self.addChild(tag, attrs={attr: val})
+
+	def getTagData(self, tag):
+		""" Returns cocatenated CDATA of the child with specified name.
+		"""
 		try:
 			return self.getTag(tag).getData()
 		except(AttributeError):
 			return None
+
+	def setTagData(self, tag, val, attrs=None):
+		""" Creates new node (if not already present) with name "tag" and (optionally) attributes "attrs"
+			and sets it's CDATA to string "val".
+		"""
+		try:
+			self.getTag(tag, attrs).setData(ustr(val))
+		except AttributeError:
+			self.addChild(tag, attrs, payload=[ustr(val)])
 
 	def getTags(self, name, attrs=None, namespace=None, one=False):
 		""" Filters all child nodes using specified arguments as filter.
@@ -254,7 +339,8 @@ class Node(object):
 			return nodes
 
 	def iterTags(self, name, attrs=None, namespace=None):
-		""" Iterate over all children using specified arguments as filter. """
+		""" Iterate over all children using specified arguments as filter.
+		"""
 		if not attrs:
 			attrs = {}
 		for node in self.children:
@@ -270,126 +356,13 @@ class Node(object):
 				else:
 					yield node
 
-	def setAttr(self, key, val):
-		""" Sets attribute "key" with the value "val". """
-		self.attrs[key] = val
-
-	def setData(self, data):
-		""" Sets node's CDATA to provided string. Resets all previous CDATA!"""
-		self.data = [ustr(data)]
-
-	def setName(self,val):
-		""" Changes the node name. """
-		self.name = val
-
-	def setNamespace(self, namespace):
-		""" Changes the node namespace. """
-		self.namespace=namespace
-
-	def setParent(self, node):
-		""" Sets node's parent to "node". WARNING: do not checks if the parent already present
-			and not removes the node from the list of childs of previous parent.
-		"""
-		self.parent = node
-
-	def setPayload(self, payload, add=0):
-		""" Sets node payload according to the list specified. WARNING: completely replaces all node's
-			previous content. If you wish just to add child or CDATA - use addData or addChild methods.
-		"""
-		if isinstance(payload, basestring):
-			payload = [payload]
-		if add:
-			self.children += payload
-		else:
-			self.children = payload
-
-	def setTag(self, name, attrs=None, namespace=None):
-		""" Same as getTag but if the node with specified namespace/attributes not found, creates such
-			node and returns it.
-		"""
-		node = self.getTags(name, attrs, namespace=namespace, one=True)
-		if node:
-			return node
-		else:
-			return self.addChild(name, attrs, namespace=namespace)
-
-	def setTagAttr(self, tag, attr, val):
-		""" Creates new node (if not already present) with name "tag"
-			and sets it's attribute "attr" to value "val".
-		"""
-		try:
-			self.getTag(tag).attrs[attr] = val
-		except(AttributeError):
-			self.addChild(tag, attrs={attr: val})
-
-	def setTagData(self, tag, val, attrs=None):
-		""" Creates new node (if not already present) with name "tag" and (optionally) attributes "attrs"
-			and sets it's CDATA to string "val". """
-		try:
-			self.getTag(tag, attrs).setData(ustr(val))
-		except(AttributeError):
-			self.addChild(tag, attrs, payload=[ustr(val)])
-
-	def hasAttr(self, key):
-		""" Checks if node have attribute "key"."""
-		return key in self.attrs
-
-	def __getitem__(self, item):
-		""" Returns node's attribute "item" value. """
-		return self.getAttr(item)
-
-	def __setitem__(self, item, val):
-		""" Sets node's attribute "item" value. """
-		return self.setAttr(item,val)
-
-	def __delitem__(self, item):
-		""" Deletes node's attribute "item". """
-		return self.delAttr(item)
-
-	def __getattr__(self, attr):
-		""" Reduce memory usage caused by T/NT classes - use memory only when needed. """
-		if attr == 'T':
-			self.T = T(self)
-			return self.T
-		if attr == 'NT':
-			self.NT = NT(self)
-			return self.NT
-		raise AttributeError
-
-class T:
-	""" Auxiliary class used to quick access to node's child nodes. """
-	def __init__(self, node):
-		setattr(self, 'node', node)
-
-	def __getattr__(self, attr):
-		return self.node.getTag(attr)
-
-	def __setattr__(self, attr, val):
-		if isinstance(val,Node):
-			Node.__init__(self.node.setTag(attr), node=val)
-		else:
-			return self.node.setTagData(attr,val)
-
-	def __delattr__(self, attr):
-		return self.node.delChild(attr)
-
-class NT(T):
-	""" Auxiliary class used to quick create node's child nodes. """
-	def __getattr__(self, attr):
-		return self.node.addChild(attr)
-
-	def __setattr__(self, attr, val):
-		if isinstance(val, Node):
-			self.node.addChild(attr, node=val)
-		else:
-			return self.node.addChild(attr, payload=[val])
-
 class NodeBuilder:
 	""" Builds a Node class minidom from data parsed to it. This class used for two purposes:
 		1. Creation an XML Node from a textual representation. F.e. reading a config file. See an XML2Node method.
 		2. Handling an incoming XML stream. This is done by mangling
 		   the __dispatch_depth parameter and redefining the dispatch method.
-		You do not need to use this class directly if you do not designing your own XML handler."""
+		You do not need to use this class directly if you do not designing your own XML handler.
+	"""
 	def __init__(self, data=None, initial_node=None):
 		""" Takes two optional parameters: "data" and "initial_node".
 			By default class initialised with empty Node class instance.
@@ -426,7 +399,8 @@ class NodeBuilder:
 			self.data_buffer = None
 
 	def destroy(self):
-		""" Method used to allow class instance to be garbage-collected. """
+		""" Method used to allow class instance to be garbage-collected.
+		"""
 		self.check_data_buffer()
 		self._parser.StartElementHandler = None
 		self._parser.EndElementHandler = None
@@ -434,7 +408,8 @@ class NodeBuilder:
 		self._parser.StartNamespaceDeclHandler = None
 
 	def starttag(self, tag, attrs):
-		""" XML Parser callback. Used internally """
+		""" XML Parser callback. Used internally.
+		"""
 		self.check_data_buffer()
 		self._inc_depth()
 		if self.__depth == self._dispatch_depth:
@@ -468,7 +443,8 @@ class NodeBuilder:
 		self.last_is_data = 0
 
 	def endtag(self, tag ):
-		""" XML Parser callback. Used internally """
+		""" XML Parser callback. Used internally.
+		"""
 		self.check_data_buffer()
 		if self.__depth == self._dispatch_depth:
 			if self._mini_dom.getName() == 'error':
@@ -481,7 +457,8 @@ class NodeBuilder:
 		if self.__depth == 0: self.stream_footer_received()
 
 	def handle_cdata(self, data):
-		""" XML Parser callback. Used internally """
+		""" XML Parser callback. Used internally.
+		"""
 		if self.last_is_data:
 			if self.data_buffer:
 				self.data_buffer.append(data)
@@ -490,11 +467,13 @@ class NodeBuilder:
 			self.last_is_data = 1
 
 	def handle_namespace_start(self, prefix, uri):
-		""" XML Parser callback. Used internally """
+		""" XML Parser callback. Used internally.
+		"""
 		self.check_data_buffer()
 
 	def getDom(self):
-		""" Returns just built Node. """
+		""" Returns just built Node.
+		"""
 		self.check_data_buffer()
 		return self._mini_dom
 
@@ -503,15 +482,18 @@ class NodeBuilder:
 			node as argument. Can be redefined to convert incoming XML stanzas to program events. 
 		"""
 	def stream_header_received(self,ns,tag,attrs):
-		""" Method called when stream just opened. """
+		""" Method called when stream just opened.
+		"""
 		self.check_data_buffer()
 
 	def stream_footer_received(self):
-		""" Method called when stream just closed. """
+		""" Method called when stream just closed.
+		"""
 		self.check_data_buffer()
 
 	def has_received_endtag(self, level=0):
-		""" Return True if at least one end tag was seen (at level) """
+		""" Return True if at least one end tag was seen (at level).
+		"""
 		return self.__depth <= level and self.__max_depth > level
 
 	def _inc_depth(self):

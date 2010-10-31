@@ -138,11 +138,14 @@ ITEM_JID = "jid"
 ITEM_NICK = "nick"
 
 class NodeProcessed(Exception):
-	""" Exception that should be raised by handler when the handling should be stopped. """
+	""" Exception that should be raised by handler 
+		when the handling should be stopped. 
+	"""
 	pass
 
 class StreamError(Exception):
-	""" Base exception class for stream errors."""
+	""" Base exception class for stream errors.
+	"""
 
 class BadFormat(StreamError):
 	pass
@@ -244,12 +247,14 @@ streamExceptions = {
 }
 
 class UserJid:
-	""" UserJid object. UserJid can be built from string, modified, compared, serialised into string. """
+	""" UserJid object. UserJid can be built from string, modified, 
+		compared, serialised into string.
+	"""
 	def __init__(self, jid=None, node="", domain="", resource=""):
-		""" Constructor. UserJid can be specified as string (jid argument) or as separate parts.
+		""" Constructor. Jid can be specified as string (jid argument) or as separate parts.
 			Examples:
-			UserJid("node@domain/resource")
-			UserJid(node="node", domain="domain.org")
+				foo = UserJid("node@domain/resource")
+				foo = UserJid(node="node", domain="domain.org")
 		"""
 		if not jid and not domain:
 			raise ValueError("UserJid must contain at least domain name")
@@ -270,35 +275,43 @@ class UserJid:
 				self.domain, self.resource = jid, ""
 
 	def getNode(self):
-		""" Return the node part of the UserJid """
+		""" Return the node part of jid.
+		"""
 		return self.node
 
 	def setNode(self,node):
-		""" Set the node part of the UserJid to new value. Specify None to remove the node part."""
+		""" Set the node part of jid to new value. Specify None to remove the node part.
+		"""
 		self.node = node.lower()
 
 	def getDomain(self):
-		""" Return the domain part of the UserJid """
+		""" Return the domain part of jid.
+		"""
 		return self.domain
 
 	def setDomain(self, domain):
-		""" Set the domain part of the UserJid to new value."""
+		""" Set the domain part of jid to new value.
+		"""
 		self.domain = domain.lower()
 
 	def getResource(self):
-		""" Return the resource part of the UserJid """
+		""" Return the resource part of jid.
+		"""
 		return self.resource
 
 	def setResource(self, resource):
-		""" Set the resource part of the UserJid to new value. Specify None to remove the resource part."""
+		""" Set the resource part of jid to new value. Specify None to remove the resource part.
+		"""
 		self.resource = resource
 
 	def getBareJid(self):
-		""" Return the bare representation of UserJid. I.e. string value w/o resource. """
+		""" Return the bare representation of jid. I.e. string value w/o resource.
+		"""
 		return self.__str__(0)
 
 	def __str__(self, showResource=True):
-		""" Serialise UserJid into string. """
+		""" Serialise UserJid into string.
+		"""
 		if self.node:
 			jid = "%s@%s" % (self.node, self.domain)
 		else:
@@ -308,11 +321,13 @@ class UserJid:
 		return jid
 
 	def __hash__(self):
-		""" Produce hash of the UserJid, Allows to use UserJid objects as keys of the dictionary. """
+		""" Produce hash of UserJid, Allows to use UserJid objects as keys of the dictionary.
+		"""
 		return hash(self.__str__())
 
 class Stanza(Node):
-	""" A "stanza" object class. Contains methods that are common for presences, iqs and messages. """
+	""" A "stanza" object class. Contains methods that are common for presences, iqs and messages.
+	"""
 	def __init__(self, name=None, to=None, typ=None, frm=None, attrs=None, payload=None, timestamp=None, xmlns=None, node=None):
 		""" Constructor, name is the name of the stanza i.e. "message" or "presence" or "iq".
 			to is the value of "to" attribure, "typ" - "type" attribute
@@ -332,10 +347,12 @@ class Stanza(Node):
 		Node.__init__(self, tag=name, attrs=attrs, payload=payload, node=node)
 		if not node and xmlns:
 			self.setNamespace(xmlns)
-		if self["to"]:
-			self.setTo(self["to"])
-		if self["from"]:
-			self.setFrom(self["from"])
+		to = self.getAttr("to")
+		if to:
+			self.setTo(to)
+		frm = self.getAttr("from")
+		if frm:
+			self.setFrom(frm)
 		self.timestamp = None
 		for x in self.getTags("x", namespace=NS_DELAY):
 			try:
@@ -347,60 +364,72 @@ class Stanza(Node):
 			self.setTimestamp(timestamp)
 
 	def setFrom(self,val):
-		""" Set the value of the "from" attribute. """
+		""" Set the value of the "from" attribute.
+		"""
 		self.setAttr("from", UserJid(val))
 
 	def getFrom(self):
-		""" Return value of the "from" attribute. """
+		""" Return value of the "from" attribute.
+		"""
 		try:
-			return self["from"]
+			return self.getAttr("from")
 		except:
 			return None
 
 	def getTo(self):
-		""" Return value of the "to" attribute. """
+		""" Return value of the "to" attribute.
+		"""
 		try: 
-			return self["to"]
+			return self.getAttr("to")
 		except:
 			return None
 
 	def setTo(self,val):
-		""" Set the value of the "to" attribute. """
+		""" Set the value of the "to" attribute.
+		"""
 		self.setAttr("to", UserJid(val))
 
 	def getID(self):
-		""" Return the value of the "id" attribute. """
+		""" Return the value of the "id" attribute.
+		"""
 		return self.getAttr("id")
 
 	def setID(self,val):
-		""" Set the value of the "id" attribute. """
+		""" Set the value of the "id" attribute.
+		"""
 		self.setAttr("id", val)
 
 	def getTimestamp(self):
-		""" Return the timestamp in the "yyyymmddThhmmss" format. """
+		""" Return the timestamp in the "yyyymmddThhmmss" format.
+		"""
 		return self.timestamp
 
 	def setTimestamp(self, val=None):
-		"""Set the timestamp. timestamp should be the yyyymmddThhmmss string."""
+		"""Set the timestamp. timestamp should be the yyyymmddThhmmss string.
+		"""
 		if not val:
 			val = time.strftime("%Y%m%dT%H:%M:%S", time.gmtime())
 		self.timestamp = val
 		self.setTag("x", {"stamp": self.timestamp}, namespace=NS_DELAY)
 
 	def getType(self):
-		""" Return the value of the "type" attribute. """
+		""" Return the value of the "type" attribute.
+		"""
 		return self.getAttr("type")
 	
 	def setType(self,val):
-		""" Set the value of the "type" attribute. """
+		""" Set the value of the "type" attribute.
+		"""
 		self.setAttr("type", val)
 
 	def getErrorCode(self):
-		""" Return the error code. Obsolette. """
+		""" Return the error code. Obsolette.
+		"""
 		return self.getTagAttr("error", "code")
 	
 	def getProperties(self):
-		""" Return the list of namespaces to which belongs the direct childs of element"""
+		""" Return the list of namespaces to which belongs the direct childs of element.
+		"""
 		props = []
 		for child in self.getChildren():
 			prop = child.getNamespace()
@@ -409,11 +438,13 @@ class Stanza(Node):
 		return props
 
 class Message(Stanza):
-	""" XMPP Message stanza - "push" mechanism."""
+	""" XMPP Message stanza - "push" mechanism.
+	"""
 	def __init__(self, to=None, body=None, typ=None, subject=None, attrs=None, frm=None, payload=None, timestamp=None, xmlns=None, node=None):
 		""" Create message object. You can specify recipient, text of message, type of message
 			any additional attributes, sender of the message, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
-			Alternatively you can pass in the other XML object as the "node" parameted to replicate it as message. """
+			Alternatively you can pass in the other XML object as the "node" parameted to replicate it as message.
+		"""
 		Stanza.__init__(self, "message", to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
 		if body:
 			self.setBody(body)
@@ -421,32 +452,39 @@ class Message(Stanza):
 			self.setSubject(subject)
 	
 	def getBody(self):
-		""" Returns text of the message. """
+		""" Returns text of the message.
+		"""
 		return self.getTagData("body")
 
 	def setBody(self, body):
-		""" Sets the text of the message. """
+		""" Sets the text of the message.
+		"""
 		self.setTagData("body", body)
 
 	def getSubject(self):
-		""" Returns subject of the message. """
+		""" Returns subject of the message.
+		"""
 		return self.getTagData("subject")
 
 	def setSubject(self, subject):
-		""" Sets the subject of the message. """
+		""" Sets the subject of the message.
+		"""
 		self.setTagData("subject", subject)
 
 	def getThread(self):
-		""" Returns thread of the message. """
+		""" Returns thread of the message.
+		"""
 		return self.getTagData("thread")
 
 	def setThread(self, thr):
-		""" Sets the thread of the message. """
+		""" Sets the thread of the message.
+		"""
 		self.setTagData("thread", thr)
 	
 	def buildReply(self, body=None):
 		""" Builds and returns another message object with specified text.
-			The to, from and thread properties of new message are pre-set as reply to this message. """
+			The to, from and thread properties of new message are pre-set as reply to this message.
+		"""
 		msg = Message(to=self.getFrom(), frm=self.getTo(), body=body)
 		thr = self.getThread()
 		if thr:
@@ -454,11 +492,13 @@ class Message(Stanza):
 		return msg
 
 class Presence(Stanza):
-	""" XMPP Presence object."""
+	""" XMPP Presence object.
+	"""
 	def __init__(self, to=None, typ=None, priority=None, show=None, status=None, attrs=None, frm=None, timestamp=None, payload=None, xmlns=None, node=None):
 		""" Create presence object. You can specify recipient, type of message, priority, show and status values
 			any additional attributes, sender of the presence, timestamp, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
-			Alternatively you can pass in the other XML object as the "node" parameted to replicate it as presence. """
+			Alternatively you can pass in the other XML object as the "node" parameted to replicate it as presence.
+		"""
 		Stanza.__init__(self, "presence", to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
 		if priority:
 			self.setPriority(priority)
@@ -468,27 +508,33 @@ class Presence(Stanza):
 			self.setStatus(status)
 	
 	def getPriority(self):
-		""" Returns the priority of the message. """
+		""" Returns the priority of the message.
+		"""
 		return self.getTagData("priority")
 
 	def setPriority(self, priority):
-		""" Sets the priority of the presence. """
+		""" Sets the priority of the presence.
+		"""
 		self.setTagData("priority", priority)
 
 	def getShow(self):
-		""" Returns the show value of the message. """
+		""" Returns the show value of the message.
+		"""
 		return self.getTagData("show")
 
 	def setShow(self, show):
-		""" Sets the show value of the message. """
+		""" Sets the show value of the message.
+		"""
 		self.setTagData("show", show)
 
 	def getStatus(self):
-		""" Returns the status string of the message. """
+		""" Returns the status string of the message.
+		"""
 		return self.getTagData("status")
 
 	def setStatus(self, status):
-		""" Sets the status string of the message. """
+		""" Sets the status string of the message.
+		"""
 		self.setTagData("status", status)
 
 	def _muc_getItemAttr(self, tag, attr):
@@ -504,31 +550,38 @@ class Presence(Stanza):
 		return None, None
 	
 	def getRole(self):
-		"""Returns the presence role (for groupchat)"""
+		"""Returns the presence role.
+		"""
 		return self._muc_getItemAttr("item", "role")
 	
 	def getAffiliation(self):
-		"""Returns the presence affiliation (for groupchat)"""
+		"""Returns the presence affiliation.
+		"""
 		return self._muc_getItemAttr("item", "affiliation")
 	
 	def getNick(self):
-		"""Returns the nick value (for nick change in groupchat)"""
+		"""Returns the nick value.
+		"""
 		return self._muc_getItemAttr("item", "nick")
 	
 	def getJid(self):
-		"""Returns the presence jid (for groupchat)"""
+		"""Returns the presence jid.
+		"""
 		return self._muc_getItemAttr("item", "jid")
 	
 	def getReason(self):
-		"""Returns the reason of the presence (for groupchat)"""
+		"""Returns the reason of the presence.
+		"""
 		return self._muc_getSubTagDataAttr("reason", "")[0]
 	
 	def getStatusCode(self):
-		"""Returns the status code of the presence (for groupchat)"""
+		"""Returns the status code of the presence.
+		"""
 		return self._muc_getItemAttr("status", "code")
 
 class Iq(Stanza): 
-	""" XMPP Iq object - get/set dialog mechanism. """
+	""" XMPP Iq object - get/set dialog mechanism.
+	"""
 	def __init__(self, typ=None, queryNS=None, attrs=None, to=None, frm=None, payload=None, xmlns=None, node=None):
 		""" Create Iq object. You can specify type, query namespace
 			any additional attributes, recipient of the iq, sender of the iq, any additional payload (f.e. jabber:x:data node) and namespace in one go.
@@ -541,23 +594,27 @@ class Iq(Stanza):
 			self.setQueryNS(queryNS)
 
 	def getQueryNS(self):
-		""" Return the namespace of the "query" child element """
+		""" Return the namespace of the "query" child element.
+		"""
 		tag=self.getTag("query")
 		if tag:
 			return tag.getNamespace()
 
 	def setQueryNS(self, namespace):
-		""" Set the namespace of the "query" child element """
+		""" Set the namespace of the "query" child element.
+		"""
 		self.setTag("query").setNamespace(namespace)
 
 	def getQueryChildren(self):
-		""" Return the "query" child element child nodes """
+		""" Return the "query" child element child nodes.
+		"""
 		tag = self.getTag("query")
 		if tag:
 			return tag.getChildren()
 
 	def setQueryPayload(self, payload):
-		""" Set the "query" child element payload """
+		""" Set the "query" child element payload.
+		"""
 		self.setTag("query").setPayload(payload)
 
 	def buildReply(self, typ):

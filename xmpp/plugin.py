@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 
 class PlugIn:
-	""" Common xmpppy plugins infrastructure: plugging in/out, printfging. """
+	""" Common xmpppy plugins infrastructure: plugging in/out, debugging. """
 	def __init__(self):
 		self._exportedMethods = []
 		self.debugFlag = self.__class__.__name__.lower()

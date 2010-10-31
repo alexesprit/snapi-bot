@@ -42,7 +42,7 @@ class CommonClient:
 	""" Base for Client class."""
 	def __init__(self, server, port=5222, debugFlags=None):
 		""" Caches server name and (optionally) port to connect to. "printf" parameter specifies
-			the printf IDs that will go into printf output. You can either specifiy an "include"
+			the debug IDs that will go into debug output. You can either specifiy an "include"
 			or "exclude" list. The latter is done via adding "always" pseudo-ID to the list.
 		"""
 		self.Namespace = protocol.NS_CLIENT
@@ -79,15 +79,18 @@ class CommonClient:
 		self._debug.colors["start"] = debug.colorDarkGray
 	
 	def registerDisconnectHandler(self, handler):
-		""" Register handler that will be called on disconnect."""
+		""" Register handler that will be called on disconnect.
+		"""
 		self.disconnectHandlers.append(handler)
 
 	def unregisterDisconnectHandler(self, handler):
-		""" Unregister handler that is called on disconnect."""
+		""" Unregister handler that is called on disconnect.
+		"""
 		self.disconnectHandlers.remove(handler)
 
 	def disconnected(self):
-		""" Called on disconnection. Calls disconnect handlers and cleans things up. """
+		""" Called on disconnection. Calls disconnect handlers and cleans things up.
+		"""
 		self.connected = False
 		for instance in self.disconnectHandlers:
 			instance()
@@ -95,12 +98,14 @@ class CommonClient:
 			self.TLS.PlugOut()
 
 	def isConnected(self):
-		""" Returns connection state. F.e.: None | TCP | TLS | SSL """
+		""" Returns connection state. F.e.: None, "TCP", "TLS", "SSL".
+		"""
 		return self.connected
 
 	def connect(self, server=None, proxy=None, SecureMode=SECURE_DISABLE, useResolver=True):
-		""" Make a tcp/ip connection, protect it with tls/ssl if possible and start XMPP stream.
-			Returns None or C_TCP or C_TLS, depending on the result."""
+		""" Make a TCP/IP connection, protect it with TLS/SSL if possible and start XMPP stream.
+			Returns None, "TCP", "TLS" or "SSL", depending on the result.
+		"""
 		if not server:
 			server = (self.Server, self.Port)
 		if proxy:
@@ -137,14 +142,15 @@ class Client(CommonClient):
 		""" Connect to jabber server. If you want to specify different ip/port to connect to you can
 			pass it as tuple as first parameter. If there is HTTP proxy between you and server 
 			specify it's address and credentials (if needed) in the second argument.
-			If you want ssl/tls support to be discovered and enable automatically, set third argument as SSL_AUTO. (ssl will be autodetected only if port is 5223 or 443)
-			If you want to force SSL start (i.e. if port 5223 or 443 is remapped to some non-standard port) then set it to SSL_FORCE.
-			If you want to disable tls/ssl support completely, set it to SSL_DISABLE.
+			If you want TLS/SSL support to be discovered and enable automatically, 
+			set third argument as SECURE_AUTO (SSL will be autodetected only if port is 5223 or 443)
+			If you want to force SSL start (i.e. if port 5223 or 443 is remapped to some non-standard port) then set it to SECURE_FORCE.
+			If you want to disable TLS/SSL support completely, set it to SECURE_DISABLE.
 			Example: connect(("192.168.5.5", 5222), {"host":"proxy.my.net", "port":8080, "user":"me", "password":"secret"})
-			Returns False or "TCP", "SSL" "TLS", depending on the result.
+			Returns None or "TCP", "SSL" "TLS", depending on the result.
 		"""
 		if(not CommonClient.connect(self, server, proxy, SecureMode, useResolver)):
-			return False
+			return None
 		if(SecureMode != SECURE_DISABLE and not hasattr(self, C_TLS)):
 			transports.TLS().PlugIn(self)
 			if(self.Dispatcher.Stream._document_attrs.get("version") == "1.0"):
@@ -197,7 +203,8 @@ class Client(CommonClient):
 
 	def getRoster(self):
 		""" Return the Roster instance, previously plugging it in and
-			requesting roster from server if needed. """
+			requesting roster from server if needed.
+		"""
 		if(not hasattr(self, "Roster")):
 			roster.Roster().PlugIn(self)
 		return self.Roster.getRoster()

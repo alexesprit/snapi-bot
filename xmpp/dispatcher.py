@@ -35,7 +35,8 @@ DBG_DISPATCHER = "dispatcher"
 
 class Dispatcher(plugin.PlugIn):
 	""" Ancestor of PlugIn class. Handles XMPP stream, i.e. aware of stream headers.
-		Can be plugged out/in to restart these headers (used for SASL f.e.). """
+		Can be plugged out/in to restart these headers (used for SASL f.e.).
+	"""
 	def __init__(self):
 		plugin.PlugIn.__init__(self)
 		self.debugFlag = DBG_DISPATCHER
@@ -53,7 +54,7 @@ class Dispatcher(plugin.PlugIn):
 		]
 
 	def dumpHandlers(self):
-		""" Return set of user-registered callbacks in it"s internal format.
+		""" Return set of user-registered callbacks in it's internal format.
 			Used within the library to carry user handlers set over Dispatcher replugins. 
 		"""
 		return self.handlers
@@ -65,7 +66,8 @@ class Dispatcher(plugin.PlugIn):
 		self.handlers = handlers
 
 	def _init(self):
-		""" Registers default namespaces/protocols/handlers. Used internally.  """
+		""" Registers default namespaces/protocols/handlers. Used internally.
+		"""
 		self.registerNamespace(protocol.NS_STREAMS)
 		self.registerNamespace(self._owner.defaultNamespace)
 		self.registerStanza("iq", protocol.Iq)
@@ -74,7 +76,9 @@ class Dispatcher(plugin.PlugIn):
 		self.registerHandler("error", self.streamErrorHandler, xmlns=protocol.NS_STREAMS)
 
 	def plugin(self, owner):
-		""" Plug the Dispatcher instance into Client class instance and send initial stream header. Used internally."""
+		""" Plug the Dispatcher instance into Client class instance and send 
+			initial stream header. Used internally.
+		"""
 		self._init()
 		for method in self._oldMethods:
 			if method.__name__ == "send":
@@ -83,13 +87,15 @@ class Dispatcher(plugin.PlugIn):
 		self.initStream()
 
 	def plugout(self):
-		""" Prepares instance to be destructed. """
+		""" Prepares instance to be destructed.
+		"""
 		self.Stream.dispatch = None
 		self.Stream.features = None
 		self.Stream.destroy()
 
 	def initStream(self):
-		""" Send an initial stream header. """
+		""" Send an initial stream header.
+		"""
 		self.Stream = simplexml.NodeBuilder()
 		self.Stream._dispatch_depth = 2
 		self.Stream.dispatch = self.dispatch
@@ -109,9 +115,9 @@ class Dispatcher(plugin.PlugIn):
 	def process(self, timeout=0):
 		""" Check incoming stream for data waiting. If "timeout" is positive - block for as max. this time.
 			Returns:
-			1) length of processed data if some data were processed
-			2) "0" string if no data were processed but link is alive
-			3) 0 (zero) if underlying connection is closed.
+				1) length of processed data if some data were processed
+				2) "0" string if no data were processed but link is alive
+				3) 0 (zero) if underlying connection is closed.
 			Take note that in case of disconnection detect during process() call
 			disconnect handlers are called automatically.
 		"""
@@ -129,7 +135,7 @@ class Dispatcher(plugin.PlugIn):
 	def registerNamespace(self, xmlns, order="info"):
 		""" Creates internal structures for newly registered namespace.
 			You can register handlers for this namespace afterwards. By default one namespace
-			already registered (jabber:client or jabber:component:accept depending on context. 
+			already registered. 
 		"""
 		self.printf("Registering namespace %s" % (xmlns), order)
 		self.handlers[xmlns] = {}
@@ -159,7 +165,7 @@ class Dispatcher(plugin.PlugIn):
 		"""
 		if not xmlns:
 			xmlns = self._owner.defaultNamespace
-		self.printf("Registering %s for %s type: %s, namespace: %s (%s)" % (handler, name, htype, namespace, xmlns), "info")
+		self.printf("Registering %s for %s type: %s, namespace: %s (%s)" % (handler, name, htype, namespace, xmlns))
 		if not htype and not namespace:
 			htype = "default"
 		if xmlns not in self.handlers:
@@ -172,7 +178,9 @@ class Dispatcher(plugin.PlugIn):
 		self.handlers[xmlns][name][key].append(handler)
 
 	def unregisterHandler(self, name, handler, htype="", namespace="", xmlns=None):
-		""" Unregister handler. "htype" and "namespace" must be specified exactly the same as with registering."""
+		""" Unregister handler. "htype" and "namespace" must be specified 
+			exactly the same as with registering.
+		"""
 		if not xmlns:
 			xmlns = self._owner.defaultNamespace
 		self.printf("Unregistering handler %s for %s type: %s, namespace: %s (%s)" % (handler, name, htype, namespace, xmlns), "stop")
@@ -201,8 +209,8 @@ class Dispatcher(plugin.PlugIn):
 		raise exc(name, text)
 
 	def dispatch(self, stanza, session=None):
-		""" Main procedure that performs XMPP stanza recognition and calling apppropriate handlers for it.
-			Called internally.
+		""" Main procedure that performs XMPP stanza recognition and calling 
+			apppropriate handlers for it. Called internally.
 		"""
 		if not session:
 			session = self
@@ -229,7 +237,7 @@ class Dispatcher(plugin.PlugIn):
 		if(not stanzaType): 
 			stanzaType = ""
 		stanzaProps = stanza.getProperties()
-		session.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID), "ok")
+		session.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID))
 
 		if stanzaID in session._expected:
 			if isinstance(session._expected[stanzaID], tuple):
@@ -269,7 +277,7 @@ class Dispatcher(plugin.PlugIn):
 		"""
 		self._expected[id] = None
 		abortTime = time.time() + timeout
-		self.printf("Waiting for ID %s with timeout %s..." % (id, timeout), "wait")
+		self.printf("Waiting for ID %s with timeout %s..." % (id, timeout))
 		while not self._expected[id]:
 			if not self.process(0.1):
 				return None 
@@ -280,7 +288,8 @@ class Dispatcher(plugin.PlugIn):
 		return response 
 
 	def sendAndWaitForResponse(self, stanza, timeout=DEFAULT_TIMEOUT):
-		""" Put stanza on the wire and wait for recipient's response to it. """
+		""" Put stanza on the wire and wait for recipient's response to it.
+		"""
 		return(self.waitForResponse(self.send(stanza), timeout))
 
 	def sendAndCallForResponse(self, stanza, func, args=None):
@@ -313,7 +322,9 @@ class Dispatcher(plugin.PlugIn):
 		return stanzaID
 
 	def disconnect(self):
-		""" Send a stream terminator and and handle all incoming stanzas before stream closure. """
+		""" Send a stream terminator and and handle all incoming stanzas 
+			before stream closure.
+		"""
 		self._owner_send("</stream:stream>")
 		while self.process(1):
 			pass

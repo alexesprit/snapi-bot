@@ -160,7 +160,6 @@ gJokes = []
 
 gID = 0
 
-gDebug.colors[FLAG_INFO] = debug.colorWhite
 gDebug.colors[FLAG_ERROR] = debug.colorBrightRed
 gDebug.colors[FLAG_WARNING] = debug.colorYellow
 gDebug.colors[FLAG_SUCCESS] = debug.colorBrightCyan
@@ -554,7 +553,7 @@ def messageHandler(session, stanza):
 	message = message.strip()
 	if(protocol.TYPE_ERROR == msgType):
 		errorCode = stanza.getErrorCode()
-		if(errorCode == u"500"):
+		if(errorCode == "500"):
 			time.sleep(1)
 			stanza = stanza.buildReply(message)
 			gClient.send(stanza)

@@ -33,14 +33,14 @@ gQuizTimer = {}
 gQuizAskTime = {}
 gQuizIdleCount = {}
 
-def quizIdleCheck(conference):
+def checkQuizIdle(conference):
 	sendToConference(conference, u"(!) Время вышло! Правильный ответ: %s" % (gQuizAnswer[conference]))
 	gQuizIdleCount[conference] += 1
 	if(gQuizIdleCount[conference] == QUIZ_IDLE_LIMIT):
 		sendToConference(conference, u"(!) Викторина автоматичеки заверщена по бездействию!")
-		quizStop()
+		quizStop(conference, False)
 	else:
-		askQuizQuestion(conference)
+		askQuizQuestion(conference, resetIdle=False)
 
 def getQuizHint(answer):
 	return(["*"] * len(answer))
@@ -51,7 +51,7 @@ def isQuizTimerEnabled(conference):
 def resetQuizTimer(conference):
 	if(isQuizTimerEnabled(conference)):
 		gQuizTimer[conference].cancel()
-	gQuizTimer[conference] = startTimer(QUIZ_TIME_LIMIT, quizIdleCheck, (conference, ))
+	gQuizTimer[conference] = startTimer(QUIZ_TIME_LIMIT, checkQuizIdle, (conference, ))
 
 def getQuizQuestion():
 	questionNum = random.randrange(0, QUIZ_TOTAL_LINES)
@@ -64,12 +64,14 @@ def getQuizQuestion():
 		else:
 			fp.readline()
 
-def askQuizQuestion(conference, lastAnswer = None):
+def askQuizQuestion(conference, lastAnswer=None, resetIdle=True):
 	question, answer = getQuizQuestion()
 	gQuizAnswer[conference] = answer
 	gQuizQuestion[conference] = question
 	gQuizHint[conference] = getQuizHint(answer)
-	gQuizIdleCount[conference] = 0
+	if resetIdle:
+		gQuizIdleCount[conference] = 0
+		print "reset idle count"
 	gQuizAskTime[conference] = time.time()
 	resetQuizTimer(conference)
 	gQuizEnable[conference] = True
@@ -78,7 +80,7 @@ def askQuizQuestion(conference, lastAnswer = None):
 	else:
 		sendToConference(conference, u"(?) Внимание вопрос:\n%s" % (question))
 
-def quizStop(conference):
+def quizStop(conference, showScores=True):
 	del(gQuizAnswer[conference])
 	del(gQuizQuestion[conference])
 	del(gQuizHint[conference])
@@ -88,7 +90,8 @@ def quizStop(conference):
 	if(isQuizTimerEnabled(conference)):
 		gQuizTimer[conference].cancel()
 		del(gQuizTimer[conference])
-	showScoreList(protocol.TYPE_PUBLIC, conference)
+	if showScores:
+		showScoreList(protocol.TYPE_PUBLIC, conference)
 
 def checkQuizAnswer(conference, nick, trueJid, answer):
 	rightAnswer = gQuizAnswer[conference].lower()

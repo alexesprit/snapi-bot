@@ -37,7 +37,8 @@ class Roster(plugin.PlugIn):
 		contacts in roster.
 	"""
 	def __init__(self):
-		""" Init internal variables. """
+		""" Init internal variables.
+		"""
 		plugin.PlugIn.__init__(self)
 		self.debugFlag = DBG_ROSTER
 		self.rosterData = {}
@@ -45,7 +46,7 @@ class Roster(plugin.PlugIn):
 		self._exportedMethods = [self.getRoster]
 
 	def plugin(self, owner):
-		""" Register presence and subscription trackers in the owner"s dispatcher.
+		""" Register presence and subscription trackers in the owner's dispatcher.
 			Also request roster from server if the "request" argument is set.
 			Used internally.
 		"""
@@ -61,7 +62,8 @@ class Roster(plugin.PlugIn):
 		self.printf("Roster requested from server", "start")
 
 	def getRoster(self):
-		""" Requests roster from server if neccessary and returns self. """
+		""" Requests roster from server if neccessary and returns self.
+		"""
 		if self.state == ROSTER_EMPTY:
 			self.requestRoster()
 		while self.state != ROSTER_LOADED:
@@ -69,8 +71,8 @@ class Roster(plugin.PlugIn):
 		return self
 
 	def rosterIqHandler(self, dis, stanza):
-		""" Subscription tracker. Used internally for setting items state in
-			internal roster representation.
+		""" Subscription tracker. Used internally for setting items state 
+			in internal roster representation.
 		"""
 		for item in stanza.getTag("query").getTags("item"):
 			jid = item.getAttr("jid")
@@ -78,7 +80,7 @@ class Roster(plugin.PlugIn):
 				if jid in self.rosterData:
 					del self.rosterData[jid]
 					return
-			if(not jid in self.rosterData):
+			if not jid in self.rosterData:
 				self.rosterData[jid] = {}
 			self.rosterData[jid]["name"] = item.getAttr("name")
 			self.rosterData[jid]["subscription"] = item.getAttr("subscription")
@@ -87,12 +89,12 @@ class Roster(plugin.PlugIn):
 				self.rosterData[jid]["resources"] = {}
 			for group in item.getTags("group"):
 				self.rosterData[jid]["groups"].append(group.getData())
-		self.printf("Roster is loaded (%d items)" % (len(self.rosterData)), "ok")
+			self.printf("Setting roster item %s" % (jid), "ok")
 		self.state = ROSTER_LOADED
 
 	def presenceHandler(self, dis, stanza):
-		""" Presence tracker. Used internally for setting items" resources state in
-			internal roster representation.
+		""" Presence tracker. Used internally for setting items' resources state
+			in internal roster representation.
 		"""
 		fullJid = stanza.getFrom()
 		bareJid = fullJid.getBareJid()
@@ -111,12 +113,16 @@ class Roster(plugin.PlugIn):
 					del item["resources"][resource]
 
 	def _getItemData(self, jid, field):
-		""" Return specific jid"s representation in internal format. Used internally. """
+		""" Return specific jid's representation in internal format. 
+			Used internally.
+		"""
 		jid = protocol.UserJid(jid).getBareJid()
 		return self.rosterData[jid][field]
 
 	def _getResourceData(self, jid, field):
-		""" Return specific jid"s resource representation in internal format. Used internally. """
+		""" Return specific jid's resource representation in internal format. 
+			Used internally.
+		"""
 		fullJid = protocol.UserJid(jid)
 		bareJid = fullJid.getBareJid()
 		resource = fullJid.getResource()
@@ -133,80 +139,95 @@ class Roster(plugin.PlugIn):
 			return resources[resource][field]
 
 	def getGroups(self, jid):
-		""" Returns groups list that contact "jid" belongs to. """
+		""" Returns groups list that jid belongs to.
+		"""
 		return self._getItemData(jid, "groups")
 
 	def getName(self, jid):
-		""" Returns name of contact "jid". """
+		""" Returns name of jid.
+		"""
 		return self._getItemData(jid, "name")
 
 	def getPriority(self, jid):
-		""" Returns priority of contact "jid". "jid" should be a full (not bare) jid."""
+		""" Returns priority of jid. Jid should be a full (not bare).
+		"""
 		return self._getResourceData(jid, "priority")
 
 	def getShow(self, jid):
-		""" Returns "show" value of contact "jid". "jid" should be a full (not bare) jid. """
+		""" Returns "show" value of jid. Jid should be a full (not bare).
+		"""
 		return(self._getResourceData(jid, "show"))
 
 	def getStatus(self, jid):
-		""" Returns "status" value of contact "jid". "jid" should be a full (not bare) jid. """
+		""" Returns "status" value of jid. Jid should be a full (not bare).
+		"""
 		return(self._getResourceData(jid, "status"))
 
 	def getSubscription(self, jid):
-		""" Returns "subscription" value of contact "jid". """
+		""" Returns "subscription" value of jid. """
 		return(self._getItemData(jid, "subscription"))
 
 	def getResources(self, jid):
-		""" Returns list of connected resources of contact "jid"."""
+		""" Returns list of connected resources of jid.
+		"""
 		fullJid = protocol.UserJid(jid)
 		bareJid = fullJid.getBareJid()
 		return self.rosterData[bareJid]["resources"].keys()
 
-	def setItem(self, jid, name=None, groups = []):
-		""" Creates/renames contact "jid" and sets the groups list that it now belongs to. """
+	def setItem(self, jid, name=None, groups=None):
+		""" Creates/renames jid and sets the groups list that it now belongs to.
+		"""
 		iq = Iq("set", NS_ROSTER)
 		query = iq.getTag("query")
-		attrs = {"jid": jid}
-		if(name):
+		if name:
 			attrs["name"] = name
-		item = query.setTag("item", attrs)
+		item = query.setTag("item", attrs={"jid": jid})
+		if not groups:
+			groups = []
 		for group in groups: 
-			item.addChild(node=Node("group", payload = [group]))
+			item.addChild(node=Node("group", payload=[group]))
 		self._owner.send(iq)
 
 	def keys(self):
-		""" Same as getItems. Provided for the sake of dictionary interface. """
+		""" Same as getItems. Provided for the sake of dictionary interface.
+		"""
 		return self.rosterData.keys()
 
 	def getItem(self, item):
-		""" Get the contact in the internal format (or None if jid "item" is not in roster). """
+		""" Get the contact in the internal format
+			or None if jid is not in roster.
+		"""
 		if item in self.rosterData:
 			return self.rosterData[item]
 
 	def delItem(self, jid):
-		""" Delete contact "jid" from roster. """
+		""" Delete jid from roster.
+		"""
 		iq = protocol.Iq(protocol.TYPE_SET, protocol.NS_ROSTER)
 		itemNode = protocol.Node("item", {"jid": jid,"subscription": "remove"})
 		iq.addChild(node=itemNode)
 		self._owner.send(iq)
 		
 	def subscribe(self, jid):
-		""" Send subscription request to jid "jid". """
+		""" Send subscription request to jid.
+		"""
 		prs = protocol.Presence(jid, protocol.PRS_SUBSCRIBE)
 		self._owner.send(prs)
 
 	def unsubscribe(self, jid):
-		""" Ask for removing our subscription for jid "jid". """
+		""" Ask for removing our subscription for jid.
+		"""
 		prs = protocol.Presence(jid, protocol.PRS_UNSUBSCRIBE)
 		self._owner.send(prs)
 
 	def authorize(self, jid):
-		""" Authorise jid "jid". Works only if these jid requested auth previously. """
+		""" Authorise jid. Works only if these jid requested auth previously.
+		"""
 		prs = protocol.Presence(jid, protocol.PRS_SUBSCRIBED)
 		self._owner.send(prs)
 
 	def unauthorize(self, jid):
-		""" Unauthorise jid "jid". Use for declining authorisation request 
+		""" Unauthorise jid. Use for declining authorisation request 
 			or for removing existing authorization.
 		"""
 		prs = protocol.Presence(jid, protocol.PRS_UNSUBSCRIBED)
