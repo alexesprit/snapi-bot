@@ -64,9 +64,6 @@ def ustr(text):
 		return unicode(text, "utf-8")
 	return text
 
-def getFilePath(*param):
-	return(os.path.join(*param))
-
 def createFile(path, data):
 	path = path.encode("utf-8")
 	if(not os.access(path, os.F_OK)):
@@ -82,9 +79,9 @@ def readFile(path, encoding=None):
 	f = file(path)
 	data = f.read()
 	f.close()
-	if(encoding):
+	if encoding:
 		data = data.decode(encoding)
-	return(data)
+	return data
 
 def writeFile(path, data, mode="w"):
 	path = path.encode("utf-8")

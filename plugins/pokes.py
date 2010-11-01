@@ -19,7 +19,7 @@ gPokes = []
 
 def loadPokes():
 	global gPokes
-	fileName = utils.getFilePath(RESOURCE_DIR, POKES_FILE)
+	fileName = getFilePath(RESOURCE_DIR, POKES_FILE)
 	gPokes = eval(utils.readFile(fileName, "utf-8"))
 
 def pokeUser(msgType, conference, nick, param):

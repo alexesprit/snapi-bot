@@ -17,7 +17,7 @@ JOKES_FILE = "jokes.txt"
 
 def loadJokes():
 	global gJokes
-	fileName = utils.getFilePath(RESOURCE_DIR, JOKES_FILE)
+	fileName = getFilePath(RESOURCE_DIR, JOKES_FILE)
 	gJokes = eval(utils.readFile(fileName, "utf-8"))
 
 def setDefJokesValue(conference):

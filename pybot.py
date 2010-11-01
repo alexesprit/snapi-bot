@@ -277,8 +277,10 @@ def time2str(time):
 		timeString = u"%d дн. %s" % (days, timeString)
 	return timeString
 
+getFilePath = os.path.join
+
 def getConfigPath(*param):
-	return(os.path.join(CONFIG_DIR, *param))
+	return os.path.join(CONFIG_DIR, *param)
 
 def decode(text, encoding=None):
 	if encoding:
@@ -699,7 +701,7 @@ def iqHandler(session, stanza):
 def saveException(funcName):
 	gInfo["err"] += 1
 	printf("Exception in %s function" % (funcName), FLAG_ERROR)
-	fileName = utils.getFilePath(SYSLOG_DIR, time.strftime(ERROR_FILE))
+	fileName = getFilePath(SYSLOG_DIR, time.strftime(ERROR_FILE))
 	utils.writeFile(fileName, traceback.format_exc() + "\n", "a")
 
 def loadPlugins():
@@ -815,7 +817,7 @@ if(__name__ == "__main__"):
 		shutdown()
 	except(Exception):
 		printf("Exception in main thread", FLAG_ERROR)
-		fileName = utils.getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE))
+		fileName = getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE))
 		utils.writeFile(fileName, traceback.format_exc() + "\n", "a")
 		if(gClient.isConnected()):
 			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)

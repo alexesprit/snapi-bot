@@ -27,7 +27,7 @@ def getTVChannelCode(channelName):
 
 def loadTVChannels():
 	global gTVChannels
-	fileName = utils.getFilePath(RESOURCE_DIR, TVCODES_FILE)
+	fileName = getFilePath(RESOURCE_DIR, TVCODES_FILE)
 	gTVChannels = eval(utils.readFile(fileName, "utf-8"))
 
 def showTVProgram(msgType, conference, nick, param):
