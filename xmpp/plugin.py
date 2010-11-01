@@ -13,13 +13,15 @@
 # GNU General Public License for more details.
 
 class PlugIn:
-	""" Common xmpppy plugins infrastructure: plugging in/out, debugging. """
+	""" Common xmpppy plugins infrastructure: plugging in/out, debugging.
+	"""
 	def __init__(self):
 		self._exportedMethods = []
 		self.debugFlag = self.__class__.__name__.lower()
 
 	def PlugIn(self, owner):
-		""" Attach to main instance and register ourself and all our staff in it. """
+		""" Attach to main instance and register ourself and all our staff in it.
+		"""
 		self._owner = owner
 		if self.debugFlag not in owner.debugFlags:
 			owner.debugFlags.append(self.debugFlag)
@@ -39,7 +41,8 @@ class PlugIn:
 			self.printf("Another %s is already plugged" % (self), "error")
  
 	def PlugOut(self):
-		""" Unregister all our staff from main instance and detach from it. """
+		""" Unregister all our staff from main instance and detach from it.
+		"""
 		self.printf("Plugging %s out of %s" % (self, self._owner), "stop")
 		if hasattr(self, "plugout"):
 			self.plugout()
@@ -51,7 +54,7 @@ class PlugIn:
 		delattr(self._owner, self.__class__.__name__)
 
 	def printf(self, text, severity="info"):
-		""" Feed a provided debug line to main instance's printf 
+		""" Feed a provided debug line to main instance's debug 
 			facility along with our ID string. 
 		"""
 		self._owner.printf(text, self.debugFlag, severity)

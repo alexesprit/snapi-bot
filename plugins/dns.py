@@ -18,18 +18,18 @@ import socket
 
 def getDNSAnswer(query):
 	try:
-		if(not re.sub("([0-9]+).([0-9]+).([0-9]+).([0-9]+)", "", query)):
-			(hostname, aliaslist, ipaddrlist) = socket.gethostbyaddr(query)
-			return(hostname)
+		if not re.sub(r"\d+\.\d+\.\d+\.\d+", "", query):
+			hostname = socket.gethostbyaddr(query)[0]
+			return hostname
 		else:
-			(hostname, aliaslist, ipaddrlist) = socket.gethostbyaddr(query)
-			return(", ".join(ipaddrlist))
-	except(socket.gaierror, socket.herror):
-		return(None)
+			ipaddrlist = socket.gethostbyaddr(query)[2]
+			return u", ".join(ipaddrlist)
+	except socket.gaierror, socket.herror:
+		return None
 
 def showServerDns(msgType, conference, nick, param):
-	answer = getDNSAnswer(param)
-	if(answer):
+	answer = getDNSAnswer(param.encode("utf-8"))
+	if answer:
 		sendMsg(msgType, conference, nick, answer)
 	else:
 		sendMsg(msgType, conference, nick, u"не могу")
