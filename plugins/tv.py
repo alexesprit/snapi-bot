@@ -39,7 +39,7 @@ def showTVProgram(msgType, conference, nick, param):
 		items = re.findall(r"<div>(.+?)</div>", rawHTML, re.DOTALL)
 		if items:
 			rawtext = "\n".join(items)
-			message = u"вот, что я нашла:\n%s" % (decode(rawtext, "utf-8"))
+			message = u"Вот, что я нашла:\n%s" % (decode(rawtext, "utf-8"))
 			sendMsg(msgType, conference, nick, message)
 		else:
 			sendMsg(msgType, conference, nick, u"На сегодня программы нет")
@@ -48,7 +48,7 @@ def showTVProgram(msgType, conference, nick, param):
 
 def showTVList(msgType, conference, nick, parameters):
 	if(protocol.TYPE_PUBLIC == msgType):
-		sendMsg(msgType, conference, nick, u"Скинула в приват")
+		sendMsg(msgType, conference, nick, u"Ушёл")
 	tvList = [u"%s - %s" % (code, name) for name, code in gTVChannels.items()]
 	tvList.sort()
 	sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Список каналов:\n%s" % ("\n".join(tvList)))
@@ -57,7 +57,7 @@ registerEvent(loadTVChannels, STARTUP)
 
 registerCommand(showTVProgram, u"тв", 10, 
 				u"Показать телепрограму для определённого канала", 
-				u"тв <название>", 
+				u"тв <канал|номер>", 
 				(u"тв первый", ), 
 				ANY | PARAM)
 registerCommand(showTVList, u"твлист", 10, 
