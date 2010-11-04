@@ -15,8 +15,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-VCARD_ID = "vcard_id"
-
 VCARD_TAGS = (
 	("NICKNAME", u"Ник"),
 	("FN", u"Имя"),
@@ -48,7 +46,7 @@ def showVCard(msgType, conference, nick, param):
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.addChild("vCard", {}, [], protocol.NS_VCARD)
 	iq.setTo(jid)
-	iq.setID(getUniqueID(VCARD_ID))
+	iq.setID(getUniqueID("vcard_id"))
 	gClient.sendAndCallForResponse(iq, _showVCard, (msgType, conference, nick, param, ))
 
 def _showVCard(stanza, msgType, conference, nick, param):

@@ -15,8 +15,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-PING_ID = "ping_id"
-
 REPLICS_FOR_OTHER = (
 	u"Понг от %s составляет", 
 	u"Скорость отклика сервера для %s равна", 
@@ -53,7 +51,7 @@ def showPing(msgType, conference, nick, param):
 		jid = conference + "/" + nick
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_VERSION)
 	iq.setTo(jid)
-	iq.setID(getUniqueID(PING_ID))
+	iq.setID(getUniqueID("ping_id"))
 	t0 = time.time()
 	gClient.sendAndCallForResponse(iq, _showPing, (t0, msgType, conference, nick, param, ))
 

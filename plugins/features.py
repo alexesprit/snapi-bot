@@ -13,8 +13,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-FEAT_ID = "features_id"
-
 FEATURES = {
 	protocol.NS_DATA:			"XEP-0004: Data Forms",
 	protocol.NS_RPC:			"XEP-0009: Jabber-RPC",
@@ -70,7 +68,7 @@ def showFeatures(msgType, conference, nick, param):
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.setTo(jid)
 	iq.addChild("query", {}, [], protocol.NS_DISCO_INFO)
-	iq.setID(getUniqueID(FEAT_ID))
+	iq.setID(getUniqueID("feat_id"))
 	gClient.sendAndCallForResponse(iq, _showFeatures, (msgType, conference, nick, param, ))
 
 def _showFeatures(stanza, msgType, conference, nick, param):

@@ -14,8 +14,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-VER_ID = "ver_id"
-
 def showVersion(msgType, conference, nick, param):
 	if param == getBotNick(conference):
 		sendMsg(msgType, conference, nick, u"Я юзаю %s %s в %s" % (gVersion[0], gVersion[1], gVersion[2]))
@@ -29,7 +27,7 @@ def showVersion(msgType, conference, nick, param):
 			jid = conference + "/" + nick
 		iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_VERSION)
 		iq.setTo(jid)
-		iq.setID(getUniqueID(VER_ID))
+		iq.setID(getUniqueID("ver_id"))
 		gClient.sendAndCallForResponse(iq, _showVersion, (msgType, conference, nick, param, ))
 
 def _showVersion(stanza, msgType, conference, nick, param):

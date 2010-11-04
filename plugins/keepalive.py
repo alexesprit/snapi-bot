@@ -13,7 +13,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-KEEP_ID = "keep_id"
 KEEPALIVE_TIMEOUT = 300
 
 def _sendKeepAlivePacket(stanza, conference):
@@ -24,7 +23,7 @@ def _sendKeepAlivePacket(stanza, conference):
 def sendKeepAlivePacket():
 	for conference in getConferences():
 		iq = protocol.Iq(protocol.TYPE_GET)
-		iq.setID(getUniqueID(KEEP_ID))
+		iq.setID(getUniqueID("keep_id"))
 		iq.addChild("ping", {}, [], protocol.NS_PING)
 		iq.setTo(conference + "/" + getBotNick(conference))
 		gClient.sendAndCallForResponse(iq, _sendKeepAlivePacket, (conference, ))

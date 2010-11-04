@@ -15,8 +15,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-DISCO_ID = "disco_id"
-
 def serviceDiscovery(msgType, conference, nick, param):
 	param = param or gServer
 	param = param.split(None, 2)
@@ -44,7 +42,7 @@ def serviceDiscovery(msgType, conference, nick, param):
 		query.setAttr("node", node)
 	else:
 		iq.setTo(jid)
-	iq.setID(getUniqueID(DISCO_ID))
+	iq.setID(getUniqueID("disco_id"))
 	gClient.sendAndCallForResponse(iq, _serviceDiscovery, (msgType, conference, nick, jid, maxCount, searchKey))
 
 def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKey):

@@ -14,8 +14,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-TIME_ID = "time_id"
-
 def showUserTime(msgType, conference, nick, param):
 	if(param):
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
@@ -27,7 +25,7 @@ def showUserTime(msgType, conference, nick, param):
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.addChild("time", {}, [], protocol.NS_ENTITY_TIME)
 	iq.setTo(jid)
-	iq.setID(getUniqueID(TIME_ID))
+	iq.setID(getUniqueID("time_id"))
 	gClient.sendAndCallForResponse(iq, _showUserTime, (msgType, conference, nick, param))
 
 def _showUserTime(stanza, msgType, conference, nick, param):

@@ -14,7 +14,6 @@
 # GNU General Public License for more details.
 
 CLIENTS_FILE = "clients.txt"
-CLIENTS_ID = "clients_id"
 
 gUserClients = {}
 
@@ -51,7 +50,7 @@ def saveUserClient(conference, nick, trueJid, aff, role):
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.addChild("query", {}, [], protocol.NS_VERSION)
 	iq.setTo(conference + "/" + nick)
-	iq.setID(getUniqueID(CLIENTS_ID))
+	iq.setID(getUniqueID("cli_id"))
 	gClient.sendAndCallForResponse(iq, _saveUserClient, (conference, trueJid, ))
 
 def _saveUserClient(stanza, conference, trueJid):

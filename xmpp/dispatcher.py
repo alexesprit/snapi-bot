@@ -315,8 +315,8 @@ class Dispatcher(plugin.PlugIn):
 			stanza.setID(stanzaID)
 		else:
 			stanzaID = stanza.getID()
-		if(self._owner._registeredName and not stanza.getAttr("from")):
-			stanza.setAttr("from", self._owner._registeredName)
+		#if(self._owner._registeredName and not stanza.getAttr("from")):
+		#	stanza.setAttr("from", self._owner._registeredName)
 		stanza.setNamespace(self._owner.Namespace)
 		self._owner_send(stanza)
 		return stanzaID

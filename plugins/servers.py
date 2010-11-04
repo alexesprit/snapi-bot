@@ -14,10 +14,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-INFO_ID = "info_id"
-STATS_ID = "stats_id"
-UPTIME_ID = "uptime_id"
-
 def _showServerStats(stanza, msgType, conference, nick, server):
 	if protocol.TYPE_RESULT == stanza.getType():
 		items = []
@@ -38,7 +34,7 @@ def _showServerInfo(stanza, msgType, conference, nick, server):
 		iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_STATS)
 		iq.setQueryPayload(stanza.getQueryChildren())
 		iq.setTo(server)
-		iq.setID(getUniqueID(STATS_ID))
+		iq.setID(getUniqueID("info_id"))
 		gClient.sendAndCallForResponse(iq, _showServerStats, (msgType, conference, nick, server, ))
 	else:
 		sendMsg(msgType, conference, nick, u"Не получается :(")
@@ -47,7 +43,7 @@ def showServerInfo(msgType, conference, nick, param):
 	server = param or gServer
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_STATS)
 	iq.setTo(server)
-	iq.setID(getUniqueID(INFO_ID))
+	iq.setID(getUniqueID("info_id"))
 	gClient.sendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, server, ))
 
 def _showServerUptime(stanza, msgType, conference, nick, server):
@@ -65,7 +61,7 @@ def showServerUptime(msgType, conference, nick, param):
 	server = param or gServer
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_LAST)
 	iq.setTo(server)
-	iq.setID(getUniqueID(UPTIME_ID))
+	iq.setID(getUniqueID("uptime_id"))
 	gClient.sendAndCallForResponse(iq, _showServerUptime, (msgType, conference, nick, server, ))
 
 registerCommand(showServerInfo, u"инфа", 10, 

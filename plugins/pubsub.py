@@ -15,7 +15,7 @@
 
 def setBotMood(msgType, jid, resource, param):
 	if(param == u"сброс" or param.count("|")):
-		iq = protocol.Iq("set")
+		iq = protocol.Iq(protocol.TYPE_SET)
 		iq.setType(protocol.TYPE_HEADLINE)
 		pubsub = iq.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
 		pubNode = protocol.Node("publish", {"node": protocol.NS_MOOD})
@@ -36,7 +36,7 @@ def setBotMood(msgType, jid, resource, param):
 
 def setBoAtctivity(msgType, jid, resource, param):
 	if(param == u"сброс" or param.count("|")):
-		iq = protocol.Iq("set")
+		iq = protocol.Iq(protocol.TYPE_SET)
 		iq.setType(protocol.TYPE_HEADLINE)
 		pubsub = iq.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
 		pubNode = protocol.Node("publish", {"node": protocol.NS_ACTIVITY})
