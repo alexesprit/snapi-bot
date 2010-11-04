@@ -538,7 +538,7 @@ def sendMsg(msgType, conference, nick, text, force=False):
 		else:
 			msgLimit = getConfigKey(conference, "msg")
 			if(msgLimit and len(text) > msgLimit):
-				sendMsg(msgType, conference, nick, u"смотри в привате (лимит %d символов)" % (msgLimit), True)
+				sendMsg(msgType, conference, nick, u"Смотри в привате (лимит %d символов)" % (msgLimit), True)
 				msgType = protocol.TYPE_PRIVATE
 	if(protocol.TYPE_PUBLIC == msgType):
 		text = u"%s: %s" % (nick, text)
@@ -632,7 +632,7 @@ def messageHandler(session, stanza):
 					return
 				callCommandHandlers(command, msgType, conference, nick, param)
 			else:
-				sendMsg(msgType, conference, nick, u"недостаточно прав")
+				sendMsg(msgType, conference, nick, u"Недостаточно прав")
 
 def presenceHandler(session, stanza):
 	fullJid = stanza.getFrom()
@@ -814,7 +814,7 @@ if(__name__ == "__main__"):
 	except(KeyboardInterrupt):
 		if(gClient.isConnected()):
 			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-			prs.setStatus(u"выключаюсь (CTRL+C)")
+			prs.setStatus(u"Выключаюсь (CTRL+C)")
 			gClient.send(prs)
 		shutdown()
 	except(protocol.SystemShutdown):
