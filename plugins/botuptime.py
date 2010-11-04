@@ -19,7 +19,7 @@ def showBotUptime(msgType, conference, nick, parameters):
 	message += u"Получено %(msg)d сообщений, обработано %(prs)d презенсов и %(iq)d iq-запросов, а также выполнено %(cmd)d команд. " % (gInfo)
 	memUsage = getUsedMemorySize()
 	if memUsage: 
-		message += u"Используется %0.2f МБ памяти, " % (memUsage)
+		message += u"Используется %0.2f МБ памяти. " % (memUsage)
 	user, system = os.times()[:2]
 	message += u"Потрачено %.2f сек. процессора, %.2f сек. системного времени и в итоге %.2f сек. общесистемного времени. " % (user, system, user + system)
 	message += u"Было запущено %(tmr)d таймеров, %(thr)d потоков, %(err)d из них с ошибками, " % (gInfo)

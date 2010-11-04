@@ -35,15 +35,16 @@ def showTVProgram(msgType, conference, nick, param):
 	program = ""
 	if channelCode:
 		url = "http://tv.yandex.ru/?mode=print&channel=%s" % (channelCode)
-		rawHTML = urllib.urlopen(url)
-		for line in rawHTML:
-			if line.startswith("<div>"):
-				program += decode(line)
-	if program:
-		message = u"вот, что я нашла:\n%s" % (unicode(program, "utf-8"))
-		sendMsg(msgType, conference, nick, message)
+		rawHTML = urllib.urlopen(url).read()
+		items = re.findall(r"<div>(.+?)</div>", rawHTML, re.DOTALL)
+		if items:
+			rawtext = "\n".join(items)
+			message = u"вот, что я нашла:\n%s" % (decode(rawtext, "utf-8"))
+			sendMsg(msgType, conference, nick, message)
+		else:
+			sendMsg(msgType, conference, nick, u"На сегодня программы нет")
 	else:
-		sendMsg(msgType, conference, nick, u"На сегодня программы нет")
+		sendMsg(msgType, conference, nick, u"Не знаю такого канала")
 
 def showTVList(msgType, conference, nick, parameters):
 	if(protocol.TYPE_PUBLIC == msgType):
