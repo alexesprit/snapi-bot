@@ -51,10 +51,10 @@ def showVCard(msgType, conference, nick, param):
 
 def _showVCard(stanza, msgType, conference, nick, param):
 	if protocol.TYPE_RESULT == stanza.getType():
-		queryNode = stanza.getTag("vCard")
-		if queryNode:
+		vCardNode = stanza.getTag("vCard")
+		if vCardNode:
 			rawVCard = {}
-			loadRawVCard(queryNode, rawVCard)
+			loadRawVCard(vCardNode, rawVCard)
 			message = getVCard(rawVCard)
 			if message:
 				if not param:

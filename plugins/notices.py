@@ -14,10 +14,10 @@
 # GNU General Public License for more details.
 
 def noticeControl(msgType, conference, nick, param):
-	if(param):
-		if(param.isdigit()):
+	if param:
+		if param.isdigit():
 			param = int(param)
-			if(param == 1):
+			if param == 1:
 				setConfigKey(conference, "notices", 1)
 				sendMsg(msgType, conference, nick, u"Оповещения включены")
 			else:
@@ -33,7 +33,7 @@ def sendNotices(msgType, conference, nick, param):
 	conferences = getConferences()
 	count = 0
 	for conf in conferences:
-		if(getConfigKey(conf, "notices")):
+		if getConfigKey(conf, "notices"):
 			sendToConference(conf, u"Новости от администрации:\n%s" % param)
 			count += 1
 	sendMsg(msgType, conference, nick, "Сообщение ушло в %d конференций из %d" % (count, len(conferences)))

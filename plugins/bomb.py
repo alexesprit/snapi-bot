@@ -22,28 +22,28 @@ gBombTimers = {}
 def getRandomColors():
 	colors = []
 	for color in COLORS:
-		if(random.randrange(0, 2)):
+		if random.randrange(0, 2):
 			colors.append(color)
-	return(colors)
+	return colors
 
 def bombMarked(conference, trueJid):
-	return(trueJid in gBombAnswer[conference])
+	return trueJid in gBombAnswer[conference]
 
 def giveBomb(msgType, conference, nick, param):
-	if(protocol.TYPE_PRIVATE == msgType):
+	if protocol.TYPE_PRIVATE == msgType:
 		sendMsg(msgType, conference, nick, u"Ага, хочешь без палева кинуть??? ]:->")
 		return
 	userNick = param or random.choice(getOnlineNicks(conference))
-	if(nickIsOnline(conference, userNick)): 
+	if nickIsOnline(conference, userNick): 
 		trueJid = getTrueJid(conference, userNick)
-		if(bombMarked(conference, trueJid)):
+		if bombMarked(conference, trueJid):
 			sendMsg(msgType, conference, nick, u"В него уже кинули, ему хватит :-D")
 		else:
 			colors = getRandomColors()
 			gBombAnswer[conference][trueJid] = random.choice(colors)
 			gBombColors[conference][trueJid] = colors
 			timeout = random.randrange(40, 71)
-			if(colors):
+			if colors:
 				message = u"Вам вручена бомба, на ней %d цветов: %s, " % (len(colors), ", ".join(colors))
 				message += u"выберите цвет провода, который нужно перерезать, бомба взорвется через %s" % (getTimeStr(timeout))
 			else:
@@ -55,31 +55,31 @@ def giveBomb(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"а это кто?");			
 
 def bombExecute(msgType, conference, nick, trueJid):
-	if(nickIsOnline(conference, nick)):
+	if nickIsOnline(conference, nick):
 		sendMsg(msgType, conference, nick, u"Надо было резать %s, чего тормозишь? :)" % (gBombAnswer[conference][trueJid]))
 		bombDetonate(msgType, conference, nick)
 	else:
 		sendMsg(msgType, conference, nick, u"Трус :/")
 
 def bombColorsListener(stanza, msgType, conference, nick, trueJid, param):
-	if(bombMarked(conference, trueJid)):
+	if bombMarked(conference, trueJid):
 		color = param.lower()
-		if(color in gBombColors[conference][trueJid]):
+		if color in gBombColors[conference][trueJid]:
 			gBombTimers[conference][trueJid].cancel()
-			if(color in gBombAnswer[conference][trueJid]):
+			if color == gBombAnswer[conference][trueJid]:
 				sendMsg(msgType, conference, nick, u"Бомба обезврежена!")
 			else:
 				sendMsg(msgType, conference, nick, u"Блин :-| надо было резать %s" % gBombAnswer[conference][trueJid])
 				bombDetonate(msgType, conference, nick)
-			del(gBombAnswer[conference][trueJid])
-			del(gBombColors[conference][trueJid])
-			del(gBombTimers[conference][trueJid])
+			del gBombAnswer[conference][trueJid]
+			del gBombColors[conference][trueJid]
+			del gBombTimers[conference][trueJid]
 
 def bombDetonate(msgType, conference, nick):
 	num = random.randrange(0, 10)
-	if(num < 1 or getNickKey(conference, nick, NICK_MODER)):
+	if num < 1 or getNickKey(conference, nick, NICK_MODER):
 		sendMsg(msgType, conference, nick, u"Бомба глюкнула...")
-	elif(num < 7):
+	elif num < 7:
 		setMUCRole(conference, nick, protocol.ROLE_NONE, u"Бабах!!!")
 	else:
 		setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Бабах!!!")
@@ -92,9 +92,9 @@ def initBombCache(conference):
 	gBombTimers[conference] = {}
 
 def freeBombCache(conference):
-	del(gBombAnswer[conference])
-	del(gBombColors[conference])
-	del(gBombTimers[conference])	
+	del gBombAnswer[conference]
+	del gBombColors[conference]
+	del gBombTimers[conference]	
 
 
 registerEvent(initBombCache, ADDCONF)

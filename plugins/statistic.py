@@ -27,36 +27,36 @@ def showConferenceStats(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, text % (gConferenceStats[conference]))
 
 def updateBotMessageStats(msgType, conference, text):
-	if(protocol.TYPE_PUBLIC == msgType and text):
+	if protocol.TYPE_PUBLIC == msgType and text:
 		gConferenceStats[conference]["mymsg"] += 1
 
 def updateMessageStats(stanza, msgType, conference, nick, trueJid, text):
-	if(nick != getBotNick(conference)):
+	if nick != getBotNick(conference):
 		gConferenceStats[conference][msgType] += 1
 
 def updateJoinStats(conference, nick, trueJid, aff, role):
-	if(not trueJid in gStatsJoined[conference]):
+	if not trueJid in gStatsJoined[conference]:
 		gStatsJoined[conference].append(trueJid)
 		gConferenceStats[conference]["join"] += 1
 		gConferenceStats[conference][role] += 1
 
 def updateLeaveStats(conference, nick, trueJid, reason, code):
-	if(not trueJid in gStatsLeaved[conference]):
+	if not trueJid in gStatsLeaved[conference]:
 		gStatsLeaved[conference].append(trueJid)
 		gConferenceStats[conference]["leave"] += 1
-	if(code == "307" and not trueJid in gStatsKicked[conference]):
+	if code == "307" and not trueJid in gStatsKicked[conference]:
 		gConferenceStats[conference]["kick"] += 1
 		gStatsKicked[conference].append(trueJid)
-	elif(code == "301" and not trueJid in gStatsBanned[conference]):
+	elif code == "301" and not trueJid in gStatsBanned[conference]:
 		gConferenceStats[conference]["ban"] += 1
 		gStatsBanned[conference].append(trueJid)
 
 def updatePresenceStats(stanza, conference, nick, trueJid):
-	if("303" == stanza.getStatusCode()):
+	if "303" == stanza.getStatusCode():
 		gConferenceStats[conference]["nick"] += 1
 	else:
 		msgType = stanza.getType()
-		if(msgType != protocol.PRS_OFFLINE):
+		if msgType and msgType != protocol.PRS_OFFLINE:
 			gConferenceStats[conference]["status"] += 1
 	
 def initConferenceStats(conference):
@@ -80,11 +80,11 @@ def initConferenceStats(conference):
 	gStatsBanned[conference] = []
 
 def freeConferenceStats(conference):
-	del(gConferenceStats[conference])
-	del(gStatsJoined[conference])
-	del(gStatsLeaved[conference])
-	del(gStatsKicked[conference])
-	del(gStatsBanned[conference])
+	del gConferenceStats[conference]
+	del gStatsJoined[conference]
+	del gStatsLeaved[conference]
+	del gStatsKicked[conference]
+	del gStatsBanned[conference]
 
 registerEvent(initConferenceStats, ADDCONF)
 registerEvent(freeConferenceStats, DELCONF)

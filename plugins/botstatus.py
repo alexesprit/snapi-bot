@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-STATUSES = (
+STATUS_STRINGS = (
 	protocol.PRS_AWAY, 
 	protocol.PRS_NA, 
 	protocol.PRS_DND, 
@@ -21,16 +21,16 @@ STATUSES = (
 )
 
 def setDefBotStatusValue(conference):
-	if(not getConfigKey(conference, "show")):
+	if not getConfigKey(conference, "show"):
 		setConfigKey(conference, "show", u"online")
 		setConfigKey(conference, "status", None)
 
 def manageBotStatusValue(msgType, conference, nick, param):
 	args = param.split(None, 1)
 	show, status = "", ""
-	if(args[0] in (STATUSES)):
+	if args[0] in STATUS_STRINGS:
 		show = args[0]
-		if(len(args) > 1):
+		if len(args) > 1:
 			status = args[1]
 	else:
 		status = param

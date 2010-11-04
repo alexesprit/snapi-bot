@@ -47,19 +47,19 @@ def getWCodeByName(city):
 	city = city.encode("utf-8")
 	fileName = getFilePath(RESOURCE_DIR, WCODES_FILE)
 	for line in open(fileName):
-		if(line.startswith(city)):
-			return(line.split("|"))
-	return(None)
+		if line.startswith(city):
+			return line.split("|")
+	return None
 	
 def getAverageValue(attr):
 	minValue = int(attr["min"])
 	maxValue = int(attr["max"])
-	return((minValue + maxValue) / 2)
+	return (minValue + maxValue) / 2
 
 def showWeather(msgType, conference, nick, param):
 	city = param.capitalize()
 	rawData = getWCodeByName(city)
-	if(rawData):
+	if rawData:
 		city, code = rawData
 		url = "http://informer.gismeteo.ru/xml/%s.xml" % (code.strip())
 		rawXML = urllib.urlopen(url).read()
@@ -73,15 +73,15 @@ def showWeather(msgType, conference, nick, param):
 			weather = forecast.getTag("PHENOMENA").getAttrs()
 			message += CLOUDINESS[weather["cloudiness"]]
 			precipitation = weather["precipitation"]
-			if(precipitation not in ["8", "9", "10"]):
+			if precipitation not in ["8", "9", "10"]:
 				rpower = weather["rpower"]
 				if("0" == rpower):
 					message += u", возможен %s\n" % (PRECIPITATION[precipitation])
 				else:
 					message += u", %s\n" % (PRECIPITATION[precipitation])
-			elif("8" == precipitation):
+			elif "8" == precipitation:
 				spower = weather["spower"]
-				if("0" == rpower):
+				if "0" == rpower:
 					message += u", возможна %s\n" % (PRECIPITATION[precipitation])
 				else:
 					message += u", %s\n" % (PRECIPITATION[precipitation])
@@ -99,10 +99,10 @@ def showWeather(msgType, conference, nick, param):
 			
 			wind = forecast.getTag("WIND").getAttrs()
 			windValue = getAverageValue(wind)
-			if(windValue):
+			if windValue:
 				message += u"Ветер: %d м/с (%s)\n" % (windValue, WINDDIRECTION[wind["direction"]])
 			message += "\n"
-		if(protocol.TYPE_PUBLIC == msgType):
+		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушла")
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 	else:

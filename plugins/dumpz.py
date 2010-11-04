@@ -19,7 +19,7 @@ DUMPZ_LANGS_FILE = "dumpzlangs.txt"
 DUMPZ_LANGS = {}
 
 def uploadToDumpz(msgType, conference, nick, param):
-	if(u"языки" == param.lower()):
+	if u"языки" == param.lower():
 		langs = [u"%s - %s" % (lang, name) \
 				for lang, name in DUMPZ_LANGS.items()]
 		langs.sort()
@@ -28,8 +28,8 @@ def uploadToDumpz(msgType, conference, nick, param):
 	else:
 		args = param.split(None, 1)
 		lang = args[0]
-		if(lang in DUMPZ_LANGS):
-			if(len(args) == 2):
+		if lang in DUMPZ_LANGS:
+			if len(args) == 2:
 				text = args[1]
 			else:
 				sendMsg(msgType, conference, nick, u"А где тескт?")

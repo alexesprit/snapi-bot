@@ -15,7 +15,7 @@
 # GNU General Public License for more details.
 
 def showUserTime(msgType, conference, nick, param):
-	if(param):
+	if param:
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			jid = conference + "/" + param
 		else:
@@ -29,20 +29,19 @@ def showUserTime(msgType, conference, nick, param):
 	gClient.sendAndCallForResponse(iq, _showUserTime, (msgType, conference, nick, param))
 
 def _showUserTime(stanza, msgType, conference, nick, param):
-	if(protocol.TYPE_RESULT == stanza.getType()):
-		tzo, utc = None, None
-		for p in stanza.getChildren():
-			tzo = p.getTagData("tzo")
-			utc = p.getTagData("utc")
-		if(tzo and utc):
+	if protocol.TYPE_RESULT == stanza.getType():
+		timeNode = stanza.getTag("time")
+		tzo = timeNode.getTagData("tzo")
+		utc = timeNode.getTagData("utc")
+		if tzo and utc:
 			sign, tzHour, tzMin = re.match("(\+|-)?([0-9]+):([0-9]+)", tzo).groups()
 			offset = int(tzHour) * 3600 + int(tzMin) * 60
-			if(sign == "-"):
+			if sign == "-":
 				offset = -offset
 			rawTime = time.strptime(utc, "%Y-%m-%dT%H:%M:%SZ")
 			rawTime = time.mktime(rawTime) + offset
 			userTime = time.strftime("%H:%M:%S (%d.%m.%y)", time.localtime(rawTime))
-			if(param):
+			if param:
 				sendMsg(msgType, conference, nick, u"У %s сейчас %s" % (param, userTime))
 			else:
 				sendMsg(msgType, conference, nick, u"У тебя сейчас %s" % (userTime))

@@ -14,15 +14,14 @@
 # GNU General Public License for more details.
 
 def showWhoIs(msgType, conference, nick, param):
-	query = urllib.urlencode({"url" : param.encode("utf-8")})
+	query = urllib.urlencode({"url": param.encode("utf-8")})
 	rawHTML = urllib.urlopen("http://1whois.ru/index.php?%s" % (query)).read()
 	items = re.search("<blockquote>(.*?)</font></blockquote>", rawHTML, re.DOTALL)
-	if(items):
+	if items:
 		text = items.group(0)
 		text = text.replace("<br />", "")
-		text = text.replace("&nbsp;", "")
-		text = decode(text)
-		sendMsg(msgType, conference, nick, unicode(text, "cp1251"))
+		text = decode(text, "cp1251")
+		sendMsg(msgType, conference, nick, text)
 	else:
 		sendMsg(msgType, conference, nick, u"Не могу :(")
 

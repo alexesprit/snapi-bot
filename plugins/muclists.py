@@ -18,7 +18,7 @@ def _showMUCList(stanza, msgType, conference, nick):
 		items = [u"%d) %s" % (i + 1, p.getAttrs()["jid"]) for i, p in enumerate(stanza.getQueryChildren())]
 		if items:
 			message = u"Смотри, что я нашла:\n"
-			if(msgType == protocol.TYPE_PUBLIC):
+			if msgType == protocol.TYPE_PUBLIC:
 				sendMsg(msgType, conference, nick, u"Ушёл")
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message + "\n".join(items))
 		else:
@@ -27,7 +27,7 @@ def _showMUCList(stanza, msgType, conference, nick):
 		sendMsg(msgType, conference, nick, u"Не могу :(")
 
 def showMUCList(msgType, conference, nick, aff):
-	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_MUC_ADMIN, payload = [protocol.Node("item", {"affiliation": aff})])
+	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_MUC_ADMIN, payload=[protocol.Node("item", {"affiliation": aff})])
 	iq.setTo(conference)
 	iq.setID(getUniqueID("muc_id"))
 	gClient.sendAndCallForResponse(iq, _showMUCList, (msgType, conference, nick, ))

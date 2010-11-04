@@ -28,7 +28,7 @@ ACCESS_DESC = {
 }
 
 def login(msgType, conference, nick, param):
-	if(msgType == protocol.TYPE_PRIVATE and param == gAdminPass):
+	if msgType == protocol.TYPE_PRIVATE and param == gAdminPass:
 		trueJid = getTrueJid(conference, nick)
 		gAdmins.append(trueJid)
 		setTempGlobalAccess(trueJid, 100)
@@ -150,20 +150,20 @@ def setGlobalAccess(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Ошибочный запрос")
 
 def showGlobalAccesses(msgType, conference, nick, param):
-	if(not gGlobalAccess):
+	if not gGlobalAccess:
 		sendMsg(msgType, conference, nick, u"Нет глобальных доступов")
 	else:
-		if(protocol.TYPE_PUBLIC == msgType):
+		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли")
 		items = [u"%s [%d]" % (jid, access) 
 				for jid, access in gGlobalAccess.items()]
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Вот, что я нашла\n" + "\n".join(items))
 
 def showLocalAccesses(msgType, conference, nick, param):
-	if(not gPermAccess[conference]):
+	if not gPermAccess[conference]:
 		sendMsg(msgType, conference, nick, u"Нет локальных доступов")
 	else:
-		if(protocol.TYPE_PUBLIC == msgType):
+		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли")
 		items = [u"%s [%d]" % (jid, access) 
 				for jid, access in gPermAccess[conference].items()]
@@ -184,8 +184,8 @@ def loadLocalAccesses(conference):
 	gTempAccess[conference] = {}
 
 def freeLocalAccesses(conference):
-	del(gPermAccess[conference])
-	del(gTempAccess[conference])
+	del gPermAccess[conference]
+	del gTempAccess[conference]
 
 registerEvent(loadGlobalAccesses, STARTUP)
 registerEvent(loadLocalAccesses, ADDCONF)

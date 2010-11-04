@@ -15,7 +15,7 @@
 
 def botRestart(msgType, conference, nick, param):
 	nick = (conferenceInList(conference)) and nick or conference.split("@")[0]
-	if(param):
+	if param:
 		message = u"Меня перезагружает %s (%s)" % (nick, param)
 	else:
 		message = u"Меня перезагружает %s" % (nick)
@@ -26,7 +26,7 @@ def botRestart(msgType, conference, nick, param):
 
 def botShutdown(msgType, conference, nick, param):
 	nick = (conferenceInList(conference)) and nick or conference.split("@")[0]
-	if(param):
+	if param:
 		message = u"Меня выключает %s (%s)" % (nick, param)
 	else:
 		message = u"Меня выключает %s" % (nick)

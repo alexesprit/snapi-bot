@@ -42,8 +42,8 @@ def searchInGoogle(msgType, conference, nick, url):
 	req = urllib.urlopen(url)
 	answer = simplejson.load(req)
 	results = answer["responseData"]["results"]
-	if(results):
-		if(msgType == protocol.TYPE_PUBLIC):
+	if results:
+		if msgType == protocol.TYPE_PUBLIC:
 			msg = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (results[0])]
 		else:
 			msg = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (result) for result in results]

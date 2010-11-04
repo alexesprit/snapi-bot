@@ -18,7 +18,7 @@ def showDates(msgType, conference, nick, param):
 	rawHTML = unicode(rawHTML, "utf-8")
 	dates = rawHTML.split("<br/>-----<br/>")
 	dates = dates[1:-1]
-	if(dates):
+	if dates:
 		dates = [date.split("/")[0] for date in dates]
 		sendMsg(msgType, conference, nick, u"Глянь, что я нашла:" + u"\n".join(dates))
 	else:

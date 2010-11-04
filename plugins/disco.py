@@ -46,7 +46,7 @@ def serviceDiscovery(msgType, conference, nick, param):
 	gClient.sendAndCallForResponse(iq, _serviceDiscovery, (msgType, conference, nick, jid, maxCount, searchKey))
 
 def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKey):
-	if(protocol.TYPE_RESULT == stanza.getType()):
+	if protocol.TYPE_RESULT == stanza.getType():
 		discoList = []
 		itemCount = 0
 		for x in stanza.getQueryChildren():

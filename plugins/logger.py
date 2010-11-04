@@ -36,18 +36,19 @@ def writeHeader(fp, jid, (year, month, day)):
 def getLogFile(msgType, jid, (year, month, day)):
 	path = u"%s/%s/%d/%02d/%02d.html" % (gLogDir, jid, year, month, day)
 	path = path.encode("utf-8")
-	if(os.path.exists(path)):
+	if os.path.exists(path):
 		f = file(path, "a")
 	else:
 		dirName = os.path.dirname(path)
-		if(not os.path.exists(dirName)):
+		if not os.path.exists(dirName):
 			os.makedirs(dirName)
 		f = file(path, "w")
 		writeHeader(f, jid, (year, month, day))
 	return f
 
 def regexUrl(matchobj):
-	return("<a href=\"" + matchobj.group(0) + "\">" + matchobj.group(0) + "</a>")
+	url = matchobj.group(0)
+	return "<a href=\"%s\">%s</a>" % (url, url)
 	
 def writeLog(msgType, jid, nick, body, aff = 0):
 	decimal = str(int(math.modf(time.time())[0] * 100000))
@@ -61,66 +62,66 @@ def writeLog(msgType, jid, nick, body, aff = 0):
 	link = timestamp + "." + decimal
 	fp = getLogFile(msgType, jid, (year, month, day, ))
 	fp.write("<span class=\"timestamp\"><a id=\"t%s\" href=\"#t%s\">[%s]</a></span>" % (link, link, timestamp))
-	if(not nick):
+	if not nick:
 		fp.write("<span class=\"system\"> %s</span><br />\n" % (body))
-	elif(body.startswith("/me")):
+	elif body.startswith("/me"):
 		fp.write("<span class=\"emote\"> * %s%s</span><br />\n" % (nick, body[3:]))
 	else:
-		if(nick.startswith("@$$")):
+		if nick.startswith("@$$"):
 			className = nick[3:-3]
 			fp.write("<span class=\"%s\"> %s</span><br />\n" % (className, body))
 		else:
-			if(aff == 2):
+			if aff == 2:
 				fp.write("<span class=\"owner\"> &lt;%s&gt;</span> %s<br />\n" % (nick, body))
-			elif(aff == 1):
+			elif aff == 1:
 				fp.write("<span class=\"admin\"> &lt;%s&gt;</span> %s<br />\n" % (nick, body))
 			else:
 				fp.write("<span class=\"self\"> &lt;%s&gt;</span> %s<br />\n" % (nick, body))
 	fp.close()
 
 def writeMessage(stanza, msgType, conference, nick, trueJid, text):
-	if(protocol.TYPE_PUBLIC == msgType and getConfigKey(conference, "log")):
+	if protocol.TYPE_PUBLIC == msgType and getConfigKey(conference, "log"):
 		aff = 0
-		if(nick and getNickKey(conference, nick, NICK_MODER)):
+		if nick and getNickKey(conference, nick, NICK_MODER):
 			level = getAccess(conference, trueJid)
 			aff = (level >= 30) and 2 or 1
 		writeLog(msgType, conference, nick, text, aff)
 
 def writeUserJoin(conference, nick, trueJid, aff, role):
-	if(getConfigKey(conference, "log")):
+	if getConfigKey(conference, "log"):
 		writeLog(protocol.TYPE_PUBLIC, conference, "@$$join$$@", u"%s зашёл в комнату как %s и %s" % (nick, role, aff))
 
 def writeUserLeave(conference, nick, trueJid, reason, code):
-	if(getConfigKey(conference, "log")):
-		if("307" == code):
-			if(reason):
+	if getConfigKey(conference, "log"):
+		if "307" == code:
+			if reason:
 				writeLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты (%s)" % (nick, reason))
 			else:
 				writeLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты" % (nick));		
-		elif("301" == code):
-			if(reason):
+		elif "301" == code:
+			if reason:
 				writeLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили (%s)" % (nick, reason))
 			else:
 				writeLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили" % (nick));	
-		elif("303" != code):
-			if(reason):
+		elif "303" != code:
+			if reason:
 				writeLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s вышел из комнаты (%s)" % (nick, reason))
 			else:
 				writeLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s вышел из комнаты" % (nick))
 
 def writePresence(stanza, conference, nick, trueJid):
-	if(getConfigKey(conference, "log")):
+	if getConfigKey(conference, "log"):
 		code = stanza.getStatusCode()
 		prsType = stanza.getType()
-		if(code == "303"):
+		if code == "303":
 			newnick = stanza.getNick()
 			writeLog(protocol.TYPE_PUBLIC, conference, "@$$nick$$@", u"%s сменил ник на %s" % (nick, newnick))
 
 def manageLoggingValue(msgType, conference, nick, param):
-	if(param):
-		if(param.isdigit()):
+	if param:
+		if param.isdigit():
 			param = int(param)
-			if(param == 1):
+			if param == 1:
 				setConfigKey(conference, "log", 1)
 				sendMsg(msgType, conference, nick, u"Логирование включено")
 			else:
@@ -134,7 +135,7 @@ def manageLoggingValue(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (loggerValue))
 
 def setDefLoggingValue(conference):
-	if(getConfigKey(conference, "log") is None):
+	if getConfigKey(conference, "log") is None:
 		setConfigKey(conference, "log", 1)
 
 if(gLogDir):

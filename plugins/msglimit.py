@@ -14,14 +14,14 @@
 # GNU General Public License for more details.
 
 def setDefMsgLimitValue(conference):
-	if(getConfigKey(conference, "msg") is None):
+	if getConfigKey(conference, "msg") is None:
 		setConfigKey(conference, "msg", 1500)
 
 def manageMsgLimitValue(msgType, conference, nick, param):
-	if(param):
-		if(param.isdigit()):
+	if param:
+		if param.isdigit():
 			param = int(param)
-			if(param > 0):
+			if param > 0:
 				param = max(100, param)
 				setConfigKey(conference, "msg", param)
 				sendMsg(msgType, conference, nick, u"Установлен лимит на %d символов" % (param))

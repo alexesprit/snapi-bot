@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def setUserRole(msgType, conference, nick, user, role):
-	if(nickInConference(conference, user)):
+	if nickInConference(conference, user):
 		iq = getMUCSetRoleStanza(conference, user, role)
 		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
 	else:

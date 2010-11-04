@@ -20,11 +20,9 @@ def showCinemaQuote(msgType, conference, nick, param):
 	url = "http://skio.ru/afofilms/kino%d.php" % (pageNum)
 	rawHTML = urllib.urlopen(url).read()
 	items = re.search("<ul type=\"circle\"(.+?)</ul>", rawHTML, re.DOTALL)
-	if(items):
-		rawHTML = items.group(0)
+	if items:
+		rawHTML = items.group(1)
 		items = re.findall("<li>(.+?)<li>", rawHTML, re.DOTALL)
-		if not items:
-			print pageNum
 		quote = random.choice(items)
 		quote = decode(quote, "cp1251")
 		sendMsg(msgType, conference, nick, quote)

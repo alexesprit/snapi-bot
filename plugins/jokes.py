@@ -21,14 +21,14 @@ def loadJokes():
 	gJokes = eval(utils.readFile(fileName, "utf-8"))
 
 def setDefJokesValue(conference):
-	if(getConfigKey(conference, "jokes") is None):
+	if getConfigKey(conference, "jokes") is None:
 		setConfigKey(conference, "jokes", 1)
 
 def manageJokesValue(msgType, conference, nick, param):
-	if(param):
-		if(param.isdigit()):
+	if param:
+		if param.isdigit():
 			param = int(param)
-			if(param == 1):
+			if param == 1:
 				setConfigKey(conference, "jokes", 1)
 				sendMsg(msgType, conference, nick, u"Шуточки включены")
 			else:

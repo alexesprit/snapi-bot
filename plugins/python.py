@@ -18,13 +18,13 @@
 def pythonEval(msgType, conference, nick, param):
 	try:
 		sendMsg(msgType, conference, nick, unicode(eval(param)))
-	except(Exception):
+	except Exception:
 		sendMsg(msgType, conference, nick, traceback.format_exc())
 
 def pythonExec(msgType, conference, nick, param):
 	try:
 		exec(unicode(param)) in globals()
-	except(Exception):
+	except Exception:
 		sendMsg(msgType, conference, nick, traceback.format_exc())
 
 def pythonShell(msgType, conference, nick, param):
@@ -39,11 +39,11 @@ def pythonShell(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, unicode(message, enc))
 
 def pythonCalc(msgType, conference, nick, param):
-	if(re.sub("([0-9]+|[\+\-\/\*\^\.()])", "", param).strip() == ""):
-		if(not param.count("**")):
+	if not re.sub("([0-9]+|[\+\-\/\*\^\.()])", "", param).strip():
+		if not param.count("**"):
 			try:
 				sendMsg(msgType, conference, nick, str(eval(param)))
-			except(ZeroDivisionError):
+			except ZeroDivisionError:
 				sendMsg(msgType, conference, nick, u"Научи меня это делать :)");		
 		else:
 			sendMsg(msgType, conference, nick, u"Не буду такое считать")

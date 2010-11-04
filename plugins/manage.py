@@ -15,9 +15,9 @@
 
 def joinConf(msgType, conference, nick, param):
 	param = param.split()
-	if(param and isJid(param[0])):
+	if param and isJid(param[0]):
 		conf = param[0]
-		if(conferenceInList(conf)):
+		if conferenceInList(conf):
 			sendMsg(msgType, conference, nick, u"Я уже там!")
 		else:
 			password = (len(param) == 2) and param[1] or None

@@ -30,9 +30,9 @@ REPLICS_FOR_ME = (
 )
 
 def _showPing(stanza, t0, msgType, conference, nick, param):
-	if(protocol.TYPE_RESULT == stanza.getType()):
+	if protocol.TYPE_RESULT == stanza.getType():
 		ping = time.time() - t0
-		if(param):
+		if param:
 			message = random.choice(REPLICS_FOR_OTHER) % (param);  
 		else:
 			message = random.choice(REPLICS_FOR_ME)
@@ -42,7 +42,7 @@ def _showPing(stanza, t0, msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"не пингуется :(")
 
 def showPing(msgType, conference, nick, param):
-	if(param):
+	if param:
 		if(conferenceInList(conference) and nickIsOnline(conference, param)):
 			jid = conference + "/" + param
 		else:

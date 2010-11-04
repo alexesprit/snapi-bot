@@ -29,13 +29,13 @@ SIGNS = {
 
 def showHoroscope(msgType, conference, nick, param):
 	param = param.lower()
-	if(param in SIGNS):
+	if param in SIGNS:
 		url = "http://horo.gala.net/?lang=ru&sign=%d" % (SIGNS[param])
 		rawHTML = urllib.urlopen(url).read()
 		items = re.search(r"<td class=stext>(.+?)</td>", rawHTML, re.DOTALL)
-		if(items):
+		if items:
 			message = unicode(items.group(1), "cp1251")
-			if(protocol.TYPE_PUBLIC == msgType):
+			if protocol.TYPE_PUBLIC == msgType:
 				sendMsg(msgType, conference, nick, u"Ушёл")
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 		else:

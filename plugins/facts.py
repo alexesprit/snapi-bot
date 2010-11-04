@@ -20,7 +20,7 @@ def showFact(msgType, conference, nick, param):
 	url = "http://skio.ru/facts/fact%d.php" % (pageNum)
 	rawHTML = urllib.urlopen(url).read()
 	items = re.search("<div style=.+?<ul>(.+?)</ul>", rawHTML, re.DOTALL)
-	if(items):
+	if items:
 		rawHTML = items.group(1)
 		items = re.findall("<li>(.+?)</li>", rawHTML, re.DOTALL)
 		fact = random.choice(items)

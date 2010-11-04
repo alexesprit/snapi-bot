@@ -14,20 +14,20 @@
 # GNU General Public License for more details.
 
 def setBotMood(msgType, jid, resource, param):
-	if(param == u"сброс" or param.count("|")):
+	if param == u"сброс" or param.count("|"):
 		iq = protocol.Iq(protocol.TYPE_SET)
 		iq.setType(protocol.TYPE_HEADLINE)
 		pubsub = iq.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
 		pubNode = protocol.Node("publish", {"node": protocol.NS_MOOD})
 		moodNode = protocol.Node("mood", {"xmlns": protocol.NS_MOOD})
-		if(param.count("|")):
+		if param.count("|"):
 			param = param.split("|")
 			moodNode.addChild(node = protocol.Node(param[0]))
 			moodNode.setTagData("text", param[1])
 		pubNode.addChild("item", {}, [moodNode], "")
 		pubsub.addChild(node = pubNode)
 		gClient.send(iq)
-		if(param == u"сброс"):
+		if param == u"сброс":
 			sendMsg(msgType, jid, resource, u"Сбросила")
 		else:
 			sendMsg(msgType, jid, resource, u"Поставила")
@@ -35,22 +35,22 @@ def setBotMood(msgType, jid, resource, param):
 		sendMsg(msgType, jid, resource, u"Читай помощь по команде")
 
 def setBoAtctivity(msgType, jid, resource, param):
-	if(param == u"сброс" or param.count("|")):
+	if param == u"сброс" or param.count("|"):
 		iq = protocol.Iq(protocol.TYPE_SET)
 		iq.setType(protocol.TYPE_HEADLINE)
 		pubsub = iq.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
 		pubNode = protocol.Node("publish", {"node": protocol.NS_ACTIVITY})
 		actNode = protocol.Node("activity", {"xmlns": protocol.NS_ACTIVITY})
-		if(param.count("|")):
+		if param.count("|"):
 			param = param.split("|")
 			act = actNode.addChild(node = protocol.Node(param[0]))
-			if(param[1]):
+			if param[1]:
 				act.addChild(node = protocol.Node(param[1]))
 			actNode.setTagData("text", param[2])
 		pubNode.addChild("item", {}, [actNode], "")
 		pubsub.addChild(node = pubNode)
 		gClient.send(iq)
-		if(param == u"сброс"):
+		if param == u"сброс":
 			sendMsg(msgType, jid, resource, u"Сбросила")
 		else:
 			sendMsg(msgType, jid, resource, u"Поставила")

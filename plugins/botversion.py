@@ -17,9 +17,9 @@ VER_FILE = "version.txt"
 
 def setBotVersion(msgType, conference, nick, param):
 	global gVersion
-	if(not param):
+	if not param:
 		sendMsg(msgType, conference, nick, u"|".join(gVersion))
-	elif(param.count("|") == 2):
+	elif param.count("|") == 2:
 		gVersion = tuple(param.split("|"))
 		fileName = getConfigPath(VER_FILE)
 		utils.writeFile(fileName, str(gVersion))

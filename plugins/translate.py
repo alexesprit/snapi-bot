@@ -36,9 +36,9 @@ def getTranslateQuery(text):
 	query = urllib.urlencode(param)
 	return query
 
-def getTranslatedText(text, src, target):
+def getTranslatedText(text, source, target):
 	query = getTranslateQuery(text)
-	url = "http://ajax.googleapis.com/ajax/services/language/translate?%s&langpair=%s|%s" % (query, src, target)
+	url = "http://ajax.googleapis.com/ajax/services/language/translate?%s&langpair=%s|%s" % (query, source, target)
 	request = urllib.urlopen(url)
 	answer = simplejson.load(request)
 	if answer["responseData"]:
@@ -64,21 +64,21 @@ def translateText(msgType, conference, nick, param):
 	else:
 		param = param.split(None, 2)
 		if len(param) == 3:
-			src, target, text = param
-			if src in LANGUAGES and target in LANGUAGES:
-				if src == "auto":
+			source, target, text = param
+			if source in LANGUAGES and target in LANGUAGES:
+				if source == "auto":
 					if target == "auto":
 						sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 						return
 					else:
-						src = detectLanguage(text)
-						if src:
-							if not src in LANGUAGES:
-								sendMsg(msgType, conference, nick, u"Не могу понять, что это за язык (%s)" % (src))
+						source = detectLanguage(text)
+						if source:
+							if not source in LANGUAGES:
+								sendMsg(msgType, conference, nick, u"Не могу понять, что это за язык (%s)" % (source))
 								return
 						else:
 							sendMsg(msgType, conference, nick, u"Не могу перевести")
-				text = getTranslatedText(text, src, target)
+				text = getTranslatedText(text, source, target)
 				if(text):
 					sendMsg(msgType, conference, nick, utils.unescapeHTML(text))
 				else:

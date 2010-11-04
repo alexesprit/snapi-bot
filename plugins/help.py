@@ -16,10 +16,10 @@
 # GNU General Public License for more details.
 
 def showHelp(msgType, conference, nick, param):
-	if(param):
+	if param:
 		param = param.lower()
 		cmdType = conferenceInList(conference) and CHAT or ROSTER
-		if(isCommand(param) and isCommandType(param, cmdType)):
+		if isCommand(param) and isCommandType(param, cmdType):
 			message = gCommands[param][CMD_DESC]
 			syntax = gCommands[param][CMD_SYNTAX]
 			if(syntax):
@@ -27,13 +27,13 @@ def showHelp(msgType, conference, nick, param):
 			message += u"\nПримеры:"
 			for example in gCommands[param][CMD_EXAMPLE]:
 				message += u"\n * %s" % (example)
-			if(cmdType == CHAT):
+			if cmdType == CHAT:
 				message += u"\nМин. уровень доступа: %d" % (gCommands[param][CMD_ACCESS])
-				if(not isAvailableCommand(conference, param)):
+				if not isAvailableCommand(conference, param):
 					message += u"\nЭта команда отключена в этой конференции!"
 			sendMsg(msgType, conference, nick, message)
 	else:
-		if(conferenceInList(conference)):
+		if conferenceInList(conference):
 			prefix = getConfigKey(conference, "prefix")
 		else:
 			prefix = ""
@@ -45,22 +45,22 @@ def showCommands(msgType, conference, nick, param):
 	message = ""
 	trueJid = getTrueJid(conference, nick)
 	for cmd in gCommands:
-		if(isCommandType(cmd, cmdType)):
-			if(getAccess(conference, trueJid) >= gCommands[cmd][CMD_ACCESS]):
-				if(cmdType == ROSTER):
+		if isCommandType(cmd, cmdType):
+			if getAccess(conference, trueJid) >= gCommands[cmd][CMD_ACCESS]:
+				if cmdType == ROSTER:
 					availableCmds.append(cmd)
 				else:
-					if(isAvailableCommand(conference, cmd)):
+					if isAvailableCommand(conference, cmd):
 						availableCmds.append(cmd)
 					else:
 						disabledCmds.append(cmd)
-	if(availableCmds):
+	if availableCmds:
 		availableCmds.sort()
 		message += u"Доступные команды:\n%s" % (u", ".join(availableCmds))
-	if(disabledCmds):
+	if disabledCmds:
 		disabledCmds.sort()
 		message += u"\n\nОтключенные команды:\n%s" % (", ".join(disabledCmds))
-	if(protocol.TYPE_PUBLIC == msgType):
+	if protocol.TYPE_PUBLIC == msgType:
 		sendMsg(msgType, conference, nick, u"ушли")
 	sendMsg(protocol.TYPE_PRIVATE, conference, nick, message);	
 

@@ -15,12 +15,12 @@
 
 def changeRosterStatus():
 	hour = time.localtime()[3]
-	if(hour >= 18):
-		show = "chat"
-	elif(hour >= 8):
-		show = "dnd"
-	elif(hour >= 0):
-		show = "xa"
+	if hour >= 18:
+		show = protocol.PRS_CHAT
+	elif hour >= 8:
+		show = protocol.PRS_DND
+	elif hour >= 0:
+		show = protocol.PRS_NA
 	gClient.setStatus(show, None, gPriority)
 	timeout = 3600 + random.randrange(-800, 801)
 	startTimer(timeout, changeRosterStatus)

@@ -14,11 +14,10 @@
 # GNU General Public License for more details.
 
 def sendInvite(msgType, conference, nick, param):
-	#reason = ""
 	param = param.split(None, 1)
 	user = param[0]
-	if(not isJid(user)):
-		if(nickInConference(conference, user)):
+	if not isJid(user):
+		if nickInConference(conference, user):
 			trueJid = getTrueJid(conference, user)
 		else:
 			return

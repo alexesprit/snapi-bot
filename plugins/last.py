@@ -20,7 +20,7 @@ def showOnlineTime(msgType, jid, resource, param):
 	gClient.sendAndCallForResponse(iq, _showOnlineTime, (msgType, jid, resource, ))
 
 def _showOnlineTime(stanza, msgType, jid, resource):
-	if(protocol.TYPE_RESULT == stanza.getType()):
+	if protocol.TYPE_RESULT == stanza.getType():
 		child = stanza.getFirstChild()
 		seconds = child.getAttr("seconds")
 		sendMsg(msgType, jid, resource, u"Ты в сети уже %s" % (getTimeStr(int(seconds))))

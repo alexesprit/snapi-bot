@@ -27,19 +27,19 @@ def freeGreetings(conference):
 
 def setUserGreeting(msgType, conference, nick, param):
 	rawGreet = param.split("=", 1)
-	if(len(rawGreet) == 2):
+	if len(rawGreet) == 2:
 		user = rawGreet[0].strip()
 		greet = rawGreet[1].strip()
-		if(isJid(user)):
+		if isJid(user):
 			trueJid = user
-		elif(nickInConference(user)):
+		elif nickInConference(user):
 			trueJid = getTrueJid(conference, user)
 		else:
 			sendMsg(msgType, conference, nick, u"А это кто?")
 			return
-		if(not greet):
-			if(trueJid in gGreets[conference]):
-				del(gGreets[conference][trueJid])
+		if not greet:
+			if trueJid in gGreets[conference]:
+				del gGreets[conference][trueJid]
 		else:
 			gGreets[conference][trueJid] = greet
 		fileName = getConfigPath(conference, GREET_FILE)
@@ -47,7 +47,7 @@ def setUserGreeting(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Запомнила")
 
 def sendUserGreeting(conference, nick, trueJid, aff, role):
-	if(trueJid in gGreets[conference]):
+	if trueJid in gGreets[conference]:
 		sendMsg(protocol.TYPE_PUBLIC, conference, nick, gGreets[conference][trueJid])
 
 registerEvent(loadGreetings, ADDCONF)

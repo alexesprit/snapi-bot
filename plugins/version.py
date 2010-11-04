@@ -33,13 +33,10 @@ def showVersion(msgType, conference, nick, param):
 def _showVersion(stanza, msgType, conference, nick, param):
 	if protocol.TYPE_RESULT == stanza.getType():
 		name, ver, os = "", "", ""
-		for child in stanza.getQueryChildren():
-			if(child.getName() == "name"):
-				name = child.getData()
-			elif(child.getName() == "version"):
-				ver = child.getData()
-			elif(child.getName() == "os"):
-				os = child.getData()
+		query = stanza.getQueryNode()
+		name = query.getTagData("name")
+		ver = query.getTagData("version")
+		os = query.getTagData("os")
 		version = u""
 		if name:
 			version += name

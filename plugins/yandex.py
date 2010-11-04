@@ -18,9 +18,8 @@ def searchInYandex(msgType, conference, nick, param):
 	rawHTML = urllib.urlopen("http://yandex.ru/msearch?s=all&%s" % (query)).read()
 	rawHTML = unicode(rawHTML, "utf-8")
 	items = re.findall("<li>\n(.+?)<p class=\"b-phone\">.+?<div class=\"www\">(.+?)</div>", rawHTML, re.DOTALL)
-	if(items):
-		print items[0]
-		if(protocol.TYPE_PUBLIC == msgType):
+	if items:
+		if protocol.TYPE_PUBLIC == msgType:
 			text = items[0][0].strip()
 			url = items[0][1]
 			message = u"%s\nhttp://%s" % (text, url)
