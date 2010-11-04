@@ -13,8 +13,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-TURN_TIMEOUT = 0.6
-
 BIG_RU = u"ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,?Ё"
 BIG_EN = u"QWERTYUIOP{}ASDFGHJKL:\"ZXCVBNM<>?&~"
 SML_RU = u"йцукенгшщзхъфывапролджэячсмитьбю.ё"
@@ -26,59 +24,57 @@ TABLE_SML = dict(zip(SML_RU + SML_EN, SML_EN + SML_RU))
 gTurnMsgCache = {}
 
 def getBigChar(char):
-	return(TABLE_BIG.get(char, char))
+	return TABLE_BIG.get(char, char)
 
 def getSmlChar(char):
-	return(TABLE_SML.get(char, char))
+	return TABLE_SML.get(char, char)
 
 def turnMessage(text):
 	text = "".join(map(getSmlChar, text))
 	text = "".join(map(getBigChar, text))
-	return(text)
+	return text
 
 def turnLastMessage(msgType, conference, nick, param):
-	if(not msgType == protocol.TYPE_PUBLIC):
-		sendMsg(msgType, conference, nick, u"тока в чате")
+	if not msgType == protocol.TYPE_PUBLIC:
+		sendMsg(msgType, conference, nick, u"Только в чате")
 		return
-	if(param):
+	if param:
 		sendMsg(msgType, conference, nick, turnMessage(param))
 	else:
 		trueJid = getTrueJid(conference, nick)
-		if(trueJid not in gTurnMsgCache[conference]):
-			sendMsg(msgType, conference, nick, u"а ты ещё ничего не говорил")
-		elif(gTurnMsgCache[conference][trueJid].lower() == u"turn"):
-			sendMsg(msgType, conference, nick, u"последнее, что ты сказал, это \"turn\" :-D")
+		if trueJid not in gTurnMsgCache[conference]:
+			sendMsg(msgType, conference, nick, u"А ты ещё ничего не говорил")
 		else:
 			savedMsg = gTurnMsgCache[conference][trueJid]
 			receiver = None
 			for userNick in getNicks(conference):
-				if(savedMsg.startswith(userNick)):
+				if savedMsg.startswith(userNick):
 					for x in [userNick + x for x in (":", ",")]:
-						if(savedMsg.startswith(x)):
+						if savedMsg.startswith(x):
 							savedMsg = savedMsg.replace(x, turnMessage(x))
 							receiver = userNick
-				if(receiver):
+				if receiver:
 					break
-			if(receiver):
+			if receiver:
 				sendToConference(conference, u"%s (от %s)" % (turnMessage(savedMsg), nick))
 			else:
 				sendMsg(msgType, conference, nick, turnMessage(savedMsg))
 
-def saveTurnMessage(stanza, msgType, conference, nick, trueJid, body):
+def saveTurnMessage(stanza, msgType, conference, nick, trueJid, message):
 	if(msgType == protocol.TYPE_PUBLIC):
 		if(trueJid != gJid and trueJid != conference):
-			time.sleep(TURN_TIMEOUT)
-			gTurnMsgCache[conference][trueJid] = body
+			if "turn" != message.lower():
+				gTurnMsgCache[conference][trueJid] = message
 
 def initTurnCache(conference):
 	gTurnMsgCache[conference] = {}
 
 def freeTurnCache(conference):
-	del(gTurnMsgCache[conference])
+	del gTurnMsgCache[conference]
 
 def clearTurnCache(conference, nick, trueJid, reason, code):
-	if(trueJid in gTurnMsgCache[conference]):
-		del(gTurnMsgCache[conference][trueJid])
+	if trueJid in gTurnMsgCache[conference]:
+		del gTurnMsgCache[conference][trueJid]
 
 registerEvent(initTurnCache, ADDCONF)
 registerEvent(freeTurnCache, DELCONF)

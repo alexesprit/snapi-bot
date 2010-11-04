@@ -30,7 +30,8 @@ def joinConf(msgType, conference, nick, param):
 def leaveConf(msgType, conference, nick, param):
 	conf = param or conference
 	if conferenceInList(conf):
-		sendMsg(msgType, conference, nick, u"Ушла")
+		if conf != conference:
+			sendMsg(msgType, conference, nick, u"Ушла")
 		myNick = (conferenceInList(conference)) and nick or conference.split("@")[0]
 		leaveConference(conf, u"Меня уводит %s" % (myNick))
 		saveConferences()
