@@ -21,47 +21,47 @@ def loadUserNotes():
 
 def addUserNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick)
-	if(trueJid not in gUserNotes):
+	if trueJid not in gUserNotes:
 		gUserNotes[trueJid] = []
 	text = u"%s\n%s" % (time.strftime("[%d.%m.%y, %H:%M]"), param)
 	gUserNotes[trueJid].append(text)
 	gUserNotes.save()
-	sendMsg(msgType, conference, nick, u"записала")
+	sendMsg(msgType, conference, nick, u"Записала")
 
 def delUserNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick)
-	if(trueJid in gUserNotes):
-		if(param.isdigit()):
+	if trueJid in gUserNotes:
+		if param.isdigit():
 			param = int(param) - 1
-			if(param < len(gUserNotes[trueJid])):
-				del(gUserNotes[trueJid][param])
-				if(not gUserNotes[trueJid]):
-					del(gUserNotes[trueJid])
+			if param < len(gUserNotes[trueJid]):
+				del gUserNotes[trueJid][param]
+				if not gUserNotes[trueJid]:
+					del gUserNotes[trueJid]
 				gUserNotes.save()
-				sendMsg(msgType, conference, nick, u"удалила")
+				sendMsg(msgType, conference, nick, u"Удалила")
 			else:
-				sendMsg(msgType, conference, nick, u"нет такого пункта")
+				sendMsg(msgType, conference, nick, u"Нет такой заметки")
 		else:
-			sendMsg(msgType, conference, nick, u"читай справку по команде")
+			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 	else:
-		sendMsg(msgType, conference, nick, u"в твоём блокноте пусто")
+		sendMsg(msgType, conference, nick, u"В твоём блокноте пусто")
 
 def showUserNotes(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick)
-	if(param == u"сброс"):
-		if(trueJid in gUserNotes):
-			del(gUserNotes[trueJid])
+	if param == u"сброс":
+		if trueJid in gUserNotes:
+			del gUserNotes[trueJid]
 			gUserNotes.save()
-			sendMsg(msgType, conference, nick, u"удалила")
+			sendMsg(msgType, conference, nick, u"Удалила")
 		else:
 			sendMsg(msgType, conference, nick, u"а у тебя и так ничего нет :P")
-	elif(not param):
-		if(trueJid in gUserNotes):
-			message = u"твои заметки:\n"
+	elif not param:
+		if trueJid in gUserNotes:
+			message = u"Твои заметки:\n"
 			items = [u"%d) %s" % (i + 1, x) for i, x in enumerate(gUserNotes[trueJid])]
 			sendMsg(msgType, conference, nick, message + "\n".join(items))
 		else:
-			sendMsg(msgType, conference, nick, u"в твоём блокноте пусто")
+			sendMsg(msgType, conference, nick, u"В твоём блокноте пусто")
 
 registerEvent(loadUserNotes, STARTUP)
 

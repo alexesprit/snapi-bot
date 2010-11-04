@@ -41,7 +41,7 @@ def askAuthQuestion(conference, nick, trueJid, aff, role):
 	if(getConfigKey(conference, "auth")):
 		if(aff == protocol.AFF_NONE):
 			question, answer = random.choice(AUTH_QUESTIONS)
-			setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"неавторизованый участник")
+			setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Неавторизованый участник")
 			message = u"Чтобы получить голос, реши пример: %s. Как решишь, напиши мне ответ" % (question)
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 			gAuthAnswer[conference][trueJid] = answer
@@ -54,11 +54,11 @@ def authAnswerListener(stanza, msgType, conference, nick, trueJid, body):
 	if(protocol.TYPE_PRIVATE == msgType):
 		if(trueJid in gAuthAnswer[conference]):
 			if(gAuthAnswer[conference][trueJid] == body):
-				sendMsg(msgType, conference, nick, u"ок, признаю - ты не бот =)")
-				setMUCRole(conference, nick, protocol.ROLE_PARTICIPANT, u"авторизация пройдена")
+				sendMsg(msgType, conference, nick, u"Признаю - ты не бот :)")
+				setMUCRole(conference, nick, protocol.ROLE_PARTICIPANT, u"Авторизация пройдена")
 				del(gAuthAnswer[conference][trueJid])
 			else:
-				sendMsg(msgType, conference, nick, u"неправильный ответ")
+				sendMsg(msgType, conference, nick, u"Неправильный ответ")
 
 def manageAuthValue(msgType, conference, nick, param):
 	if(param):
@@ -66,15 +66,15 @@ def manageAuthValue(msgType, conference, nick, param):
 			param = int(param)
 			if(param == 1):
 				setConfigKey(conference, "auth", 1)
-				sendMsg(msgType, conference, nick, u"авторизация включена")
+				sendMsg(msgType, conference, nick, u"Авторизация включена")
 			else:
 				setConfigKey(conference, "auth", 0)
-				sendMsg(msgType, conference, nick, u"авторизация отключена")
+				sendMsg(msgType, conference, nick, u"Авторизация отключена")
 			saveConferenceConfig(conference)
 		else:
-			sendMsg(msgType, conference, nick, u"прочитай помощь по команде")
+			sendMsg(msgType, conference, nick, u"Прочитай помощь по команде")
 	else:
-		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (getConfigKey(conference, "auth")))
+		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (getConfigKey(conference, "auth")))
 
 registerEvent(setDefAuthValue, ADDCONF)
 registerEvent(initAuthCache, ADDCONF)

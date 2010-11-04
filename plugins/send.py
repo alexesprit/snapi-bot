@@ -23,35 +23,35 @@ def loadSendBase(conference):
 	gSendCache[conference] = database.DataBase(fileName)
 
 def freeSendBase(conference):
-	del(gSendCache[conference])
+	del gSendCache[conference]
 
 def addToSendBase(msgType, conference, nick, param):
 	param = param.split(None, 1)
-	if(len(param) == 2):
+	if len(param) == 2:
 		userNick = param[0]
 		message = param[1]
 		message = u"%s попросил меня передать тебе следующее:\n%s" % (nick, message)
-		if(nickIsOnline(conference, userNick)):
+		if nickIsOnline(conference, userNick):
 			sendMsg(protocol.TYPE_PRIVATE, conference, userNick, message)
-			sendMsg(msgType, conference, nick, u"передала")
-		elif(nickInConference(conference, userNick)):
+			sendMsg(msgType, conference, nick, u"Передала")
+		elif nickInConference(conference, userNick):
 			trueJid = getTrueJid(conference, userNick)
 			base = gSendCache[conference]
 			if(trueJid not in base):
 				base[trueJid] = []
 			base[trueJid].append(message)
 			base.save()
-			sendMsg(msgType, conference, nick, u"передам")
+			sendMsg(msgType, conference, nick, u"Передам")
 		else:
-			sendMsg(msgType, conference, nick, u"а это кто?")
+			sendMsg(msgType, conference, nick, u"А это кто?")
 
 def checkSendBase(conference, nick, trueJid, aff, role):
 	base = gSendCache[conference]
-	if(trueJid in base):
+	if trueJid in base:
 		for message in base[trueJid]:
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 			time.sleep(0.5)
-		del(base[trueJid])
+		del base[trueJid]
 		base.save()
 
 registerEvent(loadSendBase, ADDCONF)

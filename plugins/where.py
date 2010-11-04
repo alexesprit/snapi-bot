@@ -15,14 +15,14 @@
 
 def showWhereIsBot(msgType, conference, nick, param):
 	confCount = len(getConferences())
-	if(confCount):
-		message = u"я сижу в %d конфах:\n" % (confCount)
-		infoList = [u"%d) %s\n[%s, %d чел.]" % (i + 1, conf, getBotNick(conf), len(getJidList(conf))) \
+	if confCount:
+		message = u"Я сижу в %d конференциях:\n" % (confCount)
+		infoList = [u"%d) %s\n[%s, %d чел.]" % (i + 1, conf, getBotNick(conf), len(getJidList(conf)))
 					for i, conf in enumerate(getConferences())]
 		message += "\n".join(infoList)
 		sendMsg(msgType, conference, nick, message)
 	else:
-		sendMsg(msgType, conference, nick, u"я пока нигде не сижу")
+		sendMsg(msgType, conference, nick, u"Я пока нигде не сижу")
 
 registerCommand(showWhereIsBot, u"хдебот", 10, 
 				u"Показывает, в каких конфах сидит бот", 

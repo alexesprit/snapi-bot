@@ -16,15 +16,15 @@
 URL_STRINGS = ("http://", "https://", "svn://")
 
 def showSVNLog(msgType, conference, nick, param):
-	if(param):
+	if param:
 		for x in URL_STRINGS:
-			if(param.startswith(x)):
+			if param.startswith(x):
 				param = param.split()
-				if(len(param) == 2):
-					try:
+				if len(param) == 2:
+					if count.isdigit():
 						count = int(param[1])
-					except(ValueError):
-						sendMsg(msgType, conference, nick, u"прочитай помощь по команде")
+					else:
+						sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 						return
 				else:
 					count = 10

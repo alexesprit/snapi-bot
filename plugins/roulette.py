@@ -15,15 +15,15 @@
 # GNU General Public License for more details.
 
 def playRoulette(msgType, conference, nick, param):
-	if(not getNickKey(conference, nick, NICK_MODER)):
-		if(not random.randrange(0, 6)):
+	if not getNickKey(conference, nick, NICK_MODER):
+		if not random.randrange(0, 6):
 			sendMsg(msgType, conference, nick, u"ЩЁЛК!")
 		else:
 			sendToConference(conference, u"/me выстрелила в %s" % (nick))
 			time.sleep(0.5)
 			setMUCRole(conference, nick, protocol.ROLE_NONE, u"ПЫЩЩЬ-ПТЫДЫЩЬ!")
 	else:
-		sendMsg(msgType, conference, nick, u"не могу я в модера стрелять :(")
+		sendMsg(msgType, conference, nick, u"Модераторов не трогаю :)")
 
 registerCommand(playRoulette, u"рр", 10, 
 				u"Старая добрая русская рулетка", 

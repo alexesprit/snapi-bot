@@ -30,16 +30,16 @@ def manageJokesValue(msgType, conference, nick, param):
 			param = int(param)
 			if(param == 1):
 				setConfigKey(conference, "jokes", 1)
-				sendMsg(msgType, conference, nick, u"шуточки включены")
+				sendMsg(msgType, conference, nick, u"Шуточки включены")
 			else:
 				setConfigKey(conference, "jokes", 0)
-				sendMsg(msgType, conference, nick, u"шуточки отключены")
+				sendMsg(msgType, conference, nick, u"Шуточки отключены")
 			saveConferenceConfig(conference)
 		else:
-			sendMsg(msgType, conference, nick, u"прочитай помощь по команде")
+			sendMsg(msgType, conference, nick, u"Прочитай помощь по команде")
 	else:
 		jokesValue = getConfigKey(conference, "jokes")
-		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (jokesValue))
+		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (jokesValue))
 
 registerEvent(loadJokes, STARTUP)
 registerEvent(setDefJokesValue, ADDCONF)

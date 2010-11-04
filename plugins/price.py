@@ -18,16 +18,16 @@ def showPrice(msgType, conference, nick, param):
 	url = "http://www.webvaluer.org/ru/www.%s" % (query)
 	rawHTML = urllib.urlopen(url).read()
 	items = re.search(r"<td class=\"value\">(.+?)</td>", rawHTML, re.DOTALL)
-	if(items):
+	if items:
 		cost = unicode(items.group(1), "utf-8")
 		cost = cost.split()
-		if(len(cost) == 2):
+		if len(cost) == 2:
 			cost = "%s %s" % (cost[1], cost[0])
 		else:
 			cost = cost[0]
-		sendMsg(msgType, conference, nick, u"стоимость домена %s составляет %s" %  (param, cost))
+		sendMsg(msgType, conference, nick, u"Стоимость домена %s составляет %s" %  (param, cost))
 	else:
-		sendMsg(msgType, conference, nick, u"не получается :(")
+		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 registerCommand(showPrice, u"домен", 10, 
 				u"Показывает оценочную стоимость домена", 

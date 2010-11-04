@@ -45,13 +45,13 @@ def _showUserTime(stanza, msgType, conference, nick, param):
 			rawTime = time.mktime(rawTime) + offset
 			userTime = time.strftime("%H:%M:%S (%d.%m.%y)", time.localtime(rawTime))
 			if(param):
-				sendMsg(msgType, conference, nick, u"у %s сейчас %s" % (param, userTime))
+				sendMsg(msgType, conference, nick, u"У %s сейчас %s" % (param, userTime))
 			else:
-				sendMsg(msgType, conference, nick, u"у тебя сейчас %s" % (userTime))
+				sendMsg(msgType, conference, nick, u"У тебя сейчас %s" % (userTime))
 		else:
-			sendMsg(msgType, conference, nick, u"клиент глюк, инфы не хватает")
+			sendMsg(msgType, conference, nick, u"Клиент глюк, инфы не хватает")
 	else:
-		sendMsg(msgType, conference, nick, u"не получается :(")
+		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 registerCommand(showUserTime, u"часики", 10, 
 				u"Показывает время указанного пользователя или сервера", 

@@ -23,23 +23,23 @@ def deleteFromConfig(msgType, conference, nick, param):
 	for conf in getConferences():
 		path = getConfigPath(conf, param)
 		answer = deleteFile(path)
-		if(TYPE_DIR == answer):
+		if TYPE_DIR == answer:
 			dirs += 1
-		elif(TYPE_FILE == answer):
+		elif TYPE_FILE == answer:
 			files += 1
-	sendMsg(msgType, conference, nick, u"удалено %d папок и %d файлов" % (dirs, files))
+	sendMsg(msgType, conference, nick, u"Удалено %d папок и %d файлов" % (dirs, files))
 	
 def deleteFile(path):
 	path = path.encode("utf-8")
-	if(os.path.exists(path)):
-		if(os.path.isdir(path)):
+	if os.path.exists(path):
+		if os.path.isdir(path):
 			shutil.rmtree(path)
-			return(TYPE_DIR)
+			return TYPE_DIR
 		else:
 			os.remove(path)
-			return(TYPE_FILE)
+			return TYPE_FILE
 	else:
-		return(-1)
+		return -1
 
 registerCommand(deleteFromConfig, u"rmcfg", 100, 
 				u"Удаляет файл или папку из /config", 

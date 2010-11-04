@@ -19,29 +19,29 @@ STATS_ID = "stats_id"
 UPTIME_ID = "uptime_id"
 
 def _showServerStats(stanza, msgType, conference, nick, server):
-	if(protocol.TYPE_RESULT == stanza.getType()):
+	if protocol.TYPE_RESULT == stanza.getType():
 		items = []
 		for stat in stanza.getQueryChildren():
 			attrs = stat.getAttrs()
-			if(len(attrs) == 3):
+			if len(attrs) == 3:
 				items.append(u"%(name)s: %(value)s %(units)s" % (attrs))
-		if(items):
+		if items:
 			message = u"Инфа о %s:\n%s" % (server, "\n".join(items))
 			sendMsg(msgType, conference, nick, message)
 		else:
-			sendMsg(msgType, conference, nick, u"пустая инфа")
+			sendMsg(msgType, conference, nick, u"Нет информации")
 	else:
-		sendMsg(msgType, conference, nick, u"не получается :(")
+		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 def _showServerInfo(stanza, msgType, conference, nick, server):
-	if(protocol.TYPE_RESULT == stanza.getType()):
+	if protocol.TYPE_RESULT == stanza.getType():
 		iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_STATS)
 		iq.setQueryPayload(stanza.getQueryChildren())
 		iq.setTo(server)
 		iq.setID(getUniqueID(STATS_ID))
 		gClient.sendAndCallForResponse(iq, _showServerStats, (msgType, conference, nick, server, ))
 	else:
-		sendMsg(msgType, conference, nick, u"не получается :(")
+		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 def showServerInfo(msgType, conference, nick, param):
 	server = param or gServer
@@ -51,15 +51,15 @@ def showServerInfo(msgType, conference, nick, param):
 	gClient.sendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, server, ))
 
 def _showServerUptime(stanza, msgType, conference, nick, server):
-	if(protocol.TYPE_RESULT == stanza.getType()):
+	if protocol.TYPE_RESULT == stanza.getType():
 		child = stanza.getFirstChild()
 		seconds = int(child.getAttr("seconds"))
 		if seconds:
-			sendMsg(msgType, conference, nick, u"%s работает уже %s" % (server, time2str(seconds)))
+			sendMsg(msgType, conference, nick, u"Время работы %s: %s" % (server, getUptimeStr(seconds)))
 		else:
-			sendMsg(msgType, conference, nick, u"нет информации")
+			sendMsg(msgType, conference, nick, u"Нет информации")
 	else:
-		sendMsg(msgType, conference, nick, u"не получается :(")
+		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 def showServerUptime(msgType, conference, nick, param):
 	server = param or gServer

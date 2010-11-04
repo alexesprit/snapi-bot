@@ -33,16 +33,16 @@ def showClients(msgType, conference, nick, param):
 			clients = gUserClients[conference][trueJid]
 			if(clients):
 				if(not param):
-					message = u"ты заходил сюда с "
+					message = u"Ты заходил сюда с "
 				else:
 					message = param + u" заходил сюда с "
 				sendMsg(msgType, conference, nick, message + u", ".join(clients))
 			else:
-				sendMsg(msgType, conference, nick, u"нет информации")
+				sendMsg(msgType, conference, nick, u"Нет информации")
 		else:
-			sendMsg(msgType, conference, nick, u"нет информации")
+			sendMsg(msgType, conference, nick, u"Нет информации")
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"А это кто?")
 
 def saveUserClient(conference, nick, trueJid, aff, role):
 	base = gUserClients[conference]

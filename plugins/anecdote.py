@@ -22,7 +22,7 @@ def showAnecdote(msgType, conference, nick, param):
 		anecdote = decode(rawtext, "cp1251")
 		sendMsg(msgType, conference, nick, anecdote)
 	else:
-		sendMsg(msgType, conference, nick, u"не получается")
+		sendMsg(msgType, conference, nick, u"Не получается")
 
 registerCommand(showAnecdote, u"анекдот", 10, 
 				u"Показывает случайный анекдот", 

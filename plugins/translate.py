@@ -55,7 +55,7 @@ def detectLanguage(text):
 	return None
 
 def translateText(msgType, conference, nick, param):
-	if(param == u"языки"):
+	if param.lower() == u"языки":
 		langs = [u"%s - %s" % (lang, name)
 				for lang, name in LANGUAGES.items()]
 		langs.sort()
@@ -63,26 +63,26 @@ def translateText(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, message)
 	else:
 		param = param.split(None, 2)
-		if(len(param) == 3):
-			(src, target, text) = param
-			if(src in LANGUAGES and target in LANGUAGES):
-				if(src == "auto"):
-					if(target == "auto"):
-						sendMsg(msgType, conference, nick, u"ошибочный запрос. прочитай помощь по использованию команды")
+		if len(param) == 3:
+			src, target, text = param
+			if src in LANGUAGES and target in LANGUAGES:
+				if src == "auto":
+					if target == "auto":
+						sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 						return
 					else:
 						src = detectLanguage(text)
-						if(src):
-							if(not src in LANGUAGES):
-								sendMsg(msgType, conference, nick, u"не могу понять, что это за язык (%s)" % (src))
+						if src:
+							if not src in LANGUAGES:
+								sendMsg(msgType, conference, nick, u"Не могу понять, что это за язык (%s)" % (src))
 								return
 						else:
-							sendMsg(msgType, conference, nick, u"не могу перевести")
+							sendMsg(msgType, conference, nick, u"Не могу перевести")
 				text = getTranslatedText(text, src, target)
 				if(text):
 					sendMsg(msgType, conference, nick, utils.unescapeHTML(text))
 				else:
-					sendMsg(msgType, conference, nick, u"не могу перевести")
+					sendMsg(msgType, conference, nick, u"Не могу перевести")
 
 registerCommand(translateText, u"перевод", 10, 
 				u"Перевод текста с одного языка на другой. Указав \"языки\" в кач-ве параметра можно посмотреть доступные языки для перевода", 

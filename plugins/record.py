@@ -17,16 +17,16 @@ REC_FILE = "record.txt"
 gRecords = {}
 
 def showRecord(msgType, conference, nick, param):
-	if(gRecords[conference]):
+	if gRecords[conference]:
 		sendMsg(msgType, conference, nick, 
-				u"рекорд посещаемости - %(count)d человек (%(time)s)" % (gRecords[conference]))
+				u"Рекорд посещаемости - %(count)d человек (%(time)s)" % (gRecords[conference]))
 	else:
-		sendMsg(msgType, conference, nick, u"нет информации")
+		sendMsg(msgType, conference, nick, u"Нет информации")
 		
 def calculateRecord(conference, nick, trueJid, aff, role):
 	userCount = len(getJidList(conference))
 	lastCount = gRecords[conference] and gRecords[conference]["count"] or 0
-	if(userCount >= lastCount):
+	if userCount >= lastCount:
 		gRecords[conference]["time"] = time.strftime("%d.%m.%y, %H:%M")
 		gRecords[conference]["count"] = userCount
 		fileName = getConfigPath(conference, REC_FILE)
@@ -38,7 +38,7 @@ def loadRecordsBase(conference):
 	gRecords[conference] = eval(utils.readFile(fileName))
 
 def freeRecordsBase(conference):
-	del(gRecords[conference])
+	del gRecords[conference]
 	
 registerJoinHandler(calculateRecord)
 

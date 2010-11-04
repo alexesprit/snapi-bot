@@ -15,10 +15,10 @@
 		
 def processSubscriptions(stanza, jid, resource, trueJid):
 	prsType = stanza.getType()
-	if(protocol.PRS_SUBSCRIBE == prsType):
+	if protocol.PRS_SUBSCRIBE == prsType:
 		gRoster.authorize(jid)
 		gRoster.subscribe(jid)
-	elif(protocol.PRS_UNSUBSCRIBE == prsType):
+	elif protocol.PRS_UNSUBSCRIBE == prsType:
 		gRoster.unauthorize(jid)
 		gRoster.delItem(jid)
 

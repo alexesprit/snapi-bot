@@ -27,32 +27,32 @@ def loadAutoModerators(conference):
 	gModerators[conference] = eval(utils.readFile(fileName))
 
 def freeAutoModerators(conference):
-	del(gModerators[conference])
+	del gModerators[conference]
 
 def setAutoModerator(conference, nick, trueJid, aff, role):
-	if(trueJid in gModerators[conference]):
-		setMUCRole(conference, nick, protocol.ROLE_MODERATOR, u"автомодератор")
+	if trueJid in gModerators[conference]:
+		setMUCRole(conference, nick, protocol.ROLE_MODERATOR, u"Автомодератор")
 
 def addAutoModerator(msgType, conference, nick, param):
 	user = param
 	setModeratorRole = False
-	if(nickInConference(conference, user)):
+	if nickInConference(conference, user):
 		trueJid = getTrueJid(conference, user)
 		if(getNickKey(conference, user, NICK_HERE)):
 			setModeratorRole = True
-	elif(isJid(user)):
+	elif isJid(user):
 		trueJid = user
 		user = getNickByJid(conference, trueJid)
-		if(user):
+		if user:
 			setModeratorRole = True
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"А это кто?")
 		return
-	if(trueJid not in gModerators[conference]):
+	if trueJid not in gModerators[conference]:
 		gModerators[conference].append(trueJid)
 		saveAutoModerators(conference)
-		sendMsg(msgType, conference, nick, u"добавила")
-		if(setModeratorRole):
+		sendMsg(msgType, conference, nick, u"Добавила")
+		if setModeratorRole:
 			setMUCRole(conference, user, protocol.ROLE_MODERATOR)
 	else:
 		sendMsg(msgType, conference, nick, u"%s уже есть в списке" % (param))
@@ -60,34 +60,34 @@ def addAutoModerator(msgType, conference, nick, param):
 def delAutoModerator(msgType, conference, nick, param):
 	user = param
 	setParticipantRole = False
-	if(nickInConference(conference, user)):
+	if nickInConference(conference, user):
 		trueJid = getTrueJid(conference, user)
-		if(getNickKey(conference, user, NICK_HERE)):
+		if getNickKey(conference, user, NICK_HERE):
 			setParticipantRole = True
-	elif(isJid(user)):
+	elif isJid(user):
 		trueJid = user
 		user = getNickByJid(conference, trueJid)
-		if(user):
+		if user:
 			setParticipantRole = True
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"А это кто?")
 		return
-	if(trueJid in gModerators[conference]):
+	if trueJid in gModerators[conference]:
 		gModerators[conference].remove(trueJid)
 		saveAutoModerators(conference)
-		sendMsg(msgType, conference, nick, u"удалила")
-		if(setParticipantRole):
+		sendMsg(msgType, conference, nick, u"Удалила")
+		if setParticipantRole:
 			setMUCRole(conference, user, protocol.ROLE_PARTICIPANT)
 	else:
-		sendMsg(msgType, conference, nick, u"а %s итак нет в списке" % (param))
+		sendMsg(msgType, conference, nick, u"А %s итак нет в списке" % (param))
 
 def showAutoModerators(msgType, conference, nick, param):
-	if(gModerators[conference]):
+	if gModerators[conference]:
 		items = [u"%d) %s" % (i + 1, moder) for i, moder in enumerate(gModerators[conference])]
-		message = u"список автомодераторов:\n%s" % ("\n".join(items))
+		message = u"Список автомодераторов:\n%s" % ("\n".join(items))
 		sendMsg(msgType, conference, nick, message)
 	else:
-		sendMsg(msgType, conference, nick, u"список автомодераторов пуст")
+		sendMsg(msgType, conference, nick, u"Список автомодераторов пуст")
 
 registerEvent(loadAutoModerators, ADDCONF)
 registerEvent(freeAutoModerators, DELCONF)

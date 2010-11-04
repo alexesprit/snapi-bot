@@ -16,9 +16,9 @@
 def botRestart(msgType, conference, nick, param):
 	nick = (conferenceInList(conference)) and nick or conference.split("@")[0]
 	if(param):
-		message = u"меня перезагружает %s (%s)" % (nick, param)
+		message = u"Меня перезагружает %s (%s)" % (nick, param)
 	else:
-		message = u"меня перезагружает %s" % (nick)
+		message = u"Меня перезагружает %s" % (nick)
 	prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
 	prs.setStatus(message)
 	gClient.send(prs)
@@ -27,9 +27,9 @@ def botRestart(msgType, conference, nick, param):
 def botShutdown(msgType, conference, nick, param):
 	nick = (conferenceInList(conference)) and nick or conference.split("@")[0]
 	if(param):
-		message = u"меня выключает %s (%s)" % (nick, param)
+		message = u"Меня выключает %s (%s)" % (nick, param)
 	else:
-		message = u"меня выключает %s" % (nick)
+		message = u"Меня выключает %s" % (nick)
 	prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
 	prs.setStatus(message)
 	gClient.send(prs)

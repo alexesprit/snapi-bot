@@ -15,28 +15,28 @@
 
 def showUserStatus(msgType, conference, nick, param):
 	userNick = param or nick
-	if(nickIsOnline(conference, userNick)):
+	if nickIsOnline(conference, userNick):
 		show = getNickKey(conference, userNick, NICK_SHOW)
 		status = getNickKey(conference, userNick, NICK_STATUS)
-		if(param):
-			if(status):
+		if param:
+			if status:
 				sendMsg(msgType, conference, nick, u"%s сейчас %s (%s)" % (userNick, show, status))
 			else:
 				sendMsg(msgType, conference, nick, u"%s сейчас %s" % (userNick, show))
 		else:
-			if(status):
-				sendMsg(msgType, conference, nick, u"ты сейчас %s (%s)" % (show, status))
+			if status:
+				sendMsg(msgType, conference, nick, u"Ты сейчас %s (%s)" % (show, status))
 			else:
-				sendMsg(msgType, conference, nick, u"ты сейчас %s" % (show))
+				sendMsg(msgType, conference, nick, u"Ты сейчас %s" % (show))
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"А это кто?")
 
 def updateStatus(stanza, conference, nick, trueJid):
-	if(conferenceInList(conference) and nickIsOnline(conference, nick)):
+	if conferenceInList(conference) and nickIsOnline(conference, nick):
 		show = stanza.getShow() or u"online"
 		status = stanza.getStatus()
 		setNickKey(conference, nick, NICK_SHOW, show)
-		if(status):
+		if status:
 			setNickKey(conference, nick, NICK_STATUS, status)
 
 registerPresenceHandler(updateStatus, CHAT)

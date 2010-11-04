@@ -27,7 +27,7 @@ def showFact(msgType, conference, nick, param):
 		fact = decode(fact)
 		sendMsg(msgType, conference, nick, unicode(fact, "cp1251"))
 	else:
-		sendMsg(msgType, conference, nick, u"не получается")
+		sendMsg(msgType, conference, nick, u"Не получается")
 
 registerCommand(showFact, u"факт", 10, 
 				u"Показывает случайный интересный факт", 

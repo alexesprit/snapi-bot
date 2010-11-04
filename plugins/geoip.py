@@ -22,7 +22,7 @@ def showGeoIPInfo(msgType, conference, nick, param):
 	rawHTML = unicode(rawHTML, "cp1251")
 	items = re.findall("<td class=red>(.+?)</td><td class=blue>(.+?)</td>", rawHTML)
 	items = [u"%s %s" % (item[0], item[1]) for item in items]
-	message = u"инфо о %s:\n%s" % (host, decode("\n".join(items)))
+	message = u"Инфо о %s:\n%s" % (host, decode("\n".join(items)))
 	sendMsg(msgType, conference, nick, message)
 
 registerCommand(showGeoIPInfo, u"геоип", 10, 

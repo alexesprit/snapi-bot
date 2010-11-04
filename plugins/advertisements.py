@@ -20,12 +20,12 @@ def showAdvert(msgType, conference, nick, param):
 	url = "http://skio.ru/funnyad/%d.php" % (pageNum)
 	rawHTML = urllib.urlopen(url).read()
 	items = re.findall(r"<tr><td>(.+?)</td></tr>", rawHTML, re.DOTALL)
-	if(items):
+	if items:
 		adv = random.choice(items)
 		adv = decode(adv)
 		sendMsg(msgType, conference, nick, unicode(adv, "cp1251"))
 	else:
-		sendMsg(msgType, conference, nick, u"не получается")
+		sendMsg(msgType, conference, nick, u"Не получается")
 
 registerCommand(showAdvert, u"объявление", 10, 
 				u"Показывает случайное интересное объявление", 

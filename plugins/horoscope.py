@@ -36,10 +36,10 @@ def showHoroscope(msgType, conference, nick, param):
 		if(items):
 			message = unicode(items.group(1), "cp1251")
 			if(protocol.TYPE_PUBLIC == msgType):
-				sendMsg(msgType, conference, nick, u"ушёл в приват")
+				sendMsg(msgType, conference, nick, u"Ушёл")
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 		else:
-			sendMsg(msgType, conference, nick, u"не могу :(")
+			sendMsg(msgType, conference, nick, u"Не могу :(")
 
 registerCommand(showHoroscope, u"гороскоп", 10, 
 				u"Показывает гороскоп для указанного знака гороскопа", 

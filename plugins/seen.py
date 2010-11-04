@@ -22,7 +22,7 @@ def loadSeenBase(conference):
 	gSeenCache[conference] = database.DataBase(fileName)
 
 def freeSeenBase(conference):
-	del(gSeenCache[conference])
+	del gSeenCache[conference]
 
 def saveAllSeenBases():
 	for conference in getConferences():
@@ -34,20 +34,20 @@ def updateSeenTime(conference, nick, trueJid, reason, code):
 
 def showSeenTime(msgType, conference, nick, param):
 	userNick = param or nick
-	if(nickInConference(conference, userNick)):
+	if nickInConference(conference, userNick):
 		trueJid = getTrueJid(conference, userNick)
-		if(trueJid in gSeenCache[conference]):
+		if trueJid in gSeenCache[conference]:
 			seen = gSeenCache[conference][trueJid]
 			seenDate = time.strftime("%H:%M, %d.%m.%Y", time.localtime(seen))
-			seenTime = time2str(time.time() - seen)
-			if(not param):
-				sendMsg(msgType, conference, nick, u"последний раз я видела тебя %s назад (в %s)" % (seenTime, seenDate))
+			seenTime = getTimeStr(time.time() - seen)
+			if not param:
+				sendMsg(msgType, conference, nick, u"Последний раз я видела тебя %s назад (в %s)" % (seenTime, seenDate))
 			else:
-				sendMsg(msgType, conference, nick, u"последний раз я видела %s %s назад (в %s)" % (userNick, seenTime, seenDate))
+				sendMsg(msgType, conference, nick, u"Последний раз я видела %s %s назад (в %s)" % (userNick, seenTime, seenDate))
 		else:
-			sendMsg(msgType, conference, nick, u"нет информации")
+			sendMsg(msgType, conference, nick, u"Нет информации")
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"А это кто?")
 
 registerLeaveHandler(updateSeenTime)
 

@@ -261,12 +261,20 @@ def getUsedMemorySize():
 def printf(text, flag = FLAG_INFO):
 	gDebug.show(text, flag, flag)
 
-def time2str(time):
+def getUptimeStr(time):
+	minutes, seconds = divmod(time, 60)
+	hours, minutes = divmod(minutes, 60)
+	days, hours = divmod(hours, 24)
+	timeStr = "%02d:%02d:%02d" % (hours, minutes, seconds)
+	if days:
+		timeStr = u"%d дн. %s" % (days, timeStr)
+	return timeStr
+
+def getTimeStr(time):
 	minutes, seconds = divmod(time, 60)
 	hours, minutes = divmod(minutes, 60)
 	days, hours = divmod(hours, 24)
 	timeString = ""
-
 	if seconds:
 		timeString = u"%d сек." % (seconds)
 	if minutes:

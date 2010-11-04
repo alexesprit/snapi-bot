@@ -596,7 +596,7 @@ class Iq(Stanza):
 	def getQueryNS(self):
 		""" Return the namespace of the "query" child element.
 		"""
-		tag=self.getTag("query")
+		tag = self.getTag("query")
 		if tag:
 			return tag.getNamespace()
 
@@ -611,6 +611,9 @@ class Iq(Stanza):
 		tag = self.getTag("query")
 		if tag:
 			return tag.getChildren()
+
+	def getQueryNode(self):
+		return self.getTag("query")
 
 	def setQueryPayload(self, payload):
 		""" Set the "query" child element payload.

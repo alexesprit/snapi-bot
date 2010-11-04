@@ -21,8 +21,8 @@ gTalkersCache = {}
 
 def showTopTalkersInfo(msgType, conference, nick):
 	base = gTalkersCache[conference]
-	if(base.isEmpty()):
-		sendMsg(msgType, conference, nick, u"база болтунов пуста")
+	if base.isEmpty():
+		sendMsg(msgType, conference, nick, u"База болтунов пуста")
 	else:
 		topList = []
 		replic = u"Статистика топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n"
@@ -44,28 +44,28 @@ def showTopTalkersInfo(msgType, conference, nick):
 def clearTalkersInfo(msgType, conference, nick):
 	conference = source[1]
 	trueJid = getTrueJid(conference, nick)
-	if(getAccess(conference, trueJid) >= 20):
+	if getAccess(conference, trueJid) >= 20:
 		base = gTalkersCache[conference]
 		base.clear()
 		base.save()
-		sendMsg(msgType, conference, nick, u"база данных очищена")
+		sendMsg(msgType, conference, nick, u"База данных очищена")
 	else:
-		sendMsg(msgType, conference, nick, u"недостаточно прав")
+		sendMsg(msgType, conference, nick, u"Недостаточно прав")
 
 def showTalkerInfo(msgType, conference, nick, param):
-	if(param == u"топ"):
+	if param == u"топ":
 		showTopTalkersInfo(msgType, conference, nick)
-	elif(param == u"сброс"):
+	elif param == u"сброс":
 		clearTalkersInfo(msgType, conference, nick)
 	else:
-		if(not param):
+		if not param:
 			trueJid = getTrueJid(conference, nick)
-		elif(nickInConference(conference, param)):
+		elif nickInConference(conference, param):
 			trueJid = getTrueJid(conference, param)
 		else:
 			return
 		base = gTalkersCache[conference]
-		if(trueJid in base):
+		if trueJid in base:
 			statistic = base[trueJid]
 			statisticLine = u"Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f"
 			nick = statistic["nick"]
@@ -76,10 +76,10 @@ def showTalkerInfo(msgType, conference, nick, param):
 			message = statisticLine % (nick, messages, meMessages, words, wordsPerMsg)
 			sendMsg(msgType, conference, nick, message)
 		else:
-			sendMsg(msgType, conference, nick, u"твоя статистика отсутствует")
+			sendMsg(msgType, conference, nick, u"Твоя статистика отсутствует")
 
 def updateTalkersInfo(stanza, msgType, conference, nick, trueJid, body):
-	if(trueJid != gJid and msgType == protocol.TYPE_PUBLIC and nick):
+	if trueJid != gJid and msgType == protocol.TYPE_PUBLIC and nick:
 		base = gTalkersCache[conference]
 		if(trueJid in base):
 			base[trueJid]["nick"] = nick

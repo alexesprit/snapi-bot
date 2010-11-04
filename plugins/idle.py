@@ -16,9 +16,9 @@
 def showUserIdleTime(msgType, conference, nick, param):
 	if(nickIsOnline(conference, param)):
 		idleTime = int(time.time() - getNickKey(conference, param, NICK_IDLE))
-		sendMsg(msgType, conference, nick, u"%s заснул %s назад" % (param, time2str(idleTime)))
+		sendMsg(msgType, conference, nick, u"%s заснул %s назад" % (param, getTimeStr(idleTime)))
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"А это кто?")
 
 registerCommand(showUserIdleTime, u"жив", 10, 
 				u"Показывает время неактивности пользователя", 

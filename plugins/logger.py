@@ -122,16 +122,16 @@ def manageLoggingValue(msgType, conference, nick, param):
 			param = int(param)
 			if(param == 1):
 				setConfigKey(conference, "log", 1)
-				sendMsg(msgType, conference, nick, u"логирование включено")
+				sendMsg(msgType, conference, nick, u"Логирование включено")
 			else:
 				setConfigKey(conference, "log", 0)
-				sendMsg(msgType, conference, nick, u"логирование отключено")
+				sendMsg(msgType, conference, nick, u"Логирование отключено")
 			saveConferenceConfig(conference)
 		else:
-			sendMsg(msgType, conference, nick, u"прочитай помощь по команде")
+			sendMsg(msgType, conference, nick, u"читай помощь по команде")
 	else:
 		loggerValue = getConfigKey(conference, "log")
-		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (loggerValue))
+		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (loggerValue))
 
 def setDefLoggingValue(conference):
 	if(getConfigKey(conference, "log") is None):

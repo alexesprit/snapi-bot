@@ -60,8 +60,8 @@ FEATURES = {
 }
 
 def showFeatures(msgType, conference, nick, param):
-	if(param):
-		if(conferenceInList(conference) and nickIsOnline(conference, param)):
+	if param:
+		if conferenceInList(conference) and nickIsOnline(conference, param):
 			jid = conference + "/" + param
 		else:
 			jid = param
@@ -74,23 +74,23 @@ def showFeatures(msgType, conference, nick, param):
 	gClient.sendAndCallForResponse(iq, _showFeatures, (msgType, conference, nick, param, ))
 
 def _showFeatures(stanza, msgType, conference, nick, param):
-	if(protocol.TYPE_RESULT == stanza.getType()):
+	if protocol.TYPE_RESULT == stanza.getType():
 		featureList = set()
-		for child in stanza.getQueryChildren():
-			feature = child.getAttr("var")
-			if feature:
-				for knownFeature in FEATURES:
-					if(feature.count(knownFeature)):
-						featureList.add(FEATURES[knownFeature])
-		if(featureList):
+		queryNode = stanza.getQueryNode()
+		for tag in queryNode.getTags("feature"):
+			feature = tag.getAttr("var")
+			for knownFeature in FEATURES:
+				if feature.count(knownFeature):
+					featureList.add(FEATURES[knownFeature])
+		if featureList:
 			featureList = list(featureList)
 			featureList.sort()
-			answer = u"вот, что я узнала:\n%s" % ("\n".join(featureList))
-			if(protocol.TYPE_PUBLIC == msgType):
-				sendMsg(msgType, conference, nick, u"ушли")
+			answer = u"Вот, что я узнала:\n%s" % ("\n".join(featureList))
+			if protocol.TYPE_PUBLIC == msgType:
+				sendMsg(msgType, conference, nick, u"Ушли")
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, answer)
 		else:
-			sendMsg(msgType, conference, nick, u"нет инфы")
+			sendMsg(msgType, conference, nick, u"Нет информации")
 	else:
 		sendMsg(msgType, conference, nick, u"не могу :(")
 		

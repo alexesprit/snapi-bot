@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def showTest(msgType, conference, nick, param):
-	sendMsg(msgType, conference, nick, u"две полоски o_O")
+	sendMsg(msgType, conference, nick, u"Две полоски o_O")
 
 registerCommand(showTest, u"тест", 10, 
 				u"Тест на беременность", 

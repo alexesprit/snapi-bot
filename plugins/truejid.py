@@ -16,11 +16,11 @@
 def showTrueJid(msgType, conference, nick, param):
 	if(nickInConference(conference, param)):
 		if(protocol.TYPE_PUBLIC == msgType):
-			sendMsg(msgType, conference, nick, u"смотри в привате")
+			sendMsg(msgType, conference, nick, u"Смотри в привате")
 		trueJid = getTrueJid(conference, param)
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"реальный жид %s: %s" % (param, trueJid))
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Жид %s: %s" % (param, trueJid))
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"А это кто?")
 
 registerCommand(showTrueJid, u"тружид", 20, 
 				u"Показывает реальный жид указанного ника", 

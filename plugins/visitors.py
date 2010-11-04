@@ -27,64 +27,64 @@ def loadAutoVisitors(conference):
 	gVisitors[conference] = eval(utils.readFile(fileName))
 
 def freeAutoVisitors(conference):
-	del(gVisitors[conference])
+	del gVisitors[conference]
 
 def setAutoVisitor(conference, nick, trueJid, aff, role):
-	if(trueJid in gVisitors[conference]):
-		setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"автовизитор")
+	if trueJid in gVisitors[conference]:
+		setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Автопосетитель")
 
 def addAutoVisitor(msgType, conference, nick, param):
 	user = param
 	setVisitorRole = False
-	if(nickInConference(conference, user)):
+	if nickInConference(conference, user):
 		trueJid = getTrueJid(conference, user)
-		if(getNickKey(conference, user, NICK_HERE)):
+		if getNickKey(conference, user, NICK_HERE):
 			setVisitorRole = True
-	elif(isJid(user)):
+	elif isJid(user):
 		trueJid = user
 		user = getNickByJid(conference, trueJid)
-		if(user):
+		if user:
 			setVisitorRole = True
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"А это кто?")
 		return
-	if(trueJid not in gVisitors[conference]):
+	if trueJid not in gVisitors[conference]:
 		gVisitors[conference].append(trueJid)
 		saveAutoVisitors(conference)
-		sendMsg(msgType, conference, nick, u"добавила")
-		if(setVisitorRole):
+		sendMsg(msgType, conference, nick, u"Добавила")
+		if setVisitorRole:
 			setMUCRole(conference, user, protocol.ROLE_VISITOR)
 	else:
-		sendMsg(msgType, conference, nick, u"%s уже есть в списке" % (param))
+		sendMsg(msgType, conference, nick, u"%s уже есть в списке!" % (param))
 
 def delAutoVisitort(msgType, conference, nick, param):
 	user = param
 	setParticipantRole = False
-	if(nickInConference(conference, user)):
+	if nickInConference(conference, user):
 		trueJid = getTrueJid(conference, user)
 		if(getNickKey(conference, user, NICK_HERE)):
 			setParticipantRole = True
-	elif(isJid(user)):
+	elif isJid(user):
 		trueJid = user
 		user = getNickByJid(conference, trueJid)
-		if(user):
+		if user:
 			setParticipantRole = True
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"А это кто?")
 		return
-	if(trueJid in gVisitors[conference]):
+	if trueJid in gVisitors[conference]:
 		gVisitors[conference].remove(trueJid)
 		saveAutoVisitors(conference)
-		sendMsg(msgType, conference, nick, u"удалила")
-		if(setParticipantRole):
+		sendMsg(msgType, conference, nick, u"Удалила")
+		if setParticipantRole:
 			setMUCRole(conference, user, protocol.ROLE_PARTICIPANT)
 	else:
-		sendMsg(msgType, conference, nick, u"а %s итак нет в списке" % (param))
+		sendMsg(msgType, conference, nick, u"А %s итак нет в списке" % (param))
 
 def showAutoVisitors(msgType, conference, nick, param):
 	if(gVisitors[conference]):
 		items = [u"%d) %s" % (i + 1, moder) for i, moder in enumerate(gVisitors[conference])]
-		message = u"список автомодераторов:\n%s" % ("\n".join(items))
+		message = u"Список автомодераторов:\n%s" % ("\n".join(items))
 		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"список автопосетителей пуст")

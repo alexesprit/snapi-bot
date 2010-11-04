@@ -19,15 +19,15 @@ def noticeControl(msgType, conference, nick, param):
 			param = int(param)
 			if(param == 1):
 				setConfigKey(conference, "notices", 1)
-				sendMsg(msgType, conference, nick, u"оповещения включены")
+				sendMsg(msgType, conference, nick, u"Оповещения включены")
 			else:
 				setConfigKey(conference, "notices", 0)
-				sendMsg(msgType, conference, nick, u"оповещения выключены")
+				sendMsg(msgType, conference, nick, u"Оповещения выключены")
 			saveConferenceConfig(conference)
 		else:
-			sendMsg(msgType, conference, nick, u"прочитай помощь по команде")
+			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 	else:
-		sendMsg(msgType, conference, nick, u"текущее значение: %s" % (getConfigKey(conference, "popups")))
+		sendMsg(msgType, conference, nick, u"Текущее значение: %s" % (getConfigKey(conference, "popups")))
 
 def sendNotices(msgType, conference, nick, param):
 	conferences = getConferences()
@@ -36,7 +36,7 @@ def sendNotices(msgType, conference, nick, param):
 		if(getConfigKey(conf, "notices")):
 			sendToConference(conf, u"Новости от администрации:\n%s" % param)
 			count += 1
-	sendMsg(msgType, conference, nick, "сообщение ушло в %d конференций из %d" % (count, len(conferences)))
+	sendMsg(msgType, conference, nick, "Сообщение ушло в %d конференций из %d" % (count, len(conferences)))
 
 def setDefNoticeValue(conference):
 	if(getConfigKey(conference, "notices") is None):

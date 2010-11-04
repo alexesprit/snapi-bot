@@ -37,7 +37,7 @@ def showHelp(msgType, conference, nick, param):
 			prefix = getConfigKey(conference, "prefix")
 		else:
 			prefix = ""
-		sendMsg(msgType, conference, nick, u"напишите \"%sкоманды\", чтобы узнать список всех команд, \"%sпомощь <команда>\" для получения справки по использованию команды" % (prefix, prefix))
+		sendMsg(msgType, conference, nick, u"Напишите \"%sкоманды\", чтобы узнать список всех команд, \"%sпомощь <команда>\" для получения справки по использованию команды" % (prefix, prefix))
 
 def showCommands(msgType, conference, nick, param):
 	cmdType = conferenceInList(conference) and CHAT or ROSTER

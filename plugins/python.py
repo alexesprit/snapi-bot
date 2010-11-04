@@ -44,11 +44,11 @@ def pythonCalc(msgType, conference, nick, param):
 			try:
 				sendMsg(msgType, conference, nick, str(eval(param)))
 			except(ZeroDivisionError):
-				sendMsg(msgType, conference, nick, u"научи меня это делать :)");		
+				sendMsg(msgType, conference, nick, u"Научи меня это делать :)");		
 		else:
-			sendMsg(msgType, conference, nick, u"не буду такое считать")
+			sendMsg(msgType, conference, nick, u"Не буду такое считать")
 	else:
-		sendMsg(msgType, conference, nick, u"ты глюк")
+		sendMsg(msgType, conference, nick, u"Ты глюк")
 
 registerCommand(pythonEval, u"eval", 100, 
 				u"Расчитывает и показывает заданное выражение питона", 

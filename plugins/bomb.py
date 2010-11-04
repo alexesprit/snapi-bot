@@ -31,24 +31,24 @@ def bombMarked(conference, trueJid):
 
 def giveBomb(msgType, conference, nick, param):
 	if(protocol.TYPE_PRIVATE == msgType):
-		sendMsg(msgType, conference, nick, u"ага, хочешь без палева кинуть??? ]:->")
+		sendMsg(msgType, conference, nick, u"Ага, хочешь без палева кинуть??? ]:->")
 		return
 	userNick = param or random.choice(getOnlineNicks(conference))
 	if(nickIsOnline(conference, userNick)): 
 		trueJid = getTrueJid(conference, userNick)
 		if(bombMarked(conference, trueJid)):
-			sendMsg(msgType, conference, nick, u"в него уже кинули, ему хватит :-D")
+			sendMsg(msgType, conference, nick, u"В него уже кинули, ему хватит :-D")
 		else:
 			colors = getRandomColors()
 			gBombAnswer[conference][trueJid] = random.choice(colors)
 			gBombColors[conference][trueJid] = colors
 			timeout = random.randrange(40, 71)
 			if(colors):
-				message = u"вам вручена бомба, на ней %d цветов: %s, " % (len(colors), ", ".join(colors))
-				message += u"выберите цвет провода, который нужно перерезать, бомба взорвется через %s" % (time2str(timeout))
+				message = u"Вам вручена бомба, на ней %d цветов: %s, " % (len(colors), ", ".join(colors))
+				message += u"выберите цвет провода, который нужно перерезать, бомба взорвется через %s" % (getTimeStr(timeout))
 			else:
 				# это не баг, это фича :)
-				message = u"хаха, тебе не повезло, у тебя бомба БЕЗ проводов! она взорвётся через %s" % (time2str(timeout))
+				message = u"Хаха, тебе не повезло, у тебя бомба БЕЗ проводов! Она взорвётся через %s" % (getTimeStr(timeout))
 			sendMsg(msgType, conference, userNick, message)
 			gBombTimers[conference][trueJid] = startTimer(timeout, bombExecute, (msgType, conference, userNick, trueJid))
 	else:
@@ -56,10 +56,10 @@ def giveBomb(msgType, conference, nick, param):
 
 def bombExecute(msgType, conference, nick, trueJid):
 	if(nickIsOnline(conference, nick)):
-		sendMsg(msgType, conference, nick, u"надо было резать %s, чего тормозишь? :)" % (gBombAnswer[conference][trueJid]))
+		sendMsg(msgType, conference, nick, u"Надо было резать %s, чего тормозишь? :)" % (gBombAnswer[conference][trueJid]))
 		bombDetonate(msgType, conference, nick)
 	else:
-		sendMsg(msgType, conference, nick, u"трус :/")
+		sendMsg(msgType, conference, nick, u"Трус :/")
 
 def bombColorsListener(stanza, msgType, conference, nick, trueJid, param):
 	if(bombMarked(conference, trueJid)):
@@ -67,9 +67,9 @@ def bombColorsListener(stanza, msgType, conference, nick, trueJid, param):
 		if(color in gBombColors[conference][trueJid]):
 			gBombTimers[conference][trueJid].cancel()
 			if(color in gBombAnswer[conference][trueJid]):
-				sendMsg(msgType, conference, nick, u"бомба обезврежена!")
+				sendMsg(msgType, conference, nick, u"Бомба обезврежена!")
 			else:
-				sendMsg(msgType, conference, nick, u":-| блин, надо было резать %s" % gBombAnswer[conference][trueJid])
+				sendMsg(msgType, conference, nick, u"Блин :-| надо было резать %s" % gBombAnswer[conference][trueJid])
 				bombDetonate(msgType, conference, nick)
 			del(gBombAnswer[conference][trueJid])
 			del(gBombColors[conference][trueJid])
@@ -78,11 +78,11 @@ def bombColorsListener(stanza, msgType, conference, nick, trueJid, param):
 def bombDetonate(msgType, conference, nick):
 	num = random.randrange(0, 10)
 	if(num < 1 or getNickKey(conference, nick, NICK_MODER)):
-		sendMsg(msgType, conference, nick, u"бомба глюкнула...")
+		sendMsg(msgType, conference, nick, u"Бомба глюкнула...")
 	elif(num < 7):
-		setMUCRole(conference, nick, protocol.ROLE_NONE, u"бабах!!!")
+		setMUCRole(conference, nick, protocol.ROLE_NONE, u"Бабах!!!")
 	else:
-		setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"бабах!!!")
+		setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Бабах!!!")
 		timeout = random.randrange(100, 501)
 		startTimer(timeout, setMUCRole, (conference, nick, protocol.ROLE_PARTICIPANT))
 

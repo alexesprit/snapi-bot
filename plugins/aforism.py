@@ -47,7 +47,7 @@ def showAforism(msgType, conference, nick, param):
 		aforism = unicode(items.group(1), "cp1251")
 		sendMsg(msgType, conference, nick, aforism)
 	else:
-		sendMsg(msgType, conference, nick, u"не получается")
+		sendMsg(msgType, conference, nick, u"Не получается")
 
 registerCommand(showAforism, u"афор", 10, 
 				u"Показывает случайный афоризм", 

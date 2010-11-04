@@ -103,10 +103,10 @@ def showWeather(msgType, conference, nick, param):
 				message += u"Ветер: %d м/с (%s)\n" % (windValue, WINDDIRECTION[wind["direction"]])
 			message += "\n"
 		if(protocol.TYPE_PUBLIC == msgType):
-			sendMsg(msgType, conference, nick, u"ушла в приват")
+			sendMsg(msgType, conference, nick, u"Ушла")
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 	else:
-		sendMsg(msgType, conference, nick, u"не могу :(")
+		sendMsg(msgType, conference, nick, u"Не могу :(")
 
 registerCommand(showWeather, u"погода", 10, 
 				u"Показывает погоду", 

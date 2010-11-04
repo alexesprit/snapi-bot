@@ -24,7 +24,7 @@ def showWhoIs(msgType, conference, nick, param):
 		text = decode(text)
 		sendMsg(msgType, conference, nick, unicode(text, "cp1251"))
 	else:
-		sendMsg(msgType, conference, nick, u"не могу :(")
+		sendMsg(msgType, conference, nick, u"Не могу :(")
 
 registerCommand(showWhoIs, u"хтоэто", 10, 
 				u"Показывает информацию о домене", 

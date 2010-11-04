@@ -25,9 +25,9 @@ def _showOnlineTime(stanza, msgType, jid, resource):
 	if(protocol.TYPE_RESULT == stanza.getType()):
 		child = stanza.getFirstChild()
 		seconds = child.getAttr("seconds")
-		sendMsg(msgType, jid, resource, u"ты в сети уже %s" % (time2str(int(seconds))))
+		sendMsg(msgType, jid, resource, u"Ты в сети уже %s" % (getTimeStr(int(seconds))))
 	else:
-		sendMsg(msgType, jid, resource, u"не получается :(")
+		sendMsg(msgType, jid, resource, u"Не получается :(")
 
 registerCommand(showOnlineTime, u"всети", 10, 
 				u"Показывает ваше время в сети", 

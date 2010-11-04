@@ -15,14 +15,14 @@
 
 def showBotUptime(msgType, conference, nick, parameters):
 	uptime = int(time.time() - gInfo["start"])
-	message = u"я работаю уже %s, " % (time2str(uptime))
-	message += u"получено %(msg)d сообщений, обработано %(prs)d презенсов и %(iq)d iq-запросов, а также выполнено %(cmd)d команд. " % (gInfo)
+	message = u"Время работы: %s. " % (getUptimeStr(uptime))
+	message += u"Получено %(msg)d сообщений, обработано %(prs)d презенсов и %(iq)d iq-запросов, а также выполнено %(cmd)d команд. " % (gInfo)
 	memUsage = getUsedMemorySize()
-	if(memUsage): 
-		message += u"мной съедено %0.2f МБ памяти, " % (memUsage)
-	(user, system) = os.times()[:2]
-	message += u"потрачено %.2f сек. процессора, %.2f сек. системного времени и в итоге %.2f сек. общесистемного времени. " % (user, system, user + system)
-	message += u"я запустила %(tmr)d таймеров, породила %(thr)d потоков, %(err)d из них с ошибками, " % (gInfo)
+	if memUsage: 
+		message += u"Используется %0.2f МБ памяти, " % (memUsage)
+	user, system = os.times()[:2]
+	message += u"Потрачено %.2f сек. процессора, %.2f сек. системного времени и в итоге %.2f сек. общесистемного времени. " % (user, system, user + system)
+	message += u"Было запущено %(tmr)d таймеров, %(thr)d потоков, %(err)d из них с ошибками, " % (gInfo)
 	message += u"в данный момент активно %d потоков" % (threading.activeCount())
 	sendMsg(msgType, conference, nick, message)
 

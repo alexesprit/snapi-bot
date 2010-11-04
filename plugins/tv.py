@@ -17,13 +17,13 @@
 TVCODES_FILE = "tvchannels.txt"
 
 def getTVChannelCode(channelName):
-	if(channelName.isdigit()):
-		return(channelName)
+	if channelName.isdigit():
+		return channelName
 	else:
 		channelName = channelName.lower()
 		for x in gTVChannels:
-			if(channelName == x.lower()):
-				return(gTVChannels[x])
+			if channelName == x.lower():
+				return gTVChannels[x]
 
 def loadTVChannels():
 	global gTVChannels
@@ -33,24 +33,24 @@ def loadTVChannels():
 def showTVProgram(msgType, conference, nick, param):
 	channelCode = getTVChannelCode(param)
 	program = ""
-	if(channelCode):
+	if channelCode:
 		url = "http://tv.yandex.ru/?mode=print&channel=%s" % (channelCode)
 		rawHTML = urllib.urlopen(url)
 		for line in rawHTML:
-			if(line.startswith("<div>")):
+			if line.startswith("<div>"):
 				program += decode(line)
-	if(program):
+	if program:
 		message = u"вот, что я нашла:\n%s" % (unicode(program, "utf-8"))
 		sendMsg(msgType, conference, nick, message)
 	else:
-		sendMsg(msgType, conference, nick, u"нету на сегодня программы")
+		sendMsg(msgType, conference, nick, u"На сегодня программы нет")
 
 def showTVList(msgType, conference, nick, parameters):
 	if(protocol.TYPE_PUBLIC == msgType):
-		sendMsg(msgType, conference, nick, u"скинула в приват")
+		sendMsg(msgType, conference, nick, u"Скинула в приват")
 	tvList = [u"%s - %s" % (code, name) for name, code in gTVChannels.items()]
 	tvList.sort()
-	sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"список каналов:\n%s" % ("\n".join(tvList)))
+	sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Список каналов:\n%s" % ("\n".join(tvList)))
 
 registerEvent(loadTVChannels, STARTUP)
 

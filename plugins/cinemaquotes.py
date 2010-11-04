@@ -29,7 +29,7 @@ def showCinemaQuote(msgType, conference, nick, param):
 		quote = decode(quote, "cp1251")
 		sendMsg(msgType, conference, nick, quote)
 	else:
-		sendMsg(msgType, conference, nick, u"не получается")
+		sendMsg(msgType, conference, nick, u"Не получается")
 
 registerCommand(showCinemaQuote, u"киноцитата", 10, 
 				u"Показывает случайную цитату из кино", 

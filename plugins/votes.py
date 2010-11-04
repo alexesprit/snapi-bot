@@ -44,9 +44,9 @@ def saveVotes(conference):
 def vote(msgType, conference, nick, param):
 	if(gVote[conference]):
 		if(gVote[conference]["state"] == VOTE_FINISHED):
-			sendMsg(msgType, conference, nick, u"голосование было завершено")
+			sendMsg(msgType, conference, nick, u"Голосование уже завершено!")
 		elif(gVote[conference]["state"] == VOTE_CREATED):
-			sendMsg(msgType, conference, nick, u"голосование ещё не запущено")
+			sendMsg(msgType, conference, nick, u"Голосование ещё не запущено")
 		else:
 			trueJid = getTrueJid(conference, nick)
 			if(not trueJid in gVote[conference]["voted"]):
@@ -57,9 +57,9 @@ def vote(msgType, conference, nick, param):
 					gVote[conference]["opinions"][n][1] += 1
 					gVote[conference]["voted"][trueJid] = True
 					saveVotes(conference)
-					sendMsg(msgType, conference, nick, u"поняла")
+					sendMsg(msgType, conference, nick, u"Поняла")
 				except(IndexError, ValueError):
-					sendMsg(msgType, conference, nick, u"нет такого пункта")
+					sendMsg(msgType, conference, nick, u"Нет такого пункта")
 			else:
 				sendMsg(msgType, conference, nick, u"2-ой раз голосовать не надо :P")
 	else:
@@ -68,7 +68,7 @@ def vote(msgType, conference, nick, param):
 def createNewVote(msgType, conference, nick, param):
 	if param:
 		if(gVote[conference] and gVote[conference]["state"] != VOTE_FINISHED):
-			sendMsg(msgType, conference, nick, u"имеется неоконченное голосование")
+			sendMsg(msgType, conference, nick, u"Имеется неоконченное голосование")
 		else:
 			trueJid = getTrueJid(conference, nick)
 			gVote[conference] = {"state": VOTE_CREATED, "creator": nick, "creatorjid": getTrueJid(conference, nick), "text": param, "voted": {}, "opinions": []}
@@ -81,18 +81,18 @@ def createNewVote(msgType, conference, nick, param):
 			elif(gVote[conference]["state"] == VOTE_STARTED):
 				sendMsg(msgType, conference, nick, getVoteText(conference))
 			else:
-				sendMsg(msgType, conference, nick, u"голование создано, но ещё не запущено")
+				sendMsg(msgType, conference, nick, u"Голование создано, но ещё не запущено")
 		else:
-			sendMsg(msgType, conference, nick, u"сейчас нет никаких голосований")
+			sendMsg(msgType, conference, nick, u"Сейчас нет никаких голосований")
 
 def startVote(msgType, conference, nick, parameters):
 	if(gVote[conference]):
 		if(gVote[conference]["state"] == VOTE_STARTED):
-			sendMsg(msgType, conference, nick, u"голосование уже запущено")
+			sendMsg(msgType, conference, nick, u"Голосование уже запущено")
 		elif(gVote[conference]["state"] == VOTE_FINISHED):
-			sendMsg(msgType, conference, nick, u"голосование было завершено")
+			sendMsg(msgType, conference, nick, u"Голосование было завершено")
 		elif(not gVote[conference]["opinions"]):
-			sendMsg(msgType, conference, nick, u"голосование не имеет пунктов")
+			sendMsg(msgType, conference, nick, u"Голосование не имеет пунктов")
 		else:
 			trueJid = getTrueJid(conference, nick)
 			creatorJid = gVote[conference]["creatorjid"]
@@ -101,34 +101,34 @@ def startVote(msgType, conference, nick, parameters):
 				saveVotes(conference)
 				sendToConference(conference, getVoteText(conference))
 			else:
-				sendMsg(msgType, conference, nick, u"недостаточно прав")	  
+				sendMsg(msgType, conference, nick, u"Недостаточно прав")	  
 	else:
-		sendMsg(msgType, conference, nick, u"сейчас нет никаких голосований")
+		sendMsg(msgType, conference, nick, u"Сейчас нет никаких голосований")
 
 def stopVote(msgType, conference, nick, param):
 	if(gVote[conference]):
 		if(gVote[conference]["state"] == VOTE_FINISHED):
-			sendMsg(msgType, conference, nick, u"неприменимо к оконченному голосованию")
+			sendMsg(msgType, conference, nick, u"Неприменимо к оконченному голосованию")
 		elif(gVote[conference]["state"] == VOTE_STARTED):
 			trueJid = getTrueJid(conference, nick)
 			creatorJid = gVote[conference]["creatorjid"]
 			if(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
 				gVote[conference]["state"] = VOTE_CREATED
 				saveVotes(conference)
-				sendMsg(msgType, conference, nick, u"голосование приостановлено")
+				sendMsg(msgType, conference, nick, u"Голосование приостановлено")
 			else:
 				sendMsg(msgType, conference, nick, u"ага, щаззз")
 		else:
-			sendMsg(msgType, conference, nick, u"голосование уже приостановлено")
+			sendMsg(msgType, conference, nick, u"Голосование уже приостановлено")
 	else:
-		sendMsg(msgType, conference, nick, u"сейчас нет никаких голосований")
+		sendMsg(msgType, conference, nick, u"Сейчас нет никаких голосований")
 
 def addOpinion(msgType, conference, nick, param):
 	if(gVote[conference]):
 		if(gVote[conference]["state"] == VOTE_STARTED):
-			sendMsg(msgType, conference, nick, u"неприменимо к запущеному голосованию, останови и добавь пункты")
+			sendMsg(msgType, conference, nick, u"Неприменимо к запущеному голосованию, останови и добавь пункты")
 		elif(gVote[conference]["state"] == VOTE_FINISHED):
-			sendMsg(msgType, conference, nick, u"неприменимо к оконченному голосованию")
+			sendMsg(msgType, conference, nick, u"Неприменимо к оконченному голосованию")
 		else:
 			trueJid = getTrueJid(conference, nick)
 			creatorJid = gVote[conference]["creatorjid"]
@@ -138,18 +138,18 @@ def addOpinion(msgType, conference, nick, param):
 				else:
 					gVote[conference]["opinions"].append([param, 0])
 					saveVotes(conference)
-					sendMsg(msgType, conference, nick, u"добавила")
+					sendMsg(msgType, conference, nick, u"Добавила")
 			else:
-				sendMsg(msgType, conference, nick, u"недостаточно прав")
+				sendMsg(msgType, conference, nick, u"Недостаточно прав")
 	else:
-		sendMsg(msgType, conference, nick, u"сейчас нет никаких голосований")
+		sendMsg(msgType, conference, nick, u"Сейчас нет никаких голосований")
 
 def delOpinion(msgType, conference, nick, param):
 	if(gVote[conference]):
 		if(gVote[conference]["state"] == VOTE_STARTED):
-			sendMsg(msgType, conference, nick, u"неприменимо к запущеному голосованию, останови и добавь пункты")
+			sendMsg(msgType, conference, nick, u"Неприменимо к запущеному голосованию, останови и удали пункты")
 		elif(gVote[conference]["state"] == VOTE_FINISHED):
-			sendMsg(msgType, conference, nick, u"неприменимо к оконченному голосованию")
+			sendMsg(msgType, conference, nick, u"Неприменимо к оконченному голосованию")
 		else:
 			trueJid = getTrueJid(conference, nick)
 			creatorJid = gVote[conference]["creatorjid"]
@@ -158,13 +158,13 @@ def delOpinion(msgType, conference, nick, param):
 					n = int(param) - 1
 					del(gVote[conference]["opinions"][n])
 					saveVotes(conference)
-					sendMsg(msgType, conference, nick, u"удалила")
+					sendMsg(msgType, conference, nick, u"Удалила")
 				except(KeyError, IndexError):
-					sendMsg(msgType, conference, nick, u"нет такого пункта")
+					sendMsg(msgType, conference, nick, u"Нет такого пункта")
 			else:
-				sendMsg(msgType, conference, nick, u"недостаточно прав")
+				sendMsg(msgType, conference, nick, u"Недостаточно прав")
 	else:
-		sendMsg(msgType, conference, nick, u"сейчас нет никаких голосований")
+		sendMsg(msgType, conference, nick, u"Сейчас нет никаких голосований")
 
 def showOpinions(msgType, conference, nick, param):
 	if(gVote[conference]):
@@ -175,17 +175,17 @@ def showOpinions(msgType, conference, nick, param):
 			creatorJid = gVote[conference]["creatorjid"]
 			if(creatorJid == trueJid or getAccess(conference, trueJid) >= 20):
 				if(protocol.TYPE_PUBLIC == msgType):
-					sendMsg(msgType, conference, nick, u"ушли в приват")
+					sendMsg(msgType, conference, nick, u"Ушли")
 				sendMsg(protocol.TYPE_PRIVATE, conference, nick, getVoteResults(conference))
 			else:
-				sendMsg(msgType, conference, nick, u"жди окончания голосования :-p")
+				sendMsg(msgType, conference, nick, u"Жди окончания голосования :-p")
 	else:
-		sendMsg(msgType, conference, nick, u"сейчас нет никаких голосований")
+		sendMsg(msgType, conference, nick, u"Сейчас нет никаких голосований")
 
 def endVote(msgType, conference, nick, param):
 	if(gVote[conference]):
 		if(gVote[conference]["state"] == VOTE_FINISHED):
-			sendMsg(msgType, conference, nick, u"голосование уже закончено, просмотр мнений - команда \"мнения\"")
+			sendMsg(msgType, conference, nick, u"Голосование уже закончено, просмотр мнений - команда \"мнения\"")
 		else:
 			trueJid = getTrueJid(conference, nick)
 			creatorJid = gVote[conference]["creatorjid"]
@@ -195,9 +195,9 @@ def endVote(msgType, conference, nick, param):
 				saveVotes(conference)
 				sendToConference(conference, getVoteResults(conference))
 			else:
-				sendMsg(msgType, conference, nick, u"недостаточно прав")
+				sendMsg(msgType, conference, nick, u"Недостаточно прав")
 	else:
-		sendMsg(msgType, conference, nick, u"сейчас нет никаких голосований")
+		sendMsg(msgType, conference, nick, u"Сейчас нет никаких голосований")
 
 def showVote(conference, nick, trueJid, aff, role):
 	if(gVote[conference]):

@@ -28,11 +28,11 @@ def setBotMood(msgType, jid, resource, param):
 		pubsub.addChild(node = pubNode)
 		gClient.send(iq)
 		if(param == u"сброс"):
-			sendMsg(msgType, jid, resource, u"сбросила")
+			sendMsg(msgType, jid, resource, u"Сбросила")
 		else:
-			sendMsg(msgType, jid, resource, u"поставила")
+			sendMsg(msgType, jid, resource, u"Поставила")
 	else:
-		sendMsg(msgType, jid, resource, u"читай справку по команде")
+		sendMsg(msgType, jid, resource, u"Читай помощь по команде")
 
 def setBoAtctivity(msgType, jid, resource, param):
 	if(param == u"сброс" or param.count("|")):
@@ -51,11 +51,11 @@ def setBoAtctivity(msgType, jid, resource, param):
 		pubsub.addChild(node = pubNode)
 		gClient.send(iq)
 		if(param == u"сброс"):
-			sendMsg(msgType, jid, resource, u"сбросила")
+			sendMsg(msgType, jid, resource, u"Сбросила")
 		else:
-			sendMsg(msgType, jid, resource, u"поставила")
+			sendMsg(msgType, jid, resource, u"Поставила")
 	else:
-		sendMsg(msgType, jid, resource, u"читай справку по команде")
+		sendMsg(msgType, jid, resource, u"Читай помощь по команде")
 
 registerCommand(setBoAtctivity, u"активность", 100, 
 				u"Устанавливает активность для бота. \"Cброс\" в кач-ве параметра сбрасывает активность", 

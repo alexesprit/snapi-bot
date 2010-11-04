@@ -69,9 +69,9 @@ def showTrainTable(msgType, conference, nick, param):
 					sendMsg(msgType, conference, nick, u"ушло")
 				sendMsg(protocol.TYPE_PRIVATE, conference, nick, "\n".join(message))
 			else:
-				sendMsg(msgType, conference, nick, u"не найдено")
+				sendMsg(msgType, conference, nick, u"Не найдено!")
 		else:
-			sendMsg(msgType, conference, nick, u"читай справку по команде")
+			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
 registerCommand(showTrainTable, u"расписание", 10, 
 				u"Расписание поездов", 

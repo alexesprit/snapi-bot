@@ -16,7 +16,7 @@
 def setTopic(msgType, conference, nick, param):
 	message = protocol.Message(to=conference, typ=protocol.TYPE_PUBLIC, subject=param)
 	gClient.send(message)
-	sendMsg(msgType, conference, nick, u"поставила")
+	sendMsg(msgType, conference, nick, u"Установила")
 
 registerCommand(setTopic, u"топег", 20, 
 				u"Устанавливает тему в конференции", 

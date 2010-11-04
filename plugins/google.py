@@ -49,7 +49,7 @@ def searchInGoogle(msgType, conference, nick, url):
 			msg = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (result) for result in results]
 		sendMsg(msgType, conference, nick, decode("\n\n".join(msg)))
 	else:
-		sendMsg(msgType, conference, nick, u"не найдено")
+		sendMsg(msgType, conference, nick, u"Не найдено")
 
 registerCommand(searchInGoogleEN, u"гугльен", 10, 
 				u"Поиск через Google по зарубежным сайтам", 

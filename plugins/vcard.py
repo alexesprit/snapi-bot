@@ -38,8 +38,8 @@ VCARD_TAGS = (
 )
 
 def showVCard(msgType, conference, nick, param):
-	if(param):
-		if(conferenceInList(conference) and nickIsOnline(conference, param)):
+	if param:
+		if conferenceInList(conference) and nickIsOnline(conference, param):
 			jid = conference + "/" + param
 		else:
 			jid = param
@@ -52,31 +52,31 @@ def showVCard(msgType, conference, nick, param):
 	gClient.sendAndCallForResponse(iq, _showVCard, (msgType, conference, nick, param, ))
 
 def _showVCard(stanza, msgType, conference, nick, param):
-	if(protocol.TYPE_RESULT == stanza.getType()):
-		queryNode = stanza.getChildren()
-		if(queryNode):
+	if protocol.TYPE_RESULT == stanza.getType():
+		queryNode = stanza.getTag("vCard")
+		if queryNode:
 			rawVCard = {}
-			loadRawVCard(queryNode[0], rawVCard)
+			loadRawVCard(queryNode, rawVCard)
 			message = getVCard(rawVCard)
-			if(message):
-				if(not param):
-					sendMsg(msgType, conference, nick, u"про тебя я знаю следующее:\n%s" % (message))
+			if message:
+				if not param:
+					sendMsg(msgType, conference, nick, u"Про тебя я знаю следующее:\n%s" % (message))
 				else:
-					sendMsg(msgType, conference, nick, u"про %s я знаю следующее:\n%s" % (param, message))
+					sendMsg(msgType, conference, nick, u"Про %s я знаю следующее:\n%s" % (param, message))
 			else:
-				sendMsg(msgType, conference, nick, u"пустой вкард")
+				sendMsg(msgType, conference, nick, u"Пустой вкард")
 		else:
-			if(not param):
-				sendMsg(msgType, conference, nick, u"вкард заполни сначала")
+			if not param:
+				sendMsg(msgType, conference, nick, u"Вкард заполни сначала")
 			else:
-				sendMsg(msgType, conference, nick, u"пусть %s сначала вкард заполнит" % (param))
+				sendMsg(msgType, conference, nick, u"Пусть %s сначала вкард заполнит" % (param))
 	else:
-		sendMsg(msgType, conference, nick, u"не получается :(")
+		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 def loadRawVCard(node, rawVCard):
 	for child in node.getChildren():
 		tagData = child.getData()
-		if(tagData):
+		if tagData:
 			tagName = child.getName()
 			rawVCard[tagName] = tagData
 		else:
@@ -88,7 +88,7 @@ def getVCard(rawVCard):
 		tagData = rawVCard.get(tag)
 		if tagData:
 			name += tagData + " "
-	if(name):
+	if name:
 		rawVCard["FN"] = name
 	vCardItems = []
 	for i in xrange(len(VCARD_TAGS)):
@@ -96,7 +96,7 @@ def getVCard(rawVCard):
 		tagData = rawVCard.get(tagName)
 		if tagData:
 			vCardItems.append(u"%s: %s" % (tagDesc, tagData))
-	return("\n".join(vCardItems))
+	return "\n".join(vCardItems)
 
 registerCommand(showVCard, u"визитка", 10, 
 				u"Показывает vCard указанного пользователя или сервера", 

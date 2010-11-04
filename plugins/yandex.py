@@ -17,7 +17,6 @@ def searchInYandex(msgType, conference, nick, param):
 	query = urllib.urlencode({"query": param.encode("utf-8")})
 	rawHTML = urllib.urlopen("http://yandex.ru/msearch?s=all&%s" % (query)).read()
 	rawHTML = unicode(rawHTML, "utf-8")
-	#print rawHTML
 	items = re.findall("<li>\n(.+?)<p class=\"b-phone\">.+?<div class=\"www\">(.+?)</div>", rawHTML, re.DOTALL)
 	if(items):
 		print items[0]
@@ -30,7 +29,7 @@ def searchInYandex(msgType, conference, nick, param):
 			message = "\n\n".join(items)
 		sendMsg(msgType, conference, nick, decode(message));	
 	else:
-		sendMsg(msgType, conference, nick, u"по вашему запросу ничего не найдено")
+		sendMsg(msgType, conference, nick, u"Не найдено!")
 
 registerCommand(searchInYandex, u"яндекс", 10, 
 				u"Поиск через Yandex", 

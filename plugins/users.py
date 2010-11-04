@@ -15,48 +15,48 @@
 
 def createNickList(nickList):
 	items = [u"%d) %s" % (i + 1, ", ".join(nickList[jid])) for i, jid in enumerate(nickList)]
-	return("\n".join(items))
+	return "\n".join(items)
 	
 def getInMucList(conference, offline = False):
 	nicks = (offline) and getNicks(conference) or getOnlineNicks(conference)
 	nickList = {}
 	for nick in nicks:
 		trueJid = getTrueJid(conference, nick)
-		if(not trueJid in nickList):
+		if not trueJid in nickList:
 			nickList[trueJid] = []
 		nickList[trueJid].append(nick)
-	return(nickList)
+	return nickList
 
 def showInMucUsers(msgType, conference, nick, param):
 	nickList = getInMucList(conference)
-	text = u"я вижу здесь %d человек:\n" % (len(nickList))
+	text = u"Я вижу здесь %d человек:\n" % (len(nickList))
 	text += createNickList(nickList)
 	sendMsg(msgType, conference, nick, text)
 
 def showWhoWas(msgType, conference, nick, param):
 	nickList = getInMucList(conference, True)
-	text = u"я видела здесь %d человек:\n" % (len(nickList))
+	text = u"Я видела здесь %d человек:\n" % (len(nickList))
 	text += createNickList(nickList)
 	sendMsg(msgType, conference, nick, text)
 	
 def showUserNicks(msgType, conference, nick, param):
 	userNick = param or nick
-	if(nickInConference(conference, userNick)):
+	if nickInConference(conference, userNick):
 		trueJid = getTrueJid(conference, userNick)
 		nickList = getInMucList(conference, True)
 		nicks = nickList[trueJid]
-		if(len(nicks) < 2):
-			if(param):
-				sendMsg(msgType, conference, nick, u"не видела, чтобы ник у %s менялся" % (userNick))
+		if len(nicks) < 2:
+			if param:
+				sendMsg(msgType, conference, nick, u"Я знаю тебя только как %s" % (userNick))
 			else:
-				sendMsg(msgType, conference, nick, u"не видела, чтобы твой ник менялся")
+				sendMsg(msgType, conference, nick, u"Я знаю %s только как %s")
 		else:
-			if(param):
-				sendMsg(msgType, conference, nick, u"я знаю %s как %s" % (userNick, ", ".join(nicks)))
+			if param:
+				sendMsg(msgType, conference, nick, u"Я знаю %s как %s" % (userNick, ", ".join(nicks)))
 			else:
-				sendMsg(msgType, conference, nick, u"я знаю тебя как %s" % (", ".join(nicks)))
+				sendMsg(msgType, conference, nick, u"Я знаю тебя как %s" % (", ".join(nicks)))
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"А это кто?")
 
 registerCommand(showInMucUsers, u"инмук", 10, 
 				u"Показывает список участников, находящихся в конференции", 

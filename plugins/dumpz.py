@@ -19,7 +19,7 @@ DUMPZ_LANGS_FILE = "dumpzlangs.txt"
 DUMPZ_LANGS = {}
 
 def uploadToDumpz(msgType, conference, nick, param):
-	if(param == u"языки"):
+	if(u"языки" == param.lower()):
 		langs = [u"%s - %s" % (lang, name) \
 				for lang, name in DUMPZ_LANGS.items()]
 		langs.sort()
@@ -32,7 +32,7 @@ def uploadToDumpz(msgType, conference, nick, param):
 			if(len(args) == 2):
 				text = args[1]
 			else:
-				sendMsg(msgType, conference, nick, u"а где тескт?")
+				sendMsg(msgType, conference, nick, u"А где тескт?")
 				return
 		else:
 			text = param
@@ -40,7 +40,7 @@ def uploadToDumpz(msgType, conference, nick, param):
 		query = urllib.urlencode({"lexer": lang, "code": text.encode("utf-8")})
 		req = urllib2.Request("http://dumpz.org/", query, {"Content-type": "application/x-www-form-urlencoded"})
 		res = urllib2.urlopen(req)
-		sendMsg(msgType, conference, nick, u"залито на %s" % (res.url))
+		sendMsg(msgType, conference, nick, u"Залито на %s" % (res.url))
 
 def loadDumpzLanguages():
 	global DUMPZ_LANGS

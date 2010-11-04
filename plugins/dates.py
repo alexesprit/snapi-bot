@@ -20,9 +20,9 @@ def showDates(msgType, conference, nick, param):
 	dates = dates[1:-1]
 	if(dates):
 		dates = [date.split("/")[0] for date in dates]
-		sendMsg(msgType, conference, nick, u"глянь, что я нашла:" + u"\n".join(dates))
+		sendMsg(msgType, conference, nick, u"Глянь, что я нашла:" + u"\n".join(dates))
 	else:
-		sendMsg(msgType, conference, nick, u"ничего не нашла :(")
+		sendMsg(msgType, conference, nick, u"Ничего не нашла :(")
 
 registerCommand(showDates, u"праздники", 10, 
 				u"Показывает праздники на сегодня и завтра", 

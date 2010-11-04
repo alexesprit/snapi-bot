@@ -131,14 +131,14 @@ def showScoreList(msgType, conference, nick=None):
 		scores = scores[:10]
 		items = [u"%s) %s, %s, %s" % (i + 1, x[2], x[0], x[1]) for i, x in enumerate(scores)]
 		if(nick):
-			message = u"статистика по игре:\nНик, счет, ответов\n"
+			message = u"Статистика по игре:\nНик, счет, ответов\n"
 			sendMsg(msgType, conference, nick, message + "\n".join(items))
 		else:
 			message = u"(*) Счёт:\nНик, счет, ответов\n"
 			sendToConference(conference, message + "\n".join(items))
 	else:
 		if(nick):
-			sendMsg(msgType, conference, nick, u"cтатистика по игре отсутствует")
+			sendMsg(msgType, conference, nick, u"Статистика по игре отсутствует")
 
 def startQuiz(msgType, conference, nick, param):
 	if(gQuizEnable[conference]):

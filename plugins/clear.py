@@ -16,7 +16,7 @@
 CLEAR_ITERATIONS = 20
 
 def clearConference(msgType, conference, nick, param):
-	sendMsg(msgType, conference, nick, u"сейчас уберу...")
+	sendMsg(msgType, conference, nick, u"Сейчас уберу...")
 	for i in xrange(CLEAR_ITERATIONS):
 		sendToConference(conference, "")
 		time.sleep(2)

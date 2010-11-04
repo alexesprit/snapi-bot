@@ -17,11 +17,11 @@
 VER_ID = "ver_id"
 
 def showVersion(msgType, conference, nick, param):
-	if(param == getBotNick(conference)):
-		sendMsg(msgType, conference, nick, u"я юзаю %s %s в %s" % (gVersion[0], gVersion[1], gVersion[2]))
+	if param == getBotNick(conference):
+		sendMsg(msgType, conference, nick, u"Я юзаю %s %s в %s" % (gVersion[0], gVersion[1], gVersion[2]))
 	else:
-		if(param):
-			if(conferenceInList(conference) and nickIsOnline(conference, param)):
+		if param:
+			if conferenceInList(conference) and nickIsOnline(conference, param):
 				jid = conference + "/" + param
 			else:
 				jid = param
@@ -33,7 +33,7 @@ def showVersion(msgType, conference, nick, param):
 		gClient.sendAndCallForResponse(iq, _showVersion, (msgType, conference, nick, param, ))
 
 def _showVersion(stanza, msgType, conference, nick, param):
-	if(protocol.TYPE_RESULT == stanza.getType()):
+	if protocol.TYPE_RESULT == stanza.getType():
 		name, ver, os = "", "", ""
 		for child in stanza.getQueryChildren():
 			if(child.getName() == "name"):
@@ -43,21 +43,21 @@ def _showVersion(stanza, msgType, conference, nick, param):
 			elif(child.getName() == "os"):
 				os = child.getData()
 		version = u""
-		if(name):
+		if name:
 			version += name
-		if(ver):
+		if ver:
 			version += u" " + ver
-		if(os):
+		if os:
 			version += u" в " + os
-		if(version):
-			if(not param):
-				sendMsg(msgType, conference, nick, u"ты юзаешь %s" % (version))
+		if version:
+			if not param:
+				sendMsg(msgType, conference, nick, u"Ты юзаешь %s" % (version))
 			else:
 				sendMsg(msgType, conference, nick, u"%s юзает %s" % (param, version))
 		else:
-			sendMsg(msgType, conference, nick, u"клиент глюк, инфы не хватает")
+			sendMsg(msgType, conference, nick, u"Клиент глюк, инфы не хватает")
 	else:
-		sendMsg(msgType, conference, nick, u"не получается :(")
+		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 registerCommand(showVersion, u"версия", 10, 
 				u"Показывает информацию о версии ПО указанного пользователя или сервера", 

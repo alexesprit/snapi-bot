@@ -35,7 +35,7 @@ def setUserGreeting(msgType, conference, nick, param):
 		elif(nickInConference(user)):
 			trueJid = getTrueJid(conference, user)
 		else:
-			sendMsg(msgType, conference, nick, u"а это кто?")
+			sendMsg(msgType, conference, nick, u"А это кто?")
 			return
 		if(not greet):
 			if(trueJid in gGreets[conference]):
@@ -44,7 +44,7 @@ def setUserGreeting(msgType, conference, nick, param):
 			gGreets[conference][trueJid] = greet
 		fileName = getConfigPath(conference, GREET_FILE)
 		utils.writeFile(fileName, str(gGreets[conference]))
-		sendMsg(msgType, conference, nick, u"запомнила")
+		sendMsg(msgType, conference, nick, u"Запомнила")
 
 def sendUserGreeting(conference, nick, trueJid, aff, role):
 	if(trueJid in gGreets[conference]):

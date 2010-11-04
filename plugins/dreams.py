@@ -20,7 +20,7 @@ def showDreamInfo(msgType, conference, nick, param):
 	items = re.search(r"<div id=\"mntxt\">(.+?)</p>", rawHTML, re.DOTALL)
 	message = decode(items.group(1), "cp1251")
 	if(protocol.TYPE_PUBLIC == msgType):
-		sendMsg(msgType, conference, nick, u"ушло в приват")
+		sendMsg(msgType, conference, nick, u"Ушёл")
 	sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 
 registerCommand(showDreamInfo, u"сонник", 10, 

@@ -23,22 +23,22 @@ def serviceDiscovery(msgType, conference, nick, param):
 	jid = param[0]
 	searchKey = None
 	maxCount = (protocol.TYPE_PUBLIC == msgType) and 10 or 50
-	if(len(param) > 1):
+	if len(param) > 1:
 		count = param[1]
-		if(count.isdigit()):
+		if count.isdigit():
 			count = int(count)
-			if(protocol.TYPE_PUBLIC == msgType):
+			if protocol.TYPE_PUBLIC == msgType:
 				maxCount = min(50, count)
 			else:
 				maxCount = min(250, count);	
-			if(len(param) > 2):
+			if len(param) > 2:
 				searchKey = param[2]
 		else:		
 			searchKey = param[1]
 	iq = protocol.Iq(protocol.TYPE_GET)
 	query = iq.addChild("query", None, None, protocol.NS_DISCO_ITEMS)
 	param = jid.split("#")
-	if(len(param) == 2):
+	if len(param) == 2:
 		jid, node = param
 		iq.setTo(jid)
 		query.setAttr("node", node)
@@ -55,43 +55,43 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 			itemCount += 1
 			attrs = x.getAttrs()
 			items = []
-			if("name" in attrs):
+			if "name" in attrs:
 				items.append(attrs["name"])
-			if(not isJid(jid) and "jid" in attrs):
+			if not isJid(jid) and "jid" in attrs:
 				items.append(attrs["jid"])
-			if("node" in attrs):
+			if "node" in attrs:
 				items.append(attrs["node"])
-			if(len(items) == 3):
-				if(searchKey):
-					if(not items[0].count(searchKey)):
+			if len(items) == 3:
+				if searchKey:
+					if not items[0].count(searchKey):
 						continue
 				discoList.append(u"%d) %s (%s)" % (itemCount, items[0], items[2]))
-			elif(len(items) == 2):
-				if(searchKey):
-					if(searchKey.endswith("@")):
-						if(not items[1].startswith(searchKey)):
+			elif len(items) == 2:
+				if searchKey:
+					if searchKey.endswith("@"):
+						if not items[1].startswith(searchKey):
 							continue
 						discoList.append(u"%d) %s\n%s" % (itemCount, items[1], items[0]))
 						break
 					else:
-						if(not items[0].count(searchKey)):
+						if not items[0].count(searchKey):
 							continue
 						discoList.append(u"%d) %s\n%s" % (itemCount, items[1], items[0]))
 				else:
 					discoList.append(u"%d) %s\n%s" % (itemCount, items[1], items[0]))
 			else:
-				if(searchKey):
-					if(not items[0].count(searchKey)):
+				if searchKey:
+					if not items[0].count(searchKey):
 						continue
 				discoList.append(u"%d) %s" % (itemCount, items[0]))
-		if(discoList):
-			if(0 == maxCount):
-				sendMsg(msgType, conference, nick, u"всего %d пунктов" % (itemCount))
+		if discoList:
+			if 0 == maxCount:
+				sendMsg(msgType, conference, nick, u"Всего %d пунктов" % (itemCount))
 			else:
-				if(itemCount > maxCount):
+				if itemCount > maxCount:
 					discoList = discoList[:maxCount]
 					discoList.append(u"всего %d пунктов" % (itemCount))
-				sendMsg(msgType, conference, nick, u"надискаверила:\n" + u"\n".join(discoList))
+				sendMsg(msgType, conference, nick, u"Надискаверила:\n" + u"\n".join(discoList))
 		else:
 			sendMsg(msgType, conference, nick, u"пустое диско")
 	else:

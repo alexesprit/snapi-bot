@@ -18,31 +18,31 @@ def joinConf(msgType, conference, nick, param):
 	if(param and isJid(param[0])):
 		conf = param[0]
 		if(conferenceInList(conf)):
-			sendMsg(msgType, conference, nick, u"я уже там!")
+			sendMsg(msgType, conference, nick, u"Я уже там!")
 		else:
 			password = (len(param) == 2) and param[1] or None
 			addConference(conf)
 			joinConference(conf, gBotNick, getConfigKey(conf, "password"))
 			saveConferenceConfig(conf)
 			saveConferences()
-			sendMsg(msgType, conference, nick, u"зашла")
+			sendMsg(msgType, conference, nick, u"Зашла")
 
 def leaveConf(msgType, conference, nick, param):
 	conf = param or conference
-	if(conferenceInList(conf)):
-		if(not conferenceInList(conference)):
-			sendMsg(msgType, conference, nick, u"ушла")
+	if conferenceInList(conf):
+		sendMsg(msgType, conference, nick, u"Ушла")
 		myNick = (conferenceInList(conference)) and nick or conference.split("@")[0]
-		leaveConference(conf, u"меня уводит %s" % (myNick))
+		leaveConference(conf, u"Меня уводит %s" % (myNick))
 		saveConferences()
 	else:
-		sendMsg(msgType, conference, nick, u"а меня там нету")
+		sendMsg(msgType, conference, nick, u"А меня там и нет!")
 
 registerCommand(joinConf, u"зайти", 100, 
-				u"Зайти в определённую конференцию", 
+				u"Зайти в указанную конференцию", 
 				u"зайти <конференция> [пароль]", 
-				(u"зайти test@conference.jabber.aq", u"зайти test@conference.jabber.ru 1234"))
+				(u"зайти test@conference.jabber.aq", u"зайти test@conference.jabber.ru 1234"),
+				ANY | PARAM)
 registerCommand(leaveConf, u"свали", 
-				30, u"Заставляет выйти из текущей или определённой конференции", 
+				30, u"Заставляет выйти из текущей или указанной конференции", 
 				u"свали [конференция]", 
 				(u"свали test@conference.jabber.ru", u"свали"))

@@ -23,24 +23,24 @@ def loadPokes():
 	gPokes = eval(utils.readFile(fileName, "utf-8"))
 
 def pokeUser(msgType, conference, nick, param):
-	if(msgType == protocol.TYPE_PUBLIC):
-		if(param):
+	if msgType == protocol.TYPE_PUBLIC:
+		if param:
 			botNick = getBotNick(conference)
-			if(param == u"всех"):
+			if param == u"всех":
 				for userNick in getOnlineNicks(conference):
 					if(userNick != botNick and userNick != nick):
 						message = random.choice(gPokes)
 						sendToConference(conference, u"/me " + message % (userNick))
 						time.sleep(0.5)
-			elif(nickIsOnline(conference, param)):
+			elif nickIsOnline(conference, param):
 				if param == botNick:
 					param = nick
 				message = random.choice(gPokes)
 				sendToConference(conference, u"/me " + message % (param))
 			else:
-				sendMsg(msgType, conference, nick, u"а это кто?")
+				sendMsg(msgType, conference, nick, u"А это кто?")
 		else:
-			sendMsg(msgType, conference, nick, u"мазохист? :D")
+			sendMsg(msgType, conference, nick, u"Мазохист? :D")
 	else:
 		sendMsg(msgType, conference, nick, u":-P")
 

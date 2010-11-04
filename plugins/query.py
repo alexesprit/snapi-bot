@@ -41,7 +41,7 @@ def processIqStanzas(stanza, jid, resource):
 			query = iq.getTag("query")
 			query.setAttr("seconds", int(time.time() - gInfo["start"]))
 		elif(stanza.getTags("time", {}, protocol.NS_ENTITY_TIME)):
-			tZone = time.altzone if time.daylight else time.timezone
+			tZone = time.altzone if time.localtime()[8] else time.timezone
 			sign = (tZone < 0) and "+" or "-"
 			tzo = "%s%02d:%02d" % (sign, abs(tZone) / 3600, abs(tZone) / 60 % 60)
 			utc = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())

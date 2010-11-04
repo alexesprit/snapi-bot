@@ -36,13 +36,13 @@ def showHereStatistic(msgType, conference, nick, param):
 			totalTime = base[trueJid]["here"] + hereTime
 			averageTime = totalTime / joinCount
 			record = max(base[trueJid]["record"], hereTime)
-			message = param and userNick or u"ты"
-			message = u"%s всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d" % (message, time2str(totalTime), time2str(record), time2str(averageTime), joinCount)
+			message = param and userNick or u"Ты"
+			message = u"%s всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d" % (message, getTimeStr(totalTime), getTimeStr(record), getTimeStr(averageTime), joinCount)
 			sendMsg(msgType, conference, nick, message)
 		else:
-			sendMsg(msgType, conference, nick, u"нет информации")
+			sendMsg(msgType, conference, nick, u"Нет информации")
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?")
+		sendMsg(msgType, conference, nick, u"А это кто?")
 	
 def updateJoinStatistic(conference, nick, trueJid, aff, role):
 	base = gHereTime[conference]

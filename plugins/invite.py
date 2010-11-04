@@ -35,7 +35,7 @@ def sendInvite(msgType, conference, nick, param):
 		inv.setTagData("reason", u"Вас приглашает %s" % (nick))
 	msg.addChild(node=x)
 	gClient.send(msg)
-	sendMsg(msgType, conference, nick, u"кинула инвайт")
+	sendMsg(msgType, conference, nick, u"Кинула инвайт")
 			
 registerCommand(sendInvite, u"призвать", 10, 
 				u"Приглашет заданного пользователя в конференцию", 

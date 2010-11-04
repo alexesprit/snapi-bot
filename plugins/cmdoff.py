@@ -25,19 +25,19 @@ def saveCommands(conference):
 	utils.writeFile(fileName, str(gCmdOff[conference]))
 
 def freeCommands(conference):
-	del(gCmdOff[conference])
+	del gCmdOff[conference]
 
 def cmdSwitchOff(msgType, conference, nick, param):
-	if(param):
+	if param:
 		validCmd, invalidCmd, alreadySwitched, nonSwitched = [], [], [], []
 		message = u""
 		param = param.split()
 		for cmd in param:
 			_isCommand = isCommand(cmd) and isCommandType(cmd, CHAT)
 			_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd)
-			if(_isCommand or _isMacros):
-				if(_isMacros or not isCommandType(cmd, FROZEN)):
-					if(isAvailableCommand(conference, cmd)):
+			if _isCommand or _isMacros:
+				if _isMacros or not isCommandType(cmd, FROZEN):
+					if isAvailableCommand(conference, cmd):
 						gCmdOff[conference].append(cmd)
 						validCmd.append(cmd)
 					else:
@@ -46,25 +46,25 @@ def cmdSwitchOff(msgType, conference, nick, param):
 					nonSwitched.append(cmd)
 			else:
 				invalidCmd.append(cmd)
-		if(validCmd):
+		if validCmd:
 			validCmd.sort()
-			message += u"были отключены следующие команды:\n * %s" % (", ".join(validCmd))
-		if(alreadySwitched):
+			message += u"Были отключены:\n * %s" % (", ".join(validCmd))
+		if alreadySwitched:
 			alreadySwitched.sort()
-			message += u"\nследующие команды уже отключены:\n * %s" % (", ".join(alreadySwitched))
-		if(invalidCmd):
+			message += u"\nУже отключены:\n * %s" % (", ".join(alreadySwitched))
+		if invalidCmd:
 			invalidCmd.sort()
-			message += u"\nперечисленное ниже не является командами:\n * %s" % (", ".join(invalidCmd))
-		if(nonSwitched):
+			message += u"\nНе являются командами:\n * %s" % (", ".join(invalidCmd))
+		if nonSwitched:
 			nonSwitched.sort()
-			message += u"\nследующие команды неотключаемы:\n * %s" % (", ".join(nonSwitched))
+			message += u"\nНеотключаемы:\n * %s" % (", ".join(nonSwitched))
 		saveCommands(conference)
 	else:
 		switchedOn = [cmd for cmd in gCmdOff[conference]]
-		if(switchedOn):
-			message = u"в этой конференции отключены следующие команды:\n * %s" % (", ".join(switchedOn))
+		if switchedOn:
+			message = u"Отключены следующие команды:\n * %s" % (", ".join(switchedOn))
 		else:
-			message = u"в этой конференции включены все команды"
+			message = u"В этой конференции включены все команды"
 	sendMsg(msgType, conference, nick, message)
 
 def cmdSwitchOn(msgType, conference, nick, param):
@@ -74,23 +74,23 @@ def cmdSwitchOn(msgType, conference, nick, param):
 	for cmd in param:
 		_isCommand = isCommand(cmd) and isCommandType(cmd, CHAT)
 		_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd)
-		if(_isCommand or _isMacros):
-			if(not isAvailableCommand(conference, cmd)):
+		if _isCommand or _isMacros:
+			if not isAvailableCommand(conference, cmd):
 				gCmdOff[conference].remove(cmd)
 				validCmd.append(cmd)
 			else:
 				alreadySwitched.append(cmd)
 		else:
 			invalidCmd.append(cmd)
-	if(validCmd):
+	if validCmd:
 		validCmd.sort()
-		message += u"были включены следующие команды:\n * %s" % (", ".join(validCmd))
-	if(alreadySwitched):
+		message += u"Были включены:\n * %s" % (", ".join(validCmd))
+	if alreadySwitched:
 		alreadySwitched.sort()
-		message += u"\nследующие команды уже включены:\n * %s" % (", ".join(alreadySwitched))
-	if(invalidCmd):
+		message += u"\nУже включены:\n * %s" % (", ".join(alreadySwitched))
+	if invalidCmd:
 		invalidCmd.sort()
-		message += u"\nперечисленное ниже не является командами:\n * %s" % (", ".join(invalidCmd))
+		message += u"\nпНе являются командами:\n * %s" % (", ".join(invalidCmd))
 	saveCommands(conference)
 	sendMsg(msgType, conference, nick, message)
 

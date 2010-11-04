@@ -32,7 +32,7 @@ def showServerDns(msgType, conference, nick, param):
 	if answer:
 		sendMsg(msgType, conference, nick, answer)
 	else:
-		sendMsg(msgType, conference, nick, u"не могу")
+		sendMsg(msgType, conference, nick, u"Не могу")
 
 registerCommand(showServerDns, u"днс", 10, 
 				u"Показывает ответ от DNS для определённого хоста или IP адреса", 

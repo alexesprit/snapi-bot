@@ -75,7 +75,7 @@ def convertValues(msgType, conference, nick, param):
 			try:
 				count = float(param[2])
 			except(ValueError):
-				sendMsg(msgType, conference, nick, u"читай помощь по команде")
+				sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 				return
 			frm = param[0]
 			to = param[1]
@@ -91,9 +91,9 @@ def convertValues(msgType, conference, nick, param):
 					message = message.replace("BASE", "RUR")
 					sendMsg(msgType, conference, nick, message)
 				else:
-					sendMsg(msgType, conference, nick, u"не получается")
+					sendMsg(msgType, conference, nick, u"Не получается")
 			else:
-				sendMsg(msgType, conference, nick, u"читай помощь по команде")
+				sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
 registerCommand(convertValues, u"перевести", 10, 
 				u"Перевод валют. Указав \"валюты\" в кач-ве параметра можно посмотреть доступные валюты для перевода", 
