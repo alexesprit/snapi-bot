@@ -19,11 +19,7 @@
 	(in other words) transports for xmpp-stanzas.
 	Currently here is three transports:
 		direct TCP connect - TCPSocket class
-		proxied TCP connect - HTTPProxySocket class (CONNECT proxies)
 		TLS connection - TLS class. Can be used for SSL connections also.
-
-	Transports are stackable so you - f.e. TLS use HTPPROXYsocket or TCPSocket 
-	as more low-level transport.
 """
 
 import base64
@@ -31,7 +27,7 @@ import select
 import socket
 import sys
 
-isPython26 = sys.version[:3] == '2.6'
+isPython26 = sys.version[:3] == "2.6"
 
 if isPython26:
 	import ssl
@@ -44,7 +40,6 @@ from utils.utils import ustr
 
 BUFLEN = 1024
 
-DBG_PROXY = "proxy"
 DBG_SOCKET = "socket"
 DBG_TLS = "tls"
 
@@ -56,9 +51,9 @@ class TCPSocket(plugin.PlugIn):
 	""" This class defines direct TCP connection method.
 	"""
 	def __init__(self, server=None, useResolver=True):
-		""" Cache connection point 'server'. 'server' is the tuple of (host, port)
+		""" Cache connection point "server". "server" is the tuple of (host, port)
 			absolutely the same as standard tcp socket uses. However library will lookup for 
-			('_xmpp-client._tcp.' + host) SRV record in DNS and connect to the found (if it is)
+			("_xmpp-client._tcp." + host) SRV record in DNS and connect to the found (if it is)
 			server instead
 		"""
 		plugin.PlugIn.__init__(self)
@@ -72,7 +67,7 @@ class TCPSocket(plugin.PlugIn):
 		"""
 		import dns
 		host, port = server
-		query = '_xmpp-client._tcp.%s' % (host)
+		query = "_xmpp-client._tcp.%s" % (host)
 		# ensure we haven't cached an old configuration
 		dns.DiscoverNameServers()
 		response = dns.DnsRequest().req(query, qtype='SRV')
@@ -99,12 +94,12 @@ class TCPSocket(plugin.PlugIn):
 		return "ok"
 
 	def getHost(self):
-		""" Return the 'host' value that is connection is [will be] made to.
+		""" Return the "host" value that is connection is [will be] made to.
 		"""
 		return self._server[0]
 
 	def getPort(self):
-		""" Return the 'port' value that is connection is [will be] made to.
+		""" Return the "port" value that is connection is [will be] made to.
 		"""
 		return self._server[1]
 
@@ -122,7 +117,7 @@ class TCPSocket(plugin.PlugIn):
 			self.printf("Successfully connected to remote host %s:%s" % (server[0], server[1]), "ok")
 			return "ok"
 		except socket.error, (errno, strerror): 
-			self.printf("Failed to connect to remote host %s: %s (%s)" % (server[0], strerror, errno), 'error')
+			self.printf("Failed to connect to remote host %s: %s (%s)" % (server[0], strerror, errno), "error")
 		except Exception:
 			pass
 
@@ -147,7 +142,7 @@ class TCPSocket(plugin.PlugIn):
 				return ""
 			if e[0] == socket.SSL_ERROR_WANT_WRITE:
 				return ""
-			self.printf('Socket error while receiving data', 'error')
+			self.printf("Socket error while receiving data", "error")
 			sys.exc_clear()
 			self._owner.disconnected()
 			raise IOError("Disconnected from server")
@@ -162,7 +157,6 @@ class TCPSocket(plugin.PlugIn):
 			received += add
 			if not add:
 				break
-
 		# length of 0 means disconnect
 		if len(received):
 			self._seen_data = 1
@@ -198,77 +192,8 @@ class TCPSocket(plugin.PlugIn):
 	def disconnect(self):
 		""" Closes the socket.
 		"""
-		self.printf("Closing socket", 'stop')
+		self.printf("Closing socket", "stop")
 		self._sock.close()
-
-class HTTPProxySocket(TCPSocket):
-	""" HTTP (CONNECT) proxy connection class. Uses TCPSocket as the base class
-		redefines only connect method. Allows to use HTTP proxies like squid with
-		(optionally) simple authentication (using login and password).
-	"""
-	def __init__(self, proxy, server, useResolver=True):
-		""" Caches proxy and target addresses.
-			'proxy' argument is a dictionary with mandatory keys 'host' and 'port' (proxy address)
-			and optional keys 'user' and 'password' to use for authentication.
-			'server' argument is a tuple of host and port - just like TCPSocket uses.
-		"""
-		TCPSocket.__init__(self, server, useResolver)
-		self.debugFlag = DBG_PROXY
-		self._proxy = proxy
-
-	def plugin(self, owner):
-		""" Starts connection. Used interally. Returns non-empty string on success.
-		"""
-		owner.printfFlags.append(DBG_CONNECT_PROXY)
-		return TCPSocket.plugin(self, owner)
-
-	def connect(self):
-		""" Starts connection. Connects to proxy, supplies login and password to it
-			(if were specified while creating instance). Instructs proxy to make
-			connection to the target server. Returns non-empty sting on success.
-		"""
-		if not TCPSocket.connect(self, (self._proxy['host'], self._proxy['port'])):
-			return
-		self.printf("Proxy server contacted, performing authentification", 'start')
-		connector = ['CONNECT %s:%s HTTP/1.0' % (self._server), 
-			'Proxy-Connection: Keep-Alive', 
-			'Pragma: no-cache', 
-			'Host: %s:%s' % (self._server), 
-			'User-Agent: HTTPProxySocket/v0.1']
-		if('name' in self._proxy and 'password' in self._proxy):
-			credentials = '%(user)s:%(password)s' % (self._proxy)
-			credentials = base64.encodestring(credentials).strip()
-			connector.append('Proxy-Authorization: Basic %s' % (credentials))
-		connector.append('\r\n')
-		self.send('\r\n'.join(connector))
-		try:
-			reply = self.receive().replace('\r', '')
-		except IOError:
-			self.printf('Proxy suddenly disconnected', 'error')
-			self._owner.disconnected()
-			return
-		try:
-			proto, code, desc = reply.split('\n')[0].split(' ', 2)
-		except Exception:
-			raise ValueError('Invalid proxy reply')
-		if code != '200':
-			self.printf('Invalid proxy reply: %s %s %s'%(proto, code, desc), 'error')
-			self._owner.disconnected()
-			return
-		while reply.find('\n\n') ==  -1:
-			try:
-				reply +=  self.receive().replace('\r', '')
-			except IOError:
-				self.printf('Proxy suddenly disconnected', 'error')
-				self._owner.disconnected()
-				return
-		self.printf("Authentification successfull. Jabber server contacted.", 'ok')
-		return 'ok'
-
-	def printf(self, text, severity):
-		"""Overwrites printf tag to allow printf output be presented as "CONNECTproxy".
-		"""
-		return self._owner.printf(DBG_CONNECT_PROXY, text, severity)
 
 class TLS(plugin.PlugIn):
 	""" TLS connection used to encrypts already estabilished tcp connection.
@@ -335,12 +260,12 @@ class TLS(plugin.PlugIn):
 		""" Handle server reply if TLS is allowed to process. Behaves accordingly.
 			Used internally.
 		"""
-		if stanza.getName() == "failure":
+		if stanza.getName() == "proceed":
+			self.state = TLS_SUCCESS
+			self.printf("Got starttls proceed response. Switching to TLS...", "ok")
+			self._startSSL()
+			self._owner.Dispatcher.PlugOut()
+			dispatcher.Dispatcher().PlugIn(self._owner)
+		else:
 			self.state = TLS_FAILURE
 			self.printf("Got starttls response: %s" % (self.state), "error")
-			return
-		self.state = TLS_SUCCESS
-		self.printf("Got starttls proceed response. Switching to TLS...", "ok")
-		self._startSSL()
-		self._owner.Dispatcher.PlugOut()
-		dispatcher.Dispatcher().PlugIn(self._owner)

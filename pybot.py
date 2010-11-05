@@ -164,6 +164,9 @@ gDebug.colors[FLAG_ERROR] = debug.colorBrightRed
 gDebug.colors[FLAG_WARNING] = debug.colorYellow
 gDebug.colors[FLAG_SUCCESS] = debug.colorBrightCyan
 
+def clearEventHandlers(evtType):
+	gEventHandlers[evtType] = []
+
 def registerMessageHandler(function, msgType):
 	gMessageHandlers[msgType].append(function)
 	
@@ -217,12 +220,12 @@ def callPresenceHandlers(stanza, prsType, jid, resource, trueJid):
 		startThread(handler, (stanza, jid, resource, trueJid))
 
 def callEventHandlers(evtType, param=None):
-	if(param):
+	if param:
 		for function in gEventHandlers[evtType]:
 			function(*param)
 	else:
 		for function in gEventHandlers[evtType]:
-			function();		
+			function()
 
 def callCommandHandlers(command, cmdType, jid, resource, param):
 	gInfo["cmd"] += 1
@@ -759,7 +762,7 @@ def start():
 	loadPlugins()
 
 	printf("Connecting...")
-	if(gClient.connect(server=(gHost, gPort), SecureMode=gSecureMode, useResolver=gUseResolver)):
+	if(gClient.connect(server=(gHost, gPort), secureMode=gSecureMode, useResolver=gUseResolver)):
 		printf("Connection established (%s)" % gClient.isConnected(), FLAG_SUCCESS)
 	else:
 		printf("Unable to connect", FLAG_ERROR)
@@ -778,6 +781,7 @@ def start():
 		shutdown()
 
 	callEventHandlers(STARTUP)
+	clearEventHandlers(STARTUP)
 
 	gClient.registerHandler("message", messageHandler)
 	gClient.registerHandler("presence", presenceHandler)
@@ -798,6 +802,7 @@ def start():
 		printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
 	callEventHandlers(INIT_2)
+	clearEventHandlers(INIT_2)
 	
 	printf("Now I am ready to work :)")
 	while(True):

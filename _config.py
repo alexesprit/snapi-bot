@@ -34,7 +34,7 @@ gRestart = True
 # error - ошибки
 # success - успешные результаты
 # warning - предупреждения
-gCoreDebug = ["info", "error", "success", "warning"]
+gCoreDebug = ["always"]
 # always - все типы флагов
 # auth - авторизация
 # bind - назначение ресурса

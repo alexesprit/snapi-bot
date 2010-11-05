@@ -65,7 +65,6 @@ class CommonClient:
 		self._debug.colors["auth"] = debug.colorYellow
 		self._debug.colors["bind"] = debug.colorBrown
 		self._debug.colors["dispatcher"] = debug.colorGreen
-		self._debug.colors["proxy"] = debug.colorDarkGray
 		self._debug.colors["roster"] = debug.colorMagenta
 		self._debug.colors["socket"] = debug.colorBrightRed
 		self._debug.colors["tls"] = debug.colorBrightRed
@@ -102,21 +101,18 @@ class CommonClient:
 		"""
 		return self.connected
 
-	def connect(self, server=None, proxy=None, SecureMode=SECURE_DISABLE, useResolver=True):
+	def connect(self, server=None, SecureMode=SECURE_DISABLE, useResolver=True):
 		""" Make a TCP/IP connection, protect it with TLS/SSL if possible and start XMPP stream.
 			Returns None, "TCP", "TLS" or "SSL", depending on the result.
 		"""
 		if not server:
 			server = (self.Server, self.Port)
-		if proxy:
-			sock = transports.HTTPProxySocket(proxy, server, useResolver)
-		else:
-			sock = transports.TCPSocket(server, useResolver)
+		sock = transports.TCPSocket(server, useResolver)
 		connected = sock.PlugIn(self)
 		if not connected: 
 			sock.PlugOut()
 			return False
-		self._Server, self._Proxy = server, proxy
+		self._Server = server
 		self.connected = C_TCP
 		if (SecureMode == SECURE_AUTO and self.Connection.getPort() in (5223, 443)) or SecureMode == SECURE_FORCE:
 			# FIXME. This should be done in transports.py
@@ -138,20 +134,17 @@ class CommonClient:
 
 class Client(CommonClient):
 	""" Example client class, based on CommonClient. """
-	def connect(self, server=None, proxy=None, SecureMode=SECURE_DISABLE, useResolver=True):
+	def connect(self, server=None, secureMode=SECURE_DISABLE, useResolver=True):
 		""" Connect to jabber server. If you want to specify different ip/port to connect to you can
-			pass it as tuple as first parameter. If there is HTTP proxy between you and server 
-			specify it's address and credentials (if needed) in the second argument.
-			If you want TLS/SSL support to be discovered and enable automatically, 
+			pass it as tuple as first parameter. If you want TLS/SSL support to be discovered and enable automatically, 
 			set third argument as SECURE_AUTO (SSL will be autodetected only if port is 5223 or 443)
 			If you want to force SSL start (i.e. if port 5223 or 443 is remapped to some non-standard port) then set it to SECURE_FORCE.
 			If you want to disable TLS/SSL support completely, set it to SECURE_DISABLE.
-			Example: connect(("192.168.5.5", 5222), {"host":"proxy.my.net", "port":8080, "user":"me", "password":"secret"})
 			Returns None or "TCP", "SSL" "TLS", depending on the result.
 		"""
-		if(not CommonClient.connect(self, server, proxy, SecureMode, useResolver)):
+		if(not CommonClient.connect(self, server, secureMode, useResolver)):
 			return None
-		if(SecureMode != SECURE_DISABLE and not hasattr(self, C_TLS)):
+		if(secureMode != SECURE_DISABLE and not hasattr(self, C_TLS)):
 			transports.TLS().PlugIn(self)
 			if(self.Dispatcher.Stream._document_attrs.get("version") == "1.0"):
 				# If we get version 1.0 stream the features tag MUST BE presented
