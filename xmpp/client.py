@@ -41,7 +41,7 @@ C_SSL = "SSL"
 class CommonClient:
 	""" Base for Client class."""
 	def __init__(self, server, port=5222, debugFlags=None):
-		""" Caches server name and (optionally) port to connect to. "printf" parameter specifies
+		""" Caches server name and (optionally) port to connect to. "debugFlags" parameter specifies
 			the debug IDs that will go into debug output. You can either specifiy an "include"
 			or "exclude" list. The latter is done via adding "always" pseudo-ID to the list.
 		"""
@@ -127,7 +127,7 @@ class CommonClient:
 			if not self.process(1):
 				return False
 		# If we get version 1.0 stream the features tag MUST BE presented
-		if(self.Dispatcher.Stream._document_attrs.get("version") == "1.0"):
+		if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
 			while not self.Dispatcher.Stream.features and self.process(1):
 				pass	  
 		return self.connected
@@ -142,11 +142,11 @@ class Client(CommonClient):
 			If you want to disable TLS/SSL support completely, set it to SECURE_DISABLE.
 			Returns None or "TCP", "SSL" "TLS", depending on the result.
 		"""
-		if(not CommonClient.connect(self, server, secureMode, useResolver)):
+		if not CommonClient.connect(self, server, secureMode, useResolver):
 			return None
-		if(secureMode != SECURE_DISABLE and not hasattr(self, C_TLS)):
+		if secureMode != SECURE_DISABLE and not hasattr(self, C_TLS):
 			transports.TLS().PlugIn(self)
-			if(self.Dispatcher.Stream._document_attrs.get("version") == "1.0"):
+			if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
 				# If we get version 1.0 stream the features tag MUST BE presented
 				while not self.Dispatcher.Stream.features and self.process(1):
 					pass
@@ -169,7 +169,7 @@ class Client(CommonClient):
 		while not self.Dispatcher.Stream._document_attrs and self.process(1):
 			pass
 		# If we get version 1.0 stream the features tag MUST BE presented
-		if(self.Dispatcher.Stream._document_attrs.get("version") == "1.0"):
+		if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
 			while not self.Dispatcher.Stream.features and self.process(1):
 				pass
 		auth.SASL(user, password).PlugIn(self)
@@ -192,21 +192,21 @@ class Client(CommonClient):
 		caps.setAttr("node", "http://jimm.net.ru/caps")
 		caps.setAttr("ver", "Nz009boXYEIrmRWk1N/Vsw==")
 		caps.setAttr("hash", "md5")
-		return(caps)
+		return caps
 
 	def getRoster(self):
 		""" Return the Roster instance, previously plugging it in and
 			requesting roster from server if needed.
 		"""
-		if(not hasattr(self, "Roster")):
+		if not hasattr(self, "Roster"):
 			roster.Roster().PlugIn(self)
 		return self.Roster.getRoster()
 
 	def setStatus(self, show, status, priority):
 		prs = protocol.Presence(priority=priority)
-		if(status):
+		if status:
 			prs.setStatus(status)
-		if(show):
+		if show:
 			prs.setShow(show)
 		prs.addChild(node=self.getCapsNode())
 		self.send(prs)

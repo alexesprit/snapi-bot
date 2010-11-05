@@ -268,7 +268,7 @@ class Dispatcher(plugin.PlugIn):
 			for handler in chain:
 				try:
 					handler(session, stanza)
-				except(protocol.NodeProcessed):
+				except protocol.NodeProcessed:
 					return
 
 	def waitForResponse(self, id, timeout=DEFAULT_TIMEOUT):
@@ -290,7 +290,7 @@ class Dispatcher(plugin.PlugIn):
 	def sendAndWaitForResponse(self, stanza, timeout=DEFAULT_TIMEOUT):
 		""" Put stanza on the wire and wait for recipient's response to it.
 		"""
-		return(self.waitForResponse(self.send(stanza), timeout))
+		return self.waitForResponse(self.send(stanza), timeout)
 
 	def sendAndCallForResponse(self, stanza, func, args=None):
 		""" Put stanza on the wire and call back when recipient replies.

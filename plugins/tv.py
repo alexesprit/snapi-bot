@@ -36,7 +36,7 @@ def showTVProgram(msgType, conference, nick, param):
 	if channelCode:
 		url = "http://tv.yandex.ru/?mode=print&channel=%s" % (channelCode)
 		rawHTML = urllib.urlopen(url).read()
-		items = re.findall(r"<div>(.+?)</div>", rawHTML, re.DOTALL)
+		items = re.findall(r"<div>(.+?)\n", rawHTML)
 		if items:
 			rawtext = "\n".join(items)
 			message = u"Вот, что я нашла:\n%s" % (decode(rawtext, "utf-8"))
@@ -58,7 +58,7 @@ registerEvent(loadTVChannels, STARTUP)
 registerCommand(showTVProgram, u"тв", 10, 
 				u"Показать телепрограму для определённого канала", 
 				u"тв <канал|номер>", 
-				(u"тв первый", ), 
+				(u"тв 101", u"тв первый", ), 
 				ANY | PARAM)
 registerCommand(showTVList, u"твлист", 10, 
 				u"Просмотреть список каналов, доступных для просмотра программы", 
