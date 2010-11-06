@@ -24,8 +24,7 @@ def showFact(msgType, conference, nick, param):
 		rawHTML = items.group(1)
 		items = re.findall("<li>(.+?)</li>", rawHTML, re.DOTALL)
 		fact = random.choice(items)
-		fact = decode(fact)
-		sendMsg(msgType, conference, nick, unicode(fact, "cp1251"))
+		sendMsg(msgType, conference, nick, decode(fact, "cp1251"))
 	else:
 		sendMsg(msgType, conference, nick, u"Не получается")
 

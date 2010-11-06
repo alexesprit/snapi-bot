@@ -203,7 +203,7 @@ registerCommand(logout, u"логаут", 0,
 				ANY | FROZEN | NONPARAM)
 registerCommand(showUserAccess, u"доступ", 0, 
 				u"Показывает уровень доступа определённого пользователя", 
-				u"доступ [ник]", 
+				u"доступ [ник|жид]", 
 				(u"доступ", u"доступ Nick"), 
 				ANY | FROZEN)
 registerCommand(setLocalAccess, u"дать_доступ", 20, 

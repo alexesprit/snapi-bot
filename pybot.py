@@ -519,7 +519,7 @@ def getAccess(conference, jid):
 		if(jid in gTempAccess[conference]):
 			return(gTempAccess[conference][jid]);	
 	else:
-		return(11)
+		return(10)
 	return(0)
 
 def sendTo(msgType, jid, text):

@@ -1,3 +1,5 @@
+# coding: utf-8
+
 # utils.py
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,12 +16,13 @@ import os
 import re
 
 HTML_ESC_MAP = (
-	("&gt;", ">"), 
-	("&lt;", "<"),
-	("&apos;", "'"),
-	("&quot;", "\""),
-	("&nbsp;", " "),
-	("&mdash;", "-")
+	("&gt;", u">"), 
+	("&lt;", u"<"),
+	("&apos;", u"'"),
+	("&quot;", u"\""),
+	("&nbsp;", u" "),
+	("&mdash;", u"—"),
+	("&middot;", u"·")
 )
 
 XML_ESC_MAP = (

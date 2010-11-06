@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def getTrainTable(cityFrom, cityTo, dateForward):
-	query = urllib.urlencode({"cityFrom" : cityFrom.encode("utf-8"),
+	query = urllib.urlencode({"cityFrom": cityFrom.encode("utf-8"),
 								"cityTo": cityTo.encode("utf-8"),
 								"dateForward": dateForward.encode("utf-8"),
 								})
