@@ -15,6 +15,8 @@
 
 LOGCSS_FILE = "logger.css"
 
+LOGS_URL_NOINDEX = True
+
 def writeHeader(fp, jid, (year, month, day)):
 	date = "%.2i.%.2i.%.2i" % (day, month, year)
 	cssData = utils.readFile(getFilePath(CSS_DIR, LOGCSS_FILE))
@@ -48,13 +50,16 @@ def getLogFile(msgType, jid, (year, month, day)):
 
 def regexUrl(matchobj):
 	url = matchobj.group(0)
-	return "<a href=\"%s\">%s</a>" % (url, url)
+	if LOGS_URL_NOINDEX:
+		return "<noindex><a href=\"%s\">%s</a></noindex>" % (url, url)
+	else:
+		return "<a href=\"%s\">%s</a>" % (url, url)
 	
 def writeLog(msgType, jid, nick, body, aff = 0):
 	decimal = str(int(math.modf(time.time())[0] * 100000))
 	(year, month, day, hour, minute, second, weekday, yearday, daylightsavings) = time.localtime()
 	body = utils.escapeXML(body)
-	body = re.sub("(http|ftp)(\:\/\/[^\s<]+)", regexUrl, body)
+	body = pattern.sub(regexUrl, body)
 	body = body.replace("\n", "<br/>")
 	body = body.encode("utf-8")
 	nick = nick.encode("utf-8")
@@ -119,20 +124,41 @@ def writePresence(stanza, conference, nick, trueJid):
 
 def manageLoggingValue(msgType, conference, nick, param):
 	if param:
-		if param.isdigit():
-			param = int(param)
-			if param == 1:
-				setConfigKey(conference, "log", 1)
-				sendMsg(msgType, conference, nick, u"Логирование включено")
+		param = param.split()
+		if len(param) == 2:
+			conf, value = param
+		elif len(param) == 1:
+			conf, value = conference, param[0]
+		else:
+			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
+			return
+		if not conferenceInList(conf):
+			sendMsg(msgType, conference, nick, u"Я не сижу в этой конференции!")
+			return
+		if value.isdigit():
+			value = int(value)
+			if value == 1:
+				setConfigKey(conf, "log", 1)
+				if conf != conference:
+					sendMsg(msgType, conference, nick, u"Логирование в %s включено" % (conf))
+				else:
+					sendMsg(msgType, conference, nick, u"Логирование включено")
 			else:
-				setConfigKey(conference, "log", 0)
-				sendMsg(msgType, conference, nick, u"Логирование отключено")
-			saveConferenceConfig(conference)
+				setConfigKey(conf, "log", 0)
+				if conf != conference:
+					sendMsg(msgType, conference, nick, u"Логирование в %s отключено" % (conf))
+				else:
+					sendMsg(msgType, conference, nick, u"Логирование отключено")
+			saveConferenceConfig(conf)
 		else:
 			sendMsg(msgType, conference, nick, u"читай помощь по команде")
 	else:
-		loggerValue = getConfigKey(conference, "log")
-		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (loggerValue))
+		message = [u"%d) %s [%d]" % (i + 1, c, getConfigKey(c, "log")) 
+					for i, c in enumerate(getConferences())]
+		if message:
+			sendMsg(msgType, conference, nick, "\n".join(message))
+		else:
+			sendMsg(msgType, conference, nick, u"Я пока нигде не сижу")
 
 def setDefLoggingValue(conference):
 	if getConfigKey(conference, "log") is None:
@@ -144,8 +170,7 @@ if(gLogDir):
 	registerPresenceHandler(writePresence, CHAT)
 	registerMessageHandler(writeMessage, CHAT)
 registerEvent(setDefLoggingValue, ADDCONF);		
-registerCommand(manageLoggingValue, u"логирование", 30, 
-				u"Отключает (0) или включает (1) ведение логов. Без параметра покажет текущее значение", 
-				u"логирование [0|1]", 
-				(u"логирование", u"логирование 0"), 
-				CHAT)
+registerCommand(manageLoggingValue, u"логирование", 100, 
+				u"Отключает (0) или включает (1) ведение логов для указанной/текущей конференции. Без параметра покажет значения для всех конференций, в которых сидит бот", 
+				u"логирование [комната] [0|1]", 
+				(u"логирование", u"логирование 0", u"логирование chat@conference.server.tld 0"))

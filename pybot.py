@@ -122,6 +122,7 @@ gDebug = debug.Debug(gCoreDebug, showFlags=False)
 gTagPtrn = re.compile(r"<.+?>")
 gJidPtrn = re.compile(r"\w+@\w+\.\w+", re.UNICODE)
 gSrvPtrn = re.compile(r"\w+\.\w+", re.UNICODE)
+gURLPtrn = re.compile(r"(http|ftp|svn)(\:\/\/[^\s<]+)")
 
 gSemaphore = threading.BoundedSemaphore(30)
 
