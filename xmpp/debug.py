@@ -128,7 +128,7 @@ class Debug:
 			if isinstance(logFile, str):
 				try:
 					self._fh = open(logFile, "w")
-				except (IOError):
+				except IOError:
 					raise IOError("Unable to open %s for writing" % (logFile))
 					sys.exit(0)
 			else:
@@ -195,13 +195,12 @@ class Debug:
 			elif self.timeStamp == 1:
 				prefix = "%s %s" % (time.strftime("[%H:%M:%S]"), prefix)
 			output = "%s%s%s" % (prefix, msg, self.suffix)
-			try:
-				self._fh.write(output)
-			except:
-				if os.name == "posix":
-					self._fh.write(output.encode("utf-8"))
-				elif os.name == "nt":
-					self._fh.write(output.encode("cp866"))
+			if isinstance(output, unicode):
+				if "posix" == os.name:
+					output = output.encode("utf-8")
+				elif "nt" == os.name:
+					output = output.encode("cp866")
+			self._fh.write(output)
 			self._fh.flush()
 
 	def isActive(self, flag):

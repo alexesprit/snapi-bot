@@ -24,7 +24,7 @@ def getDNSAnswer(query):
 		else:
 			ipaddrlist = socket.gethostbyaddr(query)[2]
 			return u", ".join(ipaddrlist)
-	except socket.gaierror, socket.herror:
+	except (socket.gaierror, socket.herror):
 		return None
 
 def showServerDns(msgType, conference, nick, param):

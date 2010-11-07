@@ -553,7 +553,7 @@ def sendMsg(msgType, conference, nick, text, force=False):
 
 def messageHandler(session, stanza):
 	msgType = stanza.getType()
-	if stanza.timestamp or msgType in FORBIDDEN_TYPES:
+	if stanza.getTimestamp() or msgType in FORBIDDEN_TYPES:
 		return
 	fullJid = stanza.getFrom()
 	conference = fullJid.getBareJid()
@@ -727,7 +727,7 @@ def loadPlugins():
 			if os.path.isfile(path):
 				exec(file(path)) in globals()
 				validPlugins += 1
-		except SyntaxError, NameError:
+		except (SyntaxError, NameError):
 			saveException("loadPlugins")
 			invalidPlugins += 1
 	if not invalidPlugins:
@@ -741,7 +741,7 @@ def detectMultiLaunch():
 			pid = int(utils.readFile(PID_FILE))
 			os.getsid(pid)
 			return pid
-		except OSError, IOError:
+		except (OSError, IOError):
 			utils.writeFile(PID_FILE, str(os.getpid()))
 	return None
 

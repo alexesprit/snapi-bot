@@ -285,7 +285,7 @@ class Node(object):
 		"""
 		try:
 			return self.getTag(tag).attrs[attr]
-		except AttributeError, KeyError:
+		except (AttributeError, KeyError):
 			return None
 
 	def setTagAttr(self, tag, attr, val):

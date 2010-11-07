@@ -58,7 +58,7 @@ def vote(msgType, conference, nick, param):
 					gVote[conference]["voted"][trueJid] = True
 					saveVotes(conference)
 					sendMsg(msgType, conference, nick, u"Поняла")
-				except IndexError, ValueError:
+				except (IndexError, ValueError):
 					sendMsg(msgType, conference, nick, u"Нет такого пункта")
 			else:
 				sendMsg(msgType, conference, nick, u"2-ой раз голосовать не надо :P")
@@ -159,7 +159,7 @@ def delOpinion(msgType, conference, nick, param):
 					del gVote[conference]["opinions"][n]
 					saveVotes(conference)
 					sendMsg(msgType, conference, nick, u"Удалила")
-				except KeyError, IndexError:
+				except (KeyError, IndexError):
 					sendMsg(msgType, conference, nick, u"Нет такого пункта")
 			else:
 				sendMsg(msgType, conference, nick, u"Недостаточно прав")

@@ -279,7 +279,7 @@ class UserJid:
 		"""
 		return self.node
 
-	def setNode(self,node):
+	def setNode(self, node):
 		""" Set the node part of jid to new value. Specify None to remove the node part.
 		"""
 		self.node = node.lower()
@@ -353,74 +353,63 @@ class Stanza(Node):
 		frm = self.getAttr("from")
 		if frm:
 			self.setFrom(frm)
-		self.timestamp = None
-		for x in self.getTags("x", namespace=NS_DELAY):
-			try:
-				if not self.getTimestamp() or x.getAttr("stamp") < self.getTimestamp():
-					self.setTimestamp(x.getAttr("stamp"))
-			except:
-				pass
 		if timestamp is not None:
 			self.setTimestamp(timestamp)
 
-	def setFrom(self,val):
+	def setFrom(self, value):
 		""" Set the value of the "from" attribute.
 		"""
-		self.setAttr("from", UserJid(val))
+		self.setAttr("from", UserJid(value))
 
 	def getFrom(self):
 		""" Return value of the "from" attribute.
 		"""
-		try:
-			return self.getAttr("from")
-		except:
-			return None
+		return self.getAttr("from")
 
 	def getTo(self):
 		""" Return value of the "to" attribute.
 		"""
-		try: 
-			return self.getAttr("to")
-		except:
-			return None
+		return self.getAttr("to")
 
-	def setTo(self,val):
+	def setTo(self, value):
 		""" Set the value of the "to" attribute.
 		"""
-		self.setAttr("to", UserJid(val))
+		self.setAttr("to", UserJid(value))
 
 	def getID(self):
 		""" Return the value of the "id" attribute.
 		"""
 		return self.getAttr("id")
 
-	def setID(self,val):
+	def setID(self, value):
 		""" Set the value of the "id" attribute.
 		"""
-		self.setAttr("id", val)
+		self.setAttr("id", value)
 
 	def getTimestamp(self):
 		""" Return the timestamp in the "yyyymmddThhmmss" format.
 		"""
-		return self.timestamp
+		delayNode = self.getTag("x", namespace=NS_DELAY)
+		if delayNode:
+			return delayNode.getAttr("stamp")
+		return None
 
-	def setTimestamp(self, val=None):
+	def setTimestamp(self, value=None):
 		"""Set the timestamp. timestamp should be the yyyymmddThhmmss string.
 		"""
-		if not val:
-			val = time.strftime("%Y%m%dT%H:%M:%S", time.gmtime())
-		self.timestamp = val
-		self.setTag("x", {"stamp": self.timestamp}, namespace=NS_DELAY)
+		if not value:
+			value = time.strftime("%Y%m%dT%H:%M:%S", time.gmtime())
+		self.setTag("x", {"stamp": value}, namespace=NS_DELAY)
 
 	def getType(self):
 		""" Return the value of the "type" attribute.
 		"""
 		return self.getAttr("type")
 	
-	def setType(self,val):
+	def setType(self, value):
 		""" Set the value of the "type" attribute.
 		"""
-		self.setAttr("type", val)
+		self.setAttr("type", value)
 
 	def getErrorCode(self):
 		""" Return the error code. Obsolette.
@@ -582,25 +571,25 @@ class Presence(Stanza):
 class Iq(Stanza): 
 	""" XMPP Iq object - get/set dialog mechanism.
 	"""
-	def __init__(self, typ=None, queryNS=None, attrs=None, to=None, frm=None, payload=None, xmlns=None, node=None):
+	def __init__(self, typ=None, namespace=None, attrs=None, to=None, frm=None, payload=None, xmlns=None, node=None):
 		""" Create Iq object. You can specify type, query namespace
 			any additional attributes, recipient of the iq, sender of the iq, any additional payload (f.e. jabber:x:data node) and namespace in one go.
 			Alternatively you can pass in the other XML object as the "node" parameted to replicate it as an iq
 		"""
 		Stanza.__init__(self, "iq", to=to, typ=typ, attrs=attrs, frm=frm, xmlns=xmlns, node=node)
 		if payload:
-			self.setQueryPayload(payload)
-		if queryNS:
-			self.setQueryNS(queryNS)
+			self.setPayload(payload)
+		if namespace:
+			self.setQueryNamespace(namespace)
 
-	def getQueryNS(self):
+	def getQueryNamespace(self):
 		""" Return the namespace of the "query" child element.
 		"""
 		tag = self.getTag("query")
 		if tag:
 			return tag.getNamespace()
 
-	def setQueryNS(self, namespace):
+	def setQueryNamespace(self, namespace):
 		""" Set the namespace of the "query" child element.
 		"""
 		self.setTag("query").setNamespace(namespace)
@@ -626,5 +615,5 @@ class Iq(Stanza):
 		"""
 		iq = Iq(typ, to=self.getFrom(), frm=self.getTo(), attrs={"id": self.getID()})
 		if self.getTag("query"):
-			iq.setQueryNS(self.getQueryNS())
+			iq.setQueryNamespace(self.getQueryNamespace())
 		return iq

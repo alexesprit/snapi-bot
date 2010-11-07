@@ -158,7 +158,7 @@ class Macros:
 			f = int(args[0])
 			t = int(args[1])
 			return str(random.randrange(f, t))
-		except:
+		except ValueError:
 			return ""
 
 	def getContext(self, args, context):

@@ -179,7 +179,7 @@ class Client(CommonClient):
 		if auth.AUTH_SUCCESS == self.SASL.state:
 			self.SASL.PlugOut()
 			auth.Bind().PlugIn(self)
-			if auth.BIND_SUCCESS == self.Bind.bindResource(resource):
+			if auth.BIND_SUCCESS == self.Bind.bind(resource):
 				self.Bind.PlugOut()
 				return auth.AUTH_SUCCESS
 		else:

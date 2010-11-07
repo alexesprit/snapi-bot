@@ -62,29 +62,13 @@ class SASL(plugin.PlugIn):
 			either "success" or "failure". Note that successfull auth will take at least
 			two Dispatcher.process() calls.
 		"""
-		try:
-			self.featuresHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
-		except protocol.NodeProcessed:
-			pass
-
-	def plugout(self):
-		""" Remove SASL handlers from owner's dispatcher.
-			Used internally.
-		"""
-		self._owner.unregisterHandler("challenge", self.SASLHandler, xmlns=protocol.NS_SASL)
-		self._owner.unregisterHandler("failure", self.SASLHandler, xmlns=protocol.NS_SASL)
-		self._owner.unregisterHandler("success", self.SASLHandler, xmlns=protocol.NS_SASL)
-
-	def featuresHandler(self, conn, feats):
-		""" Used to determine if server supports SASL auth.
-			Used internally.
-		"""
-		if not feats.getTag("mechanisms", namespace=protocol.NS_SASL):
+		features = self._owner.Dispatcher.Stream.features
+		if not features.getTag("mechanisms", namespace=protocol.NS_SASL):
 			self.state = AUTH_FAILURE
 			self.printf("SASL not supported by server", "error")
 			return
 		mecs = []
-		for mec in feats.getTag("mechanisms", namespace=protocol.NS_SASL).getTags("mechanism"):
+		for mec in features.getTag("mechanisms", namespace=protocol.NS_SASL).getTags("mechanism"):
 			mecs.append(mec.getData())
 		self._owner.registerHandler("challenge", self.SASLHandler, xmlns=protocol.NS_SASL)
 		self._owner.registerHandler("failure", self.SASLHandler, xmlns=protocol.NS_SASL)
@@ -103,6 +87,14 @@ class SASL(plugin.PlugIn):
 			return
 		self.state = AUTH_WAITING
 		self._owner.send(node.__str__())
+
+	def plugout(self):
+		""" Remove SASL handlers from owner's dispatcher.
+			Used internally.
+		"""
+		self._owner.unregisterHandler("challenge", self.SASLHandler, xmlns=protocol.NS_SASL)
+		self._owner.unregisterHandler("failure", self.SASLHandler, xmlns=protocol.NS_SASL)
+		self._owner.unregisterHandler("success", self.SASLHandler, xmlns=protocol.NS_SASL)
 
 	def SASLHandler(self, conn, challenge):
 		""" Perform next SASL auth step. Used internally.
@@ -188,16 +180,16 @@ class Bind(plugin.PlugIn):
 		"""
 		self._owner.unregisterHandler("features", self.featuresHandler, xmlns=protocol.NS_STREAMS)
 
-	def featuresHandler(self, conn, feats):
+	def featuresHandler(self, session, features):
 		""" Determine if server supports resource binding and set some internal attributes accordingly.
 		"""
-		if not feats.getTag("bind", namespace=protocol.NS_BIND):
+		if not features.getTag("bind", namespace=protocol.NS_BIND):
 			self.bound = BIND_FAILURE
 			self.printf("Server does not requested binding.", "error")
 			return
 		self.bound = BIND_BINDING
 
-	def bindResource(self, resource=None):
+	def bind(self, resource=None):
 		""" Perform binding. Use provided resource name or random (if not provided).
 		"""
 		while self.bound == BIND_WAITING and self._owner.process(1):
@@ -207,7 +199,7 @@ class Bind(plugin.PlugIn):
 		else:
 			resource = []
 		bNode = protocol.Node("bind", attrs={"xmlns": protocol.NS_BIND}, payload=resource)
-		iq = protocol.Stanza("iq", typ=protocol.TYPE_SET, payload=[bNode])
+		iq = protocol.Iq(typ=protocol.TYPE_SET, payload=[bNode])
 		stanza = self._owner.sendAndWaitForResponse(iq)
 		if protocol.TYPE_RESULT == stanza.getType():
 			resource = stanza.getTag("bind").getTagData("jid")
@@ -217,7 +209,7 @@ class Bind(plugin.PlugIn):
 			self._owner.Resource = jid.getResource()
 			
 			sNode = protocol.Node("session", attrs={"xmlns": protocol.NS_SESSION})
-			iq = protocol.Stanza("iq", typ=protocol.TYPE_SET, payload=[sNode])
+			iq = protocol.Iq(typ=protocol.TYPE_SET, payload=[sNode])
 			stanza = self._owner.sendAndWaitForResponse(iq)
 			if protocol.TYPE_RESULT == stanza.getType():
 				self.printf("Successfully opened session", "ok")
