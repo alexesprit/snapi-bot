@@ -24,7 +24,7 @@ gVote = {}
 
 def getVoteText(conference):
 	voteText = u"Голосование\nСоздатель: %(creator)s\n%(text)s\n" % (gVote[conference])
-	items = [u" * %s" % (x[0]) for x in gVote[conference]["opinions"]]
+	items = [u" %d) %s" % (i + 1, x[0]) for i, x in enumerate(gVote[conference]["opinions"])]
 	voteText += "\n".join(items)
 	voteText += u"\nЧтобы проголосовать, напиши номер мнения, например \"мнение 1\""
 	return voteText

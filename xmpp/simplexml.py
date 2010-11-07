@@ -15,7 +15,7 @@
 # $Id: simplexml.py,v 1.34 2009/03/03 10:24:02 normanr Exp $
 
 """ Simplexml module provides xmpppy library with all needed tools to handle XML nodes and XML streams.
-	I"m personally using it in many other separate projects. It is designed to be as standalone as possible.
+	I'm personally using it in many other separate projects. It is designed to be as standalone as possible.
 """
 
 import xml.parsers.expat
