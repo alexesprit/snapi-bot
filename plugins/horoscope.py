@@ -14,18 +14,19 @@
 # GNU General Public License for more details.
 
 SIGNS = {
-		u"овен": 1,
-		u"телец": 2, 
-		u"близнецы": 3, 
-		u"рак": 4, 
-		u"лев": 5, 
-		u"дева": 6, 
-		u"весы": 7, 
-		u"скорпион": 8, 
-		u"стрелец": 9, 
-		u"козерог": 10, 
-		u"водолей": 11, 
-		u"рыбы": 12}
+	u"овен": 1,
+	u"телец": 2, 
+	u"близнецы": 3, 
+	u"рак": 4, 
+	u"лев": 5, 
+	u"дева": 6, 
+	u"весы": 7, 
+	u"скорпион": 8, 
+	u"стрелец": 9, 
+	u"козерог": 10, 
+	u"водолей": 11, 
+	u"рыбы": 12
+}
 
 def showHoroscope(msgType, conference, nick, param):
 	param = param.lower()
@@ -35,9 +36,12 @@ def showHoroscope(msgType, conference, nick, param):
 		items = re.search(r"<td class=stext>(.+?)</td>", rawHTML, re.DOTALL)
 		if items:
 			message = unicode(items.group(1), "cp1251")
-			if protocol.TYPE_PUBLIC == msgType:
-				sendMsg(msgType, conference, nick, u"Ушёл")
-			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
+			if message == "---":
+				if protocol.TYPE_PUBLIC == msgType:
+					sendMsg(msgType, conference, nick, u"Ушёл")
+				sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
+			else:
+				sendMsg(msgType, conference, nick, u"Нет информации")
 		else:
 			sendMsg(msgType, conference, nick, u"Не могу :(")
 

@@ -33,9 +33,9 @@ def showAbyssQuote(msgType, conference, nick, param):
 	items = re.findall("<div class=\"vote\">(.+?)<div>(.+?)</div>", rawHTML, re.DOTALL)
 	if items:
 		items = [i[1] for i in items]
-		message = random.choice(items)
-		message = decode(message)
-		sendMsg(msgType, conference, nick, unicode(message, "cp1251"))
+		rawquote = random.choice(items)
+		message = decode(rawquote, "cp1251")
+		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"Не могу :(")
 

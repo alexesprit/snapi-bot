@@ -14,15 +14,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def loadLocalMacroses(conference):
-	gMacros.loadMacroses(conference)
-
-def freeLocalMacroses(conference):
-	gMacros.freeMacroses(conference)
-	
-def loadGlobalMacroses():
-	gMacros.loadMacroses()
-
 def addLocalMacros(msgType, conference, nick, param):
 	rawMacros = param.split("=", 1)
 	if len(rawMacros) != 2:
@@ -242,9 +233,9 @@ def showMacrosList(msgType, conference, nick, parameters):
 	else:
 		sendMsg(msgType, conference, nick, u"Макросов нет :(")
 
-registerEvent(loadLocalMacroses, ADDCONF)
-registerEvent(freeLocalMacroses, DELCONF)
-registerEvent(loadGlobalMacroses, STARTUP)
+registerEvent(gMacros.loadMacroses, STARTUP)
+registerEvent(gMacros.loadMacroses, ADDCONF)
+registerEvent(gMacros.freeMacroses, DELCONF)
 
 registerCommand(addLocalMacros, u"макроадд", 20, 
 				u"Добавляет локальный макрос", 
