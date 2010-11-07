@@ -114,10 +114,10 @@ class Node(object):
 		if self.namespace:
 			if not self.parent or self.parent.namespace != self.namespace:
 				if "xmlns" not in self.attrs:
-					s = s + " xmlns="%s"" % (self.namespace)
+					s = s + " xmlns=\"%s\"" % (self.namespace)
 		for key in self.attrs.keys():
 			val = ustr(self.attrs[key])
-			s = s + " %s="%s"" % (key, escapeXML(val))
+			s = s + " %s=\"%s\"" % (key, escapeXML(val))
 		s = s + ">"
 		if self.children:
 			for child in self.children:

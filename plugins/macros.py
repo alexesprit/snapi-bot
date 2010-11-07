@@ -225,7 +225,9 @@ def showMacrosList(msgType, conference, nick, parameters):
 			else:
 				disMacroses.append(macros)
 		else:
-			macroses.append(macros)
+			access = gMacros.getAccess(macros)
+			if access <= getAccess(conference, trueJid):
+				macroses.append(macros)
 	if macroses:
 		macroses.sort()
 		message += u"Глобальные:\n" + ", ".join(macroses)
