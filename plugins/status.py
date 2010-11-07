@@ -32,7 +32,7 @@ def showUserStatus(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"А это кто?")
 
 def updateStatus(stanza, conference, nick, trueJid):
-	if conferenceInList(conference) and nickIsOnline(conference, nick):
+	if nickIsOnline(conference, nick):
 		show = stanza.getShow() or u"online"
 		status = stanza.getStatus()
 		setNickKey(conference, nick, NICK_SHOW, show)

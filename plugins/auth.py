@@ -28,18 +28,18 @@ AUTH_QUESTIONS = (
 gAuthAnswer = {}
 
 def setDefAuthValue(conference):
-	if(getConfigKey(conference, "auth") is None):
+	if getConfigKey(conference, "auth") is None:
 		setConfigKey(conference, "auth", 0)
 
 def initAuthCache(conference):
 	gAuthAnswer[conference] = {}
 
 def freeAuthCache(conference):
-	del(gAuthAnswer[conference])
+	del gAuthAnswer[conference]
 
 def askAuthQuestion(conference, nick, trueJid, aff, role):
-	if(getConfigKey(conference, "auth")):
-		if(aff == protocol.AFF_NONE):
+	if getConfigKey(conference, "auth"):
+		if aff == protocol.AFF_NONE:
 			question, answer = random.choice(AUTH_QUESTIONS)
 			setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Неавторизованый участник")
 			message = u"Чтобы получить голос, реши пример: %s. Как решишь, напиши мне ответ" % (question)
@@ -47,24 +47,24 @@ def askAuthQuestion(conference, nick, trueJid, aff, role):
 			gAuthAnswer[conference][trueJid] = answer
 
 def clearAuthCache(conference, nick, trueJid, reason, code):
-	if(trueJid in gAuthAnswer[conference]):
-		del(gAuthAnswer[conference][trueJid])
+	if trueJid in gAuthAnswer[conference]:
+		del gAuthAnswer[conference][trueJid]
 
 def authAnswerListener(stanza, msgType, conference, nick, trueJid, body):
-	if(protocol.TYPE_PRIVATE == msgType):
-		if(trueJid in gAuthAnswer[conference]):
-			if(gAuthAnswer[conference][trueJid] == body):
+	if protocol.TYPE_PRIVATE == msgType:
+		if trueJid in gAuthAnswer[conference]:
+			if gAuthAnswer[conference][trueJid] == body:
 				sendMsg(msgType, conference, nick, u"Признаю - ты не бот :)")
 				setMUCRole(conference, nick, protocol.ROLE_PARTICIPANT, u"Авторизация пройдена")
-				del(gAuthAnswer[conference][trueJid])
+				del gAuthAnswer[conference][trueJid]
 			else:
 				sendMsg(msgType, conference, nick, u"Неправильный ответ")
 
 def manageAuthValue(msgType, conference, nick, param):
-	if(param):
-		if(param.isdigit()):
+	if param:
+		if param.isdigit():
 			param = int(param)
-			if(param == 1):
+			if param == 1:
 				setConfigKey(conference, "auth", 1)
 				sendMsg(msgType, conference, nick, u"Авторизация включена")
 			else:

@@ -28,11 +28,14 @@ ACCESS_DESC = {
 }
 
 def login(msgType, conference, nick, param):
-	if msgType == protocol.TYPE_PRIVATE and param == gAdminPass:
-		trueJid = getTrueJid(conference, nick)
-		gAdmins.append(trueJid)
-		setTempGlobalAccess(trueJid, 100)
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Пароль принят, глобальный доступ выдан")
+	if msgType == protocol.TYPE_PRIVATE:
+		if param == gAdminPass:
+			trueJid = getTrueJid(conference, nick)
+			gAdmins.append(trueJid)
+			setTempGlobalAccess(trueJid, 100)
+			sendMsg(msgType, conference, nick, u"Пароль принят, глобальный доступ выдан")
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка! Неверный пароль!")
 
 def logout(msgType, conference, nick, parameters):
 	trueJid = getTrueJid(conference, nick)
@@ -40,6 +43,8 @@ def logout(msgType, conference, nick, parameters):
 		gAdmins.remove(trueJid)
 		setTempGlobalAccess(trueJid)
 		sendMsg(msgType, conference, nick, u"Глобальный доступ снят")
+	else:
+		sendMsg(msgType, conference, nick, u"Ошибка! Вы не авторизованы!")
 
 def showUserAccess(msgType, conference, nick, param):
 	levelDesc = ""
@@ -109,7 +114,7 @@ def delLocalAccess(msgType, conference, nick, param):
 	myJid = getTrueJid(conference, nick)
 	myAccess = getAccess(conference, myJid)
 	userAccess = getAccess(conference, userJid)
-	if(userAccess > myAccess):
+	if userAccess > myAccess:
 		sendMsg(msgType, conference, nick, u"Недостаточно прав")
 		return
 	setPermAccess(conference, userJid)
@@ -171,16 +176,16 @@ def showLocalAccesses(msgType, conference, nick, param):
 
 def loadGlobalAccesses():
 	global gGlobalAccess
-	fileName = getConfigPath(ACCESS_FILE)
-	utils.createFile(fileName, "{}")
-	gGlobalAccess = eval(utils.readFile(fileName))
+	path = getConfigPath(ACCESS_FILE)
+	utils.createFile(path, "{}")
+	gGlobalAccess = eval(utils.readFile(path))
 	for jid in gAdmins:
 		gGlobalAccess[jid] = 100
 
 def loadLocalAccesses(conference):
-	fileName = getConfigPath(conference, ACCESS_FILE)
-	utils.createFile(fileName, "{}")
-	gPermAccess[conference] = eval(utils.readFile(fileName))
+	path = getConfigPath(conference, ACCESS_FILE)
+	utils.createFile(path, "{}")
+	gPermAccess[conference] = eval(utils.readFile(path))
 	gTempAccess[conference] = {}
 
 def freeLocalAccesses(conference):

@@ -61,8 +61,8 @@ def turnLastMessage(msgType, conference, nick, param):
 				sendMsg(msgType, conference, nick, turnMessage(savedMsg))
 
 def saveTurnMessage(stanza, msgType, conference, nick, trueJid, message):
-	if(msgType == protocol.TYPE_PUBLIC):
-		if(trueJid != gJid and trueJid != conference):
+	if msgType == protocol.TYPE_PUBLIC:
+		if trueJid != gJid and trueJid != conference:
 			if "turn" != message.lower():
 				gTurnMsgCache[conference][trueJid] = message
 

@@ -45,27 +45,27 @@ def getTrainTable(cityFrom, cityTo, dateForward):
 		travelTime = re.search(r"td class=\"{raw:.+?>.+?</i>(.+?)</td>", info, re.DOTALL)
 		travelTime = decode(travelTime.group(1)).strip()
 
-		if(info.find("tickets\": \"yes") != -1):
+		if info.find("tickets\": \"yes") != -1:
 			places = u"есть"
 		else:
 			places = u"нет"
 		tableList.append([trainName, disTime, disName, arrTime, arrName, travelTime, places])
-	return(tableList)
+	return tableList
 
 def showTrainTable(msgType, conference, nick, param):
 	param = param.split(None, 1)
-	if(len(param) == 2):
+	if len(param) == 2:
 		cities = param[1]
-		if(cities.count(">")):
+		if cities.count(">"):
 			cityFrom, cityTo = cities.split(">")
 			date = param[0]
 			tableList = getTrainTable(cityFrom, cityTo, date)
 			message = []
 			msgText = u"%d) %s\nВремя отправления: %s (%s)\nВремя прибытия: %s (%s)\nВремя в пути: %s\nМеста: %s"
-			if(tableList):
+			if tableList:
 				for i, table in enumerate(tableList):
 					message.append(msgText % (i + 1, table[0], table[1], table[2], table[3], table[4], table[5], table[6]))
-				if(protocol.TYPE_PUBLIC == msgType):
+				if protocol.TYPE_PUBLIC == msgType:
 					sendMsg(msgType, conference, nick, u"ушло")
 				sendMsg(protocol.TYPE_PRIVATE, conference, nick, "\n".join(message))
 			else:

@@ -18,8 +18,8 @@ CLIENTS_FILE = "clients.txt"
 gUserClients = {}
 
 def loadClientsCache(conference):
-	fileName = getConfigPath(conference, CLIENTS_FILE)
-	gUserClients[conference] = database.DataBase(fileName)
+	path = getConfigPath(conference, CLIENTS_FILE)
+	gUserClients[conference] = database.DataBase(path)
 
 def freeClientsCache(conference):
 	del gUserClients[conference]

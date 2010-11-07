@@ -171,9 +171,9 @@ class TCPSocket(plugin.PlugIn):
 		""" Writes raw outgoing data. Blocks until done.
 			If supplied data is unicode string, encodes it to utf-8 before send.
 		"""
-		if(isinstance(rawData, unicode)):
+		if isinstance(rawData, unicode):
 			rawData = rawData.encode("utf-8")
-		elif(not isinstance(rawData, str)):
+		elif not isinstance(rawData, str):
 			rawData = ustr(rawData).encode("utf-8")
 		try:
 			self._send(rawData)

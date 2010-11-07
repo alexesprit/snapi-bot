@@ -18,24 +18,24 @@ EXPRESSIONS_FILE = "expressions.txt"
 gExpressions = {}
 
 def saveExpressions(conference):
-	fileName = getConfigPath(conference, EXPRESSIONS_FILE);
-	utils.writeFile(fileName, str(gExpressions[conference]));
+	path = getConfigPath(conference, EXPRESSIONS_FILE);
+	utils.writeFile(path, str(gExpressions[conference]));
 
 def freeExpressions(conference):
 	del gExpressions[conference]
 
 def loadExpressions(conference):
-	fileName = getConfigPath(conference, EXPRESSIONS_FILE)
-	utils.createFile(fileName, "{}")
-	gExpressions[conference] = eval(utils.readFile(fileName))
+	path = getConfigPath(conference, EXPRESSIONS_FILE)
+	utils.createFile(path, "{}")
+	gExpressions[conference] = eval(utils.readFile(path))
 
 def addExpression(msgType, conference, nick, param):
 	param = param.split("=", 1)
-	if(len(param) == 2):
+	if len(param) == 2:
 		exp = param[0].strip()
 		text = param[1].strip()
-		if(exp and text):
-			if(exp in gExpressions):
+		if exp and text:
+			if exp in gExpressions:
 				gExpressions[conference][exp] = text
 				sendMsg(msgType, conference, nick, u"заменила")
 			else:
@@ -48,15 +48,15 @@ def addExpression(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"читай справку по команде")
 
 def delExpression(msgType, conference, nick, param):
-	if(param in gExpressions[conference]):
-		del(gExpressions[conference][param])
+	if param in gExpressions[conference]:
+		del gExpressions[conference][param]
 		saveExpressions(conference)
 		sendMsg(msgType, conference, nick, u"удалила")
 	else:
 		sendMsg(msgType, conference, nick, u"такого выражения нет")
 
 def showExpressions(msgType, conference, nick, param):
-	if(gExpressions[conference]):
+	if gExpressions[conference]:
 		items = [exp for exp in gExpressions[conference]]
 		message = u"выражения:\n%s" % ("\n".join(items))
 		sendMsg(msgType, conference, nick, message)
@@ -64,19 +64,19 @@ def showExpressions(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"выражений нет");		
 
 def showExprInfo(msgType, conference, nick, param):
-	if(param in gExpressions[conference]):
+	if param in gExpressions[conference]:
 		sendMsg(msgType, conference, nick, gExpressions[conference][param])
 	else:
 		sendMsg(msgType, conference, nick, u"такого выражения нет")	
 
 def processExpression(stanza, msgType, conference, nick, trueJid, text):
-	if(nick != getBotNick(conference)):
+	if nick != getBotNick(conference):
 		text = text.lower()
 		command = text.split()[0]
-		if(not isCommand(command)):
+		if not isCommand(command):
 			for exp in gExpressions[conference]:
 				try:
-					if(re.search(exp, text, re.DOTALL)):
+					if re.search(exp, text, re.DOTALL):
 						sendMsg(msgType, conference, nick, gExpressions[conference][exp])
 						return
 				except(re.error):

@@ -18,8 +18,8 @@ SEEN_FILE = "seen.txt"
 gSeenCache = {}
 
 def loadSeenBase(conference):
-	fileName = getConfigPath(conference, SEEN_FILE)
-	gSeenCache[conference] = database.DataBase(fileName)
+	path = getConfigPath(conference, SEEN_FILE)
+	gSeenCache[conference] = database.DataBase(path)
 
 def freeSeenBase(conference):
 	del gSeenCache[conference]
@@ -29,7 +29,7 @@ def saveAllSeenBases():
 		gSeenCache[conference].save()
 
 def updateSeenTime(conference, nick, trueJid, reason, code):
-	if("303" != code):
+	if "303" != code:
 		gSeenCache[conference][trueJid] = time.time()
 
 def showSeenTime(msgType, conference, nick, param):

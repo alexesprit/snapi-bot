@@ -26,6 +26,6 @@ def showGeoIPInfo(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, message)
 
 registerCommand(showGeoIPInfo, u"геоип", 10, 
-				u"Показывает географическое положение о хосте", 
+				u"Показывает информацию о географическом месторасположении хоста", 
 				u"геоип [сервер]", 
 				(u"геоип", u"геоип server.tld"))

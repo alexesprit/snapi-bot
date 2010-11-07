@@ -38,8 +38,8 @@ def getVoteResults(conference):
 	return voteText % ("\n".join(items))
 
 def saveVotes(conference):
-	fileName = getConfigPath(conference, VOTES_FILE)
-	utils.writeFile(fileName, str(gVote[conference]))
+	path = getConfigPath(conference, VOTES_FILE)
+	utils.writeFile(path, str(gVote[conference]))
 
 def vote(msgType, conference, nick, param):
 	if gVote[conference]:
@@ -133,7 +133,7 @@ def addOpinion(msgType, conference, nick, param):
 			trueJid = getTrueJid(conference, nick)
 			creatorJid = gVote[conference]["creatorjid"]
 			if creatorJid == trueJid or getAccess(conference, trueJid) >= 20:
-				if(param in [x[0] for x in gVote[conference]["opinions"]]):
+				if param in [x[0] for x in gVote[conference]["opinions"]]:
 					sendMsg(msgType, conference, nick, u"уже есть такой пункт")
 				else:
 					gVote[conference]["opinions"].append([param, 0])
@@ -174,7 +174,7 @@ def showOpinions(msgType, conference, nick, param):
 			trueJid = getTrueJid(conference, nick)
 			creatorJid = gVote[conference]["creatorjid"]
 			if creatorJid == trueJid or getAccess(conference, trueJid) >= 20:
-				if(protocol.TYPE_PUBLIC == msgType):
+				if protocol.TYPE_PUBLIC == msgType:
 					sendMsg(msgType, conference, nick, u"Ушли")
 				sendMsg(protocol.TYPE_PRIVATE, conference, nick, getVoteResults(conference))
 			else:
@@ -208,9 +208,9 @@ def showVote(conference, nick, trueJid, aff, role):
 				sendMsg(protocol.TYPE_PRIVATE, conference, nick, getVoteText(conference))
 
 def loadVotes(conference):
-	fileName = getConfigPath(conference, VOTES_FILE)
-	utils.createFile(fileName, "{}")
-	gVote[conference] = eval(utils.readFile(fileName))
+	path = getConfigPath(conference, VOTES_FILE)
+	utils.createFile(path, "{}")
+	gVote[conference] = eval(utils.readFile(path))
 
 registerJoinHandler(showVote)
 registerEvent(loadVotes, ADDCONF)

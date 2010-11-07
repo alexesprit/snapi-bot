@@ -182,8 +182,8 @@ def showQuizQuestion(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"(*) Текущий вопрос: \n" + gQuizQuestion[conference])
 		
 def loadQuizScores(conference):
-	fileName = getConfigPath(conference, QUIZ_SCORES_FILE)
-	gQuizScores[conference] = database.DataBase(fileName)
+	path = getConfigPath(conference, QUIZ_SCORES_FILE)
+	gQuizScores[conference] = database.DataBase(path)
 	gQuizEnable[conference] = False
 
 def freeQuizScores(conference):

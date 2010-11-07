@@ -50,10 +50,11 @@ def cleanBases():
 		base = globals()[item]
 		_cleanBase(base, SINGLE_KEEP_TIME)
 	for log in os.listdir(SYSLOG_DIR):
-		logPath = os.path.join(SYSLOG_DIR, log)
-		changeTime = os.path.getctime(logPath)
-		if(time.time() - changeTime > LOGS_KEEP_TIME):
-			os.remove(logPath)
+		path = os.path.join(SYSLOG_DIR, log)
+		if os.path.isfile(path):
+			changeTime = os.path.getctime(path)
+			if time.time() - changeTime > LOGS_KEEP_TIME:
+				os.remove(path)
 	startCleanTimer()
 
 def startCleanTimer():

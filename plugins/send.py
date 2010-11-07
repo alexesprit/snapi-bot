@@ -19,8 +19,8 @@ SEND_FILE = "send.txt"
 gSendCache = {}
 
 def loadSendBase(conference):
-	fileName = getConfigPath(conference, SEND_FILE)
-	gSendCache[conference] = database.DataBase(fileName)
+	path = getConfigPath(conference, SEND_FILE)
+	gSendCache[conference] = database.DataBase(path)
 
 def freeSendBase(conference):
 	del gSendCache[conference]
@@ -37,7 +37,7 @@ def addToSendBase(msgType, conference, nick, param):
 		elif nickInConference(conference, userNick):
 			trueJid = getTrueJid(conference, userNick)
 			base = gSendCache[conference]
-			if(trueJid not in base):
+			if trueJid not in base:
 				base[trueJid] = []
 			base[trueJid].append(message)
 			base.save()

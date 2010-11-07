@@ -45,8 +45,8 @@ CLOUDINESS = {
 
 def getWCodeByName(city):
 	city = city.encode("utf-8")
-	fileName = getFilePath(RESOURCE_DIR, WCODES_FILE)
-	for line in open(fileName):
+	path = getFilePath(RESOURCE_DIR, WCODES_FILE)
+	for line in open(path):
 		if line.startswith(city):
 			return line.split("|")
 	return None
@@ -75,7 +75,7 @@ def showWeather(msgType, conference, nick, param):
 			precipitation = weather["precipitation"]
 			if precipitation not in ["8", "9", "10"]:
 				rpower = weather["rpower"]
-				if("0" == rpower):
+				if "0" == rpower:
 					message += u", возможен %s\n" % (PRECIPITATION[precipitation])
 				else:
 					message += u", %s\n" % (PRECIPITATION[precipitation])

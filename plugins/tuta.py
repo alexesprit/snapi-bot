@@ -20,17 +20,17 @@ gHereTime = {}
 def updateHereTimeInfo(conference, nick, trueJid):
 	base = gHereTime[conference]
 	joinTime = getNickKey(conference, nick, "joined")
-	if(trueJid in base):
+	if trueJid in base:
 		hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
 		base[trueJid]["here"] += hereTime
 		base[trueJid]["record"] = max(base[trueJid]["record"], hereTime)
 
 def showHereStatistic(msgType, conference, nick, param):
 	userNick = param or nick
-	if(nickIsOnline(conference, userNick)):
+	if nickIsOnline(conference, userNick):
 		base = gHereTime[conference]
 		trueJid = getTrueJid(conference, userNick)
-		if(trueJid in base):
+		if trueJid in base:
 			joinCount = base[trueJid]["count"]
 			hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
 			totalTime = base[trueJid]["here"] + hereTime
@@ -46,7 +46,7 @@ def showHereStatistic(msgType, conference, nick, param):
 	
 def updateJoinStatistic(conference, nick, trueJid, aff, role):
 	base = gHereTime[conference]
-	if(trueJid not in base):
+	if trueJid not in base:
 		base[trueJid] = {"record": 0, "count": 0, "here": 0}
 	base[trueJid]["count"] += 1
 
@@ -54,11 +54,11 @@ def updateLeaveStatistic(conference, nick, trueJid, reason, code):
 	updateHereTimeInfo(conference, nick, trueJid)
 
 def loadHereBase(conference):
-	fileName = getConfigPath(conference, HERE_FILE)
-	gHereTime[conference] = database.DataBase(fileName)
+	path = getConfigPath(conference, HERE_FILE)
+	gHereTime[conference] = database.DataBase(path)
 
 def freeHereBase(conference):
-	del(gHereTime[conference])
+	del gHereTime[conference]
 
 def saveAllHereBases():
 	for conference in getConferences():

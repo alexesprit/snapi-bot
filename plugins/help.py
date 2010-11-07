@@ -22,7 +22,7 @@ def showHelp(msgType, conference, nick, param):
 		if isCommand(param) and isCommandType(param, cmdType):
 			message = gCommands[param][CMD_DESC]
 			syntax = gCommands[param][CMD_SYNTAX]
-			if(syntax):
+			if syntax:
 				message += u"\nСинтаксис: %s" % (syntax)
 			message += u"\nПримеры:"
 			for example in gCommands[param][CMD_EXAMPLE]:

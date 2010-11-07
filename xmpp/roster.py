@@ -134,7 +134,7 @@ class Roster(plugin.PlugIn):
 			resources = self.rosterData[bareJid]["resources"]
 			for r in resources:
 				priority = resources[r]["priority"]
-				if(priority > lastPriority):
+				if priority > lastPriority:
 					resource, lastpri = r, priority
 			return resources[resource][field]
 
@@ -156,16 +156,16 @@ class Roster(plugin.PlugIn):
 	def getShow(self, jid):
 		""" Returns "show" value of jid. Jid should be a full (not bare).
 		"""
-		return(self._getResourceData(jid, "show"))
+		return self._getResourceData(jid, "show")
 
 	def getStatus(self, jid):
 		""" Returns "status" value of jid. Jid should be a full (not bare).
 		"""
-		return(self._getResourceData(jid, "status"))
+		return self._getResourceData(jid, "status")
 
 	def getSubscription(self, jid):
 		""" Returns "subscription" value of jid. """
-		return(self._getItemData(jid, "subscription"))
+		return self._getItemData(jid, "subscription")
 
 	def getResources(self, jid):
 		""" Returns list of connected resources of jid.

@@ -26,78 +26,78 @@ gChatterCache = {}
 gUpdateCount = {}
 
 def setDefChatterValue(conference):
-	if(getConfigKey(conference, "chatter") is None):
+	if getConfigKey(conference, "chatter") is None:
 		setConfigKey(conference, "chatter", 0)
 
 def loadChatterBase(conference):
-	fileName = getConfigPath(conference, CHATTERBOX_FILE)
-	utils.createFile(fileName, "[]")
-	gChatterCache[conference] = eval(utils.readFile(fileName))
+	path = getConfigPath(conference, CHATTERBOX_FILE)
+	utils.createFile(path, "[]")
+	gChatterCache[conference] = eval(utils.readFile(path))
 	gUpdateCount[conference] = 0
 
 def freeChatterBase(conference):
-	del(gChatterCache[conference])
+	del gChatterCache[conference]
 
 def removeNicks(message, nickList):
 	nickFound = False
 	_startswith = message.startswith
 	for nick in nickList:
-		if(_startswith(nick)):
+		if _startswith(nick):
 			for x in [nick + x for x in (":", ",")]:
-				if(_startswith(x)):
+				if _startswith(x):
 					message = message.replace(x, "")
 					nickFound = True
-		if(nickFound):
+		if nickFound:
 			break
-	return(message)
+	return message
 
 def processChatter(stanza, msgType, conference, nick, trueJid, message):
-	if(protocol.TYPE_PUBLIC == msgType and getConfigKey(conference, "chatter")):
-		if(not nick): # topic
+	if protocol.TYPE_PUBLIC == msgType and getConfigKey(conference, "chatter"):
+		if not nick: # topic
 			return
 		botNick = getBotNick(conference)
-		if(nick == botNick):
+		if nick == botNick:
 			return
 
 		isHiglight = message.startswith(botNick)
 
-		if(isHiglight or not random.randrange(0, REPLY_CHANCE)):
+		if isHiglight or not random.randrange(0, REPLY_CHANCE):
 			message = removeNicks(message, getNicks(conference)).strip()
-			if(message):
+			if message:
 				command = message.split()[0].lower()
 				_isCommand = isCommand(command) and isCommandType(command, CHAT)
 				_isMacros = gMacros.hasMacros(command, conference) or gMacros.hasMacros(command)
-				if(_isCommand or _isMacros):
+				if _isCommand or _isMacros:
 					return
-				if(gChatterCache[conference]):
+				if gChatterCache[conference]:
 					text = random.choice(gChatterCache[conference])
 					isMe = text.startswith("/me")
 					time.sleep(len(text) / 4 + random.randrange(1, 5))
-					if(not isMe and (isHiglight or not random.randrange(0, 2))):
+					if not isMe and (isHiglight or not random.randrange(0, 2)):
 						sendMsg(msgType, conference, nick, text, True)
 					else:
 						sendToConference(conference, text)
-		if(isHiglight or not random.randrange(0, SAVE_CHANCE)):
+		if isHiglight or not random.randrange(0, SAVE_CHANCE):
 			message = removeNicks(message, getNicks(conference)).strip()
-			if(message):
+			if message:
 				command = message.split()[0]
-				if(isCommand(command) or gMacros.hasMacros(command, conference) or gMacros.hasMacros(command)):
+				if isCommand(command) or gMacros.hasMacros(command, conference) or gMacros.hasMacros(command):
 					return
-				if(len(gChatterCache[conference]) >= MAX_MSG_COUNT):
+				if len(gChatterCache[conference]) >= MAX_MSG_COUNT:
 					randNum = random.randrange(0, MAX_MSG_COUNT)
-					del(gChatterCache[conference][randNum])
+					del gChatterCache[conference][randNum]
 				gChatterCache[conference].append(message)
 				gUpdateCount[conference] += 1
-				if(gUpdateCount[conference] >= MSG_COUNT_TO_SAVE):
-					fileName = getConfigPath(conference, CHATTERBOX_FILE)
-					utils.writeFile(fileName, str(gChatterCache[conference]))
+				if gUpdateCount[conference] >= MSG_COUNT_TO_SAVE:
+					path = getConfigPath(conference, CHATTERBOX_FILE)
+					utils.writeFile(path, str(gChatterCache[conference]))
 					gUpdateCount[conference] = 0
 
 def manageChatterValue(msgType, conference, nick, param):
-	if(param):
-		if(param.isdigit()):
+	if param:
+		if param.isdigit():
 			param = int(param)
-			if(param == 1):
+			if param == 1:
 				setConfigKey(conference, "chatter", 1)
 				sendMsg(msgType, conference, nick, u"болталка включена")
 			else:

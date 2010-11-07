@@ -15,28 +15,26 @@
 
 CMDACCESS_FILE = 'cmdaccess.txt'
 
-gCmdAccess = {}
-
 def saveCommandAccesses():
 	global gCommandAccess
-	fileName = getConfigPath(CMDACCESS_FILE)
-	utils.writeFile(fileName, str(gCommandAccess))
+	path = getConfigPath(CMDACCESS_FILE)
+	utils.writeFile(path, str(gCommandAccess))
 
 def loadCommandAccesses():
-	global gCommandAccess;
-	fileName = getConfigPath(CMDACCESS_FILE)
-	utils.createFile(fileName, '{}')
-	gCommandAccess = eval(utils.readFile(fileName))
+	global gCommandAccess
+	path = getConfigPath(CMDACCESS_FILE)
+	utils.createFile(path, '{}')
+	gCommandAccess = eval(utils.readFile(path))
 	for command in gCommandAccess:
 		gCommands[command][CMD_ACCESS] = gCommandAccess[command]
 
 def changeCommandAccess(msgType, conference, nick, param):
 	param = param.split()
-	if(len(param) == 2):
+	if len(param) == 2:
 		command = param[0]
 		access = param[1]
-		if(isCommand(command)):
-			if(access.isdigit() and -100 <= int(access) <= 100):
+		if isCommand(command):
+			if access.isdigit() and -100 <= int(access) <= 100:
 				access = int(access)
 				gCommandAccess[command] = access
 				gCommands[command][CMD_ACCESS] = access
@@ -44,7 +42,7 @@ def changeCommandAccess(msgType, conference, nick, param):
 				sendMsg(msgType, conference, nick, u'запомнила')
 			else:
 				sendMsg(msgType, conference, nick, u'ошибочный запрос')
-				return;
+				return
 		else:
 			sendMsg(msgType, conference, nick, u'не вижу команду')
 	else:

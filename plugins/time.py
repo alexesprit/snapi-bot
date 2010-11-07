@@ -16,7 +16,7 @@
 
 def showUserTime(msgType, conference, nick, param):
 	if param:
-		if(conferenceInList(conference) and nickIsOnline(conference, param)):
+		if conferenceInList(conference) and nickIsOnline(conference, param):
 			jid = conference + "/" + param
 		else:
 			jid = param

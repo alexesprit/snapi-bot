@@ -1,1 +1,1 @@
-from macros import Macros;
+from macros import Macros

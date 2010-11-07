@@ -39,7 +39,7 @@ def sendNotices(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, "Сообщение ушло в %d конференций из %d" % (count, len(conferences)))
 
 def setDefNoticeValue(conference):
-	if(getConfigKey(conference, "notices") is None):
+	if getConfigKey(conference, "notices") is None:
 		setConfigKey(conference, "notices", 1)
 
 registerEvent(setDefNoticeValue, ADDCONF)

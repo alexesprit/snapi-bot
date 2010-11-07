@@ -68,7 +68,7 @@ class Node(object):
 		if nsp:
 			for k, v in nsp.items():
 				self.nsp_cache[k] = v
-		if(not attrs):
+		if not attrs:
 			attrs = {}
 		for attr, val in attrs.items():
 			if attr == 'xmlns':
@@ -85,7 +85,7 @@ class Node(object):
 					self.namespace,self.name = tag.split()
 				else:
 					self.name = tag
-		if(not payload):
+		if not payload:
 			payload = []
 		if isinstance(payload, basestring):
 			payload = [payload]

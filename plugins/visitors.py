@@ -18,13 +18,13 @@ VISITORS_FILE = "visitors.txt"
 gVisitors = {}
 
 def saveAutoVisitors(conference):
-	fileName = getConfigPath(conference, VISITORS_FILE)
-	utils.writeFile(fileName, str(gVisitors[conference]))
+	path = getConfigPath(conference, VISITORS_FILE)
+	utils.writeFile(path, str(gVisitors[conference]))
 
 def loadAutoVisitors(conference):
-	fileName = getConfigPath(conference, VISITORS_FILE)
-	utils.createFile(fileName, "[]")
-	gVisitors[conference] = eval(utils.readFile(fileName))
+	path = getConfigPath(conference, VISITORS_FILE)
+	utils.createFile(path, "[]")
+	gVisitors[conference] = eval(utils.readFile(path))
 
 def freeAutoVisitors(conference):
 	del gVisitors[conference]
@@ -62,7 +62,7 @@ def delAutoVisitort(msgType, conference, nick, param):
 	setParticipantRole = False
 	if nickInConference(conference, user):
 		trueJid = getTrueJid(conference, user)
-		if(getNickKey(conference, user, NICK_HERE)):
+		if getNickKey(conference, user, NICK_HERE):
 			setParticipantRole = True
 	elif isJid(user):
 		trueJid = user
@@ -82,7 +82,7 @@ def delAutoVisitort(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"А %s итак нет в списке" % (param))
 
 def showAutoVisitors(msgType, conference, nick, param):
-	if(gVisitors[conference]):
+	if gVisitors[conference]:
 		items = [u"%d) %s" % (i + 1, moder) for i, moder in enumerate(gVisitors[conference])]
 		message = u"Список автомодераторов:\n%s" % ("\n".join(items))
 		sendMsg(msgType, conference, nick, message)

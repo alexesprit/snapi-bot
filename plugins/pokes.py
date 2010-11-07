@@ -19,8 +19,8 @@ gPokes = []
 
 def loadPokes():
 	global gPokes
-	fileName = getFilePath(RESOURCE_DIR, POKES_FILE)
-	gPokes = eval(utils.readFile(fileName, "utf-8"))
+	path = getFilePath(RESOURCE_DIR, POKES_FILE)
+	gPokes = eval(utils.readFile(path, "utf-8"))
 
 def pokeUser(msgType, conference, nick, param):
 	if msgType == protocol.TYPE_PUBLIC:
@@ -28,7 +28,7 @@ def pokeUser(msgType, conference, nick, param):
 			botNick = getBotNick(conference)
 			if param == u"всех":
 				for userNick in getOnlineNicks(conference):
-					if(userNick != botNick and userNick != nick):
+					if userNick != botNick and userNick != nick:
 						message = random.choice(gPokes)
 						sendToConference(conference, u"/me " + message % (userNick))
 						time.sleep(0.5)

@@ -16,7 +16,10 @@ import urllib2
 
 DUMPZ_LANGS_FILE = "dumpzlangs.txt"
 
-DUMPZ_LANGS = {}
+def loadLangsForDumpz():
+	global DUMPZ_LANGS
+	path = getFilePath(RESOURCE_DIR, DUMPZ_LANGS_FILE)
+	DUMPZ_LANGS = eval(utils.readFile(path))
 
 def uploadToDumpz(msgType, conference, nick, param):
 	if u"языки" == param.lower():
@@ -42,12 +45,7 @@ def uploadToDumpz(msgType, conference, nick, param):
 		res = urllib2.urlopen(req)
 		sendMsg(msgType, conference, nick, u"Залито на %s" % (res.url))
 
-def loadDumpzLanguages():
-	global DUMPZ_LANGS
-	fileName = getFilePath(RESOURCE_DIR, DUMPZ_LANGS_FILE)
-	DUMPZ_LANGS = eval(utils.readFile(fileName))
-
-registerEvent(loadDumpzLanguages, STARTUP)
+registerEvent(loadLangsForDumpz, STARTUP)
 
 registerCommand(uploadToDumpz, u"пастебин", 10, 
 				u"Заливает текст на пастебин-сервис dumpz.org. Указав \"языки\" в кач-ве параметра можно посмотреть доступные языки", 

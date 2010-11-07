@@ -82,13 +82,13 @@ def showAllLocalKeys(msgType, conference, nick, parameters):
 		sendMsg(msgType, conference, nick, "База пуста!")
 
 def loadLocalBase(conference):
-	fileName = getConfigPath(conference, LOCALDB_FILE)
-	utils.createFile(fileName, "{}")
-	gLocalBase[conference] = eval(utils.readFile(fileName))
+	path = getConfigPath(conference, LOCALDB_FILE)
+	utils.createFile(path, "{}")
+	gLocalBase[conference] = eval(utils.readFile(path))
 
 def saveLocalBase(conference):
-	fileName = getConfigPath(conference, LOCALDB_FILE)
-	utils.writeFile(fileName, str(gLocalBase[conference]))
+	path = getConfigPath(conference, LOCALDB_FILE)
+	utils.writeFile(path, str(gLocalBase[conference]))
 
 def freeLocalBase(conference):
 	del gLocalBase[conference]

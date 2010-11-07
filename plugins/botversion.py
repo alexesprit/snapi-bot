@@ -21,17 +21,17 @@ def setBotVersion(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"|".join(gVersion))
 	elif param.count("|") == 2:
 		gVersion = tuple(param.split("|"))
-		fileName = getConfigPath(VER_FILE)
-		utils.writeFile(fileName, str(gVersion))
+		path = getConfigPath(VER_FILE)
+		utils.writeFile(path, str(gVersion))
 		sendMsg(msgType, conference, nick, u"Поняла, сейчас поставлю")
 	else:
 		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
 def loadBotVersion():
 	global gVersion
-	fileName = getConfigPath(VER_FILE)
-	utils.createFile(fileName, str(gVersion))
-	gVersion = eval(utils.readFile(fileName))
+	path = getConfigPath(VER_FILE)
+	utils.createFile(path, str(gVersion))
+	gVersion = eval(utils.readFile(path))
 
 registerEvent(loadBotVersion, STARTUP)
 

@@ -57,7 +57,7 @@ registerCommand(pythonEval, u"eval", 100,
 				ANY | FROZEN | PARAM)
 registerCommand(pythonExec, u"exec", 100, 
 				u"Выполняет выражение питона", u"exec <выражение>", 
-				(u"exec del(gConferences)", ), 
+				(u"exec del gConferences", ), 
 				ANY | FROZEN | PARAM)
 registerCommand(pythonShell, u"sh", 100, 
 				u"Выполняет шелл-команду", u"sh <команда>", 

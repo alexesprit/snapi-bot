@@ -69,9 +69,9 @@ def ustr(text):
 
 def createFile(path, data):
 	path = path.encode("utf-8")
-	if(not os.access(path, os.F_OK)):
+	if not os.access(path, os.F_OK):
 		dirName = os.path.dirname(path)
-		if(not os.path.exists(dirName)):
+		if not os.path.exists(dirName):
 			os.makedirs(dirName)
 		f = file(path, "w")
 		f.write(data)

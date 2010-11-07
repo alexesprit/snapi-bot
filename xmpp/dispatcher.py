@@ -234,7 +234,7 @@ class Dispatcher(plugin.PlugIn):
 
 		stanzaType = stanza.getType()
 		stanzaID = stanza.getID()
-		if(not stanzaType): 
+		if not stanzaType: 
 			stanzaType = ""
 		stanzaProps = stanza.getProperties()
 		session.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID))
@@ -308,15 +308,13 @@ class Dispatcher(plugin.PlugIn):
 			return self._owner_send(stanza)
 		if not isinstance(stanza, protocol.Stanza): 
 			stanzaID = None
-		elif(not stanza.getID()):
+		elif not stanza.getID():
 			global gID
 			gID += 1
 			stanzaID = str(gID)
 			stanza.setID(stanzaID)
 		else:
 			stanzaID = stanza.getID()
-		#if(self._owner._registeredName and not stanza.getAttr("from")):
-		#	stanza.setAttr("from", self._owner._registeredName)
 		stanza.setNamespace(self._owner.Namespace)
 		self._owner_send(stanza)
 		return stanzaID

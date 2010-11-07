@@ -29,13 +29,13 @@ def calculateRecord(conference, nick, trueJid, aff, role):
 	if userCount >= lastCount:
 		gRecords[conference]["time"] = time.strftime("%d.%m.%y, %H:%M")
 		gRecords[conference]["count"] = userCount
-		fileName = getConfigPath(conference, REC_FILE)
-		utils.writeFile(fileName, str(gRecords[conference]))
+		path = getConfigPath(conference, REC_FILE)
+		utils.writeFile(path, str(gRecords[conference]))
 
 def loadRecordsBase(conference):
-	fileName = getConfigPath(conference, REC_FILE)
-	utils.createFile(fileName, "{}")
-	gRecords[conference] = eval(utils.readFile(fileName))
+	path = getConfigPath(conference, REC_FILE)
+	utils.createFile(path, "{}")
+	gRecords[conference] = eval(utils.readFile(path))
 
 def freeRecordsBase(conference):
 	del gRecords[conference]

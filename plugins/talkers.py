@@ -81,22 +81,22 @@ def showTalkerInfo(msgType, conference, nick, param):
 def updateTalkersInfo(stanza, msgType, conference, nick, trueJid, body):
 	if trueJid != gJid and msgType == protocol.TYPE_PUBLIC and nick:
 		base = gTalkersCache[conference]
-		if(trueJid in base):
+		if trueJid in base:
 			base[trueJid]["nick"] = nick
 		else:
 			base[trueJid] = {"nick": nick, "words": 0, "messages": 0, "mes": 0}
-		if(body.startswith("/me")):
+		if body.startswith("/me"):
 			base[trueJid]["mes"] += 1
 		else:
 			base[trueJid]["messages"] += 1
 		base[trueJid]["words"] += len(body.split())
 
 def loadTalkersBase(conference):
-	fileName = getConfigPath(conference, TALKERS_FILE)
-	gTalkersCache[conference] = database.DataBase(fileName)
+	path = getConfigPath(conference, TALKERS_FILE)
+	gTalkersCache[conference] = database.DataBase(path)
 
 def freeTalkersBase(conference):
-	del(gTalkersCache[conference])
+	del gTalkersCache[conference]
 
 def saveAllTalkersBases():
 	for conference in getConferences():
@@ -108,7 +108,7 @@ registerEvent(saveAllTalkersBases, SHUTDOWN)
 registerMessageHandler(updateTalkersInfo, CHAT)
 
 registerCommand(showTalkerInfo, u"болтун", 10, 
-				u"Показывает статистику болтливости указанного пользователя", 
+				u"Показывает статистику болтливости указанного пользователя. Параметр \"топ\" - список десяти самых болтливых. Параметр \"сброс\" - очистка статистики", 
 				u"болтун [ник]", 
-				(u"болтун Nick", u"болтун топ"), 
+				(u"болтун", u"болтун Nick", u"болтун топ"), 
 				CHAT)

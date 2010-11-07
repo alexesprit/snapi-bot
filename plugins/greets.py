@@ -18,12 +18,12 @@ GREET_FILE = "greets.txt"
 gGreets = {}
 
 def loadGreetings(conference):
-	fileName = getConfigPath(conference, GREET_FILE)
-	utils.createFile(fileName, "{}")
-	gGreets[conference] = eval(utils.readFile(fileName))
+	path = getConfigPath(conference, GREET_FILE)
+	utils.createFile(path, "{}")
+	gGreets[conference] = eval(utils.readFile(path))
 
 def freeGreetings(conference):
-	del(gGreets[conference])
+	del gGreets[conference]
 
 def setUserGreeting(msgType, conference, nick, param):
 	rawGreet = param.split("=", 1)
@@ -42,8 +42,8 @@ def setUserGreeting(msgType, conference, nick, param):
 				del gGreets[conference][trueJid]
 		else:
 			gGreets[conference][trueJid] = greet
-		fileName = getConfigPath(conference, GREET_FILE)
-		utils.writeFile(fileName, str(gGreets[conference]))
+		path = getConfigPath(conference, GREET_FILE)
+		utils.writeFile(path, str(gGreets[conference]))
 		sendMsg(msgType, conference, nick, u"Запомнила")
 
 def sendUserGreeting(conference, nick, trueJid, aff, role):

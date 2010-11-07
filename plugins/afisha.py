@@ -72,7 +72,7 @@ TIME_OFFSET = {
 	"yaroslavl": +3
 }
 
-def CompareTimes(x,y):
+def CompareTimes(x, y):
 	if (x[3]>y[3] and (y[3]>3 or (y[3]<=3 and x[3]<=3))) or (x[3]==y[3] and x[4]>y[4]) or (x[3]<=3 and y[3]>3):
 		return 1
 	if (y[3]>x[3] and (x[3]>3 or (x[3]<=3 and y[3]<=3))) or (y[3]==x[3] and y[4]>x[4]) or (y[3]<=3 and x[3]>3):
@@ -88,84 +88,73 @@ def CompareSchedules(a, b):
 		b = time.strptime(b[2], "%H:%M")
 	elif isinstance(b, basestring):
 		b = time.strptime(b, "%H:%M")
-	return(CompareTimes(a, b))
+	return CompareTimes(a, b)
 
 def getFullSchedule(city):
 	now = time.localtime()
-	if(city in gAfishaCache):
-		x=time.localtime(gAfishaCache[city]["lastupdated"])
-		x1=time.localtime(gAfishaCache[city]["lastupdated"] + 86400)
-		if (now[2]==x[2] and now[1]==x[1] and now[0]==x[0] and (x[3]>3 and now[3]>3 or x[3]<=3 and now[3]<=3)) or (now[2]==x1[2] and now[1]==x1[1] and now[0]==x1[0] and now[3]<=3 and x1[3]>3):
-			return(gAfishaCache[city]["schedule"])
+	if city in gAfishaCache:
+		x = time.localtime(gAfishaCache[city]["update"])
+		x1 = time.localtime(gAfishaCache[city]["update"] - 86400)
+		if (now[2] == x[2] and now[1] == x[1] and now[0] == x[0] \
+			and (x[3] > 3 and now[3] > 3 or x[3] <= 3 and now[3] <= 3)) \
+			or (now[2] == x1[2] and now[1] == x1[1] and now[0] == x1[0] and now[3] <= 3 and x1[3] > 3):
+			return gAfishaCache[city]["schedule"]
 	schedule = []
-	getcinema=re.compile(u"class=\"b-td-item\">(?:[^>]+)>([^<]+)</a")
-	gettime=re.compile(u"<span (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")
-	gettime2=re.compile(u"<a (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")
+	getcinema = re.compile(u"class=\"b-td-item\">(?:[^>]+)>([^<]+)</a")
+	gettime = re.compile(u"<span (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")
+	gettime2 = re.compile(u"<a (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")
 	site = urllib.urlopen("http://www.afisha.ru/%s/schedule_cinema/" % (city))
 	text = unicode(site.read(), "utf-8")
-	list1=re.split(u"<h3 class=\"usetags\">([^>]+)>(?:\s*)([^<]+)(?:\s*)<", text, re.DOTALL)
-	timetable=re.compile(u"table>")
-	films=zip(list1[2::3],list1[3::3])
+	list1 = re.split(u"<h3 class=\"usetags\">([^>]+)>(?:\s*)([^<]+)(?:\s*)<", text, re.DOTALL)
+	timetable = re.compile(u"table>")
+	films = zip(list1[2::3],list1[3::3])
 	for film in films:
-		list2=getcinema.split(timetable.split(film[1])[1],re.DOTALL)
-		cinemas=zip(list2[1::2],list2[2::2])
+		list2 = getcinema.split(timetable.split(film[1])[1], re.DOTALL)
+		cinemas = zip(list2[1::2], list2[2::2])
 		for cinema in cinemas:
-			list3=gettime.split(cinema[1],re.DOTALL)
+			list3 = gettime.split(cinema[1],re.DOTALL)
 			for time1 in list3[1::2]:
 				if gettime2.match(time1):
-					if gettime2.split(time1)[1].find(":")>-1:
-						schedule.append((film[0],cinema[0],gettime2.split(time1)[1]))
+					if gettime2.split(time1)[1].find(":") > -1:
+						schedule.append((film[0], cinema[0], gettime2.split(time1)[1]))
 				else:
-					if time1.find(":")>-1:
-						schedule.append((film[0],cinema[0],time1))
+					if time1.find(":") > -1:
+						schedule.append((film[0], cinema[0], time1))
 	schedule.sort(CompareSchedules)
 	gAfishaCache[city] = {}
-	gAfishaCache[city]["lastupdated"] = time.time()
+	gAfishaCache[city]["update"] = time.time()
 	gAfishaCache[city]["schedule"] = schedule
 	return schedule
 
 def getCityTime(city):
 	offset = time.localtime()[8] and 1 or 0
 	now = time.gmtime(time.time() + (TIME_OFFSET[city] + offset) * 3600)
-	return(now)
+	return now
 
 def getCinemas(city):
-	schedude = getFullSchedule(city)
-	c = []
-	for i in schedude:
-		if(i[1] not in c):
-			c.append(i[1])
-	c.sort()
-	return(c)
+	schedule = getFullSchedule(city)
+	cinemas = list(set([i[1] for i in schedule]))	
+	cinemas.sort()
+	return cinemas
 
 def getFilms(city):
-	schedude = getFullSchedule(city)
-	c = []
-	for i in schedude:
-		if(i[0] not in c):
-			c.append(i[0])
-	c.sort()
-	return(c)
+	schedule = getFullSchedule(city)
+	films = list(set([i[0] for i in schedule]))	
+	films.sort()
+	return films
 	
 def getCities():
-	c1 = []
-	c2 = []
-	for i in AFISHA_CITIES:
-		if(AFISHA_CITIES[i] not in c2):
-			c1.append(i)
-			c2.append(AFISHA_CITIES[i])
-	c1.sort()
-	return(c1)
+	return sorted(AFISHA_CITIES.keys())
 
 def getSchedule(city, now, cinema, film):
 	ls = []
 	schedule = getFullSchedule(city)
 	n = 0
 	for i in schedule:
-		if(not cinema or cinema.lower() == i[1].lower()) and (not film or film.lower() == i[0].lower()) and (not now or CompareSchedules(i[2], now) == 1) and n < 10:
+		if (not cinema or cinema.lower() == i[1].lower()) and (not film or film.lower() == i[0].lower()) and (not now or CompareSchedules(i[2], now) == 1) and n < 10:
 			ls.append(i)
 			n += 1
-	return(ls)
+	return ls
 
 def kinoAfisha(args):
 	hasDate = re.search(u"\d:\d", args)
@@ -191,7 +180,7 @@ def kinoAfisha(args):
 				pass
 		cinema = args[2].capitalize()
 	elif len(args) == 2:
-		if(hasDate):
+		if hasDate:
 			try:
 				now = time.strptime(args[1], "%H:%M")
 			except(ValueError):
@@ -203,8 +192,8 @@ def kinoAfisha(args):
 	strTime = time.strftime(u"%H:%M", now)
 	if not cinema:
 		schedule = getSchedule(cityCode, now, None, None)
-		if(schedule):
-			return u"После %s в городе %s пройдут фильмы:\n%s" % (strTime, city, "\n".join([u"%s: %s - %s" % (i[2], i[0], i[1]) for i in schedule]))
+		if schedule:
+			return u"После %s в городе %s пройдут фильмы:\n%s" % (strTime, city, "\n".join([u"%s: %s (%s)" % (i[2], i[0], i[1]) for i in schedule]))
 		else:
 			return u"После %s в городе %s фильмов не найдено" % (strTime, city)
 	elif cinema.lower() in [i.lower() for i in getCinemas(cityCode)]:

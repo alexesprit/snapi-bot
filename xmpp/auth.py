@@ -112,7 +112,7 @@ class SASL(plugin.PlugIn):
 		if challenge.getName() == "failure":
 			self.state = AUTH_FAILURE
 			children = challenge.getChildren()
-			if(children):
+			if children:
 				reason = children[0]
 			else:
 				reason = challenge

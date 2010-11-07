@@ -164,7 +164,7 @@ def setDefLoggingValue(conference):
 	if getConfigKey(conference, "log") is None:
 		setConfigKey(conference, "log", 1)
 
-if(gLogDir):
+if gLogDir:
 	registerJoinHandler(writeUserJoin)
 	registerLeaveHandler(writeUserLeave)
 	registerPresenceHandler(writePresence, CHAT)
