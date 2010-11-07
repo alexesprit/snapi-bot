@@ -79,7 +79,7 @@ def processExpression(stanza, msgType, conference, nick, trueJid, text):
 					if re.search(exp, text, re.DOTALL):
 						sendMsg(msgType, conference, nick, gExpressions[conference][exp])
 						return
-				except(re.error):
+				except re.error:
 					pass
 
 registerEvent(loadExpressions, ADDCONF)

@@ -252,7 +252,7 @@ def execute(function, param=None):
 		else:
 			with gSemaphore:
 				function()
-	except(Exception):
+	except Exception:
 		saveException(function.__name__)
 
 def getUsedMemorySize():

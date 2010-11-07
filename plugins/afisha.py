@@ -176,14 +176,14 @@ def kinoAfisha(args):
 		if hasDate:
 			try:
 				now = time.strptime(args[1], "%H:%M")
-			except(ValueError):
+			except ValueError:
 				pass
 		cinema = args[2].capitalize()
 	elif len(args) == 2:
 		if hasDate:
 			try:
 				now = time.strptime(args[1], "%H:%M")
-			except(ValueError):
+			except ValueError:
 				pass
 		else:
 			cinema = args[1].capitalize()

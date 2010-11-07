@@ -246,7 +246,7 @@ class Dispatcher(plugin.PlugIn):
 				session.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), "ok")
 				try:
 					function(stanza, *args)
-				except(protocol.NodeProcessed):
+				except protocol.NodeProcessed:
 					pass
 			else:
 				session.printf("Expected stanza arrived!", "ok")

@@ -15,7 +15,7 @@
 # $Id: simplexml.py,v 1.34 2009/03/03 10:24:02 normanr Exp $
 
 """ Simplexml module provides xmpppy library with all needed tools to handle XML nodes and XML streams.
-	I'm personally using it in many other separate projects. It is designed to be as standalone as possible.
+	I"m personally using it in many other separate projects. It is designed to be as standalone as possible.
 """
 
 import xml.parsers.expat
@@ -55,8 +55,8 @@ class Node(object):
 				for k, v in node.nsd.items():
 					self.nsd[k] = v
 		else:
-			self.name = 'tag'
-			self.namespace = ''
+			self.name = "tag"
+			self.namespace = ""
 			self.attrs = {}
 			self.data = []
 			self.children = []
@@ -71,17 +71,17 @@ class Node(object):
 		if not attrs:
 			attrs = {}
 		for attr, val in attrs.items():
-			if attr == 'xmlns':
-				self.nsd[u''] = val
-			elif attr.startswith('xmlns:'):
+			if attr == "xmlns":
+				self.nsd[u""] = val
+			elif attr.startswith("xmlns:"):
 				self.nsd[attr[6:]] = val
 			self.attrs[attr]=attrs[attr]
 		if tag:
 			if node_built:
-				pfx, self.name = ([''] + tag.split(':'))[-2:]
+				pfx, self.name = ([""] + tag.split(":"))[-2:]
 				self.namespace = self.lookup_nsp(pfx)
 			else:
-				if ' ' in tag:
+				if " " in tag:
 					self.namespace,self.name = tag.split()
 				else:
 					self.name = tag
@@ -95,7 +95,7 @@ class Node(object):
 			else:
 				self.data.append(ustr(i))
 
-	def lookup_nsp(self, pfx=''):
+	def lookup_nsp(self, pfx=""):
 		ns = self.nsd.get(pfx)
 		if ns is None:
 			ns = self.nsp_cache.get(pfx)
@@ -104,7 +104,7 @@ class Node(object):
 					ns = self.parent.lookup_nsp(pfx)
 					self.nsp_cache[pfx] = ns
 				else:
-					return 'http://www.gajim.org/xmlns/undeclared'
+					return "http://www.gajim.org/xmlns/undeclared"
 		return ns
 
 	def __str__(self):
@@ -113,11 +113,11 @@ class Node(object):
 		s = "<" + self.name
 		if self.namespace:
 			if not self.parent or self.parent.namespace != self.namespace:
-				if 'xmlns' not in self.attrs:
-					s = s + ' xmlns="%s"' % (self.namespace)
+				if "xmlns" not in self.attrs:
+					s = s + " xmlns="%s"" % (self.namespace)
 		for key in self.attrs.keys():
 			val = ustr(self.attrs[key])
-			s = s + ' %s="%s"' % (key, escapeXML(val))
+			s = s + " %s="%s"" % (key, escapeXML(val))
 		s = s + ">"
 		if self.children:
 			for child in self.children:
@@ -133,7 +133,7 @@ class Node(object):
 
 	def addChild(self, name=None, attrs=None, payload=None, namespace=None, node=None):
 		""" If "node" argument is provided, adds it as child node. Else creates new node from
-			the other arguments' values and adds it as well.
+			the other arguments" values and adds it as well.
 		"""
 		if node:
 			newnode = node
@@ -201,7 +201,7 @@ class Node(object):
 	def getData(self):
 		""" Returns all node CDATA as string (concatenated).
 		"""
-		return ''.join(self.data)
+		return "".join(self.data)
 
 	def setData(self, data):
 		""" Sets node's CDATA to provided string. Resets all previous CDATA!
@@ -242,7 +242,7 @@ class Node(object):
 	def getPayload(self):
 		""" Return the payload of node i.e. list of child nodes and CDATA entries.
 			F.e. for "<node>text1<nodea/><nodeb/> text2</node>" will be returned list:
-			['text1', <nodea instance>, <nodeb instance>, ' text2'].
+			["text1", <nodea instance>, <nodeb instance>, " text2"].
 		"""
 		ret = []
 		for i in range(max(len(self.data), len(self.children))):
@@ -285,7 +285,7 @@ class Node(object):
 		"""
 		try:
 			return self.getTag(tag).attrs[attr]
-		except(AttributeError, KeyError):
+		except AttributeError, KeyError:
 			return None
 
 	def setTagAttr(self, tag, attr, val):
@@ -302,7 +302,7 @@ class Node(object):
 		"""
 		try:
 			return self.getTag(tag).getData()
-		except(AttributeError):
+		except AttributeError:
 			return None
 
 	def setTagData(self, tag, val, attrs=None):
@@ -318,7 +318,7 @@ class Node(object):
 		""" Filters all child nodes using specified arguments as filter.
 			Returns the list of nodes found.
 		"""
-		nodes=[]
+		nodes = []
 		if not attrs:
 			attrs = {}
 		for node in self.children:
@@ -328,9 +328,8 @@ class Node(object):
 				continue
 			if node.getName() == name:
 				for key in attrs:
-				   if key not in node.attrs or \
-						node.attrs[key] != attrs[key]:
-					break
+					if key not in node.attrs or node.attrs[key] != attrs[key]:
+						break
 				else:
 					nodes.append(node)
 			if one and nodes:
@@ -350,9 +349,8 @@ class Node(object):
 				continue
 			if node.getName() == name:
 				for key in attrs:
-					if key not in node.attrs or \
-						node.attrs[key]!=attrs[key]:
-							break
+					if key not in node.attrs or node.attrs[key]!=attrs[key]:
+						break
 				else:
 					yield node
 
@@ -384,17 +382,16 @@ class NodeBuilder:
 		self._dispatch_depth = 1
 		self._document_attrs = None
 		self._document_nsp = None
-		self._mini_dom=initial_node
+		self._mini_dom = initial_node
 		self.last_is_data = 1
-		self._ptr=None
+		self._ptr = None
 		self.data_buffer = None
-		self.streamError = ''
 		if data:
 			self._parser.Parse(data,1)
 
 	def check_data_buffer(self):
 		if self.data_buffer:
-			self._ptr.data.append(''.join(self.data_buffer))
+			self._ptr.data.append("".join(self.data_buffer))
 			del self.data_buffer[:]
 			self.data_buffer = None
 
@@ -419,27 +416,27 @@ class NodeBuilder:
 				Node(self._mini_dom, tag=tag, attrs=attrs, nsp=self._document_nsp, node_built=True)
 			self._ptr = self._mini_dom
 		elif self.__depth > self._dispatch_depth:
-			self._ptr.children.append(Node(tag=tag,parent=self._ptr,attrs=attrs, node_built=True))
+			self._ptr.children.append(Node(tag=tag, parent=self._ptr, attrs=attrs, node_built=True))
 			self._ptr = self._ptr.children[-1]
 		if self.__depth == 1:
 			self._document_attrs = {}
 			self._document_nsp = {}
-			nsp, name = (['']+tag.split(':'))[-2:]
+			nsp, name = ([""]+tag.split(":"))[-2:]
 			for attr, val in attrs.items():
-				if attr == 'xmlns':
-					self._document_nsp[u''] = val
-				elif attr.startswith('xmlns:'):
+				if attr == "xmlns":
+					self._document_nsp[u""] = val
+				elif attr.startswith("xmlns:"):
 					self._document_nsp[attr[6:]] = val
 				else:
 					self._document_attrs[attr] = val
-			ns = self._document_nsp.get(nsp, 'http://www.gajim.org/xmlns/undeclared-root')
+			ns = self._document_nsp.get(nsp, "http://www.gajim.org/xmlns/undeclared-root")
 			try:
 				self.stream_header_received(ns, name, attrs)
 			except ValueError, e:
 				self._document_attrs = None
 				raise ValueError(str(e))
 		if not self.last_is_data and self._ptr.parent:
-			self._ptr.parent.data.append('')
+			self._ptr.parent.data.append("")
 		self.last_is_data = 0
 
 	def endtag(self, tag ):
@@ -447,8 +444,6 @@ class NodeBuilder:
 		"""
 		self.check_data_buffer()
 		if self.__depth == self._dispatch_depth:
-			if self._mini_dom.getName() == 'error':
-				self.streamError = self._mini_dom.getChildren()[0].getName()
 			self.dispatch(self._mini_dom)
 		elif self.__depth > self._dispatch_depth:
 			self._ptr = self._ptr.parent
