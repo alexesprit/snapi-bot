@@ -40,7 +40,7 @@ def showHoroscope(msgType, conference, nick, param):
 	sign = param[0].lower()
 	if sign in HOROSCOPE_SIGNS:
 		rawsign = HOROSCOPE_SIGNS[sign]
-		if len(param) == 2:
+		if len(param) > 1:
 			date = param[1].lower()
 			if date in HOROSCOPE_DATES:
 				rawdate = HOROSCOPE_DATES[date]
@@ -48,7 +48,7 @@ def showHoroscope(msgType, conference, nick, param):
 				message = u"Можно указывать только следующее в кач-ве дат: %s" % (", ".join(HOROSCOPE_DATES.keys()))
 				sendMsg(msgType, conference, nick, message)
 				return
-		elif len(param) == 1:
+		else:
 			rawdate = u"today"
 
 		url = "http://img.ignio.com/r/export/utf/xml/daily/com.xml"
@@ -60,7 +60,7 @@ def showHoroscope(msgType, conference, nick, param):
 		date = xmlnode.getTagAttr("date", rawdate)
 		sendMsg(msgType, conference, nick, u"Гороскоп на %s: %s" % (date, text))
 	else:
-		message = u"Можно указывать только следующие знаки: %s" % (", ".join(HOROSCOPE_SIGNS.keys()))
+		message = u"Можно указывать только следующие знаки: %s" % (", ".join(sorted(HOROSCOPE_SIGNS.keys())))
 		sendMsg(msgType, conference, nick, message)
 
 registerCommand(showHoroscope, u"гороскоп", 10, 
