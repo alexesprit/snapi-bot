@@ -55,10 +55,12 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 			items = []
 			if "name" in attrs:
 				items.append(attrs["name"])
-			if not isJid(jid) and "jid" in attrs:
+				if not isJid(jid) and "jid" in attrs:
+					items.append(attrs["jid"])
+				if "node" in attrs:
+					items.append(attrs["node"])
+			else:
 				items.append(attrs["jid"])
-			if "node" in attrs:
-				items.append(attrs["node"])
 			if len(items) == 3:
 				if searchKey:
 					if not items[0].count(searchKey):
@@ -77,7 +79,7 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 						discoList.append(u"%d) %s\n%s" % (itemCount, items[1], items[0]))
 				else:
 					discoList.append(u"%d) %s\n%s" % (itemCount, items[1], items[0]))
-			else:
+			elif len(items) == 1:
 				if searchKey:
 					if not items[0].count(searchKey):
 						continue
