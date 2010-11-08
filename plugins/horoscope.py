@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # horoscope.py
-# Initial Copyright (c) 2007 Als <Als@exploit.in>
+# Initial Copyright (c) 2010 -Esprit-
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,40 +13,58 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-SIGNS = {
-	u"овен": 1,
-	u"телец": 2, 
-	u"близнецы": 3, 
-	u"рак": 4, 
-	u"лев": 5, 
-	u"дева": 6, 
-	u"весы": 7, 
-	u"скорпион": 8, 
-	u"стрелец": 9, 
-	u"козерог": 10, 
-	u"водолей": 11, 
-	u"рыбы": 12
+HOROSCOPE_SIGNS = {
+	u"овен": u"aries", 
+	u"телец": u"taurus", 
+	u"близнецы": u"gemini", 
+	u"рак": u"cancer", 
+	u"лев": u"leo", 
+	u"дева": u"virgo", 
+	u"весы": u"libra", 
+	u"скорпион": u"scorpio", 
+	u"стрелец": u"sagittarius", 
+	u"козерог": u"capricorn", 
+	u"водолей": u"aquarius", 
+	u"рыбы": u"pisces"
+}
+
+HOROSCOPE_DATES = {
+	u"вчера": u"yesterday", 
+	u"сегодня": u"today", 
+	u"завтра": u"tomorrow", 
+	u"послезавтра": u"tomorrow02"
 }
 
 def showHoroscope(msgType, conference, nick, param):
-	param = param.lower()
-	if param in SIGNS:
-		url = "http://horo.gala.net/?lang=ru&sign=%d" % (SIGNS[param])
-		rawHTML = urllib.urlopen(url).read()
-		items = re.search(r"<td class=stext>(.+?)</td>", rawHTML, re.DOTALL)
-		if items:
-			message = unicode(items.group(1), "cp1251")
-			if message == "---":
-				if protocol.TYPE_PUBLIC == msgType:
-					sendMsg(msgType, conference, nick, u"Ушёл")
-				sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
+	param = param.split()
+	sign = param[0].lower()
+	if sign in HOROSCOPE_SIGNS:
+		rawsign = HOROSCOPE_SIGNS[sign]
+		if len(param) == 2:
+			date = param[1].lower()
+			if date in HOROSCOPE_DATES:
+				rawdate = HOROSCOPE_DATES[date]
 			else:
-				sendMsg(msgType, conference, nick, u"Нет информации")
-		else:
-			sendMsg(msgType, conference, nick, u"Не могу :(")
+				message = u"Можно указывать только следующее в кач-ве дат: %s" % (", ".join(HOROSCOPE_DATES.keys()))
+				sendMsg(msgType, conference, nick, message)
+				return
+		elif len(param) == 1:
+			rawdate = u"today"
+
+		url = "http://img.ignio.com/r/export/utf/xml/daily/com.xml"
+		rawxml = urllib.urlopen(url).read()
+		xmlnode = simplexml.XML2Node(rawxml)
+		
+		horoNode = xmlnode.getTag(rawsign)
+		text = horoNode.getTagData(rawdate)
+		date = xmlnode.getTagAttr("date", rawdate)
+		sendMsg(msgType, conference, nick, u"Гороскоп на %s: %s" % (date, text))
+	else:
+		message = u"Можно указывать только следующие знаки: %s" % (", ".join(HOROSCOPE_SIGNS.keys()))
+		sendMsg(msgType, conference, nick, message)
 
 registerCommand(showHoroscope, u"гороскоп", 10, 
-				u"Показывает гороскоп для указанного знака гороскопа", 
-				u"гороскоп <знак>", 
-				(u"гороскоп рыбы", ), 
+				u"Показывает гороскоп для указанного знака гороскопа. Возможен просмотр гороскопа на сегодня, вчера, завтра, послезавтра (указывайте 2-м параметром, без указания покажен для сегодняшнего дня)", 
+				u"гороскоп <знак> [день]", 
+				(u"гороскоп рыбы", u"гороскоп рыбы завтра"), 
 				ANY | PARAM)
