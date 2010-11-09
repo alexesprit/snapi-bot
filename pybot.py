@@ -201,36 +201,36 @@ def registerCommand(function, command, access, desc, syntax, examples, cmdType=A
 	gCommands[command] = {CMD_ACCESS: access, CMD_DESC: desc, CMD_SYNTAX: syntax, CMD_EXAMPLE: examples, CMD_TYPE: cmdType}
 
 def callBotMessageHandlers(msgType, jid, text):
-	for handler in gBotMsgHandlers:
-		startThread(handler, (msgType, jid, text, ))
+	for function in gBotMsgHandlers:
+		startThread(function, (msgType, jid, text))
 
 def callJoinHandlers(conference, nick, trueJid, aff, role):
-	for handler in gJoinHandlers:
-		startThread(handler, (conference, nick, trueJid, aff, role))
+	for function in gJoinHandlers:
+		startThread(function, (conference, nick, trueJid, aff, role))
 
 def callLeaveHandlers(conference, nick, trueJid, reason, code):
-	for handler in gLeaveHandlers:
-		startThread(handler, (conference, nick, trueJid, reason, code))
+	for function in gLeaveHandlers:
+		startThread(function, (conference, nick, trueJid, reason, code))
 
 def callMessageHandlers(msgType, stanza, evtType, conference, nick, trueJid, body):
 	gInfo["msg"] += 1
-	for handler in gMessageHandlers[evtType]:
-		startThread(handler, (stanza, msgType, conference, nick, trueJid, body))
+	for function in gMessageHandlers[evtType]:
+		startThread(function, (stanza, msgType, conference, nick, trueJid, body))
 
 def callIqHandlers(stanza, jid, resource):
 	gInfo["iq"] += 1
-	for handler in gIqHandlers:
-		startThread(handler, (stanza, jid, resource))
+	for function in gIqHandlers:
+		startThread(function, (stanza, jid, resource))
 
 def callPresenceHandlers(stanza, prsType, jid, resource, trueJid):
 	gInfo["prs"] += 1
-	for handler in gPresenceHandlers[prsType]:
-		startThread(handler, (stanza, jid, resource, trueJid))
+	for function in gPresenceHandlers[prsType]:
+		startThread(function, (stanza, jid, resource, trueJid))
 
-def callEventHandlers(evtType, param=None):
-	if param:
+def callEventHandlers(evtType, args=None):
+	if args:
 		for function in gEventHandlers[evtType]:
-			function(*param)
+			function(*args)
 	else:
 		for function in gEventHandlers[evtType]:
 			function()
@@ -240,22 +240,22 @@ def callCommandHandlers(command, cmdType, jid, resource, param):
 	if command in gCmdHandlers:
 		startThread(gCmdHandlers[command], (cmdType, jid, resource, param))
 
-def startThread(func, param=None):
+def startThread(function, args=None):
 	gInfo["thr"] += 1
-	threading.Thread(None, execute, func.__name__, (func, param)).start()
+	threading.Thread(None, execute, function.__name__, (function, args)).start()
 
-def startTimer(timeout, func, param=None):
+def startTimer(timeout, function, args=None):
 	gInfo["tmr"] += 1
-	timer = threading.Timer(timeout, execute, (func, param))
-	timer.setName(func.__name__)
+	timer = threading.Timer(timeout, execute, (function, args))
+	timer.setName(function.__name__)
 	timer.start()
 	return timer
 
-def execute(function, param=None):
+def execute(function, args=None):
 	try:
-		if param:
+		if args:
 			with gSemaphore:
-				function(*param)
+				function(*args)
 		else:
 			with gSemaphore:
 				function()

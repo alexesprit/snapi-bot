@@ -32,7 +32,7 @@ def setUserGreeting(msgType, conference, nick, param):
 		greet = rawGreet[1].strip()
 		if isJid(user):
 			trueJid = user
-		elif nickInConference(user):
+		elif nickInConference(conference, user):
 			trueJid = getTrueJid(conference, user)
 		else:
 			sendMsg(msgType, conference, nick, u"А это кто?")
