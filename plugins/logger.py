@@ -85,7 +85,7 @@ def writeLog(msgType, jid, nick, body, aff = 0):
 	fp.close()
 
 def writeMessage(stanza, msgType, conference, nick, trueJid, text):
-	if protocol.TYPE_PUBLIC == msgType and getConfigKey(conference, "log"):
+	if protocol.TYPE_PUBLIC == msgType and getConferenceConfigKey(conference, "log"):
 		aff = 0
 		if nick and getNickKey(conference, nick, NICK_MODER):
 			level = getAccess(conference, trueJid)
@@ -93,11 +93,11 @@ def writeMessage(stanza, msgType, conference, nick, trueJid, text):
 		writeLog(msgType, conference, nick, text, aff)
 
 def writeUserJoin(conference, nick, trueJid, aff, role):
-	if getConfigKey(conference, "log"):
+	if getConferenceConfigKey(conference, "log"):
 		writeLog(protocol.TYPE_PUBLIC, conference, "@$$join$$@", u"%s зашёл в комнату как %s и %s" % (nick, role, aff))
 
 def writeUserLeave(conference, nick, trueJid, reason, code):
-	if getConfigKey(conference, "log"):
+	if getConferenceConfigKey(conference, "log"):
 		if "307" == code:
 			if reason:
 				writeLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты (%s)" % (nick, reason))
@@ -115,7 +115,7 @@ def writeUserLeave(conference, nick, trueJid, reason, code):
 				writeLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s вышел из комнаты" % (nick))
 
 def writePresence(stanza, conference, nick, trueJid):
-	if getConfigKey(conference, "log"):
+	if getConferenceConfigKey(conference, "log"):
 		code = stanza.getStatusCode()
 		prsType = stanza.getType()
 		if code == "303":
@@ -138,13 +138,13 @@ def manageLoggingValue(msgType, conference, nick, param):
 		if value.isdigit():
 			value = int(value)
 			if value == 1:
-				setConfigKey(conf, "log", 1)
+				setConferenceConfigKey(conf, "log", 1)
 				if conf != conference:
 					sendMsg(msgType, conference, nick, u"Логирование в %s включено" % (conf))
 				else:
 					sendMsg(msgType, conference, nick, u"Логирование включено")
 			else:
-				setConfigKey(conf, "log", 0)
+				setConferenceConfigKey(conf, "log", 0)
 				if conf != conference:
 					sendMsg(msgType, conference, nick, u"Логирование в %s отключено" % (conf))
 				else:
@@ -153,7 +153,7 @@ def manageLoggingValue(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"читай помощь по команде")
 	else:
-		message = [u"%d) %s [%d]" % (i + 1, c, getConfigKey(c, "log")) 
+		message = [u"%d) %s [%d]" % (i + 1, c, getConferenceConfigKey(c, "log")) 
 					for i, c in enumerate(getConferences())]
 		if message:
 			sendMsg(msgType, conference, nick, "\n".join(message))
@@ -161,8 +161,8 @@ def manageLoggingValue(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Я пока нигде не сижу")
 
 def setDefLoggingValue(conference):
-	if getConfigKey(conference, "log") is None:
-		setConfigKey(conference, "log", 1)
+	if getConferenceConfigKey(conference, "log") is None:
+		setConferenceConfigKey(conference, "log", 1)
 
 if gLogDir:
 	registerJoinHandler(writeUserJoin)

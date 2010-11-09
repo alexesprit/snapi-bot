@@ -1,6 +1,6 @@
 # coding: utf-8
 
-# autostatus.py
+# rosterstatus.py
 # Initial Copyright (с) 2010 -Esprit-
 
 # This program is free software; you can redistribute it and/or modify

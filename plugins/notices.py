@@ -18,29 +18,29 @@ def noticeControl(msgType, conference, nick, param):
 		if param.isdigit():
 			param = int(param)
 			if param == 1:
-				setConfigKey(conference, "notices", 1)
+				setConferenceConfigKey(conference, "notices", 1)
 				sendMsg(msgType, conference, nick, u"Оповещения включены")
 			else:
-				setConfigKey(conference, "notices", 0)
+				setConferenceConfigKey(conference, "notices", 0)
 				sendMsg(msgType, conference, nick, u"Оповещения выключены")
 			saveConferenceConfig(conference)
 		else:
 			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 	else:
-		sendMsg(msgType, conference, nick, u"Текущее значение: %s" % (getConfigKey(conference, "popups")))
+		sendMsg(msgType, conference, nick, u"Текущее значение: %s" % (getConferenceConfigKey(conference, "popups")))
 
 def sendNotices(msgType, conference, nick, param):
 	conferences = getConferences()
 	count = 0
 	for conf in conferences:
-		if getConfigKey(conf, "notices"):
+		if getConferenceConfigKey(conf, "notices"):
 			sendToConference(conf, u"Новости от администрации:\n%s" % param)
 			count += 1
 	sendMsg(msgType, conference, nick, "Сообщение ушло в %d конференций из %d" % (count, len(conferences)))
 
 def setDefNoticeValue(conference):
-	if getConfigKey(conference, "notices") is None:
-		setConfigKey(conference, "notices", 1)
+	if getConferenceConfigKey(conference, "notices") is None:
+		setConferenceConfigKey(conference, "notices", 1)
 
 registerEvent(setDefNoticeValue, ADDCONF)
 registerCommand(noticeControl, u"оповещения", 30, 

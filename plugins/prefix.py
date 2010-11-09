@@ -14,20 +14,20 @@
 # GNU General Public License for more details.
 
 def setDefPrefixValue(conference):
-	if getConfigKey(conference, "prefix") is None:
-		setConfigKey(conference, "prefix", "")
+	if getConferenceConfigKey(conference, "prefix") is None:
+		setConferenceConfigKey(conference, "prefix", "")
 
 def managePrefixControl(msgType, conference, nick, param):
 	if param:
 		if param.lower() != "none":
-			setConfigKey(conference, "prefix", param)
+			setConferenceConfigKey(conference, "prefix", param)
 			sendMsg(msgType, conference, nick, u"Установлен префикс: %s" % (param))
 		else:
-			setConfigKey(conference, "prefix", "")
+			setConferenceConfigKey(conference, "prefix", "")
 			sendMsg(msgType, conference, nick, u"Префикс для команд отключен")
 		saveConferenceConfig(conference)
 	else:
-		prefixValue = getConfigKey(conference, "prefix")
+		prefixValue = getConferenceConfigKey(conference, "prefix")
 		if prefixValue:
 			sendMsg(msgType, conference, nick, u"Текущее значение: %s" % (prefixValue))
 		else:

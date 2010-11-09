@@ -13,17 +13,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-STATUS_STRINGS = (
-	protocol.PRS_AWAY, 
-	protocol.PRS_NA, 
-	protocol.PRS_DND, 
-	protocol.PRS_CHAT
-)
-
 def setDefBotStatusValue(conference):
-	if not getConfigKey(conference, "show"):
-		setConfigKey(conference, "show", u"online")
-		setConfigKey(conference, "status", None)
+	if not getConferenceConfigKey(conference, "show"):
+		setConferenceConfigKey(conference, "show", u"online")
+		setConferenceConfigKey(conference, "status", None)
 
 def manageBotStatusValue(msgType, conference, nick, param):
 	args = param.split(None, 1)
@@ -34,14 +27,14 @@ def manageBotStatusValue(msgType, conference, nick, param):
 			status = args[1]
 	else:
 		status = param
-	setBotStatus(conference, status, show)
-	setConfigKey(conference, "status", status)
-	setConfigKey(conference, "show", show)
+	setConferenceStatus(conference, status, show)
+	setConferenceConfigKey(conference, "status", status)
+	setConferenceConfigKey(conference, "show", show)
 	saveConferenceConfig(conference)
 
 registerEvent(setDefBotStatusValue, ADDCONF)
 registerCommand(manageBotStatusValue, u"ботстатус", 30, 
 				u"Меняет статус бота", 
-				u"ботстатус <[статус] [сообщение]>", 
+				u"ботстатус <[статус] [текст]>", 
 				(u"ботстатус away", u"ботстатус away сплю"), 
 				CHAT | PARAM)

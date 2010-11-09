@@ -28,8 +28,8 @@ AUTH_QUESTIONS = (
 gAuthAnswer = {}
 
 def setDefAuthValue(conference):
-	if getConfigKey(conference, "auth") is None:
-		setConfigKey(conference, "auth", 0)
+	if getConferenceConfigKey(conference, "auth") is None:
+		setConferenceConfigKey(conference, "auth", 0)
 
 def initAuthCache(conference):
 	gAuthAnswer[conference] = {}
@@ -38,7 +38,7 @@ def freeAuthCache(conference):
 	del gAuthAnswer[conference]
 
 def askAuthQuestion(conference, nick, trueJid, aff, role):
-	if getConfigKey(conference, "auth"):
+	if getConferenceConfigKey(conference, "auth"):
 		if aff == protocol.AFF_NONE:
 			question, answer = random.choice(AUTH_QUESTIONS)
 			setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Неавторизованый участник")
@@ -65,16 +65,16 @@ def manageAuthValue(msgType, conference, nick, param):
 		if param.isdigit():
 			param = int(param)
 			if param == 1:
-				setConfigKey(conference, "auth", 1)
+				setConferenceConfigKey(conference, "auth", 1)
 				sendMsg(msgType, conference, nick, u"Авторизация включена")
 			else:
-				setConfigKey(conference, "auth", 0)
+				setConferenceConfigKey(conference, "auth", 0)
 				sendMsg(msgType, conference, nick, u"Авторизация отключена")
 			saveConferenceConfig(conference)
 		else:
 			sendMsg(msgType, conference, nick, u"Прочитай помощь по команде")
 	else:
-		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (getConfigKey(conference, "auth")))
+		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (getConferenceConfigKey(conference, "auth")))
 
 registerEvent(setDefAuthValue, ADDCONF)
 registerEvent(initAuthCache, ADDCONF)

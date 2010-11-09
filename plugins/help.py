@@ -34,7 +34,7 @@ def showHelp(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, message)
 	else:
 		if conferenceInList(conference):
-			prefix = getConfigKey(conference, "prefix")
+			prefix = getConferenceConfigKey(conference, "prefix")
 		else:
 			prefix = ""
 		sendMsg(msgType, conference, nick, u"Напишите \"%sкоманды\", чтобы узнать список всех команд, \"%sпомощь <команда>\" для получения справки по использованию команды" % (prefix, prefix))
@@ -61,7 +61,7 @@ def showCommands(msgType, conference, nick, param):
 		disabledCmds.sort()
 		message += u"\n\nОтключенные команды:\n%s" % (", ".join(disabledCmds))
 	if protocol.TYPE_PUBLIC == msgType:
-		sendMsg(msgType, conference, nick, u"ушли")
+		sendMsg(msgType, conference, nick, u"Ушли")
 	sendMsg(protocol.TYPE_PRIVATE, conference, nick, message);	
 
 registerCommand(showHelp, u"помощь", 0, 

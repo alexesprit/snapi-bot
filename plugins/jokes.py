@@ -21,24 +21,24 @@ def loadJokes():
 	gJokes = eval(utils.readFile(path, "utf-8"))
 
 def setDefJokesValue(conference):
-	if getConfigKey(conference, "jokes") is None:
-		setConfigKey(conference, "jokes", 1)
+	if getConferenceConfigKey(conference, "jokes") is None:
+		setConferenceConfigKey(conference, "jokes", 1)
 
 def manageJokesValue(msgType, conference, nick, param):
 	if param:
 		if param.isdigit():
 			param = int(param)
 			if param == 1:
-				setConfigKey(conference, "jokes", 1)
+				setConferenceConfigKey(conference, "jokes", 1)
 				sendMsg(msgType, conference, nick, u"Шуточки включены")
 			else:
-				setConfigKey(conference, "jokes", 0)
+				setConferenceConfigKey(conference, "jokes", 0)
 				sendMsg(msgType, conference, nick, u"Шуточки отключены")
 			saveConferenceConfig(conference)
 		else:
 			sendMsg(msgType, conference, nick, u"Прочитай помощь по команде")
 	else:
-		jokesValue = getConfigKey(conference, "jokes")
+		jokesValue = getConferenceConfigKey(conference, "jokes")
 		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (jokesValue))
 
 registerEvent(loadJokes, STARTUP)

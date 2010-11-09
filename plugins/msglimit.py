@@ -14,8 +14,8 @@
 # GNU General Public License for more details.
 
 def setDefMsgLimitValue(conference):
-	if getConfigKey(conference, "msg") is None:
-		setConfigKey(conference, "msg", 1500)
+	if getConferenceConfigKey(conference, "msg") is None:
+		setConferenceConfigKey(conference, "msg", 1500)
 
 def manageMsgLimitValue(msgType, conference, nick, param):
 	if param:
@@ -23,16 +23,16 @@ def manageMsgLimitValue(msgType, conference, nick, param):
 			param = int(param)
 			if param > 0:
 				param = max(100, param)
-				setConfigKey(conference, "msg", param)
+				setConferenceConfigKey(conference, "msg", param)
 				sendMsg(msgType, conference, nick, u"Установлен лимит на %d символов" % (param))
 			else:
-				setConfigKey(conference, "msg", 0)
+				setConferenceConfigKey(conference, "msg", 0)
 				sendMsg(msgType, conference, nick, u"Ограничение на кол-во симолов отключено")
 			saveConferenceConfig(conference)
 		else:
 			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 	else:
-		limitValue = getConfigKey(conference, "msg")
+		limitValue = getConferenceConfigKey(conference, "msg")
 		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (limitValue))
 
 registerEvent(setDefMsgLimitValue, ADDCONF)

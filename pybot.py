@@ -80,6 +80,13 @@ NICK_JOINED = "joined"
 NICK_SHOW = "show"
 NICK_STATUS = "status"
 
+STATUS_STRINGS = (
+	protocol.PRS_AWAY, 
+	protocol.PRS_NA, 
+	protocol.PRS_DND, 
+	protocol.PRS_CHAT
+)
+
 ROLES = {
 	protocol.ROLE_NONE: 0, 
 	protocol.ROLE_VISITOR: 0, 
@@ -153,9 +160,9 @@ gCommands = {}
 gCmdOff = {}
 gMacros = macros.Macros(CONFIG_DIR)
 
+gConferenceConfig = {}
 gConferences = {}
 gIsJoined = {}
-gConfig = {}
 
 gJokes = []
 
@@ -306,17 +313,17 @@ def saveConferences():
 def loadConferenceConfig(conference):
 	path = getConfigPath(conference, CONFIG_FILE)
 	utils.createFile(path, "{}")
-	gConfig[conference] = eval(utils.readFile(path))
+	gConferenceConfig[conference] = eval(utils.readFile(path))
 
 def saveConferenceConfig(conference):
 	path = getConfigPath(conference, CONFIG_FILE)
-	utils.writeFile(path, str(gConfig[conference]))
+	utils.writeFile(path, str(gConferenceConfig[conference]))
 
-def getConfigKey(conference, key):
-	return gConfig[conference].get(key)
+def getConferenceConfigKey(conference, key):
+	return gConferenceConfig[conference].get(key)
 
-def setConfigKey(conference, key, value):
-	gConfig[conference][key] = value
+def setConferenceConfigKey(conference, key, value):
+	gConferenceConfig[conference][key] = value
 
 def addConference(conference):
 	gConferences[conference] = {}
@@ -329,15 +336,15 @@ def delConference(conference):
 	for function in gEventHandlers[DELCONF]:
 		function(conference)
 	del gIsJoined[conference]
-	del gConfig[conference]
+	del gConferenceConfig[conference]
 	del gConferences[conference]
 
 def joinConference(conference, nick, password):
-	setConfigKey(conference, "nick", nick)
-	setConfigKey(conference, "password", password)
+	setConferenceConfigKey(conference, "nick", nick)
+	setConferenceConfigKey(conference, "password", password)
 	prs = protocol.Presence("%s/%s" % (conference, nick), priority=gPriority)
-	status = getConfigKey(conference, "status")
-	show = getConfigKey(conference, "show")
+	status = getConferenceConfigKey(conference, "status")
+	show = getConferenceConfigKey(conference, "show")
 	if status:
 		prs.setStatus(status)
 	if show:
@@ -358,7 +365,7 @@ def leaveConference(conference, status=None):
 
 def getBotNick(conference):
 	if conference in gConferences:
-		return getConfigKey(conference, "nick") or gBotNick
+		return getConferenceConfigKey(conference, "nick") or gBotNick
 	return gBotNick
 
 def getUniqueID(text):
@@ -366,7 +373,7 @@ def getUniqueID(text):
 	gID += 1
 	return "%s_%d" % (text, gID)
 
-def setBotStatus(conference, status, show):
+def setConferenceStatus(conference, status, show):
 	prs = protocol.Presence(conference, priority=gPriority)
 	if status:
 		prs.setStatus(status)
@@ -536,11 +543,11 @@ def sendToConference(conference, text):
 		
 def sendMsg(msgType, conference, nick, text, force=False):
 	if protocol.TYPE_PUBLIC == msgType and not force:
-		fools = getConfigKey(conference, "jokes")
+		fools = getConferenceConfigKey(conference, "jokes")
 		if fools and not random.randrange(0, 30):
 			text = random.choice(gJokes)
 		else:
-			msgLimit = getConfigKey(conference, "msg")
+			msgLimit = getConferenceConfigKey(conference, "msg")
 			if msgLimit and len(text) > msgLimit:
 				sendMsg(msgType, conference, nick, u"Смотри в привате (лимит %d символов)" % (msgLimit), True)
 				msgType = protocol.TYPE_PRIVATE
@@ -571,7 +578,7 @@ def messageHandler(session, stanza):
 			time.sleep(1)
 		elif errorCode == "406":
 			addConference(conference)
-			joinConference(conference, gBotNick, getConfigKey(conference, "password"))
+			joinConference(conference, gBotNick, getConferenceConfigKey(conference, "password"))
 			time.sleep(0.5)
 		else:
 			return
@@ -602,7 +609,7 @@ def messageHandler(session, stanza):
 				if message.startswith(x):
 					message = message.replace(x, "").strip()
 					break
-		prefix = getConfigKey(conference, "prefix")
+		prefix = getConferenceConfigKey(conference, "prefix")
 		if prefix:
 			if message.startswith(prefix):
 				message = message[len(prefix):].strip()
@@ -685,14 +692,14 @@ def presenceHandler(session, stanza):
 			errorCode = stanza.getErrorCode()
 			if errorCode == "409":
 				newNick = getBotNick(conference) + "."
-				password = getConfigKey(conference, "password")
+				password = getConferenceConfigKey(conference, "password")
 				joinConference(conference, newNick, password)
 			elif errorCode == "404":
 				delConference(conference)
 				saveConferences()
 			elif errorCode == "503":
 				botNick = getBotNick(conference)
-				password = getConfigKey(conference, "password")
+				password = getConferenceConfigKey(conference, "password")
 				startTimer(REJOIN_DELAY, conference, (conference, botNick, password, ))
 			elif errorCode in ("401", "403", "405"):
 				leaveConference(conference, u"got %s error code" % errorCode)
@@ -760,6 +767,7 @@ def shutdown(restart=False):
 
 def start():
 	global gRoster
+
 	loadPlugins()
 
 	printf("Connecting...")
@@ -798,7 +806,7 @@ def start():
 	if conferences:
 		for conference in conferences:
 			addConference(conference)
-			joinConference(conference, getBotNick(conference), getConfigKey(conference, "password"))
+			joinConference(conference, getBotNick(conference), getConferenceConfigKey(conference, "password"))
 			saveConferenceConfig(conference)
 		printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
