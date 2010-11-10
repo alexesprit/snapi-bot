@@ -42,7 +42,7 @@ class Dispatcher(plugin.PlugIn):
 		self.debugFlag = DBG_DISPATCHER
 		self.handlers = {}
 		self._expected = {}
-		self._exportedMethods = [
+		self._exportedMethods = (
 			self.process,
 			self.registerHandler,
 			self.unregisterHandler,
@@ -51,7 +51,7 @@ class Dispatcher(plugin.PlugIn):
 			self.send,
 			self.disconnect,
 			self.sendAndCallForResponse
-		]
+		)
 
 	def dumpHandlers(self):
 		""" Return set of user-registered callbacks in it's internal format.
@@ -102,10 +102,10 @@ class Dispatcher(plugin.PlugIn):
 		self.Stream.stream_header_received = self._checkStreamStart
 		self.Stream.features = None
 		metastream = protocol.Node("stream:stream")
-		metastream.setNamespace(self._owner.Namespace)
+		metastream.setNamespace(self._owner.defaultNamespace)
 		metastream.setAttr("version", "1.0")
 		metastream.setAttr("xmlns:stream", protocol.NS_STREAMS)
-		metastream.setAttr("to", self._owner.Server)
+		metastream.setAttr("to", self._owner.server)
 		self._owner.send("<?xml version=\"1.0\"?>%s>" % str(metastream)[:-2])
 
 	def _checkStreamStart(self, ns, tag, attrs):
@@ -192,7 +192,18 @@ class Dispatcher(plugin.PlugIn):
 		if handler in self.handlers[xmlns][name][key]:
 			self.handlers[xmlns][name][key].remove(handler)
 			if not self.handlers[xmlns][name][key]:
-				del self.handlers[xmlns][name]
+				for item in self.handlers[xmlns].keys():
+					if self.isTreeEmpty(self.handlers[xmlns][item]):
+						del self.handlers[xmlns][item]
+				if not self.handlers[xmlns]:
+					del self.handlers[xmlns]
+
+	def isTreeEmpty(self, tree):
+		for branch in tree:
+			if isinstance(tree[branch], list):
+				if not tree[branch]:
+					return True
+		return False
 
 	def streamErrorHandler(self, conn, error):
 		name, text = "error", error.getData()
@@ -315,7 +326,7 @@ class Dispatcher(plugin.PlugIn):
 			stanza.setID(stanzaID)
 		else:
 			stanzaID = stanza.getID()
-		stanza.setNamespace(self._owner.Namespace)
+		stanza.setNamespace(self._owner.defaultNamespace)
 		self._owner_send(stanza)
 		return stanzaID
 

@@ -27,10 +27,11 @@ def _showMUCList(stanza, msgType, conference, nick):
 		sendMsg(msgType, conference, nick, u"Не могу :(")
 
 def showMUCList(msgType, conference, nick, aff):
-	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_MUC_ADMIN, payload=[protocol.Node("item", {"affiliation": aff})])
+	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_MUC_ADMIN)
+	iq.setQueryPayload([protocol.Node("item", {"affiliation": aff})])
 	iq.setTo(conference)
 	iq.setID(getUniqueID("muc_id"))
-	gClient.sendAndCallForResponse(iq, _showMUCList, (msgType, conference, nick, ))
+	gClient.sendAndCallForResponse(iq, _showMUCList, (msgType, conference, nick))
 
 def showOutcastsList(msgType, conference, nick, param):
 	showMUCList(msgType, conference, nick, protocol.AFF_OUTCAST)

@@ -285,16 +285,16 @@ def getTimeStr(time):
 	minutes, seconds = divmod(time, 60)
 	hours, minutes = divmod(minutes, 60)
 	days, hours = divmod(hours, 24)
-	timeString = ""
+	timeStr = ""
 	if seconds:
-		timeString = u"%d сек." % (seconds)
+		timeStr = u"%d сек." % (seconds)
 	if minutes:
-		timeString = u"%d мин. %s" % (minutes, timeString)
+		timeStr = u"%d мин. %s" % (minutes, timeStr)
 	if hours:
-		timeString = u"%d ч. %s" % (hours, timeString)
+		timeStr = u"%d ч. %s" % (hours, timeStr)
 	if days:
-		timeString = u"%d дн. %s" % (days, timeString)
-	return timeString
+		timeStr = u"%d дн. %s" % (days, timeStr)
+	return timeStr
 
 getFilePath = os.path.join
 
@@ -771,7 +771,7 @@ def start():
 	loadPlugins()
 
 	printf("Connecting...")
-	if gClient.connect(server=(gHost, gPort), secureMode=gSecureMode, useResolver=gUseResolver):
+	if gClient.connect(secureMode=gSecureMode, useResolver=gUseResolver):
 		printf("Connection established (%s)" % gClient.isConnected(), FLAG_SUCCESS)
 	else:
 		printf("Unable to connect", FLAG_ERROR)

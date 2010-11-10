@@ -50,16 +50,11 @@ TLS_UNSUPPORTED = 0x3
 class TCPSocket(plugin.PlugIn):
 	""" This class defines direct TCP connection method.
 	"""
-	def __init__(self, server=None, useResolver=True):
-		""" Cache connection point "server". "server" is the tuple of (host, port)
-			absolutely the same as standard tcp socket uses. However library will lookup for 
-			("_xmpp-client._tcp." + host) SRV record in DNS and connect to the found (if it is)
-			server instead
-		"""
+	def __init__(self, useResolver=True):
 		plugin.PlugIn.__init__(self)
 		self.debugFlag = DBG_SOCKET
 		self._exportedMethods = (self.send, self.disconnect)
-		self._server, self.useResolver = server, useResolver
+		self.useResolver = useResolver
 
 	def lookup(self, server):
 		""" SRV resolver. Takes server=(host, port) as argument.
@@ -82,8 +77,7 @@ class TCPSocket(plugin.PlugIn):
 			Also registers self.disconnected method in the owner's dispatcher.
 			Called internally.
 		"""
-		if not self._server:
-			self._server = (self._owner.Server, 5222)
+		self._server = (self._owner.server, self._owner.port)
 		if self.useResolver:
 			server = self.lookup(self._server)
 		else:
@@ -92,16 +86,6 @@ class TCPSocket(plugin.PlugIn):
 			return
 		self._owner.Connection = self
 		return "ok"
-
-	def getHost(self):
-		""" Return the "host" value that is connection is [will be] made to.
-		"""
-		return self._server[0]
-
-	def getPort(self):
-		""" Return the "port" value that is connection is [will be] made to.
-		"""
-		return self._server[1]
 
 	def connect(self, server=None):
 		""" Try to connect to the given host/port. Does not lookup for SRV record.

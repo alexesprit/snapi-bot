@@ -117,7 +117,7 @@ class SASL(plugin.PlugIn):
 			self._owner.Dispatcher.PlugOut()
 			dispatcher.Dispatcher().PlugIn(self._owner)
 			self._owner.Dispatcher.restoreHandlers(handlers)
-			self._owner.User = self.username
+			self._owner._user = self.username
 			raise protocol.NodeProcessed
 
 		incoming_data = challenge.getData()
@@ -132,7 +132,7 @@ class SASL(plugin.PlugIn):
 		if chal.has_key("qop") and "auth" in [x.strip() for x in chal["qop"].split(", ")]:
 			resp={}
 			resp["username"] = self.username
-			resp["realm"] = self._owner.Server
+			resp["realm"] = self._owner.server
 			resp["nonce"] = chal["nonce"]
 			cnonce = ""
 			for i in range(7):
@@ -140,7 +140,7 @@ class SASL(plugin.PlugIn):
 			resp["cnonce"] = cnonce
 			resp["nc"] = ("00000001")
 			resp["qop"] = "auth"
-			resp["digest-uri"] = "xmpp/" + self._owner.Server
+			resp["digest-uri"] = "xmpp/" + self._owner.server
 			A1 = C([H(C([resp["username"], resp["realm"], self.password])), resp["nonce"], resp["cnonce"]])
 			A2 = C(["AUTHENTICATE", resp["digest-uri"]])
 			response = HH(C([HH(A1), resp["nonce"], resp["nc"], resp["cnonce"], resp["qop"], HH(A2)]))

@@ -45,12 +45,11 @@ class CommonClient:
 			the debug IDs that will go into debug output. You can either specifiy an "include"
 			or "exclude" list. The latter is done via adding "always" pseudo-ID to the list.
 		"""
-		self.Namespace = protocol.NS_CLIENT
-		self.defaultNamespace = self.Namespace
+		self.defaultNamespace = protocol.NS_CLIENT
 		self.disconnectHandlers = []
 
-		self.Server = server
-		self.Port = port
+		self.server = server
+		self.port = port
 
 		self._debug = debug.Debug(debugFlags, showFlags=False)
 		self.printf = self._debug.show
@@ -101,20 +100,17 @@ class CommonClient:
 		"""
 		return self.connected
 
-	def connect(self, server=None, SecureMode=SECURE_DISABLE, useResolver=True):
+	def connect(self, secureMode=SECURE_DISABLE, useResolver=True):
 		""" Make a TCP/IP connection, protect it with TLS/SSL if possible and start XMPP stream.
 			Returns None, "TCP", "TLS" or "SSL", depending on the result.
 		"""
-		if not server:
-			server = (self.Server, self.Port)
-		sock = transports.TCPSocket(server, useResolver)
+		sock = transports.TCPSocket(useResolver)
 		connected = sock.PlugIn(self)
 		if not connected: 
 			sock.PlugOut()
 			return False
-		self._Server = server
 		self.connected = C_TCP
-		if (SecureMode == SECURE_AUTO and self.Connection.getPort() in (5223, 443)) or SecureMode == SECURE_FORCE:
+		if (secureMode == SECURE_AUTO and self.port in (5223, 443)) or secureMode == SECURE_FORCE:
 			# FIXME. This should be done in transports.py
 			try:
 				transports.TLS().PlugIn(self, forceSSL=True)
@@ -134,15 +130,14 @@ class CommonClient:
 
 class Client(CommonClient):
 	""" Example client class, based on CommonClient. """
-	def connect(self, server=None, secureMode=SECURE_DISABLE, useResolver=True):
-		""" Connect to jabber server. If you want to specify different ip/port to connect to you can
-			pass it as tuple as first parameter. If you want TLS/SSL support to be discovered and enable automatically, 
+	def connect(self, secureMode=SECURE_DISABLE, useResolver=True):
+		""" Connect to jabber server. If you want TLS/SSL support to be discovered and enable automatically, 
 			set third argument as SECURE_AUTO (SSL will be autodetected only if port is 5223 or 443)
 			If you want to force SSL start (i.e. if port 5223 or 443 is remapped to some non-standard port) then set it to SECURE_FORCE.
 			If you want to disable TLS/SSL support completely, set it to SECURE_DISABLE.
 			Returns None or "TCP", "SSL" "TLS", depending on the result.
 		"""
-		if not CommonClient.connect(self, server, secureMode, useResolver):
+		if not CommonClient.connect(self, secureMode, useResolver):
 			return None
 		if secureMode != SECURE_DISABLE and not hasattr(self, C_TLS):
 			transports.TLS().PlugIn(self)
@@ -165,7 +160,7 @@ class Client(CommonClient):
 		""" Authenticate connnection and bind resource. If resource is not provided
 			random one or library name used.
 		"""
-		self._User, self._Password, self._Resource = user, password, resource
+		self._user, self._password, self._resource = user, password, resource
 		while not self.Dispatcher.Stream._document_attrs and self.process(1):
 			pass
 		# If we get version 1.0 stream the features tag MUST BE presented

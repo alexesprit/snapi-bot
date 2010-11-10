@@ -19,7 +19,7 @@ def decipherExpression(msgType, conference, nick, param):
 	elif len(param) < 2:
 		sendMsg(msgType, conference, nick, u"Что так мало?")
 	else:
-		query = urllib.urlencode({"word": param})
+		query = urllib.urlencode({"word": param.encode("cp1251")})
 		url = "http://combats.stalkers.ru/?a=analiz_nick&%s" % (query)
 		rawHTML = urllib.urlopen(url).read()
 		items = re.search(r"<div style='text-align:center;'><b>(.*?)</b></div>", rawHTML, re.DOTALL)
