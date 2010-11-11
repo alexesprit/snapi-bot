@@ -13,10 +13,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-ADV_COUNT = 12
-
 def showAdvert(msgType, conference, nick, param):
-	pageNum = random.randrange(1, ADV_COUNT + 1)
+	pageNum = random.randrange(1, 13)
 	url = "http://skio.ru/funnyad/%d.php" % (pageNum)
 	rawHTML = urllib.urlopen(url).read()
 	items = re.findall(r"<tr><td>(.+?)</td></tr>", rawHTML, re.DOTALL)

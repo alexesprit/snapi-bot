@@ -83,6 +83,20 @@ def showJabberQuote(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Не могу")
 
+def showCinemaQuote(msgType, conference, nick, param):
+	pageNum = random.randrange(1, 39)
+	url = "http://skio.ru/afofilms/kino%d.php" % (pageNum)
+	rawHTML = urllib.urlopen(url).read()
+	items = re.search("<ul type=\"circle\"(.+?)</ul>", rawHTML, re.DOTALL)
+	if items:
+		rawHTML = items.group(1)
+		items = re.findall("<li>(.+?)<li>", rawHTML, re.DOTALL)
+		quote = random.choice(items)
+		quote = decode(quote, "cp1251")
+		sendMsg(msgType, conference, nick, quote)
+	else:
+		sendMsg(msgType, conference, nick, u"Не получается")
+
 registerCommand(showAbyssQuote, u"борб", 10, 
 				u"Показывает случайную цитату из бездны bash.org.ru", 
 				None, 
@@ -104,3 +118,8 @@ registerCommand(showJabberQuote, u"жк", 10,
 				u"Показывает случайную/указанную цитату с jabber-quotes.ru", 
 				u"жк [номер]", 
 				(u"жк", u"жк 204"));
+registerCommand(showCinemaQuote, u"киноцитата", 10, 
+				u"Показывает случайную цитату из кино", 
+				None, 
+				(u"киноцитата", ), 
+				ANY | NONPARAM)

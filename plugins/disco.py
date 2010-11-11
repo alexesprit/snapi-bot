@@ -17,27 +17,28 @@
 
 def serviceDiscovery(msgType, conference, nick, param):
 	param = param or gServer
-	param = param.split(None, 2)
-	jid = param[0]
+	args = param.split(None, 2)
+	jid = args[0]
 	searchKey = None
 	maxCount = (protocol.TYPE_PUBLIC == msgType) and 10 or 50
-	if len(param) > 1:
-		count = param[1]
+	if len(args) > 1:
+		count = args[1]
 		if count.isdigit():
 			count = int(count)
 			if protocol.TYPE_PUBLIC == msgType:
 				maxCount = min(50, count)
 			else:
 				maxCount = min(250, count);	
-			if len(param) > 2:
-				searchKey = param[2]
-		else:		
-			searchKey = param[1]
+			if len(args) > 2:
+				searchKey = args[2]
+		else:
+			args = param.split(None, 1)
+			searchKey = args[1]
 	iq = protocol.Iq(protocol.TYPE_GET)
 	query = iq.addChild("query", None, None, protocol.NS_DISCO_ITEMS)
-	param = jid.split("#")
-	if len(param) == 2:
-		jid, node = param
+	args = jid.split("#")
+	if len(args) == 2:
+		jid, node = args
 		iq.setTo(jid)
 		query.setAttr("node", node)
 	else:
@@ -93,7 +94,11 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 					discoList.append(u"всего %d пунктов" % (itemCount))
 				sendMsg(msgType, conference, nick, u"Надискаверила:\n" + u"\n".join(discoList))
 		else:
-			sendMsg(msgType, conference, nick, u"пустое диско")
+			if searchKey and itemCount:
+				message = u"Текст \"%s\" не найден (всего %d пунктов)" % (searchKey, itemCount)
+				sendMsg(msgType, conference, nick, message)
+			else:
+				sendMsg(msgType, conference, nick, u"пустое диско")
 	else:
 		sendMsg(msgType, conference, nick, u"не могу")
 
