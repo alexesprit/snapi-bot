@@ -68,7 +68,7 @@ def showUserAccess(msgType, conference, nick, param):
 
 def setLocalAccess(msgType, conference, nick, param):
 	param = param.split()
-	if len(param) < 4:
+	if 4 > len(param) > 1:
 		user = param[0].strip()
 		if nickInConference(conference, user):
 			userJid = getTrueJid(conference, user)
