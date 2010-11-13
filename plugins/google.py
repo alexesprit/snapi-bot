@@ -20,36 +20,38 @@ def getGoogleSearchQuery(text, lang=None):
 	}
 	if lang:
 		param["lr"] = lang
-	query = urllib.urlencode(param)
-	return query
+	return param
 
 def searchInGoogleAll(msgType, conference, nick, text):
-	query = getGoogleSearchQuery(text)
-	url = "http://ajax.googleapis.com/ajax/services/search/web?%s" % (query)
-	searchInGoogle(msgType, conference, nick, url)
+	url = "http://ajax.googleapis.com/ajax/services/search/web"
+	qparam = getGoogleSearchQuery(text)
+	searchInGoogle(msgType, conference, nick, url, qparam)
 
 def searchInGoogleEN(msgType, conference, nick, text):
-	query = getGoogleSearchQuery(text, "lang_en")
-	url = "http://ajax.googleapis.com/ajax/services/search/web?%s" % (query)
-	searchInGoogle(msgType, conference, nick, url)
+	url = "http://ajax.googleapis.com/ajax/services/search/web"
+	qparam = getGoogleSearchQuery(text, "lang_en")
+	searchInGoogle(msgType, conference, nick, url, qparam)
 
 def searchInGoogleRU(msgType, conference, nick, text):
-	query = getGoogleSearchQuery(text, "lang_ru")
-	url = "http://ajax.googleapis.com/ajax/services/search/web?%s" % (query)
-	searchInGoogle(msgType, conference, nick, url)
+	url = "http://ajax.googleapis.com/ajax/services/search/web"
+	qparam = getGoogleSearchQuery(text, "lang_ru")
+	searchInGoogle(msgType, conference, nick, url, qparam)
 
-def searchInGoogle(msgType, conference, nick, url):
-	req = urllib.urlopen(url)
-	answer = simplejson.load(req)
-	results = answer["responseData"]["results"]
-	if results:
-		if msgType == protocol.TYPE_PUBLIC:
-			msg = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (results[0])]
+def searchInGoogle(msgType, conference, nick, url, qparam):
+	responce = getURL(url, qparam)
+	if responce:
+		answer = simplejson.load(req)
+		results = answer["responseData"]["results"]
+		if results:
+			if msgType == protocol.TYPE_PUBLIC:
+				msg = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (results[0])]
+			else:
+				msg = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (result) for result in results]
+			sendMsg(msgType, conference, nick, decode("\n\n".join(msg)))
 		else:
-			msg = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (result) for result in results]
-		sendMsg(msgType, conference, nick, decode("\n\n".join(msg)))
+			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не найдено")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(searchInGoogleEN, u"гугльен", 10, 
 				u"Поиск через Google по зарубежным сайтам", 

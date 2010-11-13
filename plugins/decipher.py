@@ -19,15 +19,22 @@ def decipherExpression(msgType, conference, nick, param):
 	elif len(param) < 2:
 		sendMsg(msgType, conference, nick, u"Что так мало?")
 	else:
-		query = urllib.urlencode({"word": param.encode("cp1251")})
-		url = "http://combats.stalkers.ru/?a=analiz_nick&%s" % (query)
-		rawHTML = urllib.urlopen(url).read()
-		items = re.search(r"<div style='text-align:center;'><b>(.*?)</b></div>", rawHTML, re.DOTALL)
-		if items:
-			text = items.group(1)
-			sendMsg(msgType, conference, nick, unicode(text, "cp1251"))
+		url = "http://combats.stalkers.ru/"
+		qparam = {
+			"a": "analiz_nick",
+			"word": param.encode("cp1251")
+		}
+		responce = getURL(url, qparam)
+		if responce:
+			rawhtml = responce.read()
+			items = re.search(r"<div style='text-align:center;'><b>(.*?)</b></div>", rawhtml, re.DOTALL)
+			if items:
+				text = items.group(1)
+				sendMsg(msgType, conference, nick, unicode(text, "cp1251"))
+			else:
+				sendMsg(msgType, conference, nick, u"Ошибка!")
 		else:
-			sendMsg(msgType, conference, nick, u"Не получается")
+			sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(decipherExpression, u"шифр", 10, 
 				u"Расшифровывает слово", 

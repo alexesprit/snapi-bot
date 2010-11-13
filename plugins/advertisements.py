@@ -16,14 +16,18 @@
 def showAdvert(msgType, conference, nick, param):
 	pageNum = random.randrange(1, 13)
 	url = "http://skio.ru/funnyad/%d.php" % (pageNum)
-	rawHTML = urllib.urlopen(url).read()
-	items = re.findall(r"<tr><td>(.+?)</td></tr>", rawHTML, re.DOTALL)
-	if items:
-		adv = random.choice(items)
-		adv = decode(adv)
-		sendMsg(msgType, conference, nick, unicode(adv, "cp1251"))
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		items = re.findall(r"<tr><td>(.+?)</td></tr>", rawhtml, re.DOTALL)
+		if items:
+			adv = random.choice(items)
+			adv = decode(adv)
+			sendMsg(msgType, conference, nick, unicode(adv, "cp1251"))
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не получается")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(showAdvert, u"объявление", 10, 
 				u"Показывает случайное интересное объявление", 

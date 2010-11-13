@@ -14,14 +14,18 @@
 # GNU General Public License for more details.
 
 def showDreamInfo(msgType, conference, nick, param):
-	query = urllib.urlencode({"key" : param.encode("cp1251")})
-	url = "http://www.sonnik.ru/search.php?%s" % (query)
-	rawHTML = urllib.urlopen(url).read()
-	items = re.search(r"<div id=\"mntxt\">(.+?)</p>", rawHTML, re.DOTALL)
-	message = decode(items.group(1), "cp1251")
-	if protocol.TYPE_PUBLIC == msgType:
-		sendMsg(msgType, conference, nick, u"Ушёл")
-	sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
+	url = "http://www.sonnik.ru/search.php"
+	qparam = {"key": param.encode("cp1251")}
+	responce = getURL(url, qparam)
+	if responce:
+		rawhtml = responce.read()
+		items = re.search(r"<div id=\"mntxt\">(.+?)</p>", rawhtml, re.DOTALL)
+		message = decode(items.group(1), "cp1251")
+		if protocol.TYPE_PUBLIC == msgType:
+			sendMsg(msgType, conference, nick, u"Ушёл")
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
+	else:
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Ошибка!")
 
 registerCommand(showDreamInfo, u"сонник", 10, 
 				u"Толкователь снов", 

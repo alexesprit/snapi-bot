@@ -14,43 +14,48 @@
 # GNU General Public License for more details.
 
 def getTrainTable(cityFrom, cityTo, dateForward):
-	query = urllib.urlencode({"cityFrom": cityFrom.encode("utf-8"),
-								"cityTo": cityTo.encode("utf-8"),
-								"dateForward": dateForward.encode("utf-8"),
-								})
-	url = "http://rasp.yandex.ru/search?%s" % (query)
-	rawHTML = urllib.urlopen(url).read()
-	rawHTML = unicode(rawHTML, "utf-8")
-	items = re.findall(u"<tr class=\"{(.+?)</tr>", rawHTML, re.DOTALL)
-	tableList = []
-	for info in items:
-		trainName = re.search("<a href=\".+?>(.+?)</a>", info, re.DOTALL)
-		trainName = decode(trainName.group(1)).strip()
+	url = "http://rasp.yandex.ru/search"
+	qparam = {
+		"cityFrom": cityFrom.encode("utf-8"),
+		"cityTo": cityTo.encode("utf-8"),
+		"dateForward": dateForward.encode("utf-8")
+	}
+	responce = getURL(url, qparam)
+	if responce:
+		rawhtml = responce.read()
+		rawhtml = unicode(rawhtml, "utf-8")
+		items = re.findall(u"<tr class=\"{(.+?)</tr>", rawhtml, re.DOTALL)
+		tableList = []
+		for info in items:
+			trainName = re.search("<a href=\".+?>(.+?)</a>", info, re.DOTALL)
+			trainName = decode(trainName.group(1)).strip()
 
-		dispatch, arrive = re.findall(r"<span class=\"point\">(.+?)</span>", info, re.DOTALL)
-		
-		timePtrn = re.compile(r"<strong(.+?)</strong>")
-		namePtrn = re.compile(r"<a href=\".+?>(.+?)</a>", re.DOTALL)
+			dispatch, arrive = re.findall(r"<span class=\"point\">(.+?)</span>", info, re.DOTALL)
+			
+			timePtrn = re.compile(r"<strong(.+?)</strong>")
+			namePtrn = re.compile(r"<a href=\".+?>(.+?)</a>", re.DOTALL)
 
-		disTime = timePtrn.search(dispatch)
-		disTime = decode(disTime.group(0)).strip()
-		disName = namePtrn.search(dispatch)
-		disName = decode(disName.group(1)).strip()
-		
-		arrTime = timePtrn.search(arrive)
-		arrTime = decode(arrTime.group(0)).strip()
-		arrName = namePtrn.search(arrive)
-		arrName = decode(arrName.group(1)).strip()
-		
-		travelTime = re.search(r"td class=\"{raw:.+?>.+?</i>(.+?)</td>", info, re.DOTALL)
-		travelTime = decode(travelTime.group(1)).strip()
+			disTime = timePtrn.search(dispatch)
+			disTime = decode(disTime.group(0)).strip()
+			disName = namePtrn.search(dispatch)
+			disName = decode(disName.group(1)).strip()
+			
+			arrTime = timePtrn.search(arrive)
+			arrTime = decode(arrTime.group(0)).strip()
+			arrName = namePtrn.search(arrive)
+			arrName = decode(arrName.group(1)).strip()
+			
+			travelTime = re.search(r"td class=\"{raw:.+?>.+?</i>(.+?)</td>", info, re.DOTALL)
+			travelTime = decode(travelTime.group(1)).strip()
 
-		if info.find("tickets\": \"yes") != -1:
-			places = u"есть"
-		else:
-			places = u"нет"
-		tableList.append([trainName, disTime, disName, arrTime, arrName, travelTime, places])
-	return tableList
+			if info.find("tickets\": \"yes") != -1:
+				places = u"есть"
+			else:
+				places = u"нет"
+			tableList.append([trainName, disTime, disName, arrTime, arrName, travelTime, places])
+		return tableList
+	else:
+		return None
 
 def showTrainTable(msgType, conference, nick, param):
 	param = param.split(None, 1)

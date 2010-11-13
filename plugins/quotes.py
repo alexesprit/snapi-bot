@@ -16,86 +16,111 @@
 
 def showBashQuote(msgType, conference, nick, param):
 	if param and param.isdigit():
-		req = "http://bash.org.ru/quote/%s" % (param)
+		url = "http://bash.org.ru/quote/%s" % (param)
 	else:
-		req = "http://bash.org.ru/random"
-	rawHTML = urllib.urlopen(req).read()
-	items = re.search("quote/(\d+).+?<div>(.+?)</div>", rawHTML, re.DOTALL)
-	if items:
-		url = "http://bash.org.ru/quote/%s" % (items.group(1))
-		quote = decode(items.group(2), "cp1251")
-		sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
+		url = "http://bash.org.ru/random"
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		items = re.search("quote/(\d+).+?<div>(.+?)</div>", rawhtml, re.DOTALL)
+		if items:
+			url = "http://bash.org.ru/quote/%s" % (items.group(1))
+			quote = decode(items.group(2), "cp1251")
+			sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
+		else:
+			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не могу")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 def showAbyssQuote(msgType, conference, nick, param):
-	rawHTML = urllib.urlopen("http://bash.org.ru/abysstop").read()
-	items = re.findall("<div class=\"vote\">(.+?)<div>(.+?)</div>", rawHTML, re.DOTALL)
-	if items:
-		items = [i[1] for i in items]
-		rawquote = random.choice(items)
-		message = decode(rawquote, "cp1251")
-		sendMsg(msgType, conference, nick, message)
+	url = "http://bash.org.ru/abysstop"
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		items = re.findall("<div class=\"vote\">(.+?)<div>(.+?)</div>", rawhtml, re.DOTALL)
+		if items:
+			items = [i[1] for i in items]
+			rawquote = random.choice(items)
+			message = decode(rawquote, "cp1251")
+			sendMsg(msgType, conference, nick, message)
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не могу :(")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 def showItHappensQuote(msgType, conference, nick, param):
 	if param and param.isdigit():
 		url = "http://ithappens.ru/story/%s" % (param)
 	else:
 		url = "http://ithappens.ru/random"
-	rawHTML = urllib.urlopen(url).read()
-	items = re.search(r"<div class.+?#(\d+).+?<p class=\"text\">(.+?)</p>", rawHTML, re.DOTALL)
-	if items:
-		url = "http://ithappens.ru/story/%s/" % (items.group(1))
-		quote = decode(items.group(2), "cp1251")
-		sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		items = re.search(r"<div class.+?#(\d+).+?<p class=\"text\">(.+?)</p>", rawhtml, re.DOTALL)
+		if items:
+			url = "http://ithappens.ru/story/%s/" % (items.group(1))
+			quote = decode(items.group(2), "cp1251")
+			sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
+		else:
+			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не могу")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 def showIBashQuote(msgType, conference, nick, param):
 	if param and param.isdigit():
 		url = "http://ibash.org.ru/quote.php?id=%s" % (param)
 	else:
 		url = "http://ibash.org.ru/random.php"
-	rawHTML = urllib.urlopen(url).read()
-	items = re.search(r"<b>#(\d+).+?<div class=\"quotbody\">(.+?)</div>", rawHTML, re.DOTALL)
-	if items:
-		url = "http://ibash.org.ru/quote.php?id=%s" % (items.group(1))
-		quote = decode(items.group(2), "cp1251")
-		sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		items = re.search(r"<b>#(\d+).+?<div class=\"quotbody\">(.+?)</div>", rawhtml, re.DOTALL)
+		if items:
+			url = "http://ibash.org.ru/quote.php?id=%s" % (items.group(1))
+			quote = decode(items.group(2), "cp1251")
+			sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
+		else:
+			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не могу")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 def showJabberQuote(msgType, conference, nick, param):
 	if param and param.isdigit():
 		url = "http://jabber-quotes.ru/id%s" % (param)
 	else:
 		url = "http://jabber-quotes.ru/random"
-	rawHTML = urllib.urlopen(url).read()
-	items = re.search(r"#(\d+).+?<blockquote>(.+?)</blockquote>", rawHTML)
-	if items:
-		quote = unicode(items.group(2), "cp1251")
-		quote = quote.replace("<br><br>", "\n")
-		quote = decode(quote)
-		url = "http://jabber-quotes.ru/id%s/" % (items.group(1))
-		sendMsg(msgType, conference, nick, u"%s\n\n%s" % (quote, url))
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		items = re.search(r"#(\d+).+?<blockquote>(.+?)</blockquote>", rawhtml)
+		if items:
+			quote = unicode(items.group(2), "cp1251")
+			quote = quote.replace("<br><br>", "\n")
+			quote = decode(quote)
+			url = "http://jabber-quotes.ru/id%s/" % (items.group(1))
+			sendMsg(msgType, conference, nick, u"%s\n\n%s" % (quote, url))
+		else:
+			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не могу")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 def showCinemaQuote(msgType, conference, nick, param):
 	pageNum = random.randrange(1, 39)
 	url = "http://skio.ru/afofilms/kino%d.php" % (pageNum)
-	rawHTML = urllib.urlopen(url).read()
-	items = re.search("<ul type=\"circle\"(.+?)</ul>", rawHTML, re.DOTALL)
-	if items:
-		rawHTML = items.group(1)
-		items = re.findall("<li>(.+?)<li>", rawHTML, re.DOTALL)
-		quote = random.choice(items)
-		quote = decode(quote, "cp1251")
-		sendMsg(msgType, conference, nick, quote)
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		items = re.search("<ul type=\"circle\"(.+?)</ul>", rawhtml, re.DOTALL)
+		if items:
+			rawhtml = items.group(1)
+			items = re.findall("<li>(.+?)<li>", rawhtml, re.DOTALL)
+			quote = random.choice(items)
+			quote = decode(quote, "cp1251")
+			sendMsg(msgType, conference, nick, quote)
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не получается")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(showAbyssQuote, u"борб", 10, 
 				u"Показывает случайную цитату из бездны bash.org.ru", 

@@ -51,8 +51,9 @@ BOTCONFIG_FILE = "config.py"
 ACCESS_FILE = "access.txt"
 CONFIG_FILE = "config.txt"
 CONF_FILE = "conferences.txt"
-ERROR_FILE = "%Y.%m.%d_error.txt"
-CRASH_FILE = "%Y.%m.%d_crash.txt"
+LOG_ERROR_FILE = "%Y.%m.%d_error.txt"
+LOG_CRASH_FILE = "%Y.%m.%d_crash.txt"
+LOG_WARN_FILE = "%Y.%m.%d_warn.txt"
 
 FLAG_INFO = "info"
 FLAG_ERROR = "error"
@@ -107,6 +108,16 @@ FORBIDDEN_TYPES = (
 	protocol.TYPE_HEADLINE
 )
 
+LOG_CRASH = 0x1
+LOG_ERROR = 0x2
+LOG_WARN = 0x3
+
+LOG_TYPES = {
+	LOG_CRASH: LOG_CRASH_FILE, 
+	LOG_ERROR: LOG_ERROR_FILE, 
+	LOG_WARN: LOG_WARN_FILE
+}
+
 REJOIN_DELAY = 120
 RECONNECT_DELAY = 15
 RESTART_DELAY = 5
@@ -133,7 +144,7 @@ gURLPtrn = re.compile(r"(http|ftp|svn)(\:\/\/[^\s<]+)")
 
 gSemaphore = threading.BoundedSemaphore(30)
 
-gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "tmr": 0}
+gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "tmr": 0, "warn": 0}
 gVersion = ("Jimm", "0.6.4v [06.07.2010]", "NokiaE51-1/0.34.011")
 
 gBotMsgHandlers = []
@@ -260,7 +271,8 @@ def execute(function, args=None):
 			with gSemaphore:
 				function()
 	except Exception:
-		saveException(function.__name__)
+		printf("Exception in %s function" % (function.__name__), FLAG_ERROR)
+		writeToLog(traceback.format_exc(), LOG_ERROR)
 
 def getUsedMemorySize():
 	if os.name == "posix":
@@ -300,6 +312,24 @@ getFilePath = os.path.join
 
 def getConfigPath(*param):
 	return os.path.join(CONFIG_DIR, *param)
+
+def getURL(url, param=None):
+	if param:
+		query = urllib.urlencode(param)
+		url = u"%s?%s" % (url, query)
+	try:
+		return urllib.urlopen(url)
+	except (IOError) as e:
+		text = u"Unable to open %s (%s)" % (url, e)
+		printf(text, FLAG_WARNING)
+		writeToLog(text, LOG_WARN)
+	return None
+
+def openURL(url, param=None):
+	responce = getURL(url, param)
+	if responce:
+		return responce.read()
+	return None
 
 def decode(text, encoding=None):
 	if encoding:
@@ -717,11 +747,13 @@ def iqHandler(session, stanza):
 	resource = fullJid.getResource()
 	callIqHandlers(stanza, bareJid, resource)
 
-def saveException(funcName):
-	gInfo["err"] += 1
-	printf("Exception in %s function" % (funcName), FLAG_ERROR)
-	path = getFilePath(SYSLOG_DIR, time.strftime(ERROR_FILE))
-	utils.writeFile(path, traceback.format_exc() + "\n", "a")
+def writeToLog(text, logtype):
+	path = getFilePath(SYSLOG_DIR, time.strftime(LOG_TYPES[logtype]))
+	utils.writeFile(path, text + "\n", "a")
+	if LOG_WARN == logtype:
+		gInfo["warn"] += 1
+	else:
+		gInfo["err"] += 1
 
 def loadPlugins():
 	printf("Loading plugins...")
@@ -735,7 +767,8 @@ def loadPlugins():
 				exec(file(path)) in globals()
 				validPlugins += 1
 		except (SyntaxError, NameError):
-			saveException("loadPlugins")
+			printf("Exception in loadPlugins function", FLAG_ERROR)
+			writeToLog(traceback.format_exc(), LOG_ERROR)
 			invalidPlugins += 1
 	if not invalidPlugins:
 		printf("Loaded %d plugins" % (validPlugins), FLAG_SUCCESS)
@@ -839,8 +872,7 @@ if __name__ == "__main__":
 		shutdown()
 	except Exception:
 		printf("Exception in main thread", FLAG_ERROR)
-		path = getFilePath(SYSLOG_DIR, time.strftime(CRASH_FILE))
-		utils.writeFile(path, traceback.format_exc() + "\n", "a")
+		writeToLog(traceback.format_exc(), LOG_CRASH)
 		if gClient.isConnected():
 			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
 			prs.setStatus(u"что-то сломалось...")

@@ -13,20 +13,22 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-FACTS_COUNT = 28
-
 def showFact(msgType, conference, nick, param):
-	pageNum = random.randrange(1, FACTS_COUNT + 1)
+	pageNum = random.randrange(1, 29)
 	url = "http://skio.ru/facts/fact%d.php" % (pageNum)
-	rawHTML = urllib.urlopen(url).read()
-	items = re.search("<div style=.+?<ul>(.+?)</ul>", rawHTML, re.DOTALL)
-	if items:
-		rawHTML = items.group(1)
-		items = re.findall("<li>(.+?)</li>", rawHTML, re.DOTALL)
-		fact = random.choice(items)
-		sendMsg(msgType, conference, nick, decode(fact, "cp1251"))
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		items = re.search("<div style=.+?<ul>(.+?)</ul>", rawhtml, re.DOTALL)
+		if items:
+			rawhtml = items.group(1)
+			items = re.findall("<li>(.+?)</li>", rawhtml, re.DOTALL)
+			fact = random.choice(items)
+			sendMsg(msgType, conference, nick, decode(fact, "cp1251"))
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не получается")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(showFact, u"факт", 10, 
 				u"Показывает случайный интересный факт", 

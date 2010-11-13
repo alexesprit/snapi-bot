@@ -21,30 +21,34 @@ def loadLangsForTranslate():
 	path = getFilePath(RESOURCE_DIR, TRANSL_LANGS_FILE)
 	TRANSL_LANGS = eval(utils.readFile(path, "utf-8"))
 
-def getTranslateQuery(text):
+def getTranslateQuery(text, langpair=None):
 	param = {
 		"v": "1.0", 
 		"q": text.encode("utf-8")
 	}
-	query = urllib.urlencode(param)
-	return query
+	if langpair:
+		param["langpair"] = langpair
+	return param
 
 def getTranslatedText(text, source, target):
-	query = getTranslateQuery(text)
-	url = "http://ajax.googleapis.com/ajax/services/language/translate?%s&langpair=%s|%s" % (query, source, target)
-	request = urllib.urlopen(url)
-	answer = simplejson.load(request)
-	if answer["responseData"]:
-		return answer["responseData"]["translatedText"]
+	url = "http://ajax.googleapis.com/ajax/services/language/translate"
+	langpair = "%s|%s" % (source, target)
+	qparam = getTranslateQuery(text, langpair)
+	responce = getURL(url, qparam)
+	if responce:
+		answer = simplejson.load(responce)
+		if answer["responseData"]:
+			return answer["responseData"]["translatedText"]
 	return None
 
 def detectLanguage(text):
-	query = getTranslateQuery(text)
-	url = "http://ajax.googleapis.com/ajax/services/language/detect?%s" % (query)
-	request = urllib.urlopen(url)
-	answer = simplejson.load(request)
-	if answer["responseData"]:
-		return answer["responseData"]["language"]
+	url = "http://ajax.googleapis.com/ajax/services/language/detect"
+	qparam = getTranslateQuery(text)
+	responce = getURL(url, qparam)
+	if responce:
+		answer = simplejson.load(responce)
+		if answer["responseData"]:
+			return answer["responseData"]["language"]
 	return None
 
 def translateText(msgType, conference, nick, param):

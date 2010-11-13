@@ -15,14 +15,18 @@
 
 def showAnecdote(msgType, conference, nick, param):
 	url = "http://anekdot.odessa.ua/rand-anekdot.php"
-	rawHTML = urllib.urlopen(url).read()
-	items = re.search("color:#FFFFFF'>(.+?)<a href", rawHTML, re.DOTALL)
-	if items:
-		rawtext = items.group(1).replace("<br />", "")
-		anecdote = decode(rawtext, "cp1251")
-		sendMsg(msgType, conference, nick, anecdote)
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		items = re.search("color:#FFFFFF'>(.+?)<a href", rawhtml, re.DOTALL)
+		if items:
+			rawtext = items.group(1).replace("<br />", "")
+			anecdote = decode(rawtext, "cp1251")
+			sendMsg(msgType, conference, nick, anecdote)
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не получается")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(showAnecdote, u"анекдот", 10, 
 				u"Показывает случайный анекдот", 

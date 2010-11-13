@@ -192,18 +192,7 @@ class Dispatcher(plugin.PlugIn):
 		if handler in self.handlers[xmlns][name][key]:
 			self.handlers[xmlns][name][key].remove(handler)
 			if not self.handlers[xmlns][name][key]:
-				for item in self.handlers[xmlns].keys():
-					if self.isTreeEmpty(self.handlers[xmlns][item]):
-						del self.handlers[xmlns][item]
-				if not self.handlers[xmlns]:
-					del self.handlers[xmlns]
-
-	def isTreeEmpty(self, tree):
-		for branch in tree:
-			if isinstance(tree[branch], list):
-				if not tree[branch]:
-					return True
-		return False
+				del self.handlers[xmlns][name]
 
 	def streamErrorHandler(self, conn, error):
 		name, text = "error", error.getData()

@@ -16,14 +16,18 @@
 
 def showGeoIPInfo(msgType, conference, nick, param):
 	host = param or gHost
-	query = urllib.urlencode({"host": host.encode("utf-8")})
-	url = "http://www.and-rey.ru/geoip/ie.php?%s" % (query)
-	rawHTML = urllib.urlopen(url).read()
-	rawHTML = unicode(rawHTML, "cp1251")
-	items = re.findall("<td class=red>(.+?)</td><td class=blue>(.+?)</td>", rawHTML)
-	items = [u"%s %s" % (item[0], item[1]) for item in items]
-	message = u"Инфо о %s:\n%s" % (host, decode("\n".join(items)))
-	sendMsg(msgType, conference, nick, message)
+	url = "http://www.and-rey.ru/geoip/ie.php"
+	qparam = {"host": host.encode("utf-8")}
+	responce = getURL(url, qparam)
+	if responce:
+		rawhtml = responce.read()
+		rawhtml = unicode(rawhtml, "cp1251")
+		items = re.findall("<td class=red>(.+?)</td><td class=blue>(.+?)</td>", rawhtml)
+		items = [u"%s %s" % (item[0], item[1]) for item in items]
+		message = u"Инфо о %s:\n%s" % (host, decode("\n".join(items)))
+		sendMsg(msgType, conference, nick, message)
+	else:
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(showGeoIPInfo, u"геоип", 10, 
 				u"Показывает информацию о географическом месторасположении хоста", 

@@ -14,15 +14,20 @@
 # GNU General Public License for more details.
 
 def showDates(msgType, conference, nick, param):
-	rawHTML = urllib.urlopen("http://wap.n-urengoy.ru/cgi-bin/wappr.pl").read()
-	rawHTML = unicode(rawHTML, "utf-8")
-	dates = rawHTML.split("<br/>-----<br/>")
-	dates = dates[1:-1]
-	if dates:
-		dates = [date.split("/")[0] for date in dates]
-		sendMsg(msgType, conference, nick, u"Глянь, что я нашла:" + u"\n".join(dates))
+	url = "http://wap.n-urengoy.ru/cgi-bin/wappr.pl"
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		rawhtml = unicode(rawhtml, "utf-8")
+		dates = rawhtml.split("<br/>-----<br/>")
+		dates = dates[1:-1]
+		if dates:
+			dates = [date.split("/")[0] for date in dates]
+			sendMsg(msgType, conference, nick, u"Глянь, что я нашла:" + u"\n".join(dates))
+		else:
+			sendMsg(msgType, conference, nick, u"На сегодня праздников нет")
 	else:
-		sendMsg(msgType, conference, nick, u"Ничего не нашла :(")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(showDates, u"праздники", 10, 
 				u"Показывает праздники на сегодня и завтра", 

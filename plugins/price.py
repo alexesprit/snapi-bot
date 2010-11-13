@@ -14,20 +14,24 @@
 # GNU General Public License for more details.
 
 def showPrice(msgType, conference, nick, param):
-	query = urllib.quote(param.encode("utf-8"))
-	url = "http://www.webvaluer.org/ru/www.%s" % (query)
-	rawHTML = urllib.urlopen(url).read()
-	items = re.search(r"<td class=\"value\">(.+?)</td>", rawHTML, re.DOTALL)
-	if items:
-		cost = unicode(items.group(1), "utf-8")
-		cost = cost.split()
-		if len(cost) == 2:
-			cost = "%s %s" % (cost[1], cost[0])
+	domen = urllib.quote(param.encode("utf-8"))
+	url = "http://www.webvaluer.org/ru/www.%s" % (domen)
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		items = re.search(r"<td class=\"value\">(.+?)</td>", rawhtml, re.DOTALL)
+		if items:
+			cost = unicode(items.group(1), "utf-8")
+			cost = cost.split()
+			if len(cost) == 2:
+				cost = "%s %s" % (cost[1], cost[0])
+			else:
+				cost = cost[0]
+			sendMsg(msgType, conference, nick, u"Стоимость домена %s составляет %s" %  (param, cost))
 		else:
-			cost = cost[0]
-		sendMsg(msgType, conference, nick, u"Стоимость домена %s составляет %s" %  (param, cost))
+			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не получается :(")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(showPrice, u"домен", 10, 
 				u"Показывает оценочную стоимость домена", 

@@ -16,14 +16,19 @@
 WEEKDAYS = (u"понедельник", u"вторник", u"среда", u"четверг", u"пятница", u"суббота", u"воскресенье")
 
 def showMoscowTime(msgType, conference, nick, param):
-	text = urllib.urlopen("http://www.zln.ru/time/").read()
-	items = re.search(r"<div id=\"servertime.+?>(.+?)</div>", text, re.DOTALL)
-	if items:
-		mskTime = unicode(items.group(1), "cp1251").strip()
-		message = u"Московское время: %s (%s, %s)" % (mskTime, time.strftime("%d.%m.%y"), WEEKDAYS[time.localtime()[6]])
-		sendMsg(msgType, conference, nick, message)
+	url = "http://www.zln.ru/time/"
+	responce = getURL(url)
+	if responce:
+		rawhtml = responce.read()
+		items = re.search(r"<div id=\"servertime.+?>(.+?)</div>", rawhtml, re.DOTALL)
+		if items:
+			mskTime = unicode(items.group(1), "cp1251").strip()
+			message = u"Московское время: %s (%s, %s)" % (mskTime, time.strftime("%d.%m.%y"), WEEKDAYS[time.localtime()[6]])
+			sendMsg(msgType, conference, nick, message)
+		else:
+			sendMsg(msgType, conference, nick, u"Не получается")
 	else:
-		sendMsg(msgType, conference, nick, u"Не получается")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(showMoscowTime, u"время", 10, 
 				u"Показывает точное московское время", 

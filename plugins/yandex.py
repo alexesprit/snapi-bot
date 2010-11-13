@@ -14,21 +14,29 @@
 # GNU General Public License for more details.
 
 def searchInYandex(msgType, conference, nick, param):
-	query = urllib.urlencode({"query": param.encode("utf-8")})
-	rawHTML = urllib.urlopen("http://yandex.ru/msearch?s=all&%s" % (query)).read()
-	rawHTML = unicode(rawHTML, "utf-8")
-	items = re.findall("<li>\n(.+?)<p class=\"b-phone\">.+?<div class=\"www\">(.+?)</div>", rawHTML, re.DOTALL)
-	if items:
-		if protocol.TYPE_PUBLIC == msgType:
-			text = items[0][0].strip()
-			url = items[0][1]
-			message = u"%s\nhttp://%s" % (text, url)
+	url = "http://yandex.ru/msearch"
+	qparam = {
+		"s": "all",
+		"query": param.encode("utf-8")
+	}
+	responce = getURL(url, qparam)
+	if responce:
+		rawhtml = responce.read()
+		rawhtml = unicode(rawhtml, "utf-8")
+		items = re.findall("<li>\n(.+?)<p class=\"b-phone\">.+?<div class=\"www\">(.+?)</div>", rawhtml, re.DOTALL)
+		if items:
+			if protocol.TYPE_PUBLIC == msgType:
+				text = items[0][0].strip()
+				url = items[0][1]
+				message = u"%s\nhttp://%s" % (text, url)
+			else:
+				items = [u"%s\nhttp://%s" % (item[0].strip(), item[1]) for item in items[:5]]
+				message = "\n\n".join(items)
+			sendMsg(msgType, conference, nick, decode(message));	
 		else:
-			items = [u"%s\nhttp://%s" % (item[0].strip(), item[1]) for item in items[:5]]
-			message = "\n\n".join(items)
-		sendMsg(msgType, conference, nick, decode(message));	
+			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не найдено!")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(searchInYandex, u"яндекс", 10, 
 				u"Поиск через Yandex", 

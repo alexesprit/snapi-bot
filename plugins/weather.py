@@ -62,51 +62,55 @@ def showWeather(msgType, conference, nick, param):
 	if rawData:
 		city, code = rawData
 		url = "http://informer.gismeteo.ru/xml/%s.xml" % (code.strip())
-		rawXML = urllib.urlopen(url).read()
-		node = simplexml.XML2Node(rawXML)
-		node = node.getTag("REPORT").getTag("TOWN")
-		message = u"Погода в городе %s:\n" % (city.decode("utf-8"))
-		for forecast in node.getTags("FORECAST"):
-			attrs = forecast.getAttrs()
-			message += u"[%(day)s.%(month)s.%(year)s, %(hour)s:00]\n"% (attrs)
+		responce = getURL(url)
+		if responce:
+			rawxml = responce.read()
+			node = simplexml.XML2Node(rawxml)
+			node = node.getTag("REPORT").getTag("TOWN")
+			message = u"Погода в городе %s:\n" % (city.decode("utf-8"))
+			for forecast in node.getTags("FORECAST"):
+				attrs = forecast.getAttrs()
+				message += u"[%(day)s.%(month)s.%(year)s, %(hour)s:00]\n"% (attrs)
 
-			weather = forecast.getTag("PHENOMENA").getAttrs()
-			message += CLOUDINESS[weather["cloudiness"]]
-			precipitation = weather["precipitation"]
-			if precipitation not in ["8", "9", "10"]:
-				rpower = weather["rpower"]
-				if "0" == rpower:
-					message += u", возможен %s\n" % (PRECIPITATION[precipitation])
+				weather = forecast.getTag("PHENOMENA").getAttrs()
+				message += CLOUDINESS[weather["cloudiness"]]
+				precipitation = weather["precipitation"]
+				if precipitation not in ["8", "9", "10"]:
+					rpower = weather["rpower"]
+					if "0" == rpower:
+						message += u", возможен %s\n" % (PRECIPITATION[precipitation])
+					else:
+						message += u", %s\n" % (PRECIPITATION[precipitation])
+				elif "8" == precipitation:
+					spower = weather["spower"]
+					if "0" == rpower:
+						message += u", возможна %s\n" % (PRECIPITATION[precipitation])
+					else:
+						message += u", %s\n" % (PRECIPITATION[precipitation])
 				else:
 					message += u", %s\n" % (PRECIPITATION[precipitation])
-			elif "8" == precipitation:
-				spower = weather["spower"]
-				if "0" == rpower:
-					message += u", возможна %s\n" % (PRECIPITATION[precipitation])
-				else:
-					message += u", %s\n" % (PRECIPITATION[precipitation])
-			else:
-				message += u", %s\n" % (PRECIPITATION[precipitation])
 
-			temp = forecast.getTag("TEMPERATURE").getAttrs()
-			message += u"Температура: %d°C\n" % (getAverageValue(temp))
+				temp = forecast.getTag("TEMPERATURE").getAttrs()
+				message += u"Температура: %d°C\n" % (getAverageValue(temp))
 
-			pressure = forecast.getTag("PRESSURE").getAttrs()
-			message += u"Давление: %d мм рт. ст.\n" % (getAverageValue(pressure))
-			
-			hudmity = forecast.getTag("RELWET").getAttrs()
-			message += u"Влажность: %s%%\n" % (getAverageValue(hudmity))
-			
-			wind = forecast.getTag("WIND").getAttrs()
-			windValue = getAverageValue(wind)
-			if windValue:
-				message += u"Ветер: %d м/с (%s)\n" % (windValue, WINDDIRECTION[wind["direction"]])
-			message += "\n"
-		if protocol.TYPE_PUBLIC == msgType:
-			sendMsg(msgType, conference, nick, u"Ушла")
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
+				pressure = forecast.getTag("PRESSURE").getAttrs()
+				message += u"Давление: %d мм рт. ст.\n" % (getAverageValue(pressure))
+				
+				hudmity = forecast.getTag("RELWET").getAttrs()
+				message += u"Влажность: %s%%\n" % (getAverageValue(hudmity))
+				
+				wind = forecast.getTag("WIND").getAttrs()
+				windValue = getAverageValue(wind)
+				if windValue:
+					message += u"Ветер: %d м/с (%s)\n" % (windValue, WINDDIRECTION[wind["direction"]])
+				message += "\n"
+			if protocol.TYPE_PUBLIC == msgType:
+				sendMsg(msgType, conference, nick, u"Ушла")
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
-		sendMsg(msgType, conference, nick, u"Не могу :(")
+		sendMsg(msgType, conference, nick, u"Город не найден!")
 
 registerCommand(showWeather, u"погода", 10, 
 				u"Показывает погоду", 

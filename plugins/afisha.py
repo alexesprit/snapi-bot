@@ -100,30 +100,32 @@ def getFullSchedule(city):
 			or (now[2] == x1[2] and now[1] == x1[1] and now[0] == x1[0] and now[3] <= 3 and x1[3] > 3):
 			return gAfishaCache[city]["schedule"]
 	schedule = []
-	getcinema = re.compile(u"class=\"b-td-item\">(?:[^>]+)>([^<]+)</a")
-	gettime = re.compile(u"<span (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")
-	gettime2 = re.compile(u"<a (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")
-	site = urllib.urlopen("http://www.afisha.ru/%s/schedule_cinema/" % (city))
-	text = unicode(site.read(), "utf-8")
-	list1 = re.split(u"<h3 class=\"usetags\">([^>]+)>(?:\s*)([^<]+)(?:\s*)<", text, re.DOTALL)
-	timetable = re.compile(u"table>")
-	films = zip(list1[2::3],list1[3::3])
-	for film in films:
-		list2 = getcinema.split(timetable.split(film[1])[1], re.DOTALL)
-		cinemas = zip(list2[1::2], list2[2::2])
-		for cinema in cinemas:
-			list3 = gettime.split(cinema[1],re.DOTALL)
-			for time1 in list3[1::2]:
-				if gettime2.match(time1):
-					if gettime2.split(time1)[1].find(":") > -1:
-						schedule.append((film[0], cinema[0], gettime2.split(time1)[1]))
-				else:
-					if time1.find(":") > -1:
-						schedule.append((film[0], cinema[0], time1))
-	schedule.sort(CompareSchedules)
-	gAfishaCache[city] = {}
-	gAfishaCache[city]["update"] = time.time()
-	gAfishaCache[city]["schedule"] = schedule
+	url = "http://www.afisha.ru/%s/schedule_cinema/" % (city)
+	responce = getURL(url)
+	if responce:
+		rawhtml = unicode(responce.read(), "utf-8")
+		getcinema = re.compile(u"class=\"b-td-item\">(?:[^>]+)>([^<]+)</a")
+		gettime = re.compile(u"<span (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")
+		gettime2 = re.compile(u"<a (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")
+		list1 = re.split(u"<h3 class=\"usetags\">([^>]+)>(?:\s*)([^<]+)(?:\s*)<", rawhtml, re.DOTALL)
+		timetable = re.compile(u"table>")
+		films = zip(list1[2::3],list1[3::3])
+		for film in films:
+			list2 = getcinema.split(timetable.split(film[1])[1], re.DOTALL)
+			cinemas = zip(list2[1::2], list2[2::2])
+			for cinema in cinemas:
+				list3 = gettime.split(cinema[1],re.DOTALL)
+				for time1 in list3[1::2]:
+					if gettime2.match(time1):
+						if gettime2.split(time1)[1].find(":") > -1:
+							schedule.append((film[0], cinema[0], gettime2.split(time1)[1]))
+					else:
+						if time1.find(":") > -1:
+							schedule.append((film[0], cinema[0], time1))
+		schedule.sort(CompareSchedules)
+		gAfishaCache[city] = {}
+		gAfishaCache[city]["update"] = time.time()
+		gAfishaCache[city]["schedule"] = schedule
 	return schedule
 
 def getCityTime(city):

@@ -30,25 +30,37 @@ def convertValues(msgType, conference, nick, param):
 		if len(param.split()) == 3:
 			param = param.upper().split()
 			try:
-				count = float(param[2])
+				value = float(param[2])
 			except ValueError:
 				sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 				return
 			source = param[0]
 			target = param[1]
 			if source in CONV_VALUES and target in CONV_VALUES:
-				date = tuple(time.localtime())[1:3]
-				url = "http://conv.rbc.ru/convert.shtml?tid_from=%s&tid_to=%s&summa=%s&day=%s&month=%s"
-				url %= (source, target, count, date[1], date[0])
-				rawhtml = urllib.urlopen(url.replace("RUR", "BASE")).read()
-				rawhtml = unicode(rawhtml, "cp1251")
-				items = re.search("<TD><B>.+?</B>.+?<TD><B>(.+?)</B>.+?<TD><B>(.+?)</B></TD>", rawhtml, re.DOTALL)
-				if items:
-					message = u"%s %s = %s %s\n1 %s = %s %s" % (count, source, items.group(2), target, source, items.group(1), target)
-					message = message.replace("BASE", "RUR")
-					sendMsg(msgType, conference, nick, message)
+				if source == "RUR":
+					source = "BASE"
+				if target == "RUR":
+					target = "BASE"
+				url = "http://conv.rbc.ru/convert.shtml"
+				qparam = {
+					"tid_from": source,
+					"tid_to": target,
+					"summa": value
+				}
+				responce = getURL(url, qparam)
+				if responce:
+					rawhtml = responce.read()
+					items = re.search("<TD><B>.+?</B>.+?<TD><B>(.+?)</B>.+?<TD><B>(.+?)</B></TD>", rawhtml, re.DOTALL)
+					if items:
+						sourceValue = unicode(items.group(2), "cp1251")
+						targetValue = unicode(items.group(1), "cp1251")
+						message = u"%s %s = %s %s\n1 %s = %s %s" % (value, source, sourceValue, target, source, targetValue, target)
+						message = message.replace("BASE", "RUR")
+						sendMsg(msgType, conference, nick, message)
+					else:
+						sendMsg(msgType, conference, nick, u"Ошибка!")
 				else:
-					sendMsg(msgType, conference, nick, u"Не получается")
+					sendMsg(msgType, conference, nick, u"Ошибка!")
 			else:
 				sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 

@@ -31,15 +31,14 @@ def loadTVChannels():
 	path = getFilePath(RESOURCE_DIR, TVCODES_FILE)
 	TV_CHANNELS = eval(utils.readFile(path, "utf-8"))
 
-def getTVQuery(channel, flag=None):
+def getTVQueryParam(channel, flag=None):
 	param = {
 		"mode": "print",
 		"channel": channel
 	}
 	if flag:
-		param["flag"] = flag
-	query = urllib.urlencode(param)
-	return query
+		qparam["flag"] = flag
+	return qparam
 
 def getTVChannelCode(channelName):
 	if channelName.isdigit():
@@ -50,39 +49,45 @@ def getTVChannelCode(channelName):
 				return TV_CHANNELS[x]
 
 def getTVForChannel(channelCode):
-	url = "http://tv.yandex.ru/?%s" % (getTVQuery(channelCode))
-	rawHTML = urllib.urlopen(url).read()
-	items = re.findall(r"<div>(.+?)\n", rawHTML)
-	if items:
-		rawtext = "\n".join(items)
-		return decode(rawtext, "utf-8")
+	url = "http://tv.yandex.ru/"
+	qparam = getTVQueryParam(channelCode)
+	responce = getURL(url, qparam)
+	if responce:
+		rawHTML = responce.read()
+		items = re.findall(r"<div>(.+?)\n", rawHTML)
+		if items:
+			rawtext = "\n".join(items)
+			return decode(rawtext, "utf-8")
 	return None
 
 def getTVForCategory(category):
 	channels = ",".join(TV_CHANNELS.values())
-	url = "http://tv.yandex.ru/?%s" % (getTVQuery(channels, category))
+	url = "http://tv.yandex.ru/?"
+	qparam = getTVQueryParam(channels, category)
 
-	rawhtml = unicode(urllib.urlopen(url).read(), "utf-8")
-	pattern = re.compile(r"<table.+?class=\"channel\".+?>(.+?)</table>", re.DOTALL)
-	nameptrn = re.compile(r"<br><b>(.+?)</b><br><br>")
-	itemptrn = re.compile(r"<div>(.+?)\n")
-	
-	program = {}
-	channels = []
-	message = []
+	responce = getURL(url, qparam)
+	if responce:
+		rawhtml = unicode(responce.read(), "utf-8")
+		pattern = re.compile(r"<table.+?class=\"channel\".+?>(.+?)</table>", re.DOTALL)
+		nameptrn = re.compile(r"<br><b>(.+?)</b><br><br>")
+		itemptrn = re.compile(r"<div>(.+?)\n")
+		
+		program = {}
+		channels = []
+		message = []
 
-	tables = pattern.findall(rawhtml)
-	for table in tables:
-		channel = nameptrn.search(table).group(1)
-		if channel not in program:
-			program[channel] = []
-			channels.append(channel)
-			program[channel] = "\n".join(itemptrn.findall(table))
+		tables = pattern.findall(rawhtml)
+		for table in tables:
+			channel = nameptrn.search(table).group(1)
+			if channel not in program:
+				program[channel] = []
+				channels.append(channel)
+				program[channel] = "\n".join(itemptrn.findall(table))
 
-	for channel in channels:
-		message.append(u"%s:\n%s" % (channel, decode(program[channel])))
-	if message:
-		return "\n".join(message)
+		for channel in channels:
+			message.append(u"%s:\n%s" % (channel, decode(program[channel])))
+		if message:
+			return "\n".join(message)
 	return None
 
 def showTVProgram(msgType, conference, nick, param):

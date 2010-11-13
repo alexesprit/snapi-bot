@@ -52,13 +52,17 @@ def showHoroscope(msgType, conference, nick, param):
 			rawdate = u"today"
 
 		url = "http://img.ignio.com/r/export/utf/xml/daily/com.xml"
-		rawxml = urllib.urlopen(url).read()
-		xmlnode = simplexml.XML2Node(rawxml)
-		
-		horoNode = xmlnode.getTag(rawsign)
-		text = horoNode.getTagData(rawdate)
-		date = xmlnode.getTagAttr("date", rawdate)
-		sendMsg(msgType, conference, nick, u"Гороскоп на %s: %s" % (date, text))
+		responce = getURL(url)
+		if responce:
+			rawxml = responce.read()
+			xmlnode = simplexml.XML2Node(rawxml)
+			
+			horoNode = xmlnode.getTag(rawsign)
+			text = horoNode.getTagData(rawdate)
+			date = xmlnode.getTagAttr("date", rawdate)
+			sendMsg(msgType, conference, nick, u"Гороскоп на %s: %s" % (date, text))
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
 		message = u"Можно указывать только следующие знаки: %s" % (", ".join(sorted(HOROSCOPE_SIGNS.keys())))
 		sendMsg(msgType, conference, nick, message)
