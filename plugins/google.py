@@ -40,8 +40,8 @@ def searchInGoogleRU(msgType, conference, nick, text):
 def searchInGoogle(msgType, conference, nick, url, qparam):
 	responce = getURL(url, qparam)
 	if responce:
-		answer = simplejson.load(req)
-		results = answer["responseData"]["results"]
+		responce = simplejson.load(responce)
+		results = responce["responseData"]["results"]
 		if results:
 			if msgType == protocol.TYPE_PUBLIC:
 				msg = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (results[0])]

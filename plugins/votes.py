@@ -23,7 +23,7 @@ VOTE_FINISHED = 0x3
 gVote = {}
 
 def getVoteText(conference):
-	voteText = u"Голосование\nСоздатель: %(creator)s\n%(text)s\n" % (gVote[conference])
+	voteText = u"Текущее голосование\nСоздатель: %(creator)s\n%(text)s\n" % (gVote[conference])
 	items = [u" %d) %s" % (i + 1, x[0]) for i, x in enumerate(gVote[conference]["opinions"])]
 	voteText += "\n".join(items)
 	voteText += u"\nЧтобы проголосовать, напиши номер мнения, например \"мнение 1\""
@@ -34,7 +34,7 @@ def getVoteResults(conference):
 	answers.sort()
 	answers.reverse()
 	voteText = u"Результаты голосования\nСоздатель: %(creator)s\n%(text)s\n%%s" % (gVote[conference])
-	items = [u" * %s (%d место и %d голосов)" % (x[1], i + 1, x[0]) for i, x in enumerate(answers)]
+	items = [u" %d) %s (%d голосов)" % (i + 1, x[1], x[0]) for i, x in enumerate(answers)]
 	return voteText % ("\n".join(items))
 
 def saveVotes(conference):
