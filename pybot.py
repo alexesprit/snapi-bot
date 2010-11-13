@@ -319,7 +319,7 @@ def getURL(url, param=None):
 		url = u"%s?%s" % (url, query)
 	try:
 		return urllib.urlopen(url)
-	except (IOError) as e:
+	except (IOError), e:
 		text = u"Unable to open %s (%s)" % (url, e)
 		printf(text, FLAG_WARNING)
 		writeToLog(text, LOG_WARN)

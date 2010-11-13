@@ -20,7 +20,11 @@ def showBotUptime(msgType, conference, nick, parameters):
 	memUsage = getUsedMemorySize()
 	if memUsage: 
 		message += u"Используется %0.2f МБ памяти. " % (memUsage)
-	message += u"Было запущено %(tmr)d таймеров, %(thr)d потоков, %(err)d ошибок, %(warn)d предупрежедний, " % (gInfo)
+	message += u"Было запущено %(tmr)d таймеров, %(thr)d потоков, " % (gInfo)
+	if gInfo["err"]:
+		message += u"%(err)d ошибок, " % (gInfo)
+	if gInfo["warn"]:
+		message += u"%(warn)d предупреждений, " % (gInfo)
 	message += u"в данный момент активно %d потоков" % (threading.activeCount())
 	sendMsg(msgType, conference, nick, message)
 
