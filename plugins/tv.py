@@ -37,8 +37,8 @@ def getTVQueryParam(channel, flag=None):
 		"channel": channel
 	}
 	if flag:
-		qparam["flag"] = flag
-	return qparam
+		param["flag"] = flag
+	return param
 
 def getTVChannelCode(channelName):
 	if channelName.isdigit():
@@ -62,7 +62,7 @@ def getTVForChannel(channelCode):
 
 def getTVForCategory(category):
 	channels = ",".join(TV_CHANNELS.values())
-	url = "http://tv.yandex.ru/?"
+	url = "http://tv.yandex.ru/"
 	qparam = getTVQueryParam(channels, category)
 
 	responce = getURL(url, qparam)
