@@ -57,10 +57,11 @@ def _saveUserClient(stanza, conference, trueJid):
 	if protocol.TYPE_RESULT == stanza.getType():
 		base = gUserClients[conference]
 		query = stanza.getQueryNode()
-		name = query.getTagData("name")
-		if name:
-			if not name in base[trueJid]:
-				base[trueJid].append(name)
+		if query:
+			name = query.getTagData("name")
+			if name:
+				if not name in base[trueJid]:
+					base[trueJid].append(name)
 
 def saveAllClientsBases():
 	for conference in getConferences():
