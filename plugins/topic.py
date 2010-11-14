@@ -14,12 +14,17 @@
 # GNU General Public License for more details.
 
 def setTopic(msgType, conference, nick, param):
-	message = protocol.Message(to=conference, typ=protocol.TYPE_PUBLIC, subject=param)
+	message = protocol.Message(to=conference, typ=protocol.TYPE_PUBLIC)
+	subject = param or ""
+	message.setSubject(subject)
 	gClient.send(message)
-	sendMsg(msgType, conference, nick, u"Установила")
+	if subject:
+		sendMsg(msgType, conference, nick, u"Установила")
+	else:
+		sendMsg(msgType, conference, nick, u"Убрала")
 
 registerCommand(setTopic, u"топег", 20, 
 				u"Устанавливает тему в конференции", 
 				u"топег <текст>", 
 				(u"топег ололо", ), 
-				CHAT | PARAM)
+				CHAT)
