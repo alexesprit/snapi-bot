@@ -39,12 +39,14 @@ def pythonShell(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, unicode(message, enc))
 
 def pythonCalc(msgType, conference, nick, param):
-	if not re.sub("([0-9]+|[\+\-\/\*\^\.\(\)<>\|\&\^~])", "", param).strip():
+	if not re.sub("([0-9]+|[\+\-\/\*\^\.\(\)\|\&\^~])", "", param).strip():
 		if not param.count("**"):
 			try:
 				sendMsg(msgType, conference, nick, str(eval(param)))
 			except (ZeroDivisionError, SyntaxError):
-				sendMsg(msgType, conference, nick, u"Научи меня это делать :)");		
+				sendMsg(msgType, conference, nick, u"Научи меня это делать :)")
+			except (MemoryError, OverflowError):
+				sendMsg(msgType, conference, nick, u"Я не такая умная, чтоб сосчитать такое :(")
 		else:
 			sendMsg(msgType, conference, nick, u"Не буду такое считать")
 	else:
