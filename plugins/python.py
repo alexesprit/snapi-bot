@@ -23,7 +23,7 @@ def pythonEval(msgType, conference, nick, param):
 
 def pythonExec(msgType, conference, nick, param):
 	try:
-		exec(unicode(param)) in globals()
+		exec(unicode(param) + "\n") in globals()
 	except Exception:
 		sendMsg(msgType, conference, nick, traceback.format_exc())
 

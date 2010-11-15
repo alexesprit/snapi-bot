@@ -16,7 +16,7 @@
 def showWhoIs(msgType, conference, nick, param):
 	url = "http://1whois.ru/index.php"
 	qparam = {"url": param.encode("utf-8")}
-	responce = getURL(url, param)
+	responce = getURL(url, qparam)
 	if responce:
 		rawhtml = responce.read()
 		items = re.search("<blockquote>(.*?)</font></blockquote>", rawhtml, re.DOTALL)
