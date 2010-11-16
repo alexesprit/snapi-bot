@@ -23,7 +23,7 @@ def searchInYandex(msgType, conference, nick, param):
 	if responce:
 		rawhtml = responce.read()
 		rawhtml = unicode(rawhtml, "utf-8")
-		items = re.findall("<li>\n(.+?)<p class=\"b-phone\">.+?<div class=\"www\">(.+?)</div>", rawhtml, re.DOTALL)
+		items = re.findall("<li >(.+?)<p class=\"b-phone\">.+?<div class=\"www\">(.+?)</div>", rawhtml, re.DOTALL)
 		if items:
 			if protocol.TYPE_PUBLIC == msgType:
 				text = items[0][0].strip()
