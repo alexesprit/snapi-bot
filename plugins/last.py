@@ -17,7 +17,7 @@ def showOnlineTime(msgType, jid, resource, param):
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_LAST)
 	iq.setTo(jid)
 	iq.setID(getUniqueID("last_id"))
-	gClient.sendAndCallForResponse(iq, _showOnlineTime, (msgType, jid, resource, ))
+	gClient.sendAndCallForResponse(iq, _showOnlineTime, (msgType, jid, resource))
 
 def _showOnlineTime(stanza, msgType, jid, resource):
 	if protocol.TYPE_RESULT == stanza.getType():

@@ -35,7 +35,7 @@ def _showServerInfo(stanza, msgType, conference, nick, server):
 		iq.setQueryPayload(stanza.getQueryChildren())
 		iq.setTo(server)
 		iq.setID(getUniqueID("info_id"))
-		gClient.sendAndCallForResponse(iq, _showServerStats, (msgType, conference, nick, server, ))
+		gClient.sendAndCallForResponse(iq, _showServerStats, (msgType, conference, nick, server))
 	else:
 		sendMsg(msgType, conference, nick, u"Не получается :(")
 
@@ -44,7 +44,7 @@ def showServerInfo(msgType, conference, nick, param):
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_STATS)
 	iq.setTo(server)
 	iq.setID(getUniqueID("info_id"))
-	gClient.sendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, server, ))
+	gClient.sendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, server))
 
 def _showServerUptime(stanza, msgType, conference, nick, server):
 	if protocol.TYPE_RESULT == stanza.getType():
@@ -62,7 +62,7 @@ def showServerUptime(msgType, conference, nick, param):
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_LAST)
 	iq.setTo(server)
 	iq.setID(getUniqueID("uptime_id"))
-	gClient.sendAndCallForResponse(iq, _showServerUptime, (msgType, conference, nick, server, ))
+	gClient.sendAndCallForResponse(iq, _showServerUptime, (msgType, conference, nick, server))
 
 registerCommand(showServerInfo, u"инфа", 10, 
 				u"Возвращает статистику о сервере", 

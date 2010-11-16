@@ -798,64 +798,60 @@ def shutdown(restart=False):
 		printf("Terminating...")
 		os.abort()
 
-def start():
-	global gRoster
-
-	loadPlugins()
-
-	printf("Connecting...")
-	if gClient.connect(secureMode=gSecureMode, useResolver=gUseResolver):
-		printf("Connection established (%s)" % gClient.isConnected(), FLAG_SUCCESS)
-	else:
-		printf("Unable to connect", FLAG_ERROR)
-		if gRestart:
-			printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
-			time.sleep(RECONNECT_DELAY)
-			shutdown(True)
-		else:
-			shutdown()
-
-	printf("Waiting for authentication...")
-	if gClient.auth(gUserName, gPassword, gResource):
-		printf("Connected", FLAG_SUCCESS)
-	else:
-		printf("Incorrect login/password", FLAG_ERROR)
-		shutdown()
-
-	callEventHandlers(STARTUP)
-	clearEventHandlers(STARTUP)
-
-	gClient.registerHandler("message", messageHandler)
-	gClient.registerHandler("presence", presenceHandler)
-	gClient.registerHandler("iq", iqHandler)
-	printf("Handlers registered", FLAG_SUCCESS)
-
-	gRoster = gClient.getRoster()
-	gClient.setStatus(None, None, gPriority)
-
-	path = getConfigPath(CONF_FILE)
-	utils.createFile(path, "[]")
-	conferences = eval(utils.readFile(path))
-	if conferences:
-		for conference in conferences:
-			addConference(conference)
-			joinConference(conference, getBotNick(conference), getConferenceConfigKey(conference, "password"))
-			saveConferenceConfig(conference)
-		printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
-
-	callEventHandlers(INIT_2)
-	clearEventHandlers(INIT_2)
-	
-	printf("Now I am ready to work :)")
-	while True:
-		gClient.process(10)
-
 if __name__ == "__main__":
 	try:
 		pid = detectMultiLaunch()
 		if not pid:
 			gInfo["start"] = time.time()
-			start()
+
+			loadPlugins()
+
+			printf("Connecting...")
+			if gClient.connect(secureMode=gSecureMode, useResolver=gUseResolver):
+				printf("Connection established (%s)" % gClient.isConnected(), FLAG_SUCCESS)
+			else:
+				printf("Unable to connect", FLAG_ERROR)
+				if gRestart:
+					printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
+					time.sleep(RECONNECT_DELAY)
+					shutdown(True)
+				else:
+					shutdown()
+
+			printf("Waiting for authentication...")
+			if gClient.auth(gUserName, gPassword, gResource):
+				printf("Connected", FLAG_SUCCESS)
+			else:
+				printf("Incorrect login/password", FLAG_ERROR)
+				shutdown()
+
+			callEventHandlers(STARTUP)
+			clearEventHandlers(STARTUP)
+
+			gClient.registerHandler("message", messageHandler)
+			gClient.registerHandler("presence", presenceHandler)
+			gClient.registerHandler("iq", iqHandler)
+			printf("Handlers registered", FLAG_SUCCESS)
+
+			gRoster = gClient.getRoster()
+			gClient.setStatus(None, None, gPriority)
+
+			path = getConfigPath(CONF_FILE)
+			utils.createFile(path, "[]")
+			conferences = eval(utils.readFile(path))
+			if conferences:
+				for conference in conferences:
+					addConference(conference)
+					joinConference(conference, getBotNick(conference), getConferenceConfigKey(conference, "password"))
+					saveConferenceConfig(conference)
+				printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
+
+			callEventHandlers(INIT_2)
+			clearEventHandlers(INIT_2)
+			
+			printf("Now I am ready to work :)")
+			while True:
+				gClient.process(10)
 		else:
 			printf("Another instance is running (pid: %s)" % (pid), FLAG_ERROR)
 	except KeyboardInterrupt:

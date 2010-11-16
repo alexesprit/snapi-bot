@@ -94,25 +94,25 @@ def writeMessage(stanza, msgType, conference, nick, trueJid, text):
 
 def writeUserJoin(conference, nick, trueJid, aff, role):
 	if getConferenceConfigKey(conference, "log"):
-		writeLog(protocol.TYPE_PUBLIC, conference, "@$$join$$@", u"%s зашёл в комнату как %s и %s" % (nick, role, aff))
+		writeLog(protocol.TYPE_PUBLIC, conference, "@$$join$$@", u"%s заходит в комнату как %s и %s" % (nick, role, aff))
 
 def writeUserLeave(conference, nick, trueJid, reason, code):
 	if getConferenceConfigKey(conference, "log"):
 		if "307" == code:
 			if reason:
-				writeLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты (%s)" % (nick, reason))
+				writeLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты: %s" % (nick, reason))
 			else:
 				writeLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты" % (nick));		
 		elif "301" == code:
 			if reason:
-				writeLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили (%s)" % (nick, reason))
+				writeLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили: %s" % (nick, reason))
 			else:
 				writeLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили" % (nick));	
-		elif "303" != code:
+		else:
 			if reason:
-				writeLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s вышел из комнаты (%s)" % (nick, reason))
+				writeLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты: %s" % (nick, reason))
 			else:
-				writeLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s вышел из комнаты" % (nick))
+				writeLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты" % (nick))
 
 def writePresence(stanza, conference, nick, trueJid):
 	if getConferenceConfigKey(conference, "log"):
@@ -120,7 +120,7 @@ def writePresence(stanza, conference, nick, trueJid):
 		prsType = stanza.getType()
 		if code == "303":
 			newnick = stanza.getNick()
-			writeLog(protocol.TYPE_PUBLIC, conference, "@$$nick$$@", u"%s сменил ник на %s" % (nick, newnick))
+			writeLog(protocol.TYPE_PUBLIC, conference, "@$$nick$$@", u"%s меняет ник на %s" % (nick, newnick))
 
 def manageLoggingValue(msgType, conference, nick, param):
 	if param:
