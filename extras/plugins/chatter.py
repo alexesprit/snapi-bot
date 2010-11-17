@@ -116,6 +116,6 @@ registerMessageHandler(processChatter, CHAT)
 
 registerCommand(manageChatterValue, u"болталка", 30, 
 				u"Отключает (0) или включает (1) болталку. Без параметра покажет текущее значение", 
-				u"болталка [0|1]", 
-				(u"болталка", u"болталка 0"), 
+				u"[0|1]", 
+				(None, u"0"), 
 				CHAT)

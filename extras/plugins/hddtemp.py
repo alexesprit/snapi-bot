@@ -34,5 +34,5 @@ def showHDDTempOutput(msgType, conference, nick, param):
 registerCommand(showHDDTempOutput, u"hddtemp", 100, 
 				u"Показывает вывод программы hddtemp для всех дисков", 
 				None, 
-				(u"hddtemp", ), 
+				None, 
 				ANY | NONPARAM)

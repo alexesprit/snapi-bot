@@ -149,16 +149,16 @@ registerEvent(freeRSSChannels, DELCONF)
 
 registerCommand(addRSSChannel, u"рсс+", 30, 
 				u"Добавляет рсс-ленту", 
-				u"рсс+ <название = ссылка>", 
-				(u"рсс+ "), 
+				u"<название = ссылка>", 
+				(u"http://server.tld/rss = News"), 
 				CHAT | PARAM)
 registerCommand(delRSSChannel, u"рсс-", 30, 
 				u"Удаляет рсс-ленту", 
-				u"рсс- <название>", 
-				(u"рсс- новости"), 
+				u"<название>", 
+				(u"новости"), 
 				CHAT | PARAM)
 registerCommand(showRSSChannels, u"рсс*", 30, 
 				u"Показывает рсс-ленты. Если указать название, то выведет подробную информацию", 
 				None, 
-				(u"рсс*"), 
+				None, 
 				CHAT)

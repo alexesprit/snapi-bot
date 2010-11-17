@@ -52,6 +52,6 @@ registerEvent(loadCommandAccesses, STARTUP)
 registerCommand(changeCommandAccess, 
 				u'командоступ', 100, 
 				u'Меняет доступ для команды', 
-				u'командоступ <команда> <число>', 
-				(u'командоступ пинг 100', ), 
+				u'<команда> <число>', 
+				(u'пинг 100', ), 
 				ANY | PARAM)
