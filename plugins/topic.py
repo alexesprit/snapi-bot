@@ -25,6 +25,6 @@ def setTopic(msgType, conference, nick, param):
 
 registerCommand(setTopic, u"топег", 20, 
 				u"Устанавливает тему в конференции", 
-				u"топег <текст>", 
-				(u"топег ололо", ), 
+				u"<текст>", 
+				(u"Ололо!", ), 
 				CHAT)

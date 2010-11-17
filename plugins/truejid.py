@@ -24,6 +24,6 @@ def showTrueJid(msgType, conference, nick, param):
 
 registerCommand(showTrueJid, u"тружид", 20, 
 				u"Показывает реальный жид указанного ника", 
-				u"тружид <ник>", 
-				(u"тружид guy", ), 
+				u"<ник>", 
+				(u"Nick", ), 
 				CHAT | PARAM)

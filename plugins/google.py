@@ -55,16 +55,16 @@ def searchInGoogle(msgType, conference, nick, url, qparam):
 
 registerCommand(searchInGoogleEN, u"гугльен", 10, 
 				u"Поиск через Google по зарубежным сайтам", 
-				u"гугльен <текст>", 
-				(u"гугльен yandex", ), 
+				u"<текст>", 
+				(u"yandex", ), 
 				ANY | PARAM)
 registerCommand(searchInGoogleRU, u"гугльру", 10, 
 				u"Поиск через Google по русскоязычным сайтам", 
-				u"гугльру <текст>", 
-				(u"гугльру yandex", ), 
+				u"<текст>", 
+				(u"yandex", ), 
 				ANY | PARAM)
 registerCommand(searchInGoogleAll, u"гугль", 10, 
 				u"Поиск через Google", 
-				u"гугль <текст>", 
-				(u"гугль yandex", ), 
+				u"<текст>", 
+				(u"yandex", ), 
 				ANY | PARAM)

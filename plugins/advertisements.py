@@ -32,5 +32,5 @@ def showAdvert(msgType, conference, nick, param):
 registerCommand(showAdvert, u"объявление", 10, 
 				u"Показывает случайное интересное объявление", 
 				None, 
-				(u"объявление", ), 
+				None, 
 				ANY | NONPARAM)

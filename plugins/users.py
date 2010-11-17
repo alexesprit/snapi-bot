@@ -61,15 +61,15 @@ def showUserNicks(msgType, conference, nick, param):
 registerCommand(showInMucUsers, u"инмук", 10, 
 				u"Показывает список участников, находящихся в конференции", 
 				None, 
-				(u"инмук", ), 
+				None, 
 				CHAT | NONPARAM)
 registerCommand(showWhoWas, u"хтобыл", 10, 
 				u"Показывает список участников, посетивших конференцию за сессию", 
 				None, 
-				(u"хтобыл", ), 
+				None, 
 				CHAT | NONPARAM)
 registerCommand(showUserNicks, u"ники", 10, 
 				u"Выводит все ники пользователя", 
-				u"ники [ник]", 
-				(u"ники", u"ники Nick"),
+				u"[ник]", 
+				(None, u"Nick"),
 				CHAT)

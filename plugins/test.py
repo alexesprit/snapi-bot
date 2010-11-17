@@ -19,5 +19,5 @@ def showTest(msgType, conference, nick, param):
 registerCommand(showTest, u"тест", 10, 
 				u"Тест на беременность", 
 				None, 
-				(u"тест", ), 
+				None, 
 				ANY | NONPARAM)

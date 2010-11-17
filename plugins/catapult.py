@@ -22,5 +22,5 @@ def runCatapult(msgType, conference, nick, param):
 registerCommand(runCatapult, u"катапульту", 10, 
 				u"Катапульта", 
 				None, 
-				(u"катапульту", ), 
+				None, 
 				CHAT | NONPARAM)

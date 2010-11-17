@@ -30,5 +30,5 @@ def _showOnlineTime(stanza, msgType, jid, resource):
 registerCommand(showOnlineTime, u"всети", 10, 
 				u"Показывает ваше время в сети", 
 				None, 
-				(u"всети", ), 
+				None, 
 				ROSTER | NONPARAM)

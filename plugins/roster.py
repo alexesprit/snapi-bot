@@ -21,5 +21,5 @@ def showRoster(msgType, conference, nick, param):
 registerCommand(showRoster, u"ростер", 100, 
 				u"Показывает содержимое ростера", 
 				None, 
-				(u"ростер", ), 
+				None, 
 				ROSTER | NONPARAM)

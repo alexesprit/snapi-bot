@@ -172,5 +172,5 @@ if gLogDir:
 registerEvent(setDefLoggingValue, ADDCONF);		
 registerCommand(manageLoggingValue, u"логирование", 100, 
 				u"Отключает (0) или включает (1) ведение логов для указанной/текущей конференции. Без параметра покажет значения для всех конференций, в которых сидит бот", 
-				u"логирование [<комната> <0|1>]", 
-				(u"логирование", u"логирование 0", u"логирование chat@conference.server.tld 0"))
+				u"[<комната> <0|1>]", 
+				(None, u"0", u"room@conference.server.tld 0"))

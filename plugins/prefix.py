@@ -36,6 +36,6 @@ def managePrefixControl(msgType, conference, nick, param):
 registerEvent(setDefPrefixValue, ADDCONF)
 registerCommand(managePrefixControl, u"префикс", 30, 
 				u"Устанавливает или отключает (если указать None) префикс для команд. Без параметра покажет текущее значение", 
-				u"префикс [что-то]", 
-				(u"префикс _", u"префикс None"), 
+				u"[что-то]", 
+				(None, u"None", u"_"), 
 				CHAT)

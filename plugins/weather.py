@@ -114,6 +114,6 @@ def showWeather(msgType, conference, nick, param):
 
 registerCommand(showWeather, u"погода", 10, 
 				u"Показывает погоду", 
-				u"погода <город>", 
-				(u"погода Москва", ), 
+				u"<город>", 
+				(u"Москва", ), 
 				ANY | PARAM)

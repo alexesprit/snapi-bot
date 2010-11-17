@@ -37,11 +37,11 @@ def botShutdown(msgType, conference, nick, param):
 
 registerCommand(botRestart, u"рестарт", 100, 
 				u"Перезапускает бота", 
-				u"рестарт [причина]", 
-				(u"рестарт", u"рестарт ы!"), 
+				u"[причина]", 
+				(None, u"ы!"), 
 				ANY | FROZEN)
 registerCommand(botShutdown, u"идиспать", 100, 
 				u"Остановка и полный выход бота", 
-				u"идиспать [причина]", 
-				(u"идиспать", u"идиспать обновления!11"), 
+				u"[причина]", 
+				(None, u"идиспать обновления!11"), 
 				ANY | FROZEN)

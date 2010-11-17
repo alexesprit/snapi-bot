@@ -53,5 +53,5 @@ def _showVersion(stanza, msgType, conference, nick, param):
 
 registerCommand(showVersion, u"версия", 10, 
 				u"Показывает информацию о версии ПО указанного пользователя или сервера", 
-				u"версия [ник|сервер]", 
-				(u"версия", u"версия Nick", u"версия server.tld"))
+				u"[ник|жид|сервер]", 
+				(None, u"Nick", u"server.tld", u"user@server.tld"))

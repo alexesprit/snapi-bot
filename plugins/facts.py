@@ -33,5 +33,5 @@ def showFact(msgType, conference, nick, param):
 registerCommand(showFact, u"факт", 10, 
 				u"Показывает случайный интересный факт", 
 				None, 
-				(u"факт", ), 
+				None, 
 				ANY | NONPARAM)

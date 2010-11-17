@@ -48,6 +48,6 @@ registerEvent(loadPokes, STARTUP)
 
 registerCommand(pokeUser, u"тык", 10, 
 				u"Тыкает пользователя. Заставляет его обратить внимание на вас", 
-				u"тык <ник>", 
-				(u"тык Nick", ), 
+				u"<ник>", 
+				(u"Nick", ), 
 				CHAT);

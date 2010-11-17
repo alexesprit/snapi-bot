@@ -83,6 +83,6 @@ registerMessageHandler(saveTurnMessage, CHAT)
 
 registerCommand(turnLastMessage, u"turn", 10, 
 				u"Переключает раскладку вашего последнего сообщения или текста в параметре команды", 
-				u"turn [текст]", 
-				(u"turn", u"turn jkjkj"), 
+				u"[текст]", 
+				(None, u"jkjkj"), 
 				CHAT)

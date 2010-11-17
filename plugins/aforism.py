@@ -56,5 +56,5 @@ def showAforism(msgType, conference, nick, param):
 registerCommand(showAforism, u"афор", 10, 
 				u"Показывает случайный афоризм", 
 				None, 
-				(u"афор", ), 
+				None, 
 				ANY | NONPARAM)

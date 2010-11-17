@@ -40,10 +40,10 @@ def leaveConf(msgType, conference, nick, param):
 
 registerCommand(joinConf, u"зайти", 100, 
 				u"Зайти в указанную конференцию", 
-				u"зайти <конференция> [пароль]", 
-				(u"зайти test@conference.jabber.aq", u"зайти test@conference.jabber.ru 1234"),
+				u"<конференция> [пароль]", 
+				(u"room@conference.server.tld", u"room@conference.server.tld"),
 				ANY | PARAM)
 registerCommand(leaveConf, u"свали", 
 				30, u"Заставляет выйти из текущей или указанной конференции", 
-				u"свали [конференция]", 
-				(u"свали test@conference.jabber.ru", u"свали"))
+				u"[конференция]", 
+				(None, u"room@conference.server.tld"))

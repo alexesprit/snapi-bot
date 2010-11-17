@@ -53,7 +53,7 @@ registerEvent(updateRosterStatus, INIT_2)
 
 registerCommand(setRosterStatus, u"ростерстатус", 100, 
 				u"Устанавливает статус в ростере", 
-				u"ростерстатус <[статус] [текст]>", 
-				(u"ростерстатус", ), 
+				u"<[статус] [текст]>", 
+				(u"away", u"away сплю"), 
 				ROSTER | PARAM)
 

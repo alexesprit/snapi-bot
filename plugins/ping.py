@@ -57,5 +57,5 @@ def showPing(msgType, conference, nick, param):
 
 registerCommand(showPing, u"пинг", 10, 
 				u"Пингует тебя, определённый ник или сервер", 
-				u"пинг [ник|сервер]", 
-				(u"пинг", u"пинг Nick", u"пинг server.tld"))
+				u"[ник|жид|сервер]", 
+				(None, u"Nick", u"server.tld", u"user@server.tld"))

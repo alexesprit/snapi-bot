@@ -42,7 +42,7 @@ def deleteFile(path):
 		return -1
 
 registerCommand(deleteFromConfig, u"rmcfg", 100, 
-				u"Удаляет файл или папку из /config", 
-				u"rmcfg <имя>", 
-				(u"rmcfg test.txt", ), 
+				u"Удаляет файл или папку из CONFIG_DIR", 
+				u"<имя>", 
+				(u"test.txt", ), 
 				ROSTER | PARAM);	 

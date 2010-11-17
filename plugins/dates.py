@@ -32,5 +32,5 @@ def showDates(msgType, conference, nick, param):
 registerCommand(showDates, u"праздники", 10, 
 				u"Показывает праздники на сегодня и завтра", 
 				None, 
-				(u"праздники", ),
+				None, 
 				ANY | NONPARAM)

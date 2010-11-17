@@ -95,16 +95,16 @@ registerJoinHandler(setAutoModerator)
 
 registerCommand(addAutoModerator, u"модер+", 20, 
 				u"Добавляет ник или жид в список автомодераторов", 
-				u"модер+ <ник|жид>", 
-				(u"модер+ Nick", u"модер+ nick@jabber.ru"), 
+				u"<ник|жид>", 
+				(u"Nick", u"nick@server.tld"), 
 				CHAT | PARAM)
 registerCommand(delAutoModerator, u"модер-", 20, 
 				u"Удаляет ник или жид из списка автомодераторов", 
-				u"модер- <ник|жид>", 
-				(u"модер- Nick", u"модер- nick@jabber.ru"), 
+				u"<ник|жид>", 
+				(u"Nick", u"nick@server.tld"), 
 				CHAT | PARAM)
 registerCommand(showAutoModerators, u"модер*", 20, 
 				u"Показывает список автомодераторов", 
 				None, 
-				(u"модер*", ),
+				None, 
 				CHAT | NONPARAM)

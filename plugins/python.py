@@ -54,18 +54,21 @@ def pythonCalc(msgType, conference, nick, param):
 
 registerCommand(pythonEval, u"eval", 100, 
 				u"Расчитывает и показывает заданное выражение питона", 
-				u"eval <выражение>", 
-				(u"eval str(gConferences)", ), 
+				u"<выражение>", 
+				(u"str(gConferences)", ), 
 				ANY | FROZEN | PARAM)
 registerCommand(pythonExec, u"exec", 100, 
-				u"Выполняет выражение питона", u"exec <выражение>", 
-				(u"exec del gConferences", ), 
+				u"Выполняет выражение питона", 
+				u"<выражение>", 
+				(u"del gConferences", ), 
 				ANY | FROZEN | PARAM)
 registerCommand(pythonShell, u"sh", 100, 
-				u"Выполняет шелл-команду", u"sh <команда>", 
-				(u"sh ls", ), 
+				u"Выполняет шелл-команду", 
+				u"<команда>", 
+				(u"ls", ), 
 				ANY | FROZEN | PARAM)
 registerCommand(pythonCalc, u"кальк", 10, 
-				u"Калькулятор", u"кальк <выражение>", 
-				(u"кальк 1 + 2", ), 
+				u"Калькулятор", 
+				u"<выражение>", 
+				(u"1 + 2", ), 
 				ANY | PARAM)

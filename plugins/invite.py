@@ -38,6 +38,6 @@ def sendInvite(msgType, conference, nick, param):
 			
 registerCommand(sendInvite, u"призвать", 10, 
 				u"Приглашет заданного пользователя в конференцию", 
-				u"призвать <ник|жид> [причина]", 
-				(u"призвать guy", u"призвать guy@jabber.aq есть дело"), 
+				u"<ник|жид> [причина]", 
+				(u"Nick", u"user@server.tld есть дело"), 
 				CHAT | PARAM)

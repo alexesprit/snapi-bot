@@ -38,6 +38,6 @@ def manageMsgLimitValue(msgType, conference, nick, param):
 registerEvent(setDefMsgLimitValue, ADDCONF)
 registerCommand(manageMsgLimitValue, u"мсглимит", 30, 
 				u"Устанавливает или отключает (если указать 0) лимит на длину сообщения бота (большие сообщения будут перенаправляться в приват). Без параметра покажет текущее значение", 
-				u"мсглимит [число]", 
-				(u"мсглимит 0", u"мсглимит 1000"), 
+				u"[число]", 
+				(u"0", u"1000"), 
 				CHAT)

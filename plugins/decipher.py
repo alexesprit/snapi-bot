@@ -38,6 +38,6 @@ def decipherExpression(msgType, conference, nick, param):
 
 registerCommand(decipherExpression, u"шифр", 10, 
 				u"Расшифровывает слово", 
-				u"шифр <слово>", 
-				(u"шифр админ", ), 
+				u"<слово>", 
+				(u"админ", ), 
 				ANY | PARAM)

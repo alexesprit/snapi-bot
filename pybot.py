@@ -733,6 +733,7 @@ def presenceHandler(session, stanza):
 				startTimer(REJOIN_DELAY, conference, (conference, botNick, password, ))
 			elif errorCode in ("401", "403", "405"):
 				leaveConference(conference, u"got %s error code" % errorCode)
+			printf(stanza, FLAG_WARNING)
 		callPresenceHandlers(stanza, CHAT, conference, nick, trueJid)
 	else:
 		resource = fullJid.getResource()

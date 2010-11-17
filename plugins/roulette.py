@@ -28,5 +28,5 @@ def playRoulette(msgType, conference, nick, param):
 registerCommand(playRoulette, u"рр", 10, 
 				u"Старая добрая русская рулетка", 
 				None, 
-				(u"рр", ), 
+				None, 
 				CHAT | NONPARAM)

@@ -125,26 +125,26 @@ def showCinemaQuote(msgType, conference, nick, param):
 registerCommand(showAbyssQuote, u"борб", 10, 
 				u"Показывает случайную цитату из бездны bash.org.ru", 
 				None, 
-				(u"борб", ), 
+				None, 
 				ANY | NONPARAM)
 registerCommand(showBashQuote, u"бор", 10, 
 				u"Показывает случайную/указанную цитату c bash.org.ru", 
-				u"бор [номер]", 
-				(u"бор", u"бор 143498"))
+				u"[номер]", 
+				(None, u"143498"))
 registerCommand(showIBashQuote, u"айбаш", 10, 
 				u"Показывает случайную/указанную цитату c ibash.org.ru", 
-				u"айбаш [номер]", 
-				(u"айбаш", u"айбаш 3619"))
+				u"[номер]", 
+				(None, u"3619"))
 registerCommand(showItHappensQuote, u"ит", 10, 
 				u"Показывает случайную/указанную цитату c ithappens.ru", 
-				u"ит [номер]", 
-				(u"ит", u"ит 2691"))
+				u"[номер]", 
+				(None, u"2691"))
 registerCommand(showJabberQuote, u"жк", 10, 
 				u"Показывает случайную/указанную цитату с jabber-quotes.ru", 
-				u"жк [номер]", 
-				(u"жк", u"жк 204"));
+				u"[номер]", 
+				(None, u"204"));
 registerCommand(showCinemaQuote, u"киноцитата", 10, 
 				u"Показывает случайную цитату из кино", 
 				None, 
-				(u"киноцитата", ), 
+				None, 
 				ANY | NONPARAM)

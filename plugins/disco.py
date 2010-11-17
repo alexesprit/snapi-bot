@@ -104,5 +104,5 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 
 registerCommand(serviceDiscovery, u"диско", 10, 
 				u"Показывает результаты обзора сервисов для указанного жида. Также можно выполнить запрос по узлу (\"жид#узел\") Второй или третий (если даётся ограничитель кол-ва) параметр - поиск (ищет заданное слово в жиде и описании элемента диско). Если поисковым словом задать имя конференции до названия сервера (например qwerty@), то покажет место этой конференции в общем рейтинге. В общий чат может дать до 50 результатов (10 - без указания кол-ва), в приват - 250 (50 - без указания кол-ва)", 
-				u"диско <жид> [кол-во результатов] [поисковая строка]", 
-				(u"диско jabber.aq", u"диско conference.jabber.aq qwerty", u"диско conference.jabber.aq 5 qwerty", u"диско conference.jabber.aq qwerty@"))
+				u"<жид> [кол-во результатов] [поисковая строка]", 
+				(u"server.tld", u"conference.server.tld qwerty", u"conference.server.tld 5 qwerty", u"conference.server.tld qwerty@"))

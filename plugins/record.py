@@ -48,5 +48,5 @@ registerEvent(freeRecordsBase, DELCONF)
 registerCommand(showRecord, u"рекорд", 10, 
 				u"Показывает рекорд посещаемости конференции", 
 				None, 
-				(u"рекорд", ), 
+				None, 
 				CHAT | NONPARAM)

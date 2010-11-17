@@ -75,6 +75,6 @@ registerJoinHandler(saveUserClient)
 
 registerCommand(showClients, u"клиенты", 10, 
 				u"Показывает, с каких клиентов заходил пользователь", 
-				u"клиенты [ник]", 
-				(u"клиенты", u"клиенты Niсk"), 
+				u"[ник]", 
+				(None, u"Niсk"), 
 				CHAT);

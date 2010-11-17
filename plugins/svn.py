@@ -33,6 +33,6 @@ def showSVNLog(msgType, conference, nick, param):
 
 registerCommand(showSVNLog, u"svn", 10, 
 				u"Показывает лог с svn", 
-				u"svn <адрес> [кол-во]", 
-				(u"svn http://jimm-fork.googlecode.com/svn/trunk 5", ), 
+				u"<адрес> [кол-во]", 
+				(u"http://server.tld/svn/trunk", u"http://server.tld/svn/trunk 5"), 
 				ANY | PARAM)

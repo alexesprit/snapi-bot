@@ -43,6 +43,6 @@ registerPresenceHandler(updateStatus, CHAT)
 
 registerCommand(showUserStatus, u"статус", 10, 
 				u"Показывает статус указанного пользователя", 
-				u"статус [ник]", 
-				(u"статус", u"статус Nick"), 
+				u"[ник]", 
+				(None, u"Nick"), 
 				CHAT);

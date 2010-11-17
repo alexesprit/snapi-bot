@@ -27,6 +27,6 @@ def showHereTime(msgType, conference, nick, param):
 
 registerCommand(showHereTime, u"здесь", 10, 
 				u"Показывает, сколько времени пользователь сидит в конференции", 
-				u"здесь [ник]", 
-				(u"здесь", u"здесь Nick"), 
+				u"[ник]", 
+				(None, u"Nick"), 
 				CHAT)

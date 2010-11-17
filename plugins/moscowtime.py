@@ -33,5 +33,5 @@ def showMoscowTime(msgType, conference, nick, param):
 registerCommand(showMoscowTime, u"время", 10, 
 				u"Показывает точное московское время", 
 				None, 
-				(u"время", ), 
+				None, 
 				ANY | NONPARAM)

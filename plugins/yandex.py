@@ -40,6 +40,6 @@ def searchInYandex(msgType, conference, nick, param):
 
 registerCommand(searchInYandex, u"яндекс", 10, 
 				u"Поиск через Yandex", 
-				u"яндекс <текст>", 
-				(u"яндекс google", ), 
+				u"<текст>", 
+				(u"google", ), 
 				ANY | PARAM)

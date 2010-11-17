@@ -103,6 +103,6 @@ registerMessageHandler(bombColorsListener, CHAT)
 
 registerCommand(giveBomb, u"бомба", 15,
 				u"Вручает пользователю бомбу. Если пользователь не обезвредит её, то бот может выкинуть его из конференции или лишить голоса",
-				u"бомба [ник]", 
-				(u"бомба", u"бомба Nick"), 
+				u"[ник]", 
+				(None, u"Nick"), 
 				CHAT)

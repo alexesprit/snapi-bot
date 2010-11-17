@@ -95,16 +95,16 @@ registerJoinHandler(setAutoVisitor)
 
 registerCommand(addAutoVisitor, u"девойс+", 15, 
 				u"Добавляет ник или жид в список автопосетителей", 
-				u"девойс+ <ник|жид>", 
-				(u"девойс+ Nick", u"девойс+ nick@jabber.ru"), 
+				u"<ник|жид>", 
+				(u"Nick", u"user@server.tld"), 
 				CHAT | PARAM)
 registerCommand(delAutoVisitort, u"девойс-", 15, 
 				u"Удаляет ник или жид из списка автопосетителей", 
-				u"девойс- <ник|жид>", 
-				(u"девойс- Nick", u"девойс- nick@jabber.ru"), 
+				u"<ник|жид>", 
+				(u"Nick", u"user@server.tld"), 
 				CHAT | PARAM)
 registerCommand(showAutoVisitors, u"девойс*", 15, 
 				u"Показывает список автопосетителей", 
 				None, 
-				(u"девойс*", ), 
+				None, 
 				CHAT | NONPARAM)

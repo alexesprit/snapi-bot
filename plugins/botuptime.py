@@ -31,5 +31,5 @@ def showBotUptime(msgType, conference, nick, parameters):
 registerCommand(showBotUptime, u"ботап", 10, 
 				u"Показывает статистику работы бота", 
 				None, 
-				(u"ботап", ), 
+				None, 
 				ANY | NONPARAM)

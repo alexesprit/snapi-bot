@@ -22,6 +22,6 @@ def showUserIdleTime(msgType, conference, nick, param):
 
 registerCommand(showUserIdleTime, u"жив", 10, 
 				u"Показывает время неактивности пользователя", 
-				u"жив <ник>", 
-				(u"жив Nick", ), 
+				u"<ник>", 
+				(u"Nick", ), 
 				CHAT | PARAM)

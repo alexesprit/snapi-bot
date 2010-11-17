@@ -98,26 +98,26 @@ registerEvent(freeLocalBase, DELCONF)
 
 registerCommand(getLocalKeyToPublic, u"???", 10, 
 				u"Ищет ответ на вопрос в локальной базе", 
-				u"??? <запрос>", 
-				(u"??? что-то", u"??? что-то ещё"), 
+				u"<ключ>", 
+				(u"секрет", ), 
 				CHAT | PARAM)
 registerCommand(getLocalKeyToPrivate, u"!??", 10, 
 				u"Ищет ответ на вопрос в локальной базе и посылает его в приват", 
-				u"!?? [ник] <запрос>", 
-				(u"!?? что-то", u"!?? guy что-то"), 
+				u"[ник] <ключ>", 
+				(u"секрет", u"Nick секрет"), 
 				CHAT | PARAM)
 registerCommand(setLocalKey, u"!!!", 20, 
 				u"Устанавливает ответ на вопрос в локальной базе", 
-				u"!!! <запрос> = <ответ>", 
-				(u"!!! что-то = the best!", u"!!! что-то ="), 
+				u"<ключ> = <значение>", 
+				(u"секрет = :-P", u"секрет ="), 
 				CHAT | PARAM)
 registerCommand(searchLocalKey, u"???поиск", 10, 
 				u"Поиск по базе", 
-				u"???поиск <запрос>", 
-				(u"???поиск что-то", ), 
+				u"<ключ>", 
+				(u"секрет", ), 
 				CHAT | PARAM)
 registerCommand(showAllLocalKeys, u"???все", 10, 
 				u"Показывает все ключи базы", 
 				None, 
-				(u"???все", ), 
+				None, 
 				CHAT | NONPARAM)

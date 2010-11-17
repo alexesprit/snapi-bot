@@ -57,6 +57,6 @@ registerEvent(saveAllSeenBases, SHUTDOWN)
 
 registerCommand(showSeenTime, u"когдабыл", 10, 
 				u"Показывает, сколько времени назад пользователь вышел из чата", 
-				u"когдабыл [ник]", 
-				(u"когдабыл Nick", ), 
+				u"[ник]", 
+				(u"Nick", ), 
 				CHAT)

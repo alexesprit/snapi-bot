@@ -49,6 +49,6 @@ registerEvent(loadLangsForDumpz, STARTUP)
 
 registerCommand(uploadToDumpz, u"пастебин", 10, 
 				u"Заливает текст на пастебин-сервис dumpz.org. Указав \"языки\" в кач-ве параметра можно посмотреть доступные языки", 
-				u"пастебин [язык] <текст>", 
-				(u"пастебин языки", u"пастебин This is text", u"пастебин cpp int *n, *p;"), 
+				u"[язык] <текст>", 
+				(u"языки", u"This is text", u"cpp int *n, *p;"), 
 				ANY | PARAM);

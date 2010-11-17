@@ -56,6 +56,6 @@ registerJoinHandler(sendUserGreeting)
 
 registerCommand(setUserGreeting, u"приветствие", 30, 
 				u"Добавляет приветствие для определённого ника/жида", 
-				u"приветствие <ник|жид> = [текст]", 
-				(u"приветствие Nick = something", ), 
+				u"<ник|жид> = [текст]", 
+				(u"Nick = Привет!", u"user@server.tld = Привет!"), 
 				CHAT | PARAM)

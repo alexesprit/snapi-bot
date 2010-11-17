@@ -66,9 +66,9 @@ def showServerUptime(msgType, conference, nick, param):
 
 registerCommand(showServerInfo, u"инфа", 10, 
 				u"Возвращает статистику о сервере", 
-				u"инфа [сервер]", 
-				(u"инфа server.tld", ))
+				u"[сервер]", 
+				(u"server.tld", ))
 registerCommand(showServerUptime, u"аптайм", 10, 
 				u"Показывает аптайм определённого сервера", 
-				u"аптайм [сервер]", 
-				(u"аптайм server.tld", ))
+				u"[сервер]", 
+				(u"server.tld", ))

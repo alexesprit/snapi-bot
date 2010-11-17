@@ -48,20 +48,20 @@ def showOwnersList(msgType, conference, nick, param):
 registerCommand(showOutcastsList, u"банлист", 20, 
 				u"Показывает список забаненных", 
 				None, 
-				(u"банлист", ), 
+				None, 
 				CHAT | NONPARAM)
 registerCommand(showMembersList, u"мемберлист", 20, 
 				u"Показывает список мемберов", 
 				None, 
-				(u"мемберлист", ), 
+				None,  
 				CHAT | NONPARAM)
 registerCommand(showAdminsList, u"админлист", 20, 
 				u"Показывает список админов", 
 				None, 
-				(u"админлист", ), 
+				None, 
 				CHAT | NONPARAM)
 registerCommand(showOwnersList, u"овнерлист", 20, 
 				u"Показывает список овнеров", 
 				None, 
-				(u"овнерлист", ), 
+				None, 
 				CHAT | NONPARAM)

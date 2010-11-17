@@ -76,6 +76,6 @@ registerLeaveHandler(updateLeaveStatistic)
 
 registerCommand(showHereStatistic, u"тута", 10, 
 				u"Показывает кол-во часов, проведённое в чатике, максимальное и среднее", 
-				u"тута [ник]", 
-				(u"тута", ), 
+				u"[ник]", 
+				(None, u"Nick"), 
 				CHAT);

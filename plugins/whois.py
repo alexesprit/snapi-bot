@@ -32,6 +32,6 @@ def showWhoIs(msgType, conference, nick, param):
 
 registerCommand(showWhoIs, u"хтоэто", 10, 
 				u"Показывает информацию о домене", 
-				u"хтоэто <адрес>", 
-				(u"хтоэто jabber.ru", ), 
+				u"<адрес>", 
+				(u"server.tld", ), 
 				ANY | PARAM)

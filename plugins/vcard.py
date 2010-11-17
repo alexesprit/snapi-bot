@@ -98,5 +98,5 @@ def getVCard(rawVCard):
 
 registerCommand(showVCard, u"визитка", 10, 
 				u"Показывает vCard указанного пользователя или сервера", 
-				u"визитка [ник|сервер]", 
-				(u"визитка", u"визитка Nick", u"визитка server.tld"))
+				u"[ник|жид|сервер]", 
+				(None, u"Nick", u"server.tld", u"user@server.tld"))

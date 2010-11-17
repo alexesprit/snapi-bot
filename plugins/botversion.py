@@ -37,6 +37,6 @@ registerEvent(loadBotVersion, STARTUP)
 
 registerCommand(setBotVersion, u"ботверсия", 100, 
 				u"Выставляет версию клиента у бота. Без параметра покажет текущее значение", 
-				u"ботверсия [клиент|версия|ось]", 
-				(u"ботверсия", u"ботверсия Jimm|0.6.4|Nokia 3310"), 
+				u"[клиент|версия|ось]", 
+				(None, u"Jimm|0.6.4|Nokia 3310"), 
 				ROSTER)

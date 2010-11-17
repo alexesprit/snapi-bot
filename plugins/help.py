@@ -17,19 +17,24 @@
 
 def showHelp(msgType, conference, nick, param):
 	if param:
-		param = param.lower()
+		command = param.lower()
 		cmdType = conferenceInList(conference) and CHAT or ROSTER
-		if isCommand(param) and isCommandType(param, cmdType):
-			message = gCommands[param][CMD_DESC]
-			syntax = gCommands[param][CMD_SYNTAX]
+		if isCommand(command) and isCommandType(command, cmdType):
+			message = gCommands[command][CMD_DESC]
+			syntax = gCommands[command][CMD_SYNTAX]
 			if syntax:
-				message += u"\nСинтаксис: %s" % (syntax)
-			message += u"\nПримеры:"
-			for example in gCommands[param][CMD_EXAMPLE]:
-				message += u"\n * %s" % (example)
+				message += u"\nСинтаксис: %s %s" % (command, syntax)
+			examples = gCommands[command][CMD_EXAMPLE]
+			if examples:
+				message += u"\nПримеры:"
+				for example in examples:
+					if example:
+						message += u"\n * %s %s" % (command, example)
+					else:
+						message += u"\n * %s" % (command)
 			if cmdType == CHAT:
-				message += u"\nМин. уровень доступа: %d" % (gCommands[param][CMD_ACCESS])
-				if not isAvailableCommand(conference, param):
+				message += u"\nМин. уровень доступа: %d" % (gCommands[command][CMD_ACCESS])
+				if not isAvailableCommand(conference, command):
 					message += u"\nЭта команда отключена в этой конференции!"
 			sendMsg(msgType, conference, nick, message)
 	else:
@@ -66,11 +71,11 @@ def showCommands(msgType, conference, nick, param):
 
 registerCommand(showHelp, u"помощь", 0, 
 				u"Даёт справку об определённой команде или выводит общую справку", 
-				u"помощь [команда]", 
-				(u"помощь", u"помощь пинг"), 
+				u"[команда]", 
+				(None, u"пинг"), 
 				ANY | FROZEN)
 registerCommand(showCommands, u"команды", 0, 
 				u"Показывает список доступных вам команд", 
 				None, 
-				(u"команды", ), 
+				None, 
 				ANY | FROZEN | NONPARAM)

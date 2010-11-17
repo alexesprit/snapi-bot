@@ -18,6 +18,6 @@ def sendStanza(source, conference, nick, param):
 
 registerCommand(sendStanza, u"станза", 100, 
 				u"Топка", 
-				u"станза <что-то>", 
-				(u"станза </stream:stream>", ), 
+				u"<что-то>", 
+				(u"</stream:stream>", ), 
 				ANY | FROZEN | PARAM)

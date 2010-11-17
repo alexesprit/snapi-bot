@@ -31,5 +31,5 @@ def showAnecdote(msgType, conference, nick, param):
 registerCommand(showAnecdote, u"анекдот", 10, 
 				u"Показывает случайный анекдот", 
 				None, 
-				(u"анекдот", ), 
+				None, 
 				ANY | NONPARAM)

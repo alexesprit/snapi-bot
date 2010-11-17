@@ -20,6 +20,6 @@ def setBotNick(msgType, conference, nick, param):
 
 registerCommand(setBotNick, u"ботник", 30,
 				u"Меняет ник бота", 
-				u"ботник <ник>",
-				(u"ботник ПеЛоТкО.о", ), 
+				u"<ник>",
+				(u"Stupid-Bot", ), 
 				CHAT | PARAM)

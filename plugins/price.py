@@ -35,6 +35,6 @@ def showPrice(msgType, conference, nick, param):
 
 registerCommand(showPrice, u"домен", 10, 
 				u"Показывает оценочную стоимость домена", 
-				u"домен <запрос>", 
-				(u"домен microsoft.com", ), 
+				u"<запрос>", 
+				(u"server.tld", ), 
 				ANY | PARAM)

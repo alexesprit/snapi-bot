@@ -29,6 +29,6 @@ def showDreamInfo(msgType, conference, nick, param):
 
 registerCommand(showDreamInfo, u"сонник", 10, 
 				u"Толкователь снов", 
-				u"сонник <что-то>", 
-				(u"сонник деньги", ), 
+				u"<что-то>", 
+				(u"деньги", ), 
 				ANY | PARAM)

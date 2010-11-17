@@ -97,5 +97,5 @@ registerBotMessageHandler(updateBotMessageStats)
 registerCommand(showConferenceStats, u"статистика", 10, 
 				u"Статистика текущей конференции", 
 				None, 
-				(u"статистика", ), 
+				None, 
 				CHAT | NONPARAM)

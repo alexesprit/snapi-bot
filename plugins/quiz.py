@@ -196,29 +196,30 @@ registerMessageHandler(quizAnswerListener, CHAT)
 registerCommand(startQuiz, u"старт", 10, 
 				u"Запуск игры", 
 				None, 
-				(u"старт", ), 
+				None, 
 				CHAT | NONPARAM)
 registerCommand(stopQuiz, u"стоп", 10, 
 				u"Остановка игры", 
 				None, 
-				(u"стоп", ), 
+				None, 
 				CHAT | NONPARAM)
 registerCommand(showQuizScores, u"счет", 10, 
 				u"Показывает счёт игры", 
 				None, 
-				(u"счет", ), 
+				None, 
 				CHAT | NONPARAM)
 registerCommand(showQuizHint, u"х", 10, 
 				u"Показать подсказку", 
 				None, 
-				(u"х", ), 
+				None, 
 				CHAT | NONPARAM)
 registerCommand(showQuizQuestion, u"повтор", 10, 
 				u"Повтор текущего вопроса", 
 				None, 
-				(u"повтор", ), 
+				None, 
 				CHAT | NONPARAM)
 registerCommand(showNextQuestion, u"сл", 10, 
-				u"Следущий вопрос", None, 
-				(u"сл", ), 
+				u"Следущий вопрос", 
+				None, 
+				None, 
 				CHAT | NONPARAM)

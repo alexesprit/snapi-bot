@@ -23,5 +23,6 @@ def clearConference(msgType, conference, nick, param):
 
 registerCommand(clearConference, u"чисть", 15, 
 				u"Очищает конференцию", 
-				None, (u"чисть", ), 
+				None, 
+				None, 
 				CHAT | NONPARAM)
