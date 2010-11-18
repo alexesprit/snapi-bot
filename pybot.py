@@ -21,7 +21,6 @@
 from __future__ import with_statement
 
 import codecs
-import math
 import os
 import random
 import re

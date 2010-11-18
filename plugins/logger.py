@@ -56,7 +56,6 @@ def regexUrl(matchobj):
 		return "<a href=\"%s\">%s</a>" % (url, url)
 	
 def writeLog(msgType, jid, nick, body, aff = 0):
-	decimal = str(int(math.modf(time.time())[0] * 100000))
 	(year, month, day, hour, minute, second, weekday, yearday, daylightsavings) = time.localtime()
 	body = utils.escapeXML(body)
 	body = gURLPtrn.sub(regexUrl, body)
@@ -64,9 +63,8 @@ def writeLog(msgType, jid, nick, body, aff = 0):
 	body = body.encode("utf-8")
 	nick = nick.encode("utf-8")
 	timestamp = "%02d:%02d:%02d" % (hour, minute, second)
-	link = timestamp + "." + decimal
 	fp = getLogFile(msgType, jid, (year, month, day, ))
-	fp.write("<span class=\"timestamp\"><a id=\"t%s\" href=\"#t%s\">[%s]</a></span>" % (link, link, timestamp))
+	fp.write("<span class=\"timestamp\"><a id=\"%s\" href=\"#%s\">[%s]</a></span>" % (timestamp, timestamp, timestamp))
 	if not nick:
 		fp.write("<span class=\"system\"> %s</span><br />\n" % (body))
 	elif body.startswith("/me"):
@@ -153,12 +151,13 @@ def manageLoggingValue(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"читай помощь по команде")
 	else:
-		message = [u"%d) %s [%d]" % (i + 1, c, getConferenceConfigKey(c, "log")) 
-					for i, c in enumerate(getConferences())]
-		if message:
-			sendMsg(msgType, conference, nick, "\n".join(message))
+		conferences = getConferences()
+		if conferences:
+			items = [u"%d) %s [%d]" % (i + 1, c, getConferenceConfigKey(c, "log")) 
+						for i, c in enumerate(conferences)]
+			sendMsg(msgType, conference, nick, u"Список конференций:\n%s" % ("\n".join(items)))
 		else:
-			sendMsg(msgType, conference, nick, u"Я пока нигде не сижу")
+			sendMsg(msgType, conference, nick, u"Я пока что нигде не сижу")
 
 def setDefLoggingValue(conference):
 	if getConferenceConfigKey(conference, "log") is None:

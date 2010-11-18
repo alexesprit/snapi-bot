@@ -28,9 +28,12 @@ def manageBotStatusValue(msgType, conference, nick, param):
 	else:
 		status = param
 	setConferenceStatus(conference, status, show)
+	
 	setConferenceConfigKey(conference, "status", status)
 	setConferenceConfigKey(conference, "show", show)
 	saveConferenceConfig(conference)
+	
+	sendMsg(msgType, conference, nick, u"Запомнила")
 
 registerEvent(setDefBotStatusValue, ADDCONF)
 registerCommand(manageBotStatusValue, u"ботстатус", 30, 

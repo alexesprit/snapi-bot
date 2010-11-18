@@ -31,12 +31,15 @@ def noticeControl(msgType, conference, nick, param):
 
 def sendNotices(msgType, conference, nick, param):
 	conferences = getConferences()
-	count = 0
-	for conf in conferences:
-		if getConferenceConfigKey(conf, "notices"):
-			sendToConference(conf, u"Новости от администрации:\n%s" % param)
-			count += 1
-	sendMsg(msgType, conference, nick, "Сообщение ушло в %d конференций из %d" % (count, len(conferences)))
+	if conferences:
+		count = 0
+		for conf in conferences:
+			if getConferenceConfigKey(conf, "notices"):
+				sendToConference(conf, u"Новости от администрации:\n%s" % param)
+				count += 1
+		sendMsg(msgType, conference, nick, "Сообщение ушло в %d конференций из %d" % (count, len(conferences)))
+	else:
+		sendMsg(msgType, conference, nick, u"Я пока что нигде не сижу")
 
 def setDefNoticeValue(conference):
 	if getConferenceConfigKey(conference, "notices") is None:

@@ -21,9 +21,11 @@ def setBotVersion(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"|".join(gVersion))
 	elif param.count("|") == 2:
 		gVersion = tuple(param.split("|"))
+
 		path = getConfigPath(VER_FILE)
 		utils.writeFile(path, str(gVersion))
-		sendMsg(msgType, conference, nick, u"Поняла, сейчас поставлю")
+
+		sendMsg(msgType, conference, nick, u"Запомнила")
 	else:
 		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 

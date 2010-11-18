@@ -47,6 +47,8 @@ def setRosterStatus(msgType, conference, nick, param):
 
 	path = getConfigPath(ROSTERSTATUS_FILE)
 	utils.writeFile(path, str(gRosterStatus))
+	
+	sendMsg(msgType, conference, nick, u"Запомнила")
 
 registerEvent(loadRosterStatusValue, STARTUP)
 registerEvent(updateRosterStatus, INIT_2)
