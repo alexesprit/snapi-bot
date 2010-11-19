@@ -94,9 +94,8 @@ def showJabberQuote(msgType, conference, nick, param):
 		rawhtml = responce.read()
 		items = re.search(r"#(\d+).+?<blockquote>(.+?)</blockquote>", rawhtml)
 		if items:
-			quote = unicode(items.group(2), "cp1251")
-			quote = quote.replace("<br><br>", "\n")
-			quote = decode(quote)
+			quote = items.group(2)
+			quote = decode(quote.replace("<br><br>", "\n"), "cp1251")
 			url = "http://jabber-quotes.ru/id%s/" % (items.group(1))
 			sendMsg(msgType, conference, nick, u"%s\n\n%s" % (quote, url))
 		else:

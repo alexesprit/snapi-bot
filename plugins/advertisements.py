@@ -22,8 +22,8 @@ def showAdvert(msgType, conference, nick, param):
 		items = re.findall(r"<tr><td>(.+?)</td></tr>", rawhtml, re.DOTALL)
 		if items:
 			adv = random.choice(items)
-			adv = decode(adv)
-			sendMsg(msgType, conference, nick, unicode(adv, "cp1251"))
+			adv = decode(adv, "cp1251")
+			sendMsg(msgType, conference, nick, adv)
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
