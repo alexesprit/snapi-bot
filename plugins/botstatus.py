@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def setDefBotStatusValue(conference):
+def setDefaultBotStatusValue(conference):
 	if not getConferenceConfigKey(conference, "show"):
 		setConferenceConfigKey(conference, "show", u"online")
 		setConferenceConfigKey(conference, "status", None)
@@ -35,7 +35,7 @@ def manageBotStatusValue(msgType, conference, nick, param):
 	
 	sendMsg(msgType, conference, nick, u"Запомнила")
 
-registerEvent(setDefBotStatusValue, ADDCONF)
+registerEvent(setDefaultBotStatusValue, ADDCONF)
 registerCommand(manageBotStatusValue, u"ботстатус", 30, 
 				u"Меняет статус бота", 
 				u"<[статус] [текст]>", 

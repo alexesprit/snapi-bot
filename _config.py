@@ -4,7 +4,7 @@
 gJid = "username@server.tld"
 gPassword = "secret"
 
-# сервер и порт для подключения 
+# сервер и порт для подключения
 gHost = "server.tld"
 gPort = 5222
 

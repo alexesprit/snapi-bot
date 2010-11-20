@@ -42,7 +42,7 @@ def getLocalKeyToPrivate(msgType, conference, nick, param):
 				sendMsg(msgType, conference, nick, u"Ушло")
 			sendTo(protocol.TYPE_PRIVATE, confJid, u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key]))
 		else:
-			sendMsg(msgType, conference, nick, u"я не знаю, что такое %s :(" % key)
+			sendMsg(msgType, conference, nick, u"Я не знаю, что такое %s :(" % key)
 	else:
 		sendMsg(msgType, conference, nick, u"Кому?")
 
@@ -61,7 +61,7 @@ def setLocalKey(msgType, conference, nick, param):
 				saveLocalBase(conference)
 				sendMsg(msgType, conference, nick, u"Прибила %s" % (key))
 			else:
-				sendMsg(msgType, conference, nick, u"%s и так нету :-P" % (key))
+				sendMsg(msgType, conference, nick, u"В базе %s и так нету :-P" % (key))
 	else:
 		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
@@ -97,22 +97,22 @@ registerEvent(loadLocalBase, ADDCONF)
 registerEvent(freeLocalBase, DELCONF)
 
 registerCommand(getLocalKeyToPublic, u"???", 10, 
-				u"Ищет ответ на вопрос в локальной базе", 
+				u"Ищет значение по ключу в локальной базе", 
 				u"<ключ>", 
 				(u"секрет", ), 
 				CHAT | PARAM)
 registerCommand(getLocalKeyToPrivate, u"!??", 10, 
-				u"Ищет ответ на вопрос в локальной базе и посылает его в приват", 
+				u"Ищет значение по ключу в локальной базе и посылает его в приват. Возможно указание ника отправителя", 
 				u"[ник] <ключ>", 
 				(u"секрет", u"Nick секрет"), 
 				CHAT | PARAM)
 registerCommand(setLocalKey, u"!!!", 20, 
-				u"Устанавливает ответ на вопрос в локальной базе", 
+				u"Устанавливает значение для ключа в локальной базе. Если значение для ключа не указывать, то ключ будет удалён", 
 				u"<ключ> = <значение>", 
-				(u"секрет = :-P", u"секрет ="), 
+				(u"секрет =", u"секрет = :-P"), 
 				CHAT | PARAM)
 registerCommand(searchLocalKey, u"???поиск", 10, 
-				u"Поиск по базе", 
+				u"Поиск ключей по базе", 
 				u"<ключ>", 
 				(u"секрет", ), 
 				CHAT | PARAM)

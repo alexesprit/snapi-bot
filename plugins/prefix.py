@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def setDefPrefixValue(conference):
+def setDefaultPrefixValue(conference):
 	if getConferenceConfigKey(conference, "prefix") is None:
 		setConferenceConfigKey(conference, "prefix", "")
 
@@ -33,7 +33,7 @@ def managePrefixControl(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Префикс не установлен")
 
-registerEvent(setDefPrefixValue, ADDCONF)
+registerEvent(setDefaultPrefixValue, ADDCONF)
 registerCommand(managePrefixControl, u"префикс", 30, 
 				u"Устанавливает или отключает (если указать None) префикс для команд. Без параметра покажет текущее значение", 
 				u"[что-то]", 

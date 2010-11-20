@@ -12,8 +12,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import urllib2
-
 DUMPZ_LANGS_FILE = "dumpzlangs.txt"
 
 def loadLangsForDumpz():
@@ -40,10 +38,17 @@ def uploadToDumpz(msgType, conference, nick, param):
 		else:
 			text = param
 			lang = "text"
-		query = urllib.urlencode({"lexer": lang, "code": text.encode("utf-8")})
-		req = urllib2.Request("http://dumpz.org/", query, {"Content-type": "application/x-www-form-urlencoded"})
-		res = urllib2.urlopen(req)
-		sendMsg(msgType, conference, nick, u"Залито на %s" % (res.url))
+		url = "http://dumpz.org/"
+		data = {
+			"lexer": lang,
+			"code": text.encode("utf-8")
+		}
+		headers = {"Content-type": "application/x-www-form-urlencoded"}
+		responce = getURL(url, None, data, headers)
+		if responce:
+			sendMsg(msgType, conference, nick, u"Залито на %s" % (responce.url))
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerEvent(loadLangsForDumpz, STARTUP)
 

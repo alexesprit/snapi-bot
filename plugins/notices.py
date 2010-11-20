@@ -41,11 +41,11 @@ def sendNotices(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Я пока что нигде не сижу")
 
-def setDefNoticeValue(conference):
+def setDefaultNoticeValue(conference):
 	if getConferenceConfigKey(conference, "notices") is None:
 		setConferenceConfigKey(conference, "notices", 1)
 
-registerEvent(setDefNoticeValue, ADDCONF)
+registerEvent(setDefaultNoticeValue, ADDCONF)
 
 registerCommand(noticeControl, u"оповещения", 30, 
 				u"Отключает (0) или включает (1) сообщения о новостях. Без параметра покажет текущее значение", 

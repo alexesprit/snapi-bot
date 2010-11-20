@@ -20,7 +20,7 @@ def loadJokes():
 	path = getFilePath(RESOURCE_DIR, JOKES_FILE)
 	gJokes = eval(utils.readFile(path, "utf-8"))
 
-def setDefJokesValue(conference):
+def setDefaultJokesValue(conference):
 	if getConferenceConfigKey(conference, "jokes") is None:
 		setConferenceConfigKey(conference, "jokes", 1)
 
@@ -42,7 +42,7 @@ def manageJokesValue(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (jokesValue))
 
 registerEvent(loadJokes, STARTUP)
-registerEvent(setDefJokesValue, ADDCONF)
+registerEvent(setDefaultJokesValue, ADDCONF)
 
 registerCommand(manageJokesValue, u"шуточки", 30, 
 				u"Отключает (0) или включает (1) шуточки, которыми бот порою подменяет ответ. Без параметра покажет текущее значение", 

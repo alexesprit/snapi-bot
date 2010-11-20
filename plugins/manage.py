@@ -36,7 +36,10 @@ def leaveConf(msgType, conference, nick, param):
 		leaveConference(conf, u"Меня уводит %s" % (myNick))
 		saveConferences()
 	else:
-		sendMsg(msgType, conference, nick, u"А меня там и нет!")
+		if param:
+			sendMsg(msgType, conference, nick, u"А меня там и нет!")
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка! Необходимо указать конференцию")
 
 registerCommand(joinConf, u"зайти", 100, 
 				u"Зайти в указанную конференцию", 

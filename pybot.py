@@ -29,6 +29,7 @@ import threading
 import time
 import traceback
 import urllib
+import urllib2
 
 import chardet
 import database
@@ -136,6 +137,7 @@ gUserName, gServer = gJid.split("@")
 gClient = client.Client(server=gServer, port=gPort, debugFlags=gXMPPDebug)
 gRoster = None
 gDebug = debug.Debug(gCoreDebug, showFlags=False)
+
 gTagPtrn = re.compile(r"<.+?>")
 gJidPtrn = re.compile(r"\w+@\w+\.\w+", re.UNICODE)
 gSrvPtrn = re.compile(r"\w+\.\w+", re.UNICODE)
@@ -187,7 +189,7 @@ def clearEventHandlers(evtType):
 
 def registerMessageHandler(function, msgType):
 	gMessageHandlers[msgType].append(function)
-	
+
 def registerBotMessageHandler(function):
 	gBotMsgHandlers.append(function)
 
@@ -312,22 +314,22 @@ getFilePath = os.path.join
 def getConfigPath(*param):
 	return os.path.join(CONFIG_DIR, *param)
 
-def getURL(url, param=None):
+def getURL(url, param=None, data=None, headers=None):
 	if param:
 		query = urllib.urlencode(param)
 		url = u"%s?%s" % (url, query)
+	if data:
+		data = urllib.urlencode(data)
+	if headers:
+		request = urllib2.Request(url, data, headers)
+	else:
+		request = urllib2.Request(url, data)
 	try:
-		return urllib.urlopen(url)
-	except (IOError), e:
+		return urllib2.urlopen(request)
+	except IOError, e:
 		text = u"Unable to open %s (%s)" % (url, e)
 		printf(text, FLAG_WARNING)
-		writeToLog(text, LOG_WARN)
-	return None
-
-def openURL(url, param=None):
-	responce = getURL(url, param)
-	if responce:
-		return responce.read()
+		writeToLog(text, LOG_WARN)		
 	return None
 
 def decode(text, encoding=None):
@@ -448,7 +450,7 @@ def isJid(jid):
 def isServer(server):
 	if not server.count(" "):
 		if gSrvPtrn.search(server):
-			return True	
+			return True
 	return False
 
 def isAdmin(jid):
@@ -569,7 +571,7 @@ def sendTo(msgType, jid, text):
 
 def sendToConference(conference, text):
 	sendTo(protocol.TYPE_PUBLIC, conference, text)
-		
+
 def sendMsg(msgType, conference, nick, text, force=False):
 	if protocol.TYPE_PUBLIC == msgType and not force:
 		fools = getConferenceConfigKey(conference, "jokes")

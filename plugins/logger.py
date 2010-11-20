@@ -159,7 +159,7 @@ def manageLoggingValue(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Я пока что нигде не сижу")
 
-def setDefLoggingValue(conference):
+def setDefaultLoggingValue(conference):
 	if getConferenceConfigKey(conference, "log") is None:
 		setConferenceConfigKey(conference, "log", 1)
 
@@ -168,7 +168,7 @@ if gLogDir:
 	registerLeaveHandler(writeUserLeave)
 	registerPresenceHandler(writePresence, CHAT)
 	registerMessageHandler(writeMessage, CHAT)
-registerEvent(setDefLoggingValue, ADDCONF);		
+registerEvent(setDefaultLoggingValue, ADDCONF);		
 registerCommand(manageLoggingValue, u"логирование", 100, 
 				u"Отключает (0) или включает (1) ведение логов для указанной/текущей конференции. Без параметра покажет значения для всех конференций, в которых сидит бот", 
 				u"[<комната> <0|1>]", 

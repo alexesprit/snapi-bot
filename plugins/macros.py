@@ -201,10 +201,10 @@ def showMacrosList(msgType, conference, nick, parameters):
 				disMacroses.append(macros)
 		if macroses:
 			macroses.sort()
-			message += u"Локальные:\n"+", ".join(macroses) + "\n"
+			message += u"Локальные:\n%s\n" % (", ".join(macroses))
 		if disMacroses:
 			disMacroses.sort()
-			message += u"Отключённые локальные макросы:\n" + ", ".join(disMacroses) + "\n\n"
+			message += u"Отключённые локальные макросы:\n%s\n\n" % (", ".join(disMacroses))
 		macroses = []
 		disMacroses = [];	
 	for macros in gMacros.getMacrosList():
@@ -221,11 +221,11 @@ def showMacrosList(msgType, conference, nick, parameters):
 				macroses.append(macros)
 	if macroses:
 		macroses.sort()
-		message += u"Глобальные:\n" + ", ".join(macroses)
+		message += u"Глобальные:\n%s\n" % (", ".join(macroses))
 	if isConference:
 		if disMacroses:
 			disMacroses.sort()
-			message += u"\nОтключённые глобальные макросы:\n" + ", ".join(disMacroses)
+			message += u"Отключённые глобальные макросы:\n%s\n\n" % (", ".join(disMacroses))
 	if message:
 		if msgType == protocol.TYPE_PUBLIC:
 			sendMsg(msgType, conference, nick, u"Ушёл")

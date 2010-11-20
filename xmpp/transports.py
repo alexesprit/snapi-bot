@@ -58,7 +58,7 @@ class TCPSocket(plugin.PlugIn):
 
 	def lookup(self, server):
 		""" SRV resolver. Takes server=(host, port) as argument.
-			Returns new (host, port) pair 
+			Returns new (host, port) pair
 		"""
 		import dns
 		host, port = server
@@ -100,7 +100,7 @@ class TCPSocket(plugin.PlugIn):
 			self._recv = self._sock.recv
 			self.printf("Successfully connected to remote host %s:%s" % (server[0], server[1]), "ok")
 			return "ok"
-		except socket.error, (errno, strerror): 
+		except socket.error, (errno, strerror):
 			self.printf("Failed to connect to remote host %s: %s (%s)" % (server[0], strerror, errno), "error")
 		except Exception:
 			pass
@@ -115,7 +115,7 @@ class TCPSocket(plugin.PlugIn):
 
 	def receive(self):
 		""" Reads all pending incoming data.
-			In case of disconnection calls owner's disconnected() method 
+			In case of disconnection calls owner's disconnected() method
 			and then raises IOError exception.
 		"""
 		try:
@@ -164,9 +164,9 @@ class TCPSocket(plugin.PlugIn):
 			# Avoid printing messages that are empty keepalive packets.
 			if rawData.strip():
 				self.printf(rawData, "sent")
+		# TODO Make better
 		except Exception:
 			self.printf("Socket error while sending data", "error")
-			self._owner.disconnected()
 
 	def pending_data(self, timeout=0):
 		""" Returns true if there is a data ready to be read.

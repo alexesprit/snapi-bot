@@ -108,7 +108,7 @@ class CommonClient:
 		connected = sock.PlugIn(self)
 		if not connected: 
 			sock.PlugOut()
-			return False
+			return None
 		self.connected = C_TCP
 		if (secureMode == SECURE_AUTO and self.port in (5223, 443)) or secureMode == SECURE_FORCE:
 			# FIXME. This should be done in transports.py
@@ -117,11 +117,11 @@ class CommonClient:
 				self.connected = C_SSL
 			except socket.sslerror:
 				self.TLS.PlugOut()
-				return False
+				return None
 		dispatcher.Dispatcher().PlugIn(self)
 		while self.Dispatcher.Stream._document_attrs is None:
 			if not self.process(1):
-				return False
+				return None
 		# If we get version 1.0 stream the features tag MUST BE presented
 		if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
 			while not self.Dispatcher.Stream.features and self.process(1):
@@ -137,24 +137,25 @@ class Client(CommonClient):
 			If you want to disable TLS/SSL support completely, set it to SECURE_DISABLE.
 			Returns None or "TCP", "SSL" "TLS", depending on the result.
 		"""
-		if not CommonClient.connect(self, secureMode, useResolver):
+		if CommonClient.connect(self, secureMode, useResolver):
+			if self.connected != C_SSL and secureMode == SECURE_AUTO:
+				transports.TLS().PlugIn(self)
+				if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
+					# If we get version 1.0 stream the features tag MUST BE presented
+					while not self.Dispatcher.Stream.features and self.process(1):
+						pass
+					if transports.TLS_UNSUPPORTED == self.TLS.state:
+						self.TLS.PlugOut()
+						return self.connected
+					while not self.TLS.state and self.process(1):
+						pass
+					if self.TLS.state != transports.TLS_SUCCESS:
+						self.TLS.PlugOut()
+						return None
+					self.connected = C_TLS
+			return self.connected
+		else:
 			return None
-		if secureMode != SECURE_DISABLE and not hasattr(self, C_TLS):
-			transports.TLS().PlugIn(self)
-			if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
-				# If we get version 1.0 stream the features tag MUST BE presented
-				while not self.Dispatcher.Stream.features and self.process(1):
-					pass
-				if transports.TLS_UNSUPPORTED == self.TLS.state:
-					self.TLS.PlugOut()
-					return self.connected
-				while not self.TLS.state and self.process(1):
-					pass
-				if self.TLS.state != transports.TLS_SUCCESS:
-					self.TLS.PlugOut()
-					return False
-				self.connected = C_TLS
-		return self.connected
 
 	def auth(self, user, password, resource=None):
 		""" Authenticate connnection and bind resource. If resource is not provided

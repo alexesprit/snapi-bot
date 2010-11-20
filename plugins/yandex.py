@@ -32,7 +32,7 @@ def searchInYandex(msgType, conference, nick, param):
 			else:
 				items = [u"%s\nhttp://%s" % (item[0].strip(), item[1]) for item in items[:5]]
 				message = "\n\n".join(items)
-			sendMsg(msgType, conference, nick, decode(message));	
+			sendMsg(msgType, conference, nick, decode(message))
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:

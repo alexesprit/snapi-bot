@@ -50,16 +50,16 @@ XMPP_FEATURES = {
 	protocol.NS_ACTIVITY:		"XEP-0108: User Activity",
 	protocol.NS_CAPS:			"XEP-0115: Entity Capabilities",
 	protocol.NS_TUNE:			"XEP-0118: User Tune",
+	protocol.NS_WAITINGLIST:	"XEP-0130: Waiting Lists",
 	protocol.NS_SHIM:			"XEP-0131: Stanza Headers and Internet Metadata",
 	protocol.NS_COMPRESS: 		"XEP-0138: Stream Compression",
 	protocol.NS_ROSTERX:		"XEP-0144: Roster Item Exchange",
-	protocol.NS_WAITINGLIST:	"XEP-0130: Waiting Lists",
+	protocol.NS_JINGLE:			"XEP-0167: Jingle RTP Sessions",
 	protocol.NS_RECEIPTS:		"XEP-0184: Message Receipts",
 	protocol.NS_PING:			"XEP-0199: XMPP Ping",
 	protocol.NS_ENTITY_TIME:	"XEP-0202: Entity Time",
 	protocol.NS_URN_DELAY:		"XEP-0203: Delayed Delivery",
-	protocol.NS_ATTENTION:		"XEP-0224: Attention",
-	protocol.NS_JINGLE:			"XEP-0234: Jingle File Transfer",
+	protocol.NS_ATTENTION:		"XEP-0224: Attention"
 }
 
 def showFeatures(msgType, conference, nick, param):

@@ -35,6 +35,7 @@ NS_DISCO						= "http://jabber.org/protocol/disco"			#XEP-0030
 NS_DISCO_INFO				 	= "http://jabber.org/protocol/disco#info"		#XEP-0030
 NS_DISCO_ITEMS					= "http://jabber.org/protocol/disco#items"		#XEP-0030
 NS_ADDRESS		  				= "http://jabber.org/protocol/address"			#XEP-0033
+NS_STATS						= "http://jabber.org/protocol/stats"			#XEP-0039
 NS_MUC							= "http://jabber.org/protocol/muc"				#XEP-0045
 NS_MUC_ADMIN					= "http://jabber.org/protocol/muc#admin"		#XEP-0045
 NS_MUC_USER						= "http://jabber.org/protocol/muc#user"			#XEP-0045
@@ -70,12 +71,13 @@ NS_WAITINGLIST					= "http://jabber.org/protocol/waitinglist"		#XEP-0130
 NS_SHIM							= "http://jabber.org/protocol/shim"				#XEP-0131
 NS_COMPRESS						= "http://jabber.org/protocol/compress"			#XEP-0138
 NS_ROSTERX						= "http://jabber.org/protocol/rosterx"			#XEP-0144
+NS_JINGLE						= "urn:xmpp:jingle:1"							#XEP-0167
 NS_RECEIPTS						= "urn:xmpp:receipts"							#XEP-0184
 NS_PING							= "urn:xmpp:ping"								#XEP-0199
 NS_ENTITY_TIME					= "urn:xmpp:time"								#XEP-0202
-NS_URN_DELAY					= "urn:xmpp:delay"								#XEP-0203
+NS_URN_DELAY					= "urn:xmpp:delay"								#XEP-0204
 NS_ATTENTION					= "urn:xmpp:attention:0"						#XEP-0224
-NS_JINGLE						= "urn:xmpp:jingle:1"							#XEP-0224
+
 NS_BIND							= "urn:ietf:params:xml:ns:xmpp-bind"			#RFC 3920
 NS_SASL							= "urn:ietf:params:xml:ns:xmpp-sasl"			#RFC 3920
 NS_STANZAS						= "urn:ietf:params:xml:ns:xmpp-stanzas"			#RFC 3920
@@ -85,10 +87,10 @@ NS_XMPP_STREAMS					= "urn:ietf:params:xml:ns:xmpp-streams"			#RFC 3920
 NS_CLIENT						= "jabber:client"								#RFC 3921
 NS_ROSTER						= "jabber:iq:roster"							#RFC 3921
 NS_SESSION						= "urn:ietf:params:xml:ns:xmpp-session"			#RFC 3921
+
 NS_IQ							= "iq"											#Jabberd2
 NS_MESSAGE						= "message"										#Jabberd2
 NS_PRESENCE						= "presence"									#Jabberd2
-NS_STATS						= "http://jabber.org/protocol/stats"			#??? ????
 
 _errorCodes = {
 	"400": "bad-request",

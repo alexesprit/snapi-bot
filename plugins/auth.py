@@ -27,7 +27,7 @@ AUTH_QUESTIONS = (
 
 gAuthAnswer = {}
 
-def setDefAuthValue(conference):
+def setDefaultAuthValue(conference):
 	if getConferenceConfigKey(conference, "auth") is None:
 		setConferenceConfigKey(conference, "auth", 0)
 
@@ -76,7 +76,7 @@ def manageAuthValue(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (getConferenceConfigKey(conference, "auth")))
 
-registerEvent(setDefAuthValue, ADDCONF)
+registerEvent(setDefaultAuthValue, ADDCONF)
 registerEvent(initAuthCache, ADDCONF)
 registerEvent(freeAuthCache, DELCONF)
 

@@ -45,7 +45,7 @@ def showHoroscope(msgType, conference, nick, param):
 			if date in HOROSCOPE_DATES:
 				rawdate = HOROSCOPE_DATES[date]
 			else:
-				message = u"Можно указывать только следующее в кач-ве дат: %s" % (", ".join(HOROSCOPE_DATES.keys()))
+				message = u"В кач-ве дат можно указывать только следующее: %s" % (", ".join(HOROSCOPE_DATES.keys()))
 				sendMsg(msgType, conference, nick, message)
 				return
 		else:
