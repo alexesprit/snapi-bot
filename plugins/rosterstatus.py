@@ -28,7 +28,7 @@ def updateRosterStatus():
 	if gRosterStatus:
 		show = gRosterStatus["show"]
 		status = gRosterStatus["status"]
-		gClient.setStatus(show, status, gPriority)
+		gClient.setStatus(show, status, PROFILE_PRIORITY)
 
 def setRosterStatus(msgType, conference, nick, param):
 	args = param.split(None, 1)
@@ -40,7 +40,7 @@ def setRosterStatus(msgType, conference, nick, param):
 			status = args[1]
 	else:
 		status = param
-	gClient.setStatus(show, status, gPriority)
+	gClient.setStatus(show, status, PROFILE_PRIORITY)
 
 	gRosterStatus["show"] = show
 	gRosterStatus["status"] = status
@@ -50,12 +50,12 @@ def setRosterStatus(msgType, conference, nick, param):
 	
 	sendMsg(msgType, conference, nick, u"Запомнила")
 
-registerEvent(loadRosterStatusValue, STARTUP)
-registerEvent(updateRosterStatus, INIT_2)
+registerEvent(loadRosterStatusValue, EVT_STARTUP)
+registerEvent(updateRosterStatus, EVT_INIT_2)
 
 registerCommand(setRosterStatus, u"ростерстатус", 100, 
 				u"Устанавливает статус в ростере", 
 				u"<[статус] [текст]>", 
 				(u"away", u"away сплю"), 
-				ROSTER | PARAM)
+				CMD_ROSTER | CMD_PARAM)
 

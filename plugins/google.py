@@ -57,14 +57,14 @@ registerCommand(searchInGoogleEN, u"гугльен", 10,
 				u"Поиск через Google по зарубежным сайтам", 
 				u"<текст>", 
 				(u"yandex", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)
 registerCommand(searchInGoogleRU, u"гугльру", 10, 
 				u"Поиск через Google по русскоязычным сайтам", 
 				u"<текст>", 
 				(u"yandex", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)
 registerCommand(searchInGoogleAll, u"гугль", 10, 
 				u"Поиск через Google", 
 				u"<текст>", 
 				(u"yandex", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

@@ -45,4 +45,4 @@ registerCommand(deleteFromConfig, u"rmcfg", 100,
 				u"Удаляет файл или папку из CONFIG_DIR", 
 				u"<имя>", 
 				(u"test.txt", ), 
-				ROSTER | PARAM);	 
+				CMD_ROSTER | CMD_PARAM);	 

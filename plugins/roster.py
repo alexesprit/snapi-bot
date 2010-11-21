@@ -15,11 +15,11 @@
 
 def showRoster(msgType, conference, nick, param):
 	items = [u"%d) %s [%s]" % (i + 1, jid, gRoster.getSubscription(jid)) \
-			for i, jid in enumerate(gRoster.keys())]
+			for i, jid in enumerate(sorted(gRoster.keys()))]
 	sendMsg(msgType, conference, nick,  u"Смотри, кто у меня есть:\n" + "\n".join(items))
 
 registerCommand(showRoster, u"ростер", 100, 
 				u"Показывает содержимое ростера", 
 				None, 
 				None, 
-				ROSTER | NONPARAM)
+				CMD_ROSTER | CMD_NONPARAM)

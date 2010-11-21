@@ -34,4 +34,4 @@ registerCommand(showWhoIs, u"хтоэто", 10,
 				u"Показывает информацию о домене", 
 				u"<адрес>", 
 				(u"server.tld", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

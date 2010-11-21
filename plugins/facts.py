@@ -34,4 +34,4 @@ registerCommand(showFact, u"факт", 10,
 				u"Показывает случайный интересный факт", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)

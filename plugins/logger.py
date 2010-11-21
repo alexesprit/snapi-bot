@@ -36,7 +36,7 @@ def writeHeader(fp, jid, (year, month, day)):
 	fp.write(header.encode("utf-8"))
 
 def getLogFile(msgType, jid, (year, month, day)):
-	path = u"%s/%s/%d/%02d/%02d.html" % (gLogDir, jid, year, month, day)
+	path = u"%s/%s/%d/%02d/%02d.html" % (LOGGER_DIR, jid, year, month, day)
 	path = path.encode("utf-8")
 	if os.path.exists(path):
 		f = file(path, "a")
@@ -58,7 +58,7 @@ def regexUrl(matchobj):
 def writeLog(msgType, jid, nick, body, aff = 0):
 	(year, month, day, hour, minute, second, weekday, yearday, daylightsavings) = time.localtime()
 	body = utils.escapeXML(body)
-	body = gURLPtrn.sub(regexUrl, body)
+	body = URL_RE.sub(regexUrl, body)
 	body = body.replace("\n", "<br/>")
 	body = body.encode("utf-8")
 	nick = nick.encode("utf-8")
@@ -130,7 +130,7 @@ def manageLoggingValue(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 			return
-		if not conferenceInList(conf):
+		if not isConferenceInList(conf):
 			sendMsg(msgType, conference, nick, u"Я не сижу в этой конференции!")
 			return
 		if value.isdigit():
@@ -154,22 +154,25 @@ def manageLoggingValue(msgType, conference, nick, param):
 		conferences = getConferences()
 		if conferences:
 			items = [u"%d) %s [%d]" % (i + 1, c, getConferenceConfigKey(c, "log")) 
-						for i, c in enumerate(conferences)]
+						for i, c in enumerate(sorted(conferences))]
 			sendMsg(msgType, conference, nick, u"Список конференций:\n%s" % ("\n".join(items)))
 		else:
-			sendMsg(msgType, conference, nick, u"Я пока что нигде не сижу")
+			sendMsg(msgType, conference, nick, u"Сейчас меня нет ни в одной конференции")
 
 def setDefaultLoggingValue(conference):
 	if getConferenceConfigKey(conference, "log") is None:
 		setConferenceConfigKey(conference, "log", 1)
 
-if gLogDir:
+if LOGGER_DIR:
 	registerJoinHandler(writeUserJoin)
 	registerLeaveHandler(writeUserLeave)
-	registerPresenceHandler(writePresence, CHAT)
-	registerMessageHandler(writeMessage, CHAT)
-registerEvent(setDefaultLoggingValue, ADDCONF);		
-registerCommand(manageLoggingValue, u"логирование", 100, 
+
+	registerPresenceHandler(writePresence, H_CONFERENCE)
+	registerMessageHandler(writeMessage, H_CONFERENCE)
+
+	registerEvent(setDefaultLoggingValue, EVT_ADDCONFERENCE)
+	
+	registerCommand(manageLoggingValue, u"логирование", 100, 
 				u"Отключает (0) или включает (1) ведение логов для указанной/текущей конференции. Без параметра покажет значения для всех конференций, в которых сидит бот", 
-				u"[<комната> <0|1>]", 
+				u"[<конференция> <0|1>]", 
 				(None, u"0", u"room@conference.server.tld 0"))

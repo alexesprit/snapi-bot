@@ -17,7 +17,7 @@ def sendInvite(msgType, conference, nick, param):
 	param = param.split(None, 1)
 	user = param[0]
 	if not isJid(user):
-		if nickInConference(conference, user):
+		if isNickInConference(conference, user):
 			trueJid = getTrueJid(conference, user)
 		else:
 			return
@@ -40,4 +40,4 @@ registerCommand(sendInvite, u"призвать", 10,
 				u"Приглашет заданного пользователя в конференцию", 
 				u"<ник|жид> [причина]", 
 				(u"Nick", u"user@server.tld есть дело"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)

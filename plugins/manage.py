@@ -17,11 +17,11 @@ def joinConf(msgType, conference, nick, param):
 	param = param.split()
 	if param and isJid(param[0]):
 		conf = param[0]
-		if conferenceInList(conf):
+		if isConferenceInList(conf):
 			sendMsg(msgType, conference, nick, u"Я уже там!")
 		else:
 			password = (len(param) == 2) and param[1] or None
-			addConference(conf)
+			EVT_ADDCONFerence(conf)
 			joinConference(conf, gBotNick, getConferenceConfigKey(conf, "password"))
 			saveConferenceConfig(conf)
 			saveConferences()
@@ -29,10 +29,10 @@ def joinConf(msgType, conference, nick, param):
 
 def leaveConf(msgType, conference, nick, param):
 	conf = param or conference
-	if conferenceInList(conf):
+	if isConferenceInList(conf):
 		if conf != conference:
 			sendMsg(msgType, conference, nick, u"Ушла")
-		myNick = (conferenceInList(conference)) and nick or conference.split("@")[0]
+		myNick = (isConferenceInList(conference)) and nick or conference.split("@")[0]
 		leaveConference(conf, u"Меня уводит %s" % (myNick))
 		saveConferences()
 	else:
@@ -45,7 +45,7 @@ registerCommand(joinConf, u"зайти", 100,
 				u"Зайти в указанную конференцию", 
 				u"<конференция> [пароль]", 
 				(u"room@conference.server.tld", u"room@conference.server.tld"),
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)
 registerCommand(leaveConf, u"свали", 
 				30, u"Заставляет выйти из текущей или указанной конференции", 
 				u"[конференция]", 

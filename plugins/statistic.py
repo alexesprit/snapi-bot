@@ -86,16 +86,19 @@ def freeConferenceStats(conference):
 	del gStatsKicked[conference]
 	del gStatsBanned[conference]
 
-registerEvent(initConferenceStats, ADDCONF)
-registerEvent(freeConferenceStats, DELCONF)
+registerEvent(initConferenceStats, EVT_ADDCONFERENCE)
+registerEvent(freeConferenceStats, EVT_DELCONFERENCE)
+
 registerJoinHandler(updateJoinStats)
 registerLeaveHandler(updateLeaveStats)
-registerPresenceHandler(updatePresenceStats, CHAT)
-registerMessageHandler(updateMessageStats, CHAT)
+
+registerPresenceHandler(updatePresenceStats, H_CONFERENCE)
+registerMessageHandler(updateMessageStats, H_CONFERENCE)
+
 registerBotMessageHandler(updateBotMessageStats)
 
 registerCommand(showConferenceStats, u"статистика", 10, 
 				u"Статистика текущей конференции", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)

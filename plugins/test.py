@@ -20,4 +20,4 @@ registerCommand(showTest, u"тест", 10,
 				u"Тест на беременность", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)

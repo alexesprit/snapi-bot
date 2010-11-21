@@ -20,7 +20,6 @@
 
 from __future__ import with_statement
 
-import codecs
 import os
 import random
 import re
@@ -28,8 +27,6 @@ import sys
 import threading
 import time
 import traceback
-import urllib
-import urllib2
 
 import chardet
 import database
@@ -51,27 +48,27 @@ BOTCONFIG_FILE = "config.py"
 ACCESS_FILE = "access.txt"
 CONFIG_FILE = "config.txt"
 CONF_FILE = "conferences.txt"
-LOG_ERROR_FILE = "%Y.%m.%d_error.txt"
-LOG_CRASH_FILE = "%Y.%m.%d_crash.txt"
-LOG_WARN_FILE = "%Y.%m.%d_warn.txt"
+LOG_ERRORS_FILE = "%Y.%m.%d_errors.txt"
+LOG_CRASHES_FILE = "%Y.%m.%d_crashes.txt"
+LOG_WARNINGS_FILE = "%Y.%m.%d_warnings.txt"
 
 FLAG_INFO = "info"
 FLAG_ERROR = "error"
 FLAG_WARNING = "warning"
 FLAG_SUCCESS = "success"
 
-ADDCONF = 0x1
-DELCONF = 0x2
-STARTUP = 0x3
-INIT_2 = 0x4
-SHUTDOWN = 0x5
+CMD_CONFERENCE = 0x0001
+CMD_ROSTER = 0x0002
+CMD_FROZEN = 0x0004
+CMD_NONPARAM = 0x0008
+CMD_PARAM = 0x0010
+CMD_ANY = CMD_CONFERENCE | CMD_ROSTER
 
-CHAT = 1 << 1
-ROSTER = 1 << 2
-FROZEN = 1 << 3
-NONPARAM = 1 << 4
-PARAM = 1 << 5
-ANY = CHAT | ROSTER
+CMD_DESC = 0x1
+CMD_TYPE = 0x2
+CMD_ACCESS = 0x3
+CMD_SYNTAX = 0x4
+CMD_EXAMPLE = 0x5
 
 NICK_JID = "jid"
 NICK_IDLE = "idle"
@@ -81,12 +78,15 @@ NICK_JOINED = "joined"
 NICK_SHOW = "show"
 NICK_STATUS = "status"
 
-STATUS_STRINGS = (
-	protocol.PRS_AWAY, 
-	protocol.PRS_NA, 
-	protocol.PRS_DND, 
-	protocol.PRS_CHAT
-)
+LOG_ERRORS = 0x1
+LOG_CRASHES = 0x2
+LOG_WARNINGS = 0x3
+
+LOG_TYPES = {
+	LOG_CRASHES: LOG_CRASHES_FILE, 
+	LOG_ERRORS: LOG_ERRORS_FILE, 
+	LOG_WARNINGS: LOG_WARNINGS_FILE
+}
 
 ROLES = {
 	protocol.ROLE_NONE: 0, 
@@ -108,45 +108,25 @@ FORBIDDEN_TYPES = (
 	protocol.TYPE_HEADLINE
 )
 
-LOG_CRASH = 0x1
-LOG_ERROR = 0x2
-LOG_WARN = 0x3
-
-LOG_TYPES = {
-	LOG_CRASH: LOG_CRASH_FILE, 
-	LOG_ERROR: LOG_ERROR_FILE, 
-	LOG_WARN: LOG_WARN_FILE
-}
+STATUS_STRINGS = (
+	protocol.PRS_AWAY, 
+	protocol.PRS_NA, 
+	protocol.PRS_DND, 
+	protocol.PRS_CHAT
+)
 
 REJOIN_DELAY = 120
 RECONNECT_DELAY = 15
 RESTART_DELAY = 5
 
-CMD_DESC = 0x1
-CMD_ACCESS = 0x2
-CMD_SYNTAX = 0x3
-CMD_EXAMPLE = 0x4
-CMD_TYPE = 0x5
+H_CONFERENCE = 0x1
+H_ROSTER = 0x2
 
-gCurrentDir = os.path.dirname(sys.argv[0])
-if gCurrentDir:
-	os.chdir(gCurrentDir)
-execfile(BOTCONFIG_FILE) in globals()
-
-gUserName, gServer = gJid.split("@")
-gClient = client.Client(server=gServer, port=gPort, debugFlags=gXMPPDebug)
-gRoster = None
-gDebug = debug.Debug(gCoreDebug, showFlags=False)
-
-gTagPtrn = re.compile(r"<.+?>")
-gJidPtrn = re.compile(r"\w+@\w+\.\w+", re.UNICODE)
-gSrvPtrn = re.compile(r"\w+\.\w+", re.UNICODE)
-gURLPtrn = re.compile(r"(http|ftp|svn)(\:\/\/[^\s<]+)")
-
-gSemaphore = threading.BoundedSemaphore(30)
-
-gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "tmr": 0, "warn": 0}
-gVersion = ("Jimm", "0.6.4v [06.07.2010]", "NokiaE51-1/0.34.011")
+EVT_ADDCONFERENCE = 0x1
+EVT_DELCONFERENCE = 0x2
+EVT_STARTUP = 0x3
+EVT_INIT_2 = 0x4
+EVT_SHUTDOWN = 0x5
 
 gBotMsgHandlers = []
 gJoinHandlers = []
@@ -155,14 +135,20 @@ gIqHandlers = []
 gCmdHandlers = {}
 
 gEventHandlers = {
-	ADDCONF: [], 
-	DELCONF: [], 
-	STARTUP: [], 
-	INIT_2: [], 
-	SHUTDOWN: []
+	EVT_ADDCONFERENCE: [], 
+	EVT_DELCONFERENCE: [], 
+	EVT_STARTUP: [], 
+	EVT_INIT_2: [], 
+	EVT_SHUTDOWN: []
 }
-gPresenceHandlers = {ROSTER: [], CHAT: []}
-gMessageHandlers = {ROSTER: [], CHAT: []}
+gPresenceHandlers = {
+	H_ROSTER: [], 
+	H_CONFERENCE: []
+}
+gMessageHandlers = {
+	H_ROSTER: [], 
+	H_CONFERENCE: []
+}
 
 gGlobalAccess = {}
 gTempAccess = {}
@@ -178,11 +164,10 @@ gIsJoined = {}
 
 gJokes = []
 
-gID = 0
+gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "tmr": 0, "warn": 0}
+gVersion = ("Jimm", "0.6.4v [06.07.2010]", "NokiaE51-1/0.34.011")
 
-gDebug.colors[FLAG_ERROR] = debug.colorBrightRed
-gDebug.colors[FLAG_WARNING] = debug.colorYellow
-gDebug.colors[FLAG_SUCCESS] = debug.colorBrightCyan
+THR_SEMAPHORE = threading.BoundedSemaphore(30)
 
 def clearEventHandlers(evtType):
 	gEventHandlers[evtType] = []
@@ -208,7 +193,7 @@ def registerPresenceHandler(function, prsType):
 def registerEvent(function, evtType):
 	gEventHandlers[evtType].append(function)
 
-def registerCommand(function, command, access, desc, syntax, examples, cmdType=ANY):
+def registerCommand(function, command, access, desc, syntax, examples, cmdType=CMD_ANY):
 	gCmdHandlers[command] = function
 	gCommands[command] = {CMD_ACCESS: access, CMD_DESC: desc, CMD_SYNTAX: syntax, CMD_EXAMPLE: examples, CMD_TYPE: cmdType}
 
@@ -224,9 +209,9 @@ def callLeaveHandlers(conference, nick, trueJid, reason, code):
 	for function in gLeaveHandlers:
 		startThread(function, (conference, nick, trueJid, reason, code))
 
-def callMessageHandlers(msgType, stanza, evtType, conference, nick, trueJid, body):
+def callMessageHandlers(hType, msgType, stanza, conference, nick, trueJid, body):
 	gInfo["msg"] += 1
-	for function in gMessageHandlers[evtType]:
+	for function in gMessageHandlers[hType]:
 		startThread(function, (stanza, msgType, conference, nick, trueJid, body))
 
 def callIqHandlers(stanza, jid, resource):
@@ -234,9 +219,9 @@ def callIqHandlers(stanza, jid, resource):
 	for function in gIqHandlers:
 		startThread(function, (stanza, jid, resource))
 
-def callPresenceHandlers(stanza, prsType, jid, resource, trueJid):
+def callPresenceHandlers(hType, stanza, jid, resource, trueJid):
 	gInfo["prs"] += 1
-	for function in gPresenceHandlers[prsType]:
+	for function in gPresenceHandlers[hType]:
 		startThread(function, (stanza, jid, resource, trueJid))
 
 def callEventHandlers(evtType, args=None):
@@ -266,77 +251,22 @@ def startTimer(timeout, function, args=None):
 def execute(function, args=None):
 	try:
 		if args:
-			with gSemaphore:
+			with THR_SEMAPHORE:
 				function(*args)
 		else:
-			with gSemaphore:
+			with THR_SEMAPHORE:
 				function()
 	except Exception:
 		printf("Exception in %s function" % (function.__name__), FLAG_ERROR)
-		writeToLog(traceback.format_exc(), LOG_ERROR)
+		writeSystemLog(traceback.format_exc(), LOG_ERRORS)
 
-def getUsedMemorySize():
-	if os.name == "posix":
-		pipe = os.popen("ps -o rss -p %s" % os.getpid())
-		pipe.readline()
-		return float(pipe.readline().strip()) / 1024
-	return 0
-
-def printf(text, flag = FLAG_INFO):
+def printf(text, flag=FLAG_INFO):
 	gDebug.show(text, flag, flag)
-
-def getUptimeStr(time):
-	minutes, seconds = divmod(time, 60)
-	hours, minutes = divmod(minutes, 60)
-	days, hours = divmod(hours, 24)
-	timeStr = "%02d:%02d:%02d" % (hours, minutes, seconds)
-	if days:
-		timeStr = u"%d дн. %s" % (days, timeStr)
-	return timeStr
-
-def getTimeStr(time):
-	minutes, seconds = divmod(time, 60)
-	hours, minutes = divmod(minutes, 60)
-	days, hours = divmod(hours, 24)
-	timeStr = ""
-	if seconds:
-		timeStr = u"%d сек." % (seconds)
-	if minutes:
-		timeStr = u"%d мин. %s" % (minutes, timeStr)
-	if hours:
-		timeStr = u"%d ч. %s" % (hours, timeStr)
-	if days:
-		timeStr = u"%d дн. %s" % (days, timeStr)
-	return timeStr
 
 getFilePath = os.path.join
 
 def getConfigPath(*param):
 	return os.path.join(CONFIG_DIR, *param)
-
-def getURL(url, param=None, data=None, headers=None):
-	if param:
-		query = urllib.urlencode(param)
-		url = u"%s?%s" % (url, query)
-	if data:
-		data = urllib.urlencode(data)
-	if headers:
-		request = urllib2.Request(url, data, headers)
-	else:
-		request = urllib2.Request(url, data)
-	try:
-		return urllib2.urlopen(request)
-	except IOError, e:
-		text = u"Unable to open %s (%s)" % (url, e)
-		printf(text, FLAG_WARNING)
-		writeToLog(text, LOG_WARN)		
-	return None
-
-def decode(text, encoding=None):
-	if encoding:
-		text = unicode(text, encoding)
-	text = gTagPtrn.sub("", text.replace("<br />","\n").replace("<br>","\n"))
-	return utils.unescapeHTML(text)
 
 def saveConferences():
 	utils.writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
@@ -360,11 +290,11 @@ def addConference(conference):
 	gConferences[conference] = {}
 	gIsJoined[conference] = False
 	loadConferenceConfig(conference)
-	for function in gEventHandlers[ADDCONF]:
+	for function in gEventHandlers[EVT_ADDCONFERENCE]:
 		function(conference)
 
 def delConference(conference):
-	for function in gEventHandlers[DELCONF]:
+	for function in gEventHandlers[EVT_DELCONFERENCE]:
 		function(conference)
 	del gIsJoined[conference]
 	del gConferenceConfig[conference]
@@ -373,7 +303,7 @@ def delConference(conference):
 def joinConference(conference, nick, password):
 	setConferenceConfigKey(conference, "nick", nick)
 	setConferenceConfigKey(conference, "password", password)
-	prs = protocol.Presence("%s/%s" % (conference, nick), priority=gPriority)
+	prs = protocol.Presence("%s/%s" % (conference, nick), priority=PROFILE_PRIORITY)
 	status = getConferenceConfigKey(conference, "status")
 	show = getConferenceConfigKey(conference, "show")
 	if status:
@@ -399,63 +329,6 @@ def getBotNick(conference):
 		return getConferenceConfigKey(conference, "nick") or gBotNick
 	return gBotNick
 
-def getUniqueID(text):
-	global gID
-	gID += 1
-	return "%s_%d" % (text, gID)
-
-def setConferenceStatus(conference, status, show):
-	prs = protocol.Presence(conference, priority=gPriority)
-	if status:
-		prs.setStatus(status)
-	if show:
-		prs.setShow(show)
-	prs.addChild(node=gClient.getCapsNode())
-	gClient.send(prs)
-
-def getMUCSetRoleStanza(conference, user, role, reason=None):
-	iq = protocol.Iq(protocol.TYPE_SET)
-	iq.setTo(conference)
-	query = protocol.Node("query", {"xmlns": protocol.NS_MUC_ADMIN})
-	role = query.addChild("item", {"nick": user, "role": role})
-	if reason:
-		role.setTagData("reason", reason)
-	iq.addChild(node=query)
-	return iq
-
-def setMUCRole(conference, user, role, reason=None):
-	iq = getMUCSetRoleStanza(conference, user, role, reason)
-	gClient.send(iq)
-
-def getMUCSetAffiliationStanza(conference, user, itemType, aff, reason=None):
-	iq = protocol.Iq(protocol.TYPE_SET)
-	iq.setTo(conference)
-	query = protocol.Node("query", {"xmlns": protocol.NS_MUC_ADMIN})
-	aff = query.addChild("item", {itemType: user, "affiliation": aff})
-	if reason:
-		aff.setTagData("reason", reason)
-	iq.addChild(node=query)
-	return iq
-
-def setMUCAffiliation(conference, user, itemType, aff, reason=None):
-	iq = getMUCSetAffiliationStanza(conference, user, itemType, aff, reason)
-	gClient.send(iq)
-
-def isJid(jid):
-	if not jid.count(" "):
-		if gJidPtrn.search(jid):
-			return True
-	return False
-
-def isServer(server):
-	if not server.count(" "):
-		if gSrvPtrn.search(server):
-			return True
-	return False
-
-def isAdmin(jid):
-	return jid in gAdmins
-
 def isCommand(command):
 	return command in gCommands
 
@@ -470,11 +343,6 @@ def getNicks(conference):
 
 def getOnlineNicks(conference):
 	return [x for x in gConferences[conference] if getNickKey(conference, x, NICK_HERE)]
-
-def getJidList(conference, offline=False):
-	nicks = offline and getNicks(conference) or getOnlineNicks(conference)
-	jidList = tuple(set([getTrueJid(conference,  nick) for nick in nicks]))
-	return jidList
 	
 def getTrueJid(jid, resource=None):
 	if isinstance(jid, protocol.UserJid):
@@ -483,7 +351,7 @@ def getTrueJid(jid, resource=None):
 		if jid.find("/") > -1:
 			jid, resource = jid.split("/", 1)
 	if jid in gConferences:
-		if nickInConference(jid, resource):
+		if isNickInConference(jid, resource):
 			jid = getNickKey(jid, resource, NICK_JID)
 	return jid
 
@@ -503,14 +371,14 @@ def getNickKey(conference, nick, key):
 def setNickKey(conference, nick, key, value):
 	gConferences[conference][nick][key] = value
 
-def conferenceInList(conference):
+def isConferenceInList(conference):
 	return conference in gConferences
 
-def nickInConference(conference, nick):
+def isNickInConference(conference, nick):
 	return nick in gConferences[conference]
 
-def nickIsOnline(conference, nick):
-	return nickInConference(conference, nick) and getNickKey(conference, nick, NICK_HERE)
+def isNickOnline(conference, nick):
+	return isNickInConference(conference, nick) and getNickKey(conference, nick, NICK_HERE)
 
 def setTempAccess(conference, jid, level=0):
 	gTempAccess[conference][jid] = None
@@ -595,7 +463,7 @@ def messageHandler(session, stanza):
 		return
 	fullJid = stanza.getFrom()
 	conference = fullJid.getBareJid()
-	isConference = conferenceInList(conference)
+	isConference = isConferenceInList(conference)
 	if protocol.TYPE_PUBLIC == msgType and not isConference:
 		return
 	trueJid = getTrueJid(fullJid)
@@ -617,11 +485,14 @@ def messageHandler(session, stanza):
 		stanza.setType(protocol.TYPE_PUBLIC)
 		gClient.send(stanza)
 		return
+	if isConference:
+		if stanza.getTag("subject"):
+			message = stanza.getSubject()
 	if not message:
 		return
 	nick = fullJid.getResource()
 	if protocol.TYPE_PUBLIC == msgType:
-		if nickInConference(conference, nick):
+		if isNickInConference(conference, nick):
 			setNickKey(conference, nick, NICK_IDLE, time.time())
 	else:
 		if stanza.getTag("request"):
@@ -629,8 +500,9 @@ def messageHandler(session, stanza):
 			reportMsg.setID(stanza.getID())
 			reportMsg.addChild("received", None, None, protocol.NS_RECEIPTS)
 			gClient.send(reportMsg)
-	cmdType = isConference and CHAT or ROSTER
-	callMessageHandlers(msgType, stanza, cmdType, conference, nick, trueJid, message)
+	cmdType = isConference and CMD_CONFERENCE or CMD_ROSTER
+	hType = isConference and H_CONFERENCE or H_ROSTER
+	callMessageHandlers(hType, msgType, stanza, conference, nick, trueJid, message)
 	if isConference:
 		botNick = getBotNick(conference)
 		if botNick == nick:
@@ -668,9 +540,9 @@ def messageHandler(session, stanza):
 		if isCommandType(command, cmdType):
 			if getAccess(conference, trueJid) >= access:
 				param = (len(rawBody) == 2) and rawBody[1] or None
-				if param and isCommandType(command, NONPARAM):
+				if param and isCommandType(command, CMD_NONPARAM):
 					return
-				if not param and isCommandType(command, PARAM):
+				if not param and isCommandType(command, CMD_PARAM):
 					return
 				callCommandHandlers(command, msgType, conference, nick, param)
 			else:
@@ -680,7 +552,7 @@ def presenceHandler(session, stanza):
 	fullJid = stanza.getFrom()
 	prsType =  stanza.getType()
 	jid = fullJid.getBareJid()
-	if conferenceInList(jid):
+	if isConferenceInList(jid):
 		conference = jid
 		trueJid = stanza.getJid()
 		nick = fullJid.getResource()
@@ -692,8 +564,8 @@ def presenceHandler(session, stanza):
 				return
 			aff = stanza.getAffiliation()
 			role = stanza.getRole()
-			if not nickIsOnline(conference, nick):
-				if not nickInConference(conference, nick):
+			if not isNickOnline(conference, nick):
+				if not isNickInConference(conference, nick):
 					gConferences[conference][nick] = {}
 				setNickKey(conference, nick, NICK_JID, trueJid)
 				setNickKey(conference, nick, NICK_IDLE, time.time())
@@ -709,7 +581,7 @@ def presenceHandler(session, stanza):
 			setTempAccess(conference, trueJid, roleAccess + affAccess)
 			setNickKey(conference, nick, NICK_MODER, role == protocol.ROLE_MODERATOR)
 		elif protocol.PRS_OFFLINE == prsType:
-			if nickIsOnline(conference, nick):
+			if isNickOnline(conference, nick):
 				code = stanza.getStatusCode()
 				reason = stanza.getReason() or stanza.getStatus()
 				setNickKey(conference, nick, NICK_HERE, False)
@@ -728,17 +600,18 @@ def presenceHandler(session, stanza):
 			elif errorCode == "404":
 				delConference(conference)
 				saveConferences()
+				writeSystemLog(u"%s is deleted (%s)" % (conference, errorCode), LOG_WARNINGS, True)
 			elif errorCode == "503":
 				botNick = getBotNick(conference)
 				password = getConferenceConfigKey(conference, "password")
-				startTimer(REJOIN_DELAY, conference, (conference, botNick, password, ))
+				startTimer(REJOIN_DELAY, conference, (conference, botNick, password))
 			elif errorCode in ("401", "403", "405"):
 				leaveConference(conference, u"got %s error code" % errorCode)
-			printf(stanza, FLAG_WARNING)
-		callPresenceHandlers(stanza, CHAT, conference, nick, trueJid)
+				writeSystemLog(u"Got error in %s (%s)" % (conference, errorCode), LOG_WARNINGS, True)
+		callPresenceHandlers(H_CONFERENCE, stanza, conference, nick, trueJid)
 	else:
 		resource = fullJid.getResource()
-		callPresenceHandlers(stanza, ROSTER, jid, resource, None)
+		callPresenceHandlers(H_ROSTER, stanza, jid, resource, None)
 
 def iqHandler(session, stanza):
 	fullJid = stanza.getFrom()
@@ -749,13 +622,32 @@ def iqHandler(session, stanza):
 	resource = fullJid.getResource()
 	callIqHandlers(stanza, bareJid, resource)
 
-def writeToLog(text, logtype):
+def writeSystemLog(text, logtype, show=False):
 	path = getFilePath(SYSLOG_DIR, time.strftime(LOG_TYPES[logtype]))
 	utils.writeFile(path, text + "\n", "a")
-	if LOG_WARN == logtype:
+	if LOG_WARNINGS == logtype:
 		gInfo["warn"] += 1
 	else:
 		gInfo["err"] += 1
+	if show:
+		if LOG_WARNINGS == logtype:
+			printf(text, FLAG_WARNING)
+		else:
+			printf(text, FLAG_ERROR)
+
+def loadMainConfig():
+	f = file(BOTCONFIG_FILE)
+	exec f in globals()
+	
+	global PROFILE_USERNAME, PROFILE_SERVER
+	PROFILE_USERNAME, PROFILE_SERVER = PROFILE_JID.split("@")
+
+def initDebugger():
+	global gDebug
+	gDebug = debug.Debug(CORE_DBG, showFlags=False)
+	gDebug.colors[FLAG_ERROR] = debug.colorBrightRed
+	gDebug.colors[FLAG_WARNING] = debug.colorYellow
+	gDebug.colors[FLAG_SUCCESS] = debug.colorBrightCyan
 
 def loadPlugins():
 	printf("Loading plugins...")
@@ -766,18 +658,19 @@ def loadPlugins():
 		try:
 			path = os.path.join(PLUGIN_DIR, plugin)
 			if os.path.isfile(path):
-				exec(file(path)) in globals()
+				f = file(path)
+				exec f in globals()
 				validPlugins += 1
 		except (SyntaxError, NameError):
 			printf("Exception in loadPlugins function", FLAG_ERROR)
-			writeToLog(traceback.format_exc(), LOG_ERROR)
+			writeSystemLog(traceback.format_exc(), LOG_ERRORS)
 			invalidPlugins += 1
 	if not invalidPlugins:
 		printf("Loaded %d plugins" % (validPlugins), FLAG_SUCCESS)
 	else:
 		printf("Loaded %d plugins (%d with errors)" % (validPlugins, invalidPlugins), FLAG_WARNING)
 
-def detectMultiLaunch():
+def findAnotherInstance():
 	if os.name == "posix":
 		try:
 			pid = int(utils.readFile(PID_FILE))
@@ -789,7 +682,7 @@ def detectMultiLaunch():
 
 def shutdown(restart=False):
 	gClient.disconnected()
-	callEventHandlers(SHUTDOWN)
+	callEventHandlers(EVT_SHUTDOWN)
 	if restart:
 		printf("Restarting...")
 		time.sleep(RESTART_DELAY)
@@ -801,19 +694,29 @@ def shutdown(restart=False):
 		os.abort()
 
 if __name__ == "__main__":
-	try:
-		pid = detectMultiLaunch()
-		if not pid:
-			gInfo["start"] = time.time()
+	global gDebug, gClient, gRoster
 
+	gInfo["start"] = time.time()
+
+	currentDir = os.path.dirname(sys.argv[0])
+	if currentDir:
+		os.chdir(currentDir)
+
+	loadMainConfig()
+	initDebugger()
+
+	pid = findAnotherInstance()
+	if not pid:
+		try:
 			loadPlugins()
 
 			printf("Connecting...")
-			if gClient.connect(secureMode=gSecureMode, useResolver=gUseResolver):
+			gClient = client.Client(server=PROFILE_SERVER, port=PROFILE_PORT, debugFlags=XMPP_DBG)
+			if gClient.connect(secureMode=PROFILE_SECURE, useResolver=PROFILE_USE_RESOLVER):
 				printf("Connection established (%s)" % gClient.isConnected(), FLAG_SUCCESS)
 			else:
 				printf("Unable to connect", FLAG_ERROR)
-				if gRestart:
+				if RESTART_IF_ERROR:
 					printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
 					time.sleep(RECONNECT_DELAY)
 					shutdown(True)
@@ -821,14 +724,14 @@ if __name__ == "__main__":
 					shutdown()
 
 			printf("Waiting for authentication...")
-			if gClient.auth(gUserName, gPassword, gResource):
+			if gClient.auth(PROFILE_USERNAME, PROFILE_PASSWORD, PROFILE_RESOURCE):
 				printf("Connected", FLAG_SUCCESS)
 			else:
 				printf("Incorrect login/password", FLAG_ERROR)
 				shutdown()
 
-			callEventHandlers(STARTUP)
-			clearEventHandlers(STARTUP)
+			callEventHandlers(EVT_STARTUP)
+			clearEventHandlers(EVT_STARTUP)
 
 			gClient.registerHandler("message", messageHandler)
 			gClient.registerHandler("presence", presenceHandler)
@@ -836,7 +739,7 @@ if __name__ == "__main__":
 			printf("Handlers registered", FLAG_SUCCESS)
 
 			gRoster = gClient.getRoster()
-			gClient.setStatus(None, None, gPriority)
+			gClient.setStatus(None, None, PROFILE_PRIORITY)
 
 			path = getConfigPath(CONF_FILE)
 			utils.createFile(path, "[]")
@@ -848,31 +751,31 @@ if __name__ == "__main__":
 					saveConferenceConfig(conference)
 				printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
-			callEventHandlers(INIT_2)
-			clearEventHandlers(INIT_2)
+			callEventHandlers(EVT_INIT_2)
+			clearEventHandlers(EVT_INIT_2)
 			
 			printf("Now I am ready to work :)")
 			while True:
 				gClient.process(10)
-		else:
-			printf("Another instance is running (pid: %s)" % (pid), FLAG_ERROR)
-	except KeyboardInterrupt:
-		if gClient.isConnected():
-			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-			prs.setStatus(u"Выключаюсь (CTRL+C)")
-			gClient.send(prs)
-		shutdown()
-	except protocol.SystemShutdown:
-		printf("Remote server was switched off", FLAG_WARNING)
-		shutdown()
-	except protocol.Conflict:
-		printf("Resource conflict", FLAG_WARNING)
-		shutdown()
-	except Exception:
-		printf("Exception in main thread", FLAG_ERROR)
-		writeToLog(traceback.format_exc(), LOG_CRASH)
-		if gClient.isConnected():
-			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-			prs.setStatus(u"что-то сломалось...")
-			gClient.send(prs)
-		shutdown(gRestart)
+		except KeyboardInterrupt:
+			if gClient.isConnected():
+				prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
+				prs.setStatus(u"Выключаюсь (CTRL+C)")
+				gClient.send(prs)
+			shutdown()
+		except protocol.SystemShutdown:
+			printf("Remote server was switched off", FLAG_WARNING)
+			shutdown()
+		except protocol.Conflict:
+			printf("Resource conflict", FLAG_WARNING)
+			shutdown()
+		except Exception:
+			printf("Exception in main thread", FLAG_ERROR)
+			writeSystemLog(traceback.format_exc(), LOG_CRASHES)
+			if gClient.isConnected():
+				prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
+				prs.setStatus(u"что-то сломалось...")
+				gClient.send(prs)
+			shutdown(RESTART_IF_ERROR)
+	else:
+		printf("Another instance is running (pid: %s)" % (pid), FLAG_ERROR)

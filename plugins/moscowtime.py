@@ -34,4 +34,4 @@ registerCommand(showMoscowTime, u"время", 10,
 				u"Показывает точное московское время", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)

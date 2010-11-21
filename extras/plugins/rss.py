@@ -57,31 +57,33 @@ def cleanRSSCache(conference):
 			cache.pop()
 
 def sendRSSNews(conference, url, onlyFirst=False):
-	printf("loading %s" % (url))
-	rawXML = urllib.urlopen(url).read()
-	xmlNode = protocol.simplexml.XML2Node(rawXML)
-	if "feed" == xmlNode.getName():
-		rssType = TYPE_ATOM
-		itemName = "entry"
-		textName = "content"
-	else:
-		rssType = TYPE_RSS
-		itemName = "item"
-		textName = "description"
-		xmlNode = xmlNode.getFirstChild()
-	for i, tag in enumerate(xmlNode.getTags(itemName)):
-		name = decode(tag.getTagData("title")).strip()
-		tagHash = hashlib.md5(name.encode("utf-8")).hexdigest()
-		if tagHash not in gRSSCache[conference][url]:
-			gRSSCache[conference][url].append(tagHash)
-			if not onlyFirst or (onlyFirst and i == 0):
-				text = decode(tag.getTagData(textName)).strip()
-				if TYPE_ATOM == rssType:
-					link = decode(tag.getTag("link").getAttr("href")).strip()
-				else:
-					link = decode(tag.getTagData("link")).strip()
-				sendToConference(conference, u"Тема: %s\n%s\n\nСсылка: %s" % (name, text, link))
-				time.sleep(RSS_SEND_INTERVAL)
+	#printf("loading %s" % (url))
+	responce = getURL(url)
+	if responce:
+		rawXML = responce.read()
+		xmlNode = protocol.simplexml.XML2Node(rawXML)
+		if "feed" == xmlNode.getName():
+			rssType = TYPE_ATOM
+			itemName = "entry"
+			textName = "content"
+		else:
+			rssType = TYPE_RSS
+			itemName = "item"
+			textName = "description"
+			xmlNode = xmlNode.getFirstChild()
+		for i, tag in enumerate(xmlNode.getTags(itemName)):
+			name = decode(tag.getTagData("title")).strip()
+			tagHash = hashlib.md5(name.encode("utf-8")).hexdigest()
+			if tagHash not in gRSSCache[conference][url]:
+				gRSSCache[conference][url].append(tagHash)
+				if not onlyFirst or (onlyFirst and i == 0):
+					text = decode(tag.getTagData(textName)).strip()
+					if TYPE_ATOM == rssType:
+						link = decode(tag.getTag("link").getAttr("href")).strip()
+					else:
+						link = decode(tag.getTagData("link")).strip()
+					sendToConference(conference, u"Тема: %s\n%s\n\nСсылка: %s" % (name, text, link))
+					time.sleep(RSS_SEND_INTERVAL)
 		
 def startRSSQuery(conference):
 	for url in gRSSItems[conference].values():
@@ -143,22 +145,22 @@ def showRSSChannels(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"нет такой ленты")
 
-registerEvent(startRSSQueries, INIT_2)
-registerEvent(loadRSSChannels, ADDCONF)
-registerEvent(freeRSSChannels, DELCONF)
+registerEvent(startRSSQueries, EVT_INIT_2)
+registerEvent(loadRSSChannels, EVT_ADDCONFERENCE)
+registerEvent(freeRSSChannels, EVT_DELCONFERENCE)
 
 registerCommand(addRSSChannel, u"рсс+", 30, 
 				u"Добавляет рсс-ленту", 
 				u"<название = ссылка>", 
 				(u"http://server.tld/rss = News"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(delRSSChannel, u"рсс-", 30, 
 				u"Удаляет рсс-ленту", 
 				u"<название>", 
 				(u"новости"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(showRSSChannels, u"рсс*", 30, 
 				u"Показывает рсс-ленты. Если указать название, то выведет подробную информацию", 
 				None, 
 				None, 
-				CHAT)
+				CMD_CONFERENCE)

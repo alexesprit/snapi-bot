@@ -31,4 +31,4 @@ registerCommand(showDreamInfo, u"сонник", 10,
 				u"Толкователь снов", 
 				u"<что-то>", 
 				(u"деньги", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

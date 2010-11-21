@@ -61,9 +61,9 @@ registerCommand(setBoAtctivity, u"активность", 100,
 				u"Устанавливает активность для бота. \"Cброс\" в кач-ве параметра сбрасывает активность", 
 				u"<осн.|доп.|текст>", 
 				(u"doing_chores|doing_maintenance|ололо", ), 
-				ROSTER | PARAM)
+				CMD_ROSTER | CMD_PARAM)
 registerCommand(setBotMood, u"настроение", 100, 
 				u"Устанавливает настроение для бота. \"Cброс\" в кач-ве параметра сбрасывает настроение", 
 				u"<название|текст>", 
 				(u"calm|ололо", ), 
-				ROSTER | PARAM)
+				CMD_ROSTER | CMD_PARAM)

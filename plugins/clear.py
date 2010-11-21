@@ -25,4 +25,4 @@ registerCommand(clearConference, u"чисть", 15,
 				u"Очищает конференцию", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)

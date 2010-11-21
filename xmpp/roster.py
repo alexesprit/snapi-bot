@@ -204,8 +204,9 @@ class Roster(plugin.PlugIn):
 		""" Delete jid from roster.
 		"""
 		iq = protocol.Iq(protocol.TYPE_SET, protocol.NS_ROSTER)
-		itemNode = protocol.Node("item", {"jid": jid,"subscription": "remove"})
-		iq.addChild(node=itemNode)
+		query = iq.getTag("query")
+		itemNode = protocol.Node("item", {"jid": jid, "subscription": "remove"})
+		query.addChild(node=itemNode)
 		self._owner.send(iq)
 		
 	def subscribe(self, jid):

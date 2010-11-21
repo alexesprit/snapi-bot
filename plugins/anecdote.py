@@ -32,4 +32,4 @@ registerCommand(showAnecdote, u"анекдот", 10,
 				u"Показывает случайный анекдот", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)

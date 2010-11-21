@@ -42,11 +42,11 @@ def freeRecordsBase(conference):
 	
 registerJoinHandler(calculateRecord)
 
-registerEvent(loadRecordsBase, ADDCONF)
-registerEvent(freeRecordsBase, DELCONF)
+registerEvent(loadRecordsBase, EVT_ADDCONFERENCE)
+registerEvent(freeRecordsBase, EVT_DELCONFERENCE)
 
 registerCommand(showRecord, u"рекорд", 10, 
 				u"Показывает рекорд посещаемости конференции", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)

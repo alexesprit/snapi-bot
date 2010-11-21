@@ -56,19 +56,19 @@ registerCommand(pythonEval, u"eval", 100,
 				u"Расчитывает и показывает заданное выражение питона", 
 				u"<выражение>", 
 				(u"str(gConferences)", ), 
-				ANY | FROZEN | PARAM)
+				CMD_ANY | CMD_FROZEN | CMD_PARAM)
 registerCommand(pythonExec, u"exec", 100, 
 				u"Выполняет выражение питона", 
 				u"<выражение>", 
 				(u"del gConferences", ), 
-				ANY | FROZEN | PARAM)
+				CMD_ANY | CMD_FROZEN | CMD_PARAM)
 registerCommand(pythonShell, u"sh", 100, 
 				u"Выполняет шелл-команду", 
 				u"<команда>", 
 				(u"ls", ), 
-				ANY | FROZEN | PARAM)
+				CMD_ANY | CMD_FROZEN | CMD_PARAM)
 registerCommand(pythonCalc, u"кальк", 10, 
 				u"Калькулятор", 
 				u"<выражение>", 
 				(u"1 + 2", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

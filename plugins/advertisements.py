@@ -33,4 +33,4 @@ registerCommand(showAdvert, u"объявление", 10,
 				u"Показывает случайное интересное объявление", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)

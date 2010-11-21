@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def sendToAdmins(msgType, conference, nick, param):
-	for admin in gAdmins:
+	for admin in PROFILE_ADMINS:
 		sendTo(protocol.TYPE_PRIVATE, admin, u"Сообщение от %s/%s:\n%s" % (conference, nick, param))
 	sendMsg(msgType, conference, nick, u"Ваше сообщение отправлено!")
 	
@@ -25,9 +25,9 @@ registerCommand(sendToAdmins, u"мессага_админу", 10,
 				u"Отправляет сообщение всем администраторам бота", 
 				u"<сообщение>", 
 				(u"привет!11", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)
 registerCommand(messageToChat, u"сказать", 20, 
 				u"Сказать через бота в конференции", 
 				u"<сообщение>", 
 				(u"Всем привет!!!", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)

@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def showUserIdleTime(msgType, conference, nick, param):
-	if nickIsOnline(conference, param):
+	if isNickOnline(conference, param):
 		idleTime = int(time.time() - getNickKey(conference, param, NICK_IDLE))
 		sendMsg(msgType, conference, nick, u"%s заснул %s назад" % (param, getTimeStr(idleTime)))
 	else:
@@ -24,4 +24,4 @@ registerCommand(showUserIdleTime, u"жив", 10,
 				u"Показывает время неактивности пользователя", 
 				u"<ник>", 
 				(u"Nick", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)

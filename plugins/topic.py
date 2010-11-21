@@ -27,4 +27,4 @@ registerCommand(setTopic, u"топег", 20,
 				u"Устанавливает тему в конференции", 
 				u"<текст>", 
 				(u"Ололо!", ), 
-				CHAT)
+				CMD_CONFERENCE)

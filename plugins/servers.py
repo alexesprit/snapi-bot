@@ -40,7 +40,7 @@ def _showServerInfo(stanza, msgType, conference, nick, server):
 		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 def showServerInfo(msgType, conference, nick, param):
-	server = param or gServer
+	server = param or PROFILE_SERVER
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_STATS)
 	iq.setTo(server)
 	iq.setID(getUniqueID("info_id"))
@@ -58,7 +58,7 @@ def _showServerUptime(stanza, msgType, conference, nick, server):
 		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 def showServerUptime(msgType, conference, nick, param):
-	server = param or gServer
+	server = param or PROFILE_SERVER
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_LAST)
 	iq.setTo(server)
 	iq.setID(getUniqueID("uptime_id"))

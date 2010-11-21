@@ -39,16 +39,23 @@ def cleanBase(base, keepTime):
 			cleanedKeys += 1
 	if cleanedKeys:
 		base.save()
+	return cleanedKeys
 
 def cleanBases():
 	_cleanBase = cleanBase
 	for conference in getConferences():
+		cleanedKeys = 0
 		for item in CHAT_BASES:
 			base = globals()[item][conference]
-			_cleanBase(base, CHAT_KEEP_TIME)
+			cleanedKeys += _cleanBase(base, CHAT_KEEP_TIME)
+		if cleanedKeys:
+			printf(u"%d keys were removed from %s bases" % (cleanedKeys, conference))
 	for item in SINGLE_BASES:
+		cleanedKeys = 0
 		base = globals()[item]
 		_cleanBase(base, SINGLE_KEEP_TIME)
+		if cleanedKeys:
+			printf(u"%d keys were removed from %s base" % (cleanedKeys, item))
 	for log in os.listdir(SYSLOG_DIR):
 		path = os.path.join(SYSLOG_DIR, log)
 		if os.path.isfile(path):
@@ -60,4 +67,4 @@ def cleanBases():
 def startCleanTimer():
 	startTimer(CLEAN_TIMEOUT, cleanBases)
 
-registerEvent(startCleanTimer, INIT_2)
+registerEvent(startCleanTimer, EVT_INIT_2)

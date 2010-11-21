@@ -20,4 +20,4 @@ registerCommand(sendStanza, u"станза", 100,
 				u"Топка", 
 				u"<что-то>", 
 				(u"</stream:stream>", ), 
-				ANY | FROZEN | PARAM)
+				CMD_ANY | CMD_FROZEN | CMD_PARAM)

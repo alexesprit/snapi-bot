@@ -60,7 +60,7 @@ def showTalkerInfo(msgType, conference, nick, param):
 	else:
 		if not param:
 			trueJid = getTrueJid(conference, nick)
-		elif nickInConference(conference, param):
+		elif isNickInConference(conference, param):
 			trueJid = getTrueJid(conference, param)
 		else:
 			return
@@ -79,17 +79,18 @@ def showTalkerInfo(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Твоя статистика отсутствует")
 
 def updateTalkersInfo(stanza, msgType, conference, nick, trueJid, body):
-	if trueJid != gJid and msgType == protocol.TYPE_PUBLIC and nick:
-		base = gTalkersCache[conference]
-		if trueJid in base:
-			base[trueJid]["nick"] = nick
-		else:
-			base[trueJid] = {"nick": nick, "words": 0, "messages": 0, "mes": 0}
-		if body.startswith("/me"):
-			base[trueJid]["mes"] += 1
-		else:
-			base[trueJid]["messages"] += 1
-		base[trueJid]["words"] += len(body.split())
+	if msgType == protocol.TYPE_PUBLIC:
+		if trueJid != PROFILE_JID and trueJid != conference:
+			base = gTalkersCache[conference]
+			if trueJid in base:
+				base[trueJid]["nick"] = nick
+			else:
+				base[trueJid] = {"nick": nick, "words": 0, "messages": 0, "mes": 0}
+			if body.startswith("/me"):
+				base[trueJid]["mes"] += 1
+			else:
+				base[trueJid]["messages"] += 1
+			base[trueJid]["words"] += len(body.split())
 
 def loadTalkersBase(conference):
 	path = getConfigPath(conference, TALKERS_FILE)
@@ -102,13 +103,14 @@ def saveAllTalkersBases():
 	for conference in getConferences():
 		gTalkersCache[conference].save()
 
-registerEvent(loadTalkersBase, ADDCONF)
-registerEvent(freeTalkersBase, DELCONF)
-registerEvent(saveAllTalkersBases, SHUTDOWN)
-registerMessageHandler(updateTalkersInfo, CHAT)
+registerEvent(loadTalkersBase, EVT_ADDCONFERENCE)
+registerEvent(freeTalkersBase, EVT_DELCONFERENCE)
+registerEvent(saveAllTalkersBases, EVT_SHUTDOWN)
+
+registerMessageHandler(updateTalkersInfo, H_CONFERENCE)
 
 registerCommand(showTalkerInfo, u"болтун", 10, 
 				u"Показывает статистику болтливости указанного пользователя. Параметр \"топ\" - список десяти самых болтливых. Параметр \"сброс\" - очистка статистики", 
 				u"[ник]", 
 				(None, u"топ", u"Nick"), 
-				CHAT)
+				CMD_CONFERENCE)

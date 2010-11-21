@@ -29,18 +29,21 @@ ACCESS_DESC = {
 
 def login(msgType, conference, nick, param):
 	if msgType == protocol.TYPE_PRIVATE:
-		if param == gAdminPass:
+		if param == BOT_ADMIN_PASSWORD:
 			trueJid = getTrueJid(conference, nick)
-			gAdmins.append(trueJid)
-			setTempGlobalAccess(trueJid, 100)
-			sendMsg(msgType, conference, nick, u"Пароль принят, глобальный доступ выдан")
+			if trueJid not in BOT_ADMINS:
+				BOT_ADMINS.append(trueJid)
+				setTempGlobalAccess(trueJid, 100)
+				sendMsg(msgType, conference, nick, u"Пароль принят, глобальный доступ выдан")
+			else:
+				sendMsg(msgType, conference, nick, u"Ошибка! Вы уже авторизованы!")
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка! Неверный пароль!")
 
 def logout(msgType, conference, nick, parameters):
 	trueJid = getTrueJid(conference, nick)
-	if trueJid in gAdmins:
-		gAdmins.remove(trueJid)
+	if trueJid in BOT_ADMINS:
+		BOT_ADMINS.remove(trueJid)
 		setTempGlobalAccess(trueJid)
 		sendMsg(msgType, conference, nick, u"Глобальный доступ снят")
 	else:
@@ -52,7 +55,7 @@ def showUserAccess(msgType, conference, nick, param):
 	if not param:
 		userJid = getTrueJid(conference, nick)
 	else:
-		if conferenceInList(conference) and nickInConference(conference, user):
+		if isConferenceInList(conference) and isNickInConference(conference, user):
 			userJid = getTrueJid(conference, user)
 		elif isJid(user):
 			userJid = user
@@ -70,7 +73,7 @@ def setLocalAccess(msgType, conference, nick, param):
 	param = param.split()
 	if 4 > len(param) > 1:
 		user = param[0].strip()
-		if nickInConference(conference, user):
+		if isNickInConference(conference, user):
 			userJid = getTrueJid(conference, user)
 		elif isJid(user):
 			userJid = getTrueJid(conference, user)
@@ -104,7 +107,7 @@ def setLocalAccess(msgType, conference, nick, param):
 
 def delLocalAccess(msgType, conference, nick, param):
 	user = param
-	if nickInConference(conference, user):
+	if isNickInConference(conference, user):
 		userJid = getTrueJid(conference, user)
 	elif isJid(user):
 		userJid = getTrueJid(conference, user)
@@ -124,8 +127,8 @@ def setGlobalAccess(msgType, conference, nick, param):
 	param = param.split()
 	if len(param) < 3:
 		user = param[0].strip()
-		if conferenceInList(conference):
-			if nickInConference(conference, user):
+		if isConferenceInList(conference):
+			if isNickInConference(conference, user):
 				userJid = getTrueJid(conference, user)
 			elif isJid(user):
 				userJid = user
@@ -161,7 +164,7 @@ def showGlobalAccesses(msgType, conference, nick, param):
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли")
 		items = [u"%d) %s [%d]" % (i + 1, item, gGlobalAccess[item]) 
-				for i, item in enumerate(gGlobalAccess)]
+				for i, item in enumerate(sorted(gGlobalAccess))]
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Глобальные уровни доступа:\n%s" % ("\n".join(items)))
 
 def showLocalAccesses(msgType, conference, nick, param):
@@ -172,7 +175,7 @@ def showLocalAccesses(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Ушли")
 		accesses = gPermAccess[conference]
 		items = [u"%d) %s [%d]" % (i + 1, item, accesses[item]) 
-				for i, item in enumerate(accesses)]
+				for i, item in enumerate(sorted(accesses))]
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Локальные уровни доступа:\n%s" % ("\n".join(items)))
 
 def loadGlobalAccesses():
@@ -180,7 +183,7 @@ def loadGlobalAccesses():
 	path = getConfigPath(ACCESS_FILE)
 	utils.createFile(path, "{}")
 	gGlobalAccess = eval(utils.readFile(path))
-	for jid in gAdmins:
+	for jid in BOT_ADMINS:
 		gGlobalAccess[jid] = 100
 
 def loadLocalAccesses(conference):
@@ -193,47 +196,47 @@ def freeLocalAccesses(conference):
 	del gPermAccess[conference]
 	del gTempAccess[conference]
 
-registerEvent(loadGlobalAccesses, STARTUP)
-registerEvent(loadLocalAccesses, ADDCONF)
-registerEvent(freeLocalAccesses, DELCONF)
+registerEvent(loadGlobalAccesses, EVT_STARTUP)
+registerEvent(loadLocalAccesses, EVT_ADDCONFERENCE)
+registerEvent(freeLocalAccesses, EVT_DELCONFERENCE)
 
 registerCommand(login, u"логин", 0,
 				u"Авторизоваться как админиcтратор бота", 
 				u"<пароль>",
 				(u"secret", ), 
-				ANY | FROZEN | PARAM)
+				CMD_ANY | CMD_FROZEN | CMD_PARAM)
 registerCommand(logout, u"логаут", 0,
 				u"Разлогиниться", 
 				None, 
 				None, 
-				ANY | FROZEN | NONPARAM)
+				CMD_ANY | CMD_FROZEN | CMD_NONPARAM)
 registerCommand(showUserAccess, u"доступ", 0, 
 				u"Показывает уровень доступа определённого пользователя", 
 				u"[ник|жид]", 
 				(None, u"Nick", u"user@server.tld"), 
-				ANY | FROZEN)
+				CMD_CONFERENCE | CMD_FROZEN)
 registerCommand(setLocalAccess, u"дать_доступ", 20, 
 				u"Устанавливает уровень локального доступа для определённого пользователя на определённый уровень. Если указывается второй параметр (что угодно), то выдаётся постоянный доступ доступ", 
 				u"<ник|жид> <уровень> [навсегда]", 
 				(u"Nick 100", u"user@server.tld 100", u"Nick 100 1"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(delLocalAccess, u"снять_доступ", 20, 
 				u"Снимает уровень локального доступа для определённого пользователя.", 
 				u"<ник|жид>", 
 				(u"Nick", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setGlobalAccess, u"глобдоступ", 100, 
 				u"Устанавливает или снимает (если не писать уровень) уровень глобального доступа для определённого пользователя", 
 				u"<ник|жид> [уровень]", 
 				(u"Nick", u"user@server.tld", u"Nick 100"), 
-				ANY | FROZEN | PARAM)
+				CMD_ANY | CMD_FROZEN | CMD_PARAM)
 registerCommand(showGlobalAccesses, u"доступы", 100, 
 				u"Показывает все глобальные уровни доступа", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)
 registerCommand(showLocalAccesses, u"локалдоступы", 20, 
 				u"Показывает все локальные уровни доступа", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)

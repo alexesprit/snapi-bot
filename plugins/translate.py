@@ -81,10 +81,10 @@ def translateText(msgType, conference, nick, param):
 				else:
 					sendMsg(msgType, conference, nick, u"Не могу перевести")
 
-registerEvent(loadLangsForTranslate, STARTUP)
+registerEvent(loadLangsForTranslate, EVT_STARTUP)
 
 registerCommand(translateText, u"перевод", 10, 
 				u"Перевод текста с одного языка на другой. Указав \"языки\" в кач-ве параметра можно посмотреть доступные языки для перевода", 
 				u"<исходный_язык> <нужный_язык> <фраза>", 
 				(u"языки", u"en ru hello", u"ru en привет"), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

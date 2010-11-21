@@ -22,4 +22,4 @@ registerCommand(setBotNick, u"ботник", 30,
 				u"Меняет ник бота", 
 				u"<ник>",
 				(u"Stupid-Bot", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)

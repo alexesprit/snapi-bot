@@ -48,10 +48,10 @@ def changeCommandAccess(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u'читай справку по команде')
 
-registerEvent(loadCommandAccesses, STARTUP)
+registerEvent(loadCommandAccesses, EVT_STARTUP)
 registerCommand(changeCommandAccess, 
 				u'командоступ', 100, 
 				u'Меняет доступ для команды', 
 				u'<команда> <число>', 
 				(u'пинг 100', ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

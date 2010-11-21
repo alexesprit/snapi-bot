@@ -43,7 +43,7 @@ def _showPing(stanza, t0, msgType, conference, nick, param):
 
 def showPing(msgType, conference, nick, param):
 	if param:
-		if conferenceInList(conference) and nickIsOnline(conference, param):
+		if isConferenceInList(conference) and isNickOnline(conference, param):
 			jid = conference + "/" + param
 		else:
 			jid = param

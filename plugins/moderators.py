@@ -36,7 +36,7 @@ def setAutoModerator(conference, nick, trueJid, aff, role):
 def addAutoModerator(msgType, conference, nick, param):
 	user = param
 	setModeratorRole = False
-	if nickInConference(conference, user):
+	if isNickInConference(conference, user):
 		trueJid = getTrueJid(conference, user)
 		if getNickKey(conference, user, NICK_HERE):
 			setModeratorRole = True
@@ -60,7 +60,7 @@ def addAutoModerator(msgType, conference, nick, param):
 def delAutoModerator(msgType, conference, nick, param):
 	user = param
 	setParticipantRole = False
-	if nickInConference(conference, user):
+	if isNickInConference(conference, user):
 		trueJid = getTrueJid(conference, user)
 		if getNickKey(conference, user, NICK_HERE):
 			setParticipantRole = True
@@ -89,22 +89,22 @@ def showAutoModerators(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Список автомодераторов пуст")
 
-registerEvent(loadAutoModerators, ADDCONF)
-registerEvent(freeAutoModerators, DELCONF)
+registerEvent(loadAutoModerators, EVT_ADDCONFERENCE)
+registerEvent(freeAutoModerators, EVT_DELCONFERENCE)
 registerJoinHandler(setAutoModerator)
 
 registerCommand(addAutoModerator, u"модер+", 20, 
 				u"Добавляет ник или жид в список автомодераторов", 
 				u"<ник|жид>", 
 				(u"Nick", u"nick@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(delAutoModerator, u"модер-", 20, 
 				u"Удаляет ник или жид из списка автомодераторов", 
 				u"<ник|жид>", 
 				(u"Nick", u"nick@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(showAutoModerators, u"модер*", 20, 
 				u"Показывает список автомодераторов", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)

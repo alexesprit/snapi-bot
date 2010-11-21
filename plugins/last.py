@@ -31,4 +31,4 @@ registerCommand(showOnlineTime, u"всети", 10,
 				u"Показывает ваше время в сети", 
 				None, 
 				None, 
-				ROSTER | NONPARAM)
+				CMD_ROSTER | CMD_NONPARAM)

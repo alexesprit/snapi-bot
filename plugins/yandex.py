@@ -42,4 +42,4 @@ registerCommand(searchInYandex, u"яндекс", 10,
 				u"Поиск через Yandex", 
 				u"<текст>", 
 				(u"google", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

@@ -190,7 +190,7 @@ def showGlobalMacroAccess(msgType, conference, nick, param):
 def showMacrosList(msgType, conference, nick, parameters):
 	message, disMacroses, macroses = u"", [], []
 	trueJid = getTrueJid(conference, nick)
-	isConference = conferenceInList(conference)
+	isConference = isConferenceInList(conference)
 	if isConference:
 		for macros in gMacros.getMacrosList(conference):
 			if isAvailableCommand(conference, macros):
@@ -233,62 +233,62 @@ def showMacrosList(msgType, conference, nick, parameters):
 	else:
 		sendMsg(msgType, conference, nick, u"Макросов нет :(")
 
-registerEvent(gMacros.loadMacroses, STARTUP)
-registerEvent(gMacros.loadMacroses, ADDCONF)
-registerEvent(gMacros.freeMacroses, DELCONF)
+registerEvent(gMacros.loadMacroses, EVT_STARTUP)
+registerEvent(gMacros.loadMacroses, EVT_ADDCONFERENCE)
+registerEvent(gMacros.freeMacroses, EVT_DELCONFERENCE)
 
 registerCommand(addLocalMacros, u"макроадд", 20, 
 				u"Добавляет локальный макрос", 
 				u"<название>=<макрос>",
 				(u"глюк = сказать /me подумала, что все глючат", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(addGlobalMacros, u"гмакроадд", 100, 
 				u"Добавить глобальный макрос", 
 				u"<название> = <макрос>", 
 				(u"глюк = сказать /me подумала, что все глючат", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)
 registerCommand(delLocalMacros, u"макродел", 20, 
 				u"Удалить локальный макроc", 
 				u"<название>", 
 				(u"глюк", ), 
-				CHAT)
+				CMD_CONFERENCE)
 registerCommand(delGlobalMacros, u"гмакродел", 100, 
 				u"Удалить глобальный макроc", 
 				u"<название>", 
 				(u"глюк", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)
 registerCommand(showLocalMacrosInfo, u"макроинфо", 20, 
 				u"Открыть локальный макрос, т.е. просто посмотреть как он выглядит", 
 				u"[название]", 
 				(u"глюк", ), 
-				CHAT)
+				CMD_CONFERENCE)
 registerCommand(showGlobalMacrosInfo, u"гмакроинфо", 100, 
 				u"Открыть глобальный макрос, т.е. просто посмотреть как он выглядит", 
 				u"[название]", 
 				(u"глюк", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)
 registerCommand(expandLocalMacros, u"макроэксп", 20, 
 				u"Развернуть локальный макроc, т.е. посмотреть на него в сыром виде", 
 				u"<название> [параметры]", 
 				(u"глюк", u"глюк бу!"), 
-				CHAT)
+				CMD_CONFERENCE)
 registerCommand(expandGlobalMacros, u"гмакроэксп", 100, 
 				u"Развернуть глобальный макроc, т.е. посмотреть на него в сыром виде", 
 				u"<название> [параметры]", 
 				(u"глюк", u"глюк бу!"), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)
 registerCommand(showLocalMacroAccess, u"макродоступ", 20, 
 				u"Изменить или посмотреть доступ к локальному макросу", 
 				u"<название> [доступ]", 
 				(u"глюк", u"глюк 10"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(showGlobalMacroAccess, u"гмакродоступ", 100, 
 				u"Изменить или посмотреть доступ к глобальному макросу", 
 				u"<название> [доступ]", 
 				(u"админ", u"админ 20"), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)
 registerCommand(showMacrosList, u"макролист", 10, 
 				u"Список макросов", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)

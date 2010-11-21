@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def botRestart(msgType, conference, nick, param):
-	nick = (conferenceInList(conference)) and nick or conference.split("@")[0]
+	nick = (isConferenceInList(conference)) and nick or conference.split("@")[0]
 	if param:
 		message = u"Меня перезагружает %s (%s)" % (nick, param)
 	else:
@@ -25,7 +25,7 @@ def botRestart(msgType, conference, nick, param):
 	shutdown(True)
 
 def botShutdown(msgType, conference, nick, param):
-	nick = (conferenceInList(conference)) and nick or conference.split("@")[0]
+	nick = (isConferenceInList(conference)) and nick or conference.split("@")[0]
 	if param:
 		message = u"Меня выключает %s (%s)" % (nick, param)
 	else:
@@ -39,9 +39,9 @@ registerCommand(botRestart, u"рестарт", 100,
 				u"Перезапускает бота", 
 				u"[причина]", 
 				(None, u"ы!"), 
-				ANY | FROZEN)
+				CMD_ANY | CMD_FROZEN)
 registerCommand(botShutdown, u"идиспать", 100, 
 				u"Остановка и полный выход бота", 
 				u"[причина]", 
 				(None, u"идиспать обновления!11"), 
-				ANY | FROZEN)
+				CMD_ANY | CMD_FROZEN)

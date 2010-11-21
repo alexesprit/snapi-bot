@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def setUserRole(msgType, conference, nick, user, role):
-	if nickInConference(conference, user):
+	if isNickInConference(conference, user):
 		iq = getMUCSetRoleStanza(conference, user, role)
 		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
 	else:
@@ -24,7 +24,7 @@ def setUserAffiliation(msgType, conference, nick, user, aff):
 	if isJid(user) or isServer(user):
 		iq = getMUCSetAffiliationStanza(conference, user, protocol.ITEM_JID, aff)
 		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
-	elif nickInConference(conference, user):
+	elif isNickInConference(conference, user):
 		iq = getMUCSetAffiliationStanza(conference, user, protocol.ITEM_NICK, aff)
 		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
 	else:
@@ -67,44 +67,44 @@ registerCommand(setOutcast, u"бан", 20,
 				u"Банит пользователя", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setNone, u"избани", 20, 
 				u"Разбанивает пользователя", 
 				u"<ник/жид>", 
 				(u"Nick", u"user@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setMember, u"мембер", 20, 
 				u"Дает мембера", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setAdmin, u"админ", 30, 
 				u"Дает админа", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setOwner, u"овнер", 30, 
 				u"Дает овнера", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setKick, u"кик", 15, 
 				u"Кикает", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setVisitor, u"девойс", 15, 
 				u"Отнимает голос", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setParticipant, u"войс", 15, 
 				u"Даёт голос", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setModerator, u"модер", 20, 
 				u"Даёт модера", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)

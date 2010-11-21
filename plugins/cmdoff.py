@@ -33,10 +33,10 @@ def cmdSwitchOff(msgType, conference, nick, param):
 		message = u""
 		param = param.split()
 		for cmd in param:
-			_isCommand = isCommand(cmd) and isCommandType(cmd, CHAT)
+			_isCommand = isCommand(cmd) and isCommandType(cmd, CMD_CONFERENCE)
 			_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd)
 			if _isCommand or _isMacros:
-				if _isMacros or not isCommandType(cmd, FROZEN):
+				if _isMacros or not isCommandType(cmd, CMD_FROZEN):
 					if isAvailableCommand(conference, cmd):
 						gCmdOff[conference].append(cmd)
 						validCmd.append(cmd)
@@ -72,7 +72,7 @@ def cmdSwitchOn(msgType, conference, nick, param):
 	message = u""
 	param = param.split()
 	for cmd in param:
-		_isCommand = isCommand(cmd) and isCommandType(cmd, CHAT)
+		_isCommand = isCommand(cmd) and isCommandType(cmd, CMD_CONFERENCE)
 		_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd)
 		if _isCommand or _isMacros:
 			if not isAvailableCommand(conference, cmd):
@@ -94,16 +94,16 @@ def cmdSwitchOn(msgType, conference, nick, param):
 	saveCommands(conference)
 	sendMsg(msgType, conference, nick, message)
 
-registerEvent(loadCommands, ADDCONF)
-registerEvent(freeCommands, DELCONF)
+registerEvent(loadCommands, EVT_ADDCONFERENCE)
+registerEvent(freeCommands, EVT_DELCONFERENCE)
 
 registerCommand(cmdSwitchOn, u"комвкл", 30, 
 				u"Включает определённые команды для текущей конференции", 
 				u"<команды>", 
 				(u"тык диско версия пинг", ), 
-				CHAT | FROZEN | PARAM)
+				CMD_CONFERENCE | CMD_FROZEN | CMD_PARAM)
 registerCommand(cmdSwitchOff, u"комвыкл", 30, 
 				u"Отключает определённые команды для текущей конференции. Без параметров показывает список отключенных команд", 
 				u"[команды]", 
 				(None, u"тык диско версия пинг", ), 
-				CHAT | FROZEN)
+				CMD_CONFERENCE | CMD_FROZEN)

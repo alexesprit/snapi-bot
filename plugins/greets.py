@@ -32,7 +32,7 @@ def setUserGreeting(msgType, conference, nick, param):
 		greet = rawGreet[1].strip()
 		if isJid(user):
 			trueJid = user
-		elif nickInConference(conference, user):
+		elif isNickInConference(conference, user):
 			trueJid = getTrueJid(conference, user)
 		else:
 			sendMsg(msgType, conference, nick, u"А это кто?")
@@ -50,12 +50,12 @@ def sendUserGreeting(conference, nick, trueJid, aff, role):
 	if trueJid in gGreets[conference]:
 		sendMsg(protocol.TYPE_PUBLIC, conference, nick, gGreets[conference][trueJid])
 
-registerEvent(loadGreetings, ADDCONF)
-registerEvent(freeGreetings, DELCONF)
+registerEvent(loadGreetings, EVT_ADDCONFERENCE)
+registerEvent(freeGreetings, EVT_DELCONFERENCE)
 registerJoinHandler(sendUserGreeting)
 
 registerCommand(setUserGreeting, u"приветствие", 30, 
 				u"Добавляет приветствие для определённого ника/жида", 
 				u"<ник|жид> = [текст]", 
 				(u"Nick = Привет!", u"user@server.tld = Привет!"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)

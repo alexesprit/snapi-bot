@@ -57,4 +57,4 @@ registerCommand(showAforism, u"афор", 10,
 				u"Показывает случайный афоризм", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)

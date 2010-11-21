@@ -31,10 +31,10 @@ def addToSendBase(msgType, conference, nick, param):
 		userNick = param[0]
 		message = param[1]
 		message = u"%s попросил меня передать тебе следующее:\n%s" % (nick, message)
-		if nickIsOnline(conference, userNick):
+		if isNickOnline(conference, userNick):
 			sendMsg(protocol.TYPE_PRIVATE, conference, userNick, message)
 			sendMsg(msgType, conference, nick, u"Передала")
-		elif nickInConference(conference, userNick):
+		elif isNickInConference(conference, userNick):
 			trueJid = getTrueJid(conference, userNick)
 			base = gSendCache[conference]
 			if trueJid not in base:
@@ -54,12 +54,12 @@ def checkSendBase(conference, nick, trueJid, aff, role):
 		del base[trueJid]
 		base.save()
 
-registerEvent(loadSendBase, ADDCONF)
-registerEvent(freeSendBase, DELCONF)
+registerEvent(loadSendBase, EVT_ADDCONFERENCE)
+registerEvent(freeSendBase, EVT_DELCONFERENCE)
 registerJoinHandler(checkSendBase)
 
 registerCommand(addToSendBase, u"передать", 10, 
-				u"Запоминает сообщение и передаёт его указанному пользователю, как только он зайдёт в конференцию (или сразу, если указанный пользователь уже в комнате)", 
+				u"Запоминает сообщение и передаёт его указанному пользователю, как только он зайдёт в конференцию (или сразу, если указанный пользователь уже в конференции)", 
 				u"<кому> <что>", 
 				(u"Nick хай!", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)

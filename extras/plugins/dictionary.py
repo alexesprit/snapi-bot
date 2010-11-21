@@ -137,4 +137,4 @@ registerCommand(searchInGoogleDict, u"определение", 10,
 				u"Поиск значения слова/выражения через Google Dictionary", 
 				u"<исходный_язык> <нужный_язык> <текст>", 
 				(u"en ru unity", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

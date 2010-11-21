@@ -32,7 +32,7 @@ def pokeUser(msgType, conference, nick, param):
 						message = random.choice(gPokes)
 						sendToConference(conference, u"/me " + message % (userNick))
 						time.sleep(0.5)
-			elif nickIsOnline(conference, param):
+			elif isNickOnline(conference, param):
 				if param == botNick:
 					param = nick
 				message = random.choice(gPokes)
@@ -44,10 +44,10 @@ def pokeUser(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u":-P")
 
-registerEvent(loadPokes, STARTUP)
+registerEvent(loadPokes, EVT_STARTUP)
 
 registerCommand(pokeUser, u"тык", 10, 
 				u"Тыкает пользователя. Заставляет его обратить внимание на вас", 
 				u"<ник>", 
 				(u"Nick", ), 
-				CHAT);
+				CMD_CONFERENCE);

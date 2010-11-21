@@ -37,4 +37,4 @@ registerCommand(showPrice, u"домен", 10,
 				u"Показывает оценочную стоимость домена", 
 				u"<запрос>", 
 				(u"server.tld", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

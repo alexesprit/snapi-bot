@@ -63,18 +63,18 @@ def showUserNotes(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"В твоём блокноте пусто")
 
-registerEvent(loadUserNotes, STARTUP)
+registerEvent(loadUserNotes, EVT_STARTUP)
 
 registerCommand(addUserNote, u"заметка+", 10, 
 				u"Добавляет запись в ваш блокнот", 
 				u"<что-то>", 
 				(u"ы", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)
 registerCommand(delUserNote, u"заметка-", 10, 
 				u"Удаляет запись из вашего блокнота", 
 				u"<номер>", 
 				(u"2", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)
 registerCommand(showUserNotes, u"заметки", 10, 
 				u"Показывает все записи из вашего блокнота. Указав \"сброс\" в кач-ве параметра, вы можете очистить ваши заметки", 
 				u"[параметры]", 

@@ -32,4 +32,4 @@ registerCommand(showBotUptime, u"ботап", 10,
 				u"Показывает статистику работы бота", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)

@@ -30,7 +30,7 @@ def getLocalKeyToPrivate(msgType, conference, nick, param):
 	confJid = ""
 	if len(param) == 2:
 		userNick = param[0].strip()
-		if nickIsOnline(conference, userNick):
+		if isNickOnline(conference, userNick):
 			confJid = conference + "/" + userNick
 			key = param[1].lower()
 	elif len(param) == 1:
@@ -93,31 +93,31 @@ def saveLocalBase(conference):
 def freeLocalBase(conference):
 	del gLocalBase[conference]
 
-registerEvent(loadLocalBase, ADDCONF)
-registerEvent(freeLocalBase, DELCONF)
+registerEvent(loadLocalBase, EVT_ADDCONFERENCE)
+registerEvent(freeLocalBase, EVT_DELCONFERENCE)
 
 registerCommand(getLocalKeyToPublic, u"???", 10, 
 				u"Ищет значение по ключу в локальной базе", 
 				u"<ключ>", 
 				(u"секрет", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(getLocalKeyToPrivate, u"!??", 10, 
 				u"Ищет значение по ключу в локальной базе и посылает его в приват. Возможно указание ника отправителя", 
 				u"[ник] <ключ>", 
 				(u"секрет", u"Nick секрет"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setLocalKey, u"!!!", 20, 
 				u"Устанавливает значение для ключа в локальной базе. Если значение для ключа не указывать, то ключ будет удалён", 
 				u"<ключ> = <значение>", 
 				(u"секрет =", u"секрет = :-P"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(searchLocalKey, u"???поиск", 10, 
 				u"Поиск ключей по базе", 
 				u"<ключ>", 
 				(u"секрет", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(showAllLocalKeys, u"???все", 10, 
 				u"Показывает все ключи базы", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)

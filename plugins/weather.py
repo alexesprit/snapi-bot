@@ -116,4 +116,4 @@ registerCommand(showWeather, u"погода", 10,
 				u"Показывает погоду", 
 				u"<город>", 
 				(u"Москва", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

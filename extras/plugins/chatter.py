@@ -65,7 +65,7 @@ def processChatter(stanza, msgType, conference, nick, trueJid, message):
 			message = removeNicks(message, getNicks(conference)).strip()
 			if message:
 				command = message.split()[0].lower()
-				_isCommand = isCommand(command) and isCommandType(command, CHAT)
+				_isCommand = isCommand(command) and isCommandType(command, CMD_CONFERENCE)
 				_isMacros = gMacros.hasMacros(command, conference) or gMacros.hasMacros(command)
 				if _isCommand or _isMacros:
 					return
@@ -109,13 +109,14 @@ def manageChatterValue(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (getConfigKey(conference, "chatter")))
 
-registerEvent(loadChatterBase, ADDCONF)
-registerEvent(freeChatterBase, DELCONF)
-registerEvent(setDefChatterValue, ADDCONF)
-registerMessageHandler(processChatter, CHAT)
+registerEvent(loadChatterBase, EVT_ADDCONFERENCE)
+registerEvent(freeChatterBase, EVT_DELCONFERENCE)
+registerEvent(setDefChatterValue, EVT_ADDCONFERENCE)
+
+registerMessageHandler(processChatter, H_CONFERENCE)
 
 registerCommand(manageChatterValue, u"болталка", 30, 
 				u"Отключает (0) или включает (1) болталку. Без параметра покажет текущее значение", 
 				u"[0|1]", 
 				(None, u"0"), 
-				CHAT)
+				CMD_CONFERENCE)

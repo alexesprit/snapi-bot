@@ -16,7 +16,7 @@
 def showSVNLog(msgType, conference, nick, param):
 	param = param.split()
 	url = param[0]
-	if gURLPtrn.search(url):
+	if isURL(url):
 		if len(param) == 2:
 			if count.isdigit():
 				count = int(param[1])
@@ -35,4 +35,4 @@ registerCommand(showSVNLog, u"svn", 10,
 				u"Показывает лог с svn", 
 				u"<адрес> [кол-во]", 
 				(u"http://server.tld/svn/trunk", u"http://server.tld/svn/trunk 5"), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

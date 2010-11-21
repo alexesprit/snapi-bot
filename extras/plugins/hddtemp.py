@@ -35,4 +35,4 @@ registerCommand(showHDDTempOutput, u"hddtemp", 100,
 				u"Показывает вывод программы hddtemp для всех дисков", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)

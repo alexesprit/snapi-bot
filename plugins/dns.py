@@ -38,4 +38,4 @@ registerCommand(showServerDns, u"днс", 10,
 				u"Показывает ответ от DNS для определённого хоста или IP адреса", 
 				u"<хост|IP>", 
 				(u"server.tld", u"127.0.0.1"), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

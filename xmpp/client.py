@@ -51,16 +51,16 @@ class CommonClient:
 		self.server = server
 		self.port = port
 
+		self._owner = self
+		self.connected = False
+		
+		self.initDebugger(debugFlags)
+	
+	def initDebugger(self, debugFlags=None):
 		self._debug = debug.Debug(debugFlags, showFlags=False)
 		self.printf = self._debug.show
 		self.debugFlags = self._debug.debugFlags
-		self.initDebugColors()
 
-		self._owner = self
-		self._registeredName = None
-		self.connected = False
-	
-	def initDebugColors(self):
 		self._debug.colors["auth"] = debug.colorYellow
 		self._debug.colors["bind"] = debug.colorBrown
 		self._debug.colors["dispatcher"] = debug.colorGreen

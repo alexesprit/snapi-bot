@@ -33,4 +33,4 @@ registerCommand(showDates, u"праздники", 10,
 				u"Показывает праздники на сегодня и завтра", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)

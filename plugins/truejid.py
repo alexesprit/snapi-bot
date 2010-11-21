@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def showTrueJid(msgType, conference, nick, param):
-	if nickInConference(conference, param):
+	if isNickInConference(conference, param):
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Смотри в привате")
 		trueJid = getTrueJid(conference, param)
@@ -26,4 +26,4 @@ registerCommand(showTrueJid, u"тружид", 20,
 				u"Показывает реальный жид указанного ника", 
 				u"<ник>", 
 				(u"Nick", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)

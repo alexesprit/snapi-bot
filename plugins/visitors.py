@@ -36,7 +36,7 @@ def setAutoVisitor(conference, nick, trueJid, aff, role):
 def addAutoVisitor(msgType, conference, nick, param):
 	user = param
 	setVisitorRole = False
-	if nickInConference(conference, user):
+	if isNickInConference(conference, user):
 		trueJid = getTrueJid(conference, user)
 		if getNickKey(conference, user, NICK_HERE):
 			setVisitorRole = True
@@ -60,7 +60,7 @@ def addAutoVisitor(msgType, conference, nick, param):
 def delAutoVisitort(msgType, conference, nick, param):
 	user = param
 	setParticipantRole = False
-	if nickInConference(conference, user):
+	if isNickInConference(conference, user):
 		trueJid = getTrueJid(conference, user)
 		if getNickKey(conference, user, NICK_HERE):
 			setParticipantRole = True
@@ -89,22 +89,22 @@ def showAutoVisitors(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"список автопосетителей пуст")
 
-registerEvent(loadAutoVisitors, ADDCONF)
-registerEvent(freeAutoVisitors, DELCONF)
+registerEvent(loadAutoVisitors, EVT_ADDCONFERENCE)
+registerEvent(freeAutoVisitors, EVT_DELCONFERENCE)
 registerJoinHandler(setAutoVisitor)
 
 registerCommand(addAutoVisitor, u"девойс+", 15, 
 				u"Добавляет ник или жид в список автопосетителей", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(delAutoVisitort, u"девойс-", 15, 
 				u"Удаляет ник или жид из списка автопосетителей", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(showAutoVisitors, u"девойс*", 15, 
 				u"Показывает список автопосетителей", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)

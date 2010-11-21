@@ -18,7 +18,7 @@
 def showHelp(msgType, conference, nick, param):
 	if param:
 		command = param.lower()
-		cmdType = conferenceInList(conference) and CHAT or ROSTER
+		cmdType = isConferenceInList(conference) and CMD_CONFERENCE or CMD_ROSTER
 		if isCommand(command) and isCommandType(command, cmdType):
 			message = gCommands[command][CMD_DESC]
 			syntax = gCommands[command][CMD_SYNTAX]
@@ -32,27 +32,27 @@ def showHelp(msgType, conference, nick, param):
 						message += u"\n * %s %s" % (command, example)
 					else:
 						message += u"\n * %s" % (command)
-			if cmdType == CHAT:
+			if cmdType == CMD_CONFERENCE:
 				message += u"\nМин. уровень доступа: %d" % (gCommands[command][CMD_ACCESS])
 				if not isAvailableCommand(conference, command):
 					message += u"\nЭта команда отключена в этой конференции!"
 			sendMsg(msgType, conference, nick, message)
 	else:
-		if conferenceInList(conference):
+		if isConferenceInList(conference):
 			prefix = getConferenceConfigKey(conference, "prefix")
 		else:
 			prefix = ""
 		sendMsg(msgType, conference, nick, u"Напишите \"%sкоманды\", чтобы узнать список всех команд, \"%sпомощь <команда>\" для получения справки по использованию команды" % (prefix, prefix))
 
 def showCommands(msgType, conference, nick, param):
-	cmdType = conferenceInList(conference) and CHAT or ROSTER
+	cmdType = isConferenceInList(conference) and CMD_CONFERENCE or CMD_ROSTER
 	availableCmds, disabledCmds = [], []
 	message = ""
 	trueJid = getTrueJid(conference, nick)
 	for cmd in gCommands:
 		if isCommandType(cmd, cmdType):
 			if getAccess(conference, trueJid) >= gCommands[cmd][CMD_ACCESS]:
-				if cmdType == ROSTER:
+				if cmdType == CMD_ROSTER:
 					availableCmds.append(cmd)
 				else:
 					if isAvailableCommand(conference, cmd):
@@ -73,9 +73,9 @@ registerCommand(showHelp, u"помощь", 0,
 				u"Даёт справку об определённой команде или выводит общую справку", 
 				u"[команда]", 
 				(None, u"пинг"), 
-				ANY | FROZEN)
+				CMD_ANY | CMD_FROZEN)
 registerCommand(showCommands, u"команды", 0, 
 				u"Показывает список доступных вам команд", 
 				None, 
 				None, 
-				ANY | FROZEN | NONPARAM)
+				CMD_ANY | CMD_FROZEN | CMD_NONPARAM)

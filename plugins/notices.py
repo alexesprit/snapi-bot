@@ -45,15 +45,15 @@ def setDefaultNoticeValue(conference):
 	if getConferenceConfigKey(conference, "notices") is None:
 		setConferenceConfigKey(conference, "notices", 1)
 
-registerEvent(setDefaultNoticeValue, ADDCONF)
+registerEvent(setDefaultNoticeValue, EVT_ADDCONFERENCE)
 
 registerCommand(noticeControl, u"оповещения", 30, 
 				u"Отключает (0) или включает (1) сообщения о новостях. Без параметра покажет текущее значение", 
 				u"[0|1]", 
 				(None, u"0"), 
-				CHAT)
+				CMD_CONFERENCE)
 registerCommand(sendNotices, u"оповещение", 100, 
 				u"Отправляет сообщение по всем конференциям, в которых сидит бот", 
 				u"<сообщение>", 
 				(u"привет!11", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

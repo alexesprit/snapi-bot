@@ -37,12 +37,12 @@ VCARD_TAGS = (
 
 def showVCard(msgType, conference, nick, param):
 	if param:
-		if conferenceInList(conference) and nickIsOnline(conference, param):
+		if isConferenceInList(conference) and isNickOnline(conference, param):
 			jid = conference + "/" + param
 		else:
 			jid = param
 	else:
-		jid = conferenceInList(conference) and (conference + "/" + nick) or conference
+		jid = isConferenceInList(conference) and (conference + "/" + nick) or conference
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.addChild("vCard", {}, [], protocol.NS_VCARD)
 	iq.setTo(jid)

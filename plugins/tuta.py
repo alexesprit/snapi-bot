@@ -27,7 +27,7 @@ def updateHereTimeInfo(conference, nick, trueJid):
 
 def showHereStatistic(msgType, conference, nick, param):
 	userNick = param or nick
-	if nickIsOnline(conference, userNick):
+	if isNickOnline(conference, userNick):
 		base = gHereTime[conference]
 		trueJid = getTrueJid(conference, userNick)
 		if trueJid in base:
@@ -67,9 +67,9 @@ def saveAllHereBases():
 			updateHereTimeInfo(conference, nick, trueJid)
 		gHereTime[conference].save()
 
-registerEvent(loadHereBase, ADDCONF)
-registerEvent(freeHereBase, DELCONF)
-registerEvent(saveAllHereBases, SHUTDOWN)
+registerEvent(loadHereBase, EVT_ADDCONFERENCE)
+registerEvent(freeHereBase, EVT_DELCONFERENCE)
+registerEvent(saveAllHereBases, EVT_SHUTDOWN)
 
 registerJoinHandler(updateJoinStatistic)
 registerLeaveHandler(updateLeaveStatistic)
@@ -78,4 +78,4 @@ registerCommand(showHereStatistic, u"тута", 10,
 				u"Показывает кол-во часов, проведённое в чатике, максимальное и среднее", 
 				u"[ник]", 
 				(None, u"Nick"), 
-				CHAT);
+				CMD_CONFERENCE);

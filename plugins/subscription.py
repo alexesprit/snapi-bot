@@ -18,8 +18,10 @@ def processSubscriptions(stanza, jid, resource, trueJid):
 	if protocol.PRS_SUBSCRIBE == prsType:
 		gRoster.authorize(jid)
 		gRoster.subscribe(jid)
+		printf("%s is added into roster" % (jid))
 	elif protocol.PRS_UNSUBSCRIBE == prsType:
 		gRoster.unauthorize(jid)
 		gRoster.delItem(jid)
+		printf("%s is removed from roster" % (jid))
 
-registerPresenceHandler(processSubscriptions, ROSTER)
+registerPresenceHandler(processSubscriptions, H_ROSTER)

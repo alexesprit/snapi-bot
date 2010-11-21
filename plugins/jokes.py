@@ -41,11 +41,11 @@ def manageJokesValue(msgType, conference, nick, param):
 		jokesValue = getConferenceConfigKey(conference, "jokes")
 		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (jokesValue))
 
-registerEvent(loadJokes, STARTUP)
-registerEvent(setDefaultJokesValue, ADDCONF)
+registerEvent(loadJokes, EVT_STARTUP)
+registerEvent(setDefaultJokesValue, EVT_ADDCONFERENCE)
 
 registerCommand(manageJokesValue, u"шуточки", 30, 
 				u"Отключает (0) или включает (1) шуточки, которыми бот порою подменяет ответ. Без параметра покажет текущее значение", 
 				u"[0|1]", 
 				(None, u"0"), 
-				CHAT)
+				CMD_CONFERENCE)

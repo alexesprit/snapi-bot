@@ -82,26 +82,27 @@ def processExpression(stanza, msgType, conference, nick, trueJid, text):
 				except re.error:
 					pass
 
-registerEvent(loadExpressions, ADDCONF)
-registerEvent(freeExpressions, DELCONF)
-registerMessageHandler(processExpression, CHAT)
+registerEvent(loadExpressions, EVT_ADDCONFERENCE)
+registerEvent(freeExpressions, EVT_DELCONFERENCE)
+
+registerMessageHandler(processExpression, H_CONFERENCE)
 
 registerCommand(addExpression, u"выражение+", 20, 
 				u"Добавить регулярное выражение", 
 				u"<выражение=текст>", 
 				(u"где(.+)\?=гугли", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(delExpression, u"выражение-", 20, 
 				u"Удалить регулярное выражение", 
 				u"<выражение>", 
 				(u"где(.+)\?", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(showExpressions, u"выражения", 20, 
 				u"Показывает все регулярные выражения. Синтаксис аналогичен регулярным выражениям языка Python", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showExprInfo, u"выражение*", 20, u"Показывает информацию о регулярном выражении", 
 				u"<выражение>", 
 				(u"где(.*?)?", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)

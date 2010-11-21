@@ -62,7 +62,7 @@ def turnLastMessage(msgType, conference, nick, param):
 
 def saveTurnMessage(stanza, msgType, conference, nick, trueJid, message):
 	if msgType == protocol.TYPE_PUBLIC:
-		if trueJid != gJid and trueJid != conference:
+		if trueJid != PROFILE_JID and trueJid != conference:
 			if "turn" != message.lower():
 				gTurnMsgCache[conference][trueJid] = message
 
@@ -76,13 +76,15 @@ def clearTurnCache(conference, nick, trueJid, reason, code):
 	if trueJid in gTurnMsgCache[conference]:
 		del gTurnMsgCache[conference][trueJid]
 
-registerEvent(initTurnCache, ADDCONF)
-registerEvent(freeTurnCache, DELCONF)
+registerEvent(initTurnCache, EVT_ADDCONFERENCE)
+registerEvent(freeTurnCache, EVT_DELCONFERENCE)
+
 registerLeaveHandler(clearTurnCache)
-registerMessageHandler(saveTurnMessage, CHAT)
+
+registerMessageHandler(saveTurnMessage, H_CONFERENCE)
 
 registerCommand(turnLastMessage, u"turn", 10, 
 				u"Переключает раскладку вашего последнего сообщения или текста в параметре команды", 
 				u"[текст]", 
 				(None, u"jkjkj"), 
-				CHAT)
+				CMD_CONFERENCE)

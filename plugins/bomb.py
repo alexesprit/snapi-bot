@@ -34,7 +34,7 @@ def giveBomb(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Ага, хочешь без палева кинуть??? ]:->")
 		return
 	userNick = param or random.choice(getOnlineNicks(conference))
-	if nickIsOnline(conference, userNick): 
+	if isNickOnline(conference, userNick): 
 		trueJid = getTrueJid(conference, userNick)
 		if bombMarked(conference, trueJid):
 			sendMsg(msgType, conference, nick, u"В него уже кинули, ему хватит :-D")
@@ -55,7 +55,7 @@ def giveBomb(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"а это кто?");			
 
 def bombExecute(msgType, conference, nick, trueJid):
-	if nickIsOnline(conference, nick):
+	if isNickOnline(conference, nick):
 		sendMsg(msgType, conference, nick, u"Надо было резать %s, чего тормозишь? :)" % (gBombAnswer[conference][trueJid]))
 		bombDetonate(msgType, conference, nick)
 	else:
@@ -97,12 +97,12 @@ def freeBombCache(conference):
 	del gBombTimers[conference]	
 
 
-registerEvent(initBombCache, ADDCONF)
-registerEvent(freeBombCache, DELCONF)
-registerMessageHandler(bombColorsListener, CHAT)
+registerEvent(initBombCache, EVT_ADDCONFERENCE)
+registerEvent(freeBombCache, EVT_DELCONFERENCE)
+registerMessageHandler(bombColorsListener, H_CONFERENCE)
 
 registerCommand(giveBomb, u"бомба", 15,
 				u"Вручает пользователю бомбу. Если пользователь не обезвредит её, то бот может выкинуть его из конференции или лишить голоса",
 				u"[ник]", 
 				(None, u"Nick"), 
-				CHAT)
+				CMD_CONFERENCE)

@@ -32,4 +32,4 @@ def sendKeepAlivePacket():
 def startKeepAliveTimer():
 	startTimer(KEEPALIVE_TIMEOUT, sendKeepAlivePacket)
 
-registerEvent(startKeepAliveTimer, INIT_2)
+registerEvent(startKeepAliveTimer, EVT_INIT_2)

@@ -50,10 +50,10 @@ def uploadToDumpz(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
 
-registerEvent(loadLangsForDumpz, STARTUP)
+registerEvent(loadLangsForDumpz, EVT_STARTUP)
 
 registerCommand(uploadToDumpz, u"пастебин", 10, 
 				u"Заливает текст на пастебин-сервис dumpz.org. Указав \"языки\" в кач-ве параметра можно посмотреть доступные языки", 
 				u"[язык] <текст>", 
 				(u"языки", u"This is text", u"cpp int *n, *p;"), 
-				ANY | PARAM);
+				CMD_ANY | CMD_PARAM);

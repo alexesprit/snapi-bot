@@ -23,4 +23,4 @@ registerCommand(runCatapult, u"катапульту", 10,
 				u"Катапульта", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)

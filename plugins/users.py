@@ -41,7 +41,7 @@ def showWhoWas(msgType, conference, nick, param):
 	
 def showUserNicks(msgType, conference, nick, param):
 	userNick = param or nick
-	if nickInConference(conference, userNick):
+	if isNickInConference(conference, userNick):
 		trueJid = getTrueJid(conference, userNick)
 		nickList = getInMucList(conference, True)
 		nicks = nickList[trueJid]
@@ -62,14 +62,14 @@ registerCommand(showInMucUsers, u"инмук", 10,
 				u"Показывает список участников, находящихся в конференции", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showWhoWas, u"хтобыл", 10, 
 				u"Показывает список участников, посетивших конференцию за сессию", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showUserNicks, u"ники", 10, 
 				u"Выводит все ники пользователя", 
 				u"[ник]", 
 				(None, u"Nick"),
-				CHAT)
+				CMD_CONFERENCE)

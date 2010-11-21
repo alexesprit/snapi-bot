@@ -26,7 +26,7 @@ def freeClientsCache(conference):
 
 def showClients(msgType, conference, nick, param):
 	userNick = param or nick
-	if nickInConference(conference, userNick):
+	if isNickInConference(conference, userNick):
 		trueJid = getTrueJid(conference, userNick)
 		if trueJid in gUserClients[conference]:
 			clients = gUserClients[conference][trueJid]
@@ -67,9 +67,9 @@ def saveAllClientsBases():
 	for conference in getConferences():
 		gUserClients[conference].save()
 
-registerEvent(loadClientsCache, ADDCONF)
-registerEvent(freeClientsCache, DELCONF)
-registerEvent(saveAllClientsBases, SHUTDOWN)
+registerEvent(loadClientsCache, EVT_ADDCONFERENCE)
+registerEvent(freeClientsCache, EVT_DELCONFERENCE)
+registerEvent(saveAllClientsBases, EVT_SHUTDOWN)
 
 registerJoinHandler(saveUserClient)
 
@@ -77,4 +77,4 @@ registerCommand(showClients, u"клиенты", 10,
 				u"Показывает, с каких клиентов заходил пользователь", 
 				u"[ник]", 
 				(None, u"Niсk"), 
-				CHAT);
+				CMD_CONFERENCE);

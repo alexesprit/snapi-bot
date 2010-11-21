@@ -40,4 +40,4 @@ registerCommand(decipherExpression, u"шифр", 10,
 				u"Расшифровывает слово", 
 				u"<слово>", 
 				(u"админ", ), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

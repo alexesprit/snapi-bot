@@ -35,10 +35,10 @@ def loadBotVersion():
 	utils.createFile(path, str(gVersion))
 	gVersion = eval(utils.readFile(path))
 
-registerEvent(loadBotVersion, STARTUP)
+registerEvent(loadBotVersion, EVT_STARTUP)
 
 registerCommand(setBotVersion, u"ботверсия", 100, 
 				u"Выставляет версию клиента у бота. Без параметра покажет текущее значение", 
 				u"[клиент|версия|ось]", 
 				(None, u"Jimm|0.6.4|Nokia 3310"), 
-				ROSTER)
+				CMD_ROSTER)

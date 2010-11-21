@@ -15,7 +15,7 @@
 
 def showHereTime(msgType, conference, nick, param):
 	userNick = param or nick
-	if nickIsOnline(conference, userNick):
+	if isNickOnline(conference, userNick):
 		joinedTime = getNickKey(conference, userNick, NICK_JOINED)
 		joinedTime = getTimeStr(time.time() - joinedTime)
 		if not param:
@@ -29,4 +29,4 @@ registerCommand(showHereTime, u"здесь", 10,
 				u"Показывает, сколько времени пользователь сидит в конференции", 
 				u"[ник]", 
 				(None, u"Nick"), 
-				CHAT)
+				CMD_CONFERENCE)

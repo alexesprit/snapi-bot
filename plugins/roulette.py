@@ -29,4 +29,4 @@ registerCommand(playRoulette, u"рр", 10,
 				u"Старая добрая русская рулетка", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)

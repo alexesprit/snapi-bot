@@ -15,7 +15,7 @@
 # GNU General Public License for more details.
 
 def showGeoIPInfo(msgType, conference, nick, param):
-	host = param or gHost
+	host = param or PROFILE_HOST
 	url = "http://www.and-rey.ru/geoip/ie.php"
 	qparam = {"host": host.encode("utf-8")}
 	responce = getURL(url, qparam)

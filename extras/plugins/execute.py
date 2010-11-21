@@ -15,14 +15,16 @@
 
 EXECUTE_FILE = "execute.txt"
 
-def executeExtCode():
+def executeExternalCode():
 	path = getConfigPath(EXECUTE_FILE)
 	if os.path.exists(path):
 		try:
-			exec(file(path)) in globals()
+			f = file(path)
+			exec f in globals()
 		except Exception:
 			printf("Error while executing %s!" % (path), FLAG_ERROR)
+			writeSystemLog(traceback.format_exc(), LOG_ERRORS)
 	else:
-		printf("%s is not found!" % (path), FLAG_WARNING)
+		writeSystemLog("%s is not found!" % (path), LOG_WARNINGS, True)
 
-registerEvent(executeExtCode, STARTUP)
+registerEvent(executeExternalCode, EVT_STARTUP)

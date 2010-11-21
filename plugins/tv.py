@@ -126,10 +126,10 @@ def showTVProgram(msgType, conference, nick, param):
 		else:
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"На сегодня программы для этой категории нет")
 
-registerEvent(loadTVChannels, STARTUP)
+registerEvent(loadTVChannels, EVT_STARTUP)
 
 registerCommand(showTVProgram, u"тв", 10, 
 				u"Показать телепрограму для определённого канала/категории. Параметр \"каналы\" - список каналов, параметр \"категории\" - список категорий", 
 				u"<канал|номер|категория>", 
 				(u"101", u"первый", u"каналы", u"категории"), 
-				ANY | PARAM)
+				CMD_ANY | CMD_PARAM)

@@ -15,7 +15,7 @@
 
 def showUserStatus(msgType, conference, nick, param):
 	userNick = param or nick
-	if nickIsOnline(conference, userNick):
+	if isNickOnline(conference, userNick):
 		show = getNickKey(conference, userNick, NICK_SHOW)
 		status = getNickKey(conference, userNick, NICK_STATUS)
 		if param:
@@ -32,17 +32,17 @@ def showUserStatus(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"А это кто?")
 
 def updateStatus(stanza, conference, nick, trueJid):
-	if nickIsOnline(conference, nick):
+	if isNickOnline(conference, nick):
 		show = stanza.getShow() or u"online"
 		status = stanza.getStatus()
 		setNickKey(conference, nick, NICK_SHOW, show)
 		if status:
 			setNickKey(conference, nick, NICK_STATUS, status)
 
-registerPresenceHandler(updateStatus, CHAT)
+registerPresenceHandler(updateStatus, H_CONFERENCE)
 
 registerCommand(showUserStatus, u"статус", 10, 
 				u"Показывает статус указанного пользователя", 
 				u"[ник]", 
 				(None, u"Nick"), 
-				CHAT);
+				CMD_CONFERENCE);

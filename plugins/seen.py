@@ -34,7 +34,7 @@ def updateSeenTime(conference, nick, trueJid, reason, code):
 
 def showSeenTime(msgType, conference, nick, param):
 	userNick = param or nick
-	if nickInConference(conference, userNick):
+	if isNickInConference(conference, userNick):
 		trueJid = getTrueJid(conference, userNick)
 		if trueJid in gSeenCache[conference]:
 			seen = gSeenCache[conference][trueJid]
@@ -51,12 +51,12 @@ def showSeenTime(msgType, conference, nick, param):
 
 registerLeaveHandler(updateSeenTime)
 
-registerEvent(loadSeenBase, ADDCONF)
-registerEvent(freeSeenBase, DELCONF)
-registerEvent(saveAllSeenBases, SHUTDOWN)
+registerEvent(loadSeenBase, EVT_ADDCONFERENCE)
+registerEvent(freeSeenBase, EVT_DELCONFERENCE)
+registerEvent(saveAllSeenBases, EVT_SHUTDOWN)
 
 registerCommand(showSeenTime, u"когдабыл", 10, 
 				u"Показывает, сколько времени назад пользователь вышел из чата", 
 				u"[ник]", 
 				(u"Nick", ), 
-				CHAT)
+				CMD_CONFERENCE)

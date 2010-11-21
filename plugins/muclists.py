@@ -49,19 +49,19 @@ registerCommand(showOutcastsList, u"банлист", 20,
 				u"Показывает список забаненных", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showMembersList, u"мемберлист", 20, 
 				u"Показывает список мемберов", 
 				None, 
 				None,  
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showAdminsList, u"админлист", 20, 
 				u"Показывает список админов", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showOwnersList, u"овнерлист", 20, 
 				u"Показывает список овнеров", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)

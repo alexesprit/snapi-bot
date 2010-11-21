@@ -189,37 +189,38 @@ def loadQuizScores(conference):
 def freeQuizScores(conference):
 	del gQuizScores[conference]
 
-registerEvent(loadQuizScores, ADDCONF)
-registerEvent(freeQuizScores, DELCONF)
-registerMessageHandler(quizAnswerListener, CHAT)
+registerEvent(loadQuizScores, EVT_ADDCONFERENCE)
+registerEvent(freeQuizScores, EVT_DELCONFERENCE)
+
+registerMessageHandler(quizAnswerListener, H_CONFERENCE)
 
 registerCommand(startQuiz, u"старт", 10, 
 				u"Запуск игры", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(stopQuiz, u"стоп", 10, 
 				u"Остановка игры", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showQuizScores, u"счет", 10, 
 				u"Показывает счёт игры", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showQuizHint, u"х", 10, 
 				u"Показать подсказку", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showQuizQuestion, u"повтор", 10, 
 				u"Повтор текущего вопроса", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showNextQuestion, u"сл", 10, 
 				u"Следущий вопрос", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)

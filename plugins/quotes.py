@@ -125,7 +125,7 @@ registerCommand(showAbyssQuote, u"борб", 10,
 				u"Показывает случайную цитату из бездны bash.org.ru", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)
 registerCommand(showBashQuote, u"бор", 10, 
 				u"Показывает случайную/указанную цитату c bash.org.ru", 
 				u"[номер]", 
@@ -146,4 +146,4 @@ registerCommand(showCinemaQuote, u"киноцитата", 10,
 				u"Показывает случайную цитату из кино", 
 				None, 
 				None, 
-				ANY | NONPARAM)
+				CMD_ANY | CMD_NONPARAM)

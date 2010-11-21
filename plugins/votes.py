@@ -213,45 +213,45 @@ def loadVotes(conference):
 	gVote[conference] = eval(utils.readFile(path))
 
 registerJoinHandler(showVote)
-registerEvent(loadVotes, ADDCONF)
+registerEvent(loadVotes, EVT_ADDCONFERENCE)
 
 registerCommand(vote, u"мнение", 10, 
 				u"Для подачи мнения в текущем голосовании", 
 				u"<номер>", 
 				(u"1", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(createNewVote, u"голосование", 11, 
 				u"Создает новое голосование или показывает текущее (если имеется)", 
 				u"[текст]", 
 				(None, u"винды - сакс!"), 
-				CHAT)
+				CMD_CONFERENCE)
 registerCommand(startVote, u"голосование+", 11, 
 				u"Возобновляет голосование", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(stopVote, u"голосование-", 11, 
 				u"Останавливает голосование, все данные сохраняются до продолжения голосования", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(addOpinion, u"пункт+", 11, 
 				u"Добавляет пункт к текущему голосованию", 
 				u"<пункт>", 
 				(u"да", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(delOpinion, u"пункт-", 11, 
 				u"Удаляет пункт из голосования. Пункт указывается его номером", 
 				u"<номер_пункта>", 
 				(u"5", ), 
-				CHAT | PARAM)
+				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(showOpinions, u"мнения", 11, 
 				u"Отдаёт текущие результаты голосования в приват, не завершая голосования при этом", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(endVote, u"итоги", 11, 
 				u"Завершает голование и показывает его результаты", 
 				None, 
 				None, 
-				CHAT | NONPARAM)
+				CMD_CONFERENCE | CMD_NONPARAM)
