@@ -47,6 +47,8 @@ def saveUserClient(conference, nick, trueJid, aff, role):
 	base = gUserClients[conference]
 	if trueJid not in base:
 		base[trueJid] = []
+	else:
+		base.updateChangeTime(trueJid)
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.addChild("query", {}, [], protocol.NS_VERSION)
 	iq.setTo(conference + "/" + nick)

@@ -533,7 +533,7 @@ def messageHandler(session, stanza):
 			access = gMacros.getAccess(command, conference)
 		else:
 			return
-		message = gMacros.expand(message, (conference, nick, ), conference)
+		message = gMacros.expand(message, (conference, nick), conference)
 		rawBody = message.split(None, 1)
 		command = rawBody[0].lower()
 	if isCommand(command) and isAvailableCommand(conference, command):

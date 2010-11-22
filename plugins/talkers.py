@@ -76,7 +76,7 @@ def showTalkerInfo(msgType, conference, nick, param):
 			message = statisticLine % (nick, messages, meMessages, words, wordsPerMsg)
 			sendMsg(msgType, conference, nick, message)
 		else:
-			sendMsg(msgType, conference, nick, u"Твоя статистика отсутствует")
+			sendMsg(msgType, conference, nick, u"Нет информации")
 
 def updateTalkersInfo(stanza, msgType, conference, nick, trueJid, body):
 	if msgType == protocol.TYPE_PUBLIC:

@@ -30,7 +30,7 @@ CHAT_BASES = (
 SINGLE_BASES = ("gUserNotes", )
 
 def cleanBase(base, keepTime):
-	bGetUpdateTime = base.getUpdateTime
+	bGetUpdateTime = base.getChangeTime
 	cleanedKeys = 0
 	for key in base.keys():
 		updateTime = bGetUpdateTime(key)

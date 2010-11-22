@@ -31,8 +31,8 @@ class DataBase:
 		self.changes = eval(utils.readFile(path + '.db'))
 		self.path = path
 	
-	def __contains__(self, key):
-		return key in self.base
+	def __contains__(self, item):
+		return item in self.base
 	
 	def __iter__(self):
 		for item in self.base:
@@ -69,5 +69,8 @@ class DataBase:
 	def isEmpty(self):
 		return not self.base
 		
-	def getUpdateTime(self, key):
-		return self.changes[key]
+	def getChangeTime(self, item):
+		return self.changes[item]
+		
+	def updateChangeTime(self, item):
+		self.changes[item] = time.time()
