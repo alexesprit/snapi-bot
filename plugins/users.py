@@ -13,44 +13,31 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def createNickList(nickList):
-	items = [u"%d) %s" % (i + 1, ", ".join(nickList[jid])) for i, jid in enumerate(nickList)]
-	return "\n".join(items)
-	
-def getInMucList(conference, offline = False):
-	nicks = (offline) and getNicks(conference) or getOnlineNicks(conference)
-	nickList = {}
-	for nick in nicks:
-		trueJid = getTrueJid(conference, nick)
-		if not trueJid in nickList:
-			nickList[trueJid] = []
-		nickList[trueJid].append(nick)
-	return nickList
-
 def showInMucUsers(msgType, conference, nick, param):
-	nickList = getInMucList(conference)
-	text = u"Я вижу здесь %d человек:\n" % (len(nickList))
-	text += createNickList(nickList)
-	sendMsg(msgType, conference, nick, text)
+	items = [u"%d) %s" % (i + 1, user) 
+			for i, user in enumerate(sorted(getOnlineNicks(conference)))]
+	message = u"Я вижу здесь %d участников:\n%s" % (len(items), "\n".join(items))
+	sendMsg(msgType, conference, nick, message)
 
 def showWhoWas(msgType, conference, nick, param):
-	nickList = getInMucList(conference, True)
-	text = u"Я видела здесь %d человек:\n" % (len(nickList))
-	text += createNickList(nickList)
-	sendMsg(msgType, conference, nick, text)
+	items = [u"%d) %s" % (i + 1, user) 
+			for i, user in enumerate(sorted(getNicks(conference)))]
+	message = u"Я видела здесь %d участников:\n%s" % (len(items), "\n".join(items))
+	sendMsg(msgType, conference, nick, message)
 	
 def showUserNicks(msgType, conference, nick, param):
 	userNick = param or nick
 	if isNickInConference(conference, userNick):
 		trueJid = getTrueJid(conference, userNick)
-		nickList = getInMucList(conference, True)
-		nicks = nickList[trueJid]
+		nicks = [user for user in getNicks(conference) 
+				if trueJid == getTrueJid(conference, user)]
 		if len(nicks) < 2:
 			if param:
 				sendMsg(msgType, conference, nick, u"Я знаю тебя только как %s" % (userNick))
 			else:
 				sendMsg(msgType, conference, nick, u"Я знаю %s только как %s")
 		else:
+			nicks.sort()
 			if param:
 				sendMsg(msgType, conference, nick, u"Я знаю %s как %s" % (userNick, ", ".join(nicks)))
 			else:

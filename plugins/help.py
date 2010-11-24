@@ -70,7 +70,7 @@ def showCommands(msgType, conference, nick, param):
 	sendMsg(protocol.TYPE_PRIVATE, conference, nick, message);	
 
 registerCommand(showHelp, u"помощь", 0, 
-				u"Даёт справку об определённой команде или выводит общую справку", 
+				u"Показывает справку по использованию определённой команды, без параметра или выводит общую справку", 
 				u"[команда]", 
 				(None, u"пинг"), 
 				CMD_ANY | CMD_FROZEN)

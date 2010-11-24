@@ -39,7 +39,7 @@ def sendNotices(msgType, conference, nick, param):
 				count += 1
 		sendMsg(msgType, conference, nick, "Сообщение ушло в %d конференций из %d" % (count, len(conferences)))
 	else:
-		sendMsg(msgType, conference, nick, u"Я пока что нигде не сижу")
+		sendMsg(msgType, conference, nick, u"Некому рассылать :(")
 
 def setDefaultNoticeValue(conference):
 	if getConferenceConfigKey(conference, "notices") is None:

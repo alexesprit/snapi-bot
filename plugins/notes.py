@@ -54,7 +54,7 @@ def showUserNotes(msgType, conference, nick, param):
 			gUserNotes.save()
 			sendMsg(msgType, conference, nick, u"Удалила")
 		else:
-			sendMsg(msgType, conference, nick, u"а у тебя и так ничего нет :P")
+			sendMsg(msgType, conference, nick, u"А у тебя и так ничего нет :P")
 	elif not param:
 		if trueJid in gUserNotes:
 			message = u"Твои заметки:\n"

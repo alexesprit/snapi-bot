@@ -24,7 +24,7 @@ def showRecord(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Нет информации")
 		
 def calculateRecord(conference, nick, trueJid, aff, role):
-	userCount = len(getJidList(conference))
+	userCount = len(getOnlineNicks(conference))
 	lastCount = gRecords[conference] and gRecords[conference]["count"] or 0
 	if userCount >= lastCount:
 		gRecords[conference]["time"] = time.strftime("%d.%m.%y, %H:%M")

@@ -31,11 +31,12 @@ def showClients(msgType, conference, nick, param):
 		if trueJid in gUserClients[conference]:
 			clients = gUserClients[conference][trueJid]
 			if clients:
+				clients.sort()
 				if not param:
-					message = u"Ты заходил сюда с "
+					message = u"Ты пользуешься следующим: %s" % (u", ".join(clients))
 				else:
-					message = param + u" заходил сюда с "
-				sendMsg(msgType, conference, nick, message + u", ".join(clients))
+					message = u"%s пользуется следующим: %s" % (userNick, u", ".join(clients))
+				sendMsg(msgType, conference, nick, message)
 			else:
 				sendMsg(msgType, conference, nick, u"Нет информации")
 		else:

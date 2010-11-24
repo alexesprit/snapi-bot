@@ -20,14 +20,15 @@ def showUserStatus(msgType, conference, nick, param):
 		status = getNickKey(conference, userNick, NICK_STATUS)
 		if param:
 			if status:
-				sendMsg(msgType, conference, nick, u"%s сейчас %s (%s)" % (userNick, show, status))
+				message = u"%s сейчас %s (%s)" % (userNick, show, status)
 			else:
-				sendMsg(msgType, conference, nick, u"%s сейчас %s" % (userNick, show))
+				message = u"%s сейчас %s" % (userNick, show)
 		else:
 			if status:
-				sendMsg(msgType, conference, nick, u"Ты сейчас %s (%s)" % (show, status))
+				message = u"Ты сейчас %s (%s)" % (show, status)
 			else:
-				sendMsg(msgType, conference, nick, u"Ты сейчас %s" % (show))
+				message = u"Ты сейчас %s" % (show)
+		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 

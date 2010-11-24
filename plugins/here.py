@@ -16,12 +16,13 @@
 def showHereTime(msgType, conference, nick, param):
 	userNick = param or nick
 	if isNickOnline(conference, userNick):
-		joinedTime = getNickKey(conference, userNick, NICK_JOINED)
-		joinedTime = getTimeStr(time.time() - joinedTime)
+		rawtime = getNickKey(conference, userNick, NICK_JOINED)
+		joinTime = getTimeStr(time.time() - rawtime)
 		if not param:
-			sendMsg(msgType, conference, nick, u"Ты уже здесь %s" % (joinedTime))
+			message = u"Ты уже здесь %s" % (joinTime)
 		else:
-			sendMsg(msgType, conference, nick, u"%s уже здесь %s" % (userNick, joinedTime))
+			message = u"%s уже здесь %s" % (userNick, joinTime)
+		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 
