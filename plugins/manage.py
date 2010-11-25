@@ -21,8 +21,8 @@ def joinConf(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Я уже там!")
 		else:
 			password = (len(param) == 2) and param[1] or None
-			EVT_ADDCONFerence(conf)
-			joinConference(conf, gBotNick, getConferenceConfigKey(conf, "password"))
+			addConference(conf)
+			joinConference(conf, PROFILE_NICK, getConferenceConfigKey(conf, "password"))
 			saveConferenceConfig(conf)
 			saveConferences()
 			sendMsg(msgType, conference, nick, u"Зашла")

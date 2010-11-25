@@ -18,70 +18,68 @@ def addLocalMacros(msgType, conference, nick, param):
 	rawMacros = param.split("=", 1)
 	if len(rawMacros) != 2:
 		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
-		return
 	else:
 		macros, body = rawMacros
 		macros = macros.strip()
 		body = body.strip()
-	if macros and body:
-		if isCommand(macros):
-			sendMsg(msgType, conference, nick, u"Это имя уже занято командой")
-		elif gMacros.hasMacros(macros):
-			sendMsg(msgType, conference, nick, u"Это имя занято глобальным макросом")
-		else:
-			command = body.split()[0]
-			if isCommand(command):
-				access = gCommands[command][CMD_ACCESS]
-			elif gMacros.hasMacros(command):
-				access = gMacros.getAccess(command)
-			elif gMacros.hasMacros(command, conference):
-				access = gMacros.getAccess(command, conference)
+		if macros and body:
+			if isCommand(macros):
+				sendMsg(msgType, conference, nick, u"Это имя уже занято командой")
+			elif gMacros.hasMacros(macros):
+				sendMsg(msgType, conference, nick, u"Это имя занято глобальным макросом")
 			else:
-				sendMsg(msgType, conference, nick, u"Не вижу команду внутри макроса")
-				return
-			trueJid = getTrueJid(conference, nick)
-			if access <= getAccess(conference, trueJid):
-				if gMacros.hasMacros(macros, conference):
-					sendMsg(msgType, conference, nick, u"Заменила")
+				command = body.split()[0]
+				if isCommand(command):
+					access = gCommands[command][CMD_ACCESS]
+				elif gMacros.hasMacros(command):
+					access = gMacros.getAccess(command)
+				elif gMacros.hasMacros(command, conference):
+					access = gMacros.getAccess(command, conference)
 				else:
-					sendMsg(msgType, conference, nick, u"Добавила");		
-				gMacros.add(macros, body, access, conference)
-				gMacros.saveMacroses(conference)
-			else:
-				sendMsg(msgType, conference, nick, u"Недостаточно прав")
-	else:
-		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
+					sendMsg(msgType, conference, nick, u"Не вижу команду внутри макроса")
+					return
+				trueJid = getTrueJid(conference, nick)
+				if access <= getAccess(conference, trueJid):
+					if gMacros.hasMacros(macros, conference):
+						sendMsg(msgType, conference, nick, u"Заменила")
+					else:
+						sendMsg(msgType, conference, nick, u"Добавила");		
+					gMacros.add(macros, body, access, conference)
+					gMacros.saveMacroses(conference)
+				else:
+					sendMsg(msgType, conference, nick, u"Недостаточно прав")
+		else:
+			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
 def addGlobalMacros(msgType, conference, nick, param):
 	rawMacros = param.split("=", 1)
 	if len(rawMacros) != 2:
 		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
-		return
 	else:
 		macros, body = rawMacros
 		macros = macros.strip()
 		body = body.strip()
-	if macros and body:
-		if isCommand(macros):
-			sendMsg(msgType, conference, nick, u"Это имя уже занято командой")
+		if macros and body:
+			if isCommand(macros):
+				sendMsg(msgType, conference, nick, u"Это имя уже занято командой")
+			else:
+				command = body.split()[0]
+				if isCommand(command):
+					access = gCommands[command][CMD_ACCESS]
+				elif gMacros.hasMacros(command):
+					access = gMacros.getAccess(command)
+				else:
+					sendMsg(msgType, conference, nick, u"Не вижу команду внутри макроса")
+					return
+				if gMacros.hasMacros(macros):
+					access = gMacros.getAccess(macros)
+					sendMsg(msgType, conference, nick, u"Заменила")
+				else:
+					sendMsg(msgType, conference, nick, u"Добавила")
+				gMacros.add(macros, body, access)
+				gMacros.saveMacroses()
 		else:
-			command = body.split()[0]
-			if isCommand(command):
-				access = gCommands[command][CMD_ACCESS]
-			elif gMacros.hasMacros(command):
-				access = gMacros.getAccess(command)
-			else:
-				sendMsg(msgType, conference, nick, u"Не вижу команду внутри макроса")
-				return
-			if gMacros.hasMacros(macros):
-				access = gMacros.getAccess(macros)
-				sendMsg(msgType, conference, nick, u"Заменила")
-			else:
-				sendMsg(msgType, conference, nick, u"Добавила")
-			gMacros.add(macros, body, access)
-			gMacros.saveMacroses()
-	else:
-		sendMsg(msgType, conference, nick, u"Читай справку по команде")
+			sendMsg(msgType, conference, nick, u"Читай справку по команде")
 
 def delLocalMacros(msgType, conference, nick, param):
 	if gMacros.hasMacros(param, conference):
@@ -90,6 +88,7 @@ def delLocalMacros(msgType, conference, nick, param):
 		if getAccess(conference, trueJid) >= access:
 			gMacros.remove(param, conference)
 			gMacros.saveMacroses(conference)
+
 			sendMsg(msgType, conference, nick, u"Удалила")
 		else:
 			sendMsg(msgType, conference, nick, u"Недостаточно прав")
@@ -100,16 +99,18 @@ def delGlobalMacros(msgType, conference, nick, param):
 	if gMacros.hasMacros(param): 
 		gMacros.remove(param)
 		gMacros.saveMacroses()
+
 		sendMsg(msgType, conference, nick, u"Удалила")
 	else:
 		sendMsg(msgType, conference, nick, u"Нет такого макроса")
 
 def expandLocalMacros(msgType, conference, nick, param):
-	if gMacros.hasMacros(param, conference):
+	macros = param.split()[0].lower()
+	if gMacros.hasMacros(macros, conference):
 		access = gMacros.getAccess(macros, conference)
 		trueJid = getTrueJid(conference, nick)
 		if access <= getAccess(conference, trueJid):
-			sendMsg(msgType, conference, nick, gMacros.expand(param, (conference, nick, ), conference))
+			sendMsg(msgType, conference, nick, gMacros.expand(param, (conference, nick), conference))
 		else:
 			sendMsg(msgType, conference, nick, u"Недостаточно прав")
 	else:
@@ -118,7 +119,7 @@ def expandLocalMacros(msgType, conference, nick, param):
 def expandGlobalMacros(msgType, conference, nick, param):
 	macros = param.split()[0].lower()
 	if gMacros.hasMacros(macros):
-		sendMsg(msgType, conference, nick, gMacros.expand(param, (conference, nick, )))
+		sendMsg(msgType, conference, nick, gMacros.expand(param, (conference, nick)))
 	else:
 		sendMsg(msgType, conference, nick, u"Нет такого макроса")
 
@@ -141,7 +142,7 @@ def showGlobalMacrosInfo(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Нет такого макроса")
 
 def showLocalMacroAccess(msgType, conference, nick, param):
-	param = param.split()
+	param = param.split(None, 1)
 	macros = param[0]
 	if gMacros.hasMacros(macros, conference):
 		if len(param) == 2:
@@ -153,21 +154,20 @@ def showLocalMacroAccess(msgType, conference, nick, param):
 					access = int(param[1])
 					gMacros.setAccess(macros, access, conference)
 					gMacros.saveMacroses(conference)
+
 					sendMsg(msgType, conference, nick, u"Запомнила")
 				else:
 					sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число больше 0!")
 			else:
 				sendMsg(msgType, conference, nick, u"Недостаточно прав")
-		elif len(param) == 1:
+		else:
 			access = gMacros.getAccess(macros, conference)
 			sendMsg(msgType, conference, nick, str(access))
-		else:
-			sendMsg(msgType, conference, nick, u"Ошибочный запрос")
 	else:
 		sendMsg(msgType, conference, nick, u"Нет такого макроса")
 
 def showGlobalMacroAccess(msgType, conference, nick, param):
-	param = param.split()
+	param = param.split(None, 1)
 	macros = param[0]
 	if gMacros.hasMacros(macros):
 		if len(param) == 2:
@@ -176,14 +176,13 @@ def showGlobalMacroAccess(msgType, conference, nick, param):
 				access = int(param[1])
 				gMacros.setAccess(macros, access)
 				gMacros.saveMacroses()
+
 				sendMsg(msgType, conference, nick, u"Запомнила")
 			else:
 				sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число больше 0!")
-		elif len(param) == 1:
+		else:
 			access = gMacros.getAccess(macros)
 			sendMsg(msgType, conference, nick, str(access))
-		else:
-			sendMsg(msgType, conference, nick, u"Ошибочный запрос")
 	else:
 		sendMsg(msgType, conference, nick, u"Нет такого макроса")
 

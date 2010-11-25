@@ -70,40 +70,37 @@ def showUserAccess(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"%d" % (access))
 
 def setLocalAccess(msgType, conference, nick, param):
-	param = param.split()
-	if 4 > len(param) > 1:
-		user = param[0].strip()
-		if isNickInConference(conference, user):
-			userJid = getTrueJid(conference, user)
-		elif isJid(user):
-			userJid = getTrueJid(conference, user)
-		else:
-			sendMsg(msgType, conference, nick, u"А кто это?")
-			return
-		try:
-			access = int(param[1])
-			if -100 <= access <= 100:
-				userAccess = getAccess(conference, userJid)
-				myJid = getTrueJid(conference, nick)
-				myAccess = getAccess(conference, myJid)
-				if access == userAccess:
-					sendMsg(msgType, conference, nick, u"Уровень доступа у %s уже %d!" % (user, access))
-					return				
-				if userAccess > myAccess or access > myAccess:
-					sendMsg(msgType, conference, nick, u"Недостаточно прав")
-					return
-				if len(param) == 2:
-					setTempAccess(conference, userJid, access)
-					sendMsg(msgType, conference, nick, u"Доступ выдан до выхода из конференции")
-				else:
-					setPermAccess(conference, userJid, access)
-					sendMsg(msgType, conference, nick, u"Выдан постоянный доступ")
-			else:
-				sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
-		except ValueError:
-			sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
+	param = param.split(None, 2)
+	user = param[0].strip()
+	if isNickInConference(conference, user):
+		userJid = getTrueJid(conference, user)
+	elif isJid(user):
+		userJid = getTrueJid(conference, user)
 	else:
-		sendMsg(msgType, conference, nick, u"Ошибочный запрос")
+		sendMsg(msgType, conference, nick, u"А кто это?")
+		return
+	try:
+		access = int(param[1])
+		if -100 <= access <= 100:
+			userAccess = getAccess(conference, userJid)
+			myJid = getTrueJid(conference, nick)
+			myAccess = getAccess(conference, myJid)
+			if access == userAccess:
+				sendMsg(msgType, conference, nick, u"Уровень доступа у %s уже %d!" % (user, access))
+				return				
+			if userAccess > myAccess or access > myAccess:
+				sendMsg(msgType, conference, nick, u"Недостаточно прав")
+				return
+			if len(param) == 2:
+				setTempAccess(conference, userJid, access)
+				sendMsg(msgType, conference, nick, u"Доступ выдан до выхода из конференции")
+			else:
+				setPermAccess(conference, userJid, access)
+				sendMsg(msgType, conference, nick, u"Выдан постоянный доступ")
+		else:
+			sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
+	except ValueError:
+		sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
 
 def delLocalAccess(msgType, conference, nick, param):
 	user = param
@@ -124,38 +121,35 @@ def delLocalAccess(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, u"Постоянный доступ снят")
 
 def setGlobalAccess(msgType, conference, nick, param):
-	param = param.split()
-	if len(param) < 3:
-		user = param[0].strip()
-		if isConferenceInList(conference):
-			if isNickInConference(conference, user):
-				userJid = getTrueJid(conference, user)
-			elif isJid(user):
-				userJid = user
-			else:
-				sendMsg(msgType, conference, nick, u"А это кто?")
-				return
+	param = param.split(None, 1)
+	user = param[0].strip()
+	if isConferenceInList(conference):
+		if isNickInConference(conference, user):
+			userJid = getTrueJid(conference, user)
+		elif isJid(user):
+			userJid = user
 		else:
-			if isJid(user):
-				userJid = user
-			else:
-				sendMsg(msgType, conference, nick, u"А это кто?")
-				return
-		if len(param) == 2:
-			try:
-				access = int(param[1])
-				if -100 <= access <= 100:
-					setPermGlobalAccess(userJid, int(access))
-					sendMsg(msgType, conference, nick, u"Дала")
-				else:
-					sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
-			except ValueError:
-				sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
-		else:
-			setPermGlobalAccess(userJid)
-			sendMsg(msgType, conference, nick, u"Сняла")
+			sendMsg(msgType, conference, nick, u"А это кто?")
+			return
 	else:
-		sendMsg(msgType, conference, nick, u"Ошибочный запрос")
+		if isJid(user):
+			userJid = user
+		else:
+			sendMsg(msgType, conference, nick, u"А это кто?")
+			return
+	if len(param) == 2:
+		try:
+			access = int(param[1])
+			if -100 <= access <= 100:
+				setPermGlobalAccess(userJid, int(access))
+				sendMsg(msgType, conference, nick, u"Дала")
+			else:
+				sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
+		except ValueError:
+			sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
+	else:
+		setPermGlobalAccess(userJid)
+		sendMsg(msgType, conference, nick, u"Сняла")
 
 def showGlobalAccesses(msgType, conference, nick, param):
 	if not gGlobalAccess:

@@ -25,7 +25,7 @@ def showDreamInfo(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Ушёл")
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 	else:
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Ошибка!")
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(showDreamInfo, u"сонник", 10, 
 				u"Толкователь снов", 
