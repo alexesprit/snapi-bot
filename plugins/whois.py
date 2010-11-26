@@ -16,12 +16,12 @@
 def showWhoIs(msgType, conference, nick, param):
 	url = "http://1whois.ru/index.php"
 	qparam = {"url": param.encode("utf-8")}
-	responce = getURL(url, qparam)
-	if responce:
-		rawhtml = responce.read()
+	response = getURL(url, qparam)
+	if response:
+		rawhtml = response.read()
 		items = re.search("<blockquote>(.*?)</font></blockquote>", rawhtml, re.DOTALL)
-		if items:
-			text = items.group(0)
+		if elements:
+			text = elements.group(0)
 			text = text.replace("<br />", "")
 			text = decode(text, "cp1251")
 			sendMsg(msgType, conference, nick, text)

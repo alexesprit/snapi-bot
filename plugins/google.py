@@ -38,16 +38,15 @@ def searchInGoogleRU(msgType, conference, nick, text):
 	searchInGoogle(msgType, conference, nick, url, qparam)
 
 def searchInGoogle(msgType, conference, nick, url, qparam):
-	responce = getURL(url, qparam)
-	if responce:
-		responce = simplejson.load(responce)
-		results = responce["responseData"]["results"]
+	response = getURL(url, qparam)
+	if response:
+		response = simplejson.load(response)
+		results = response["responseData"]["results"]
 		if results:
 			if msgType == protocol.TYPE_PUBLIC:
-				msg = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (results[0])]
-			else:
-				msg = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (result) for result in results]
-			sendMsg(msgType, conference, nick, decode("\n\n".join(msg)))
+				results = results[0]
+			elements = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (result) for result in results]
+			sendMsg(msgType, conference, nick, decode("\n\n".join(elements)))
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:

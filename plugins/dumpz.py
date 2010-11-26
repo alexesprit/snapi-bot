@@ -21,10 +21,10 @@ def loadLangsForDumpz():
 
 def uploadToDumpz(msgType, conference, nick, param):
 	if u"языки" == param.lower():
-		langs = [u"%s - %s" % (lang, name) \
+		elements = [u"%s - %s" % (lang, name) \
 				for lang, name in DUMPZ_LANGS.items()]
-		langs.sort()
-		message = u"Доступные языки:\n%s" % ("\n".join(langs))
+		elements.sort()
+		message = u"Доступные языки:\n%s" % ("\n".join(elements))
 		sendMsg(msgType, conference, nick, message)
 	else:
 		args = param.split(None, 1)
@@ -44,9 +44,9 @@ def uploadToDumpz(msgType, conference, nick, param):
 			"code": text.encode("utf-8")
 		}
 		headers = {"Content-type": "application/x-www-form-urlencoded"}
-		responce = getURL(url, None, data, headers)
-		if responce:
-			sendMsg(msgType, conference, nick, u"Залито на %s" % (responce.url))
+		response = getURL(url, None, data, headers)
+		if response:
+			sendMsg(msgType, conference, nick, u"Залито на %s" % (response.url))
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
 

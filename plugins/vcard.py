@@ -88,13 +88,13 @@ def getVCard(rawVCard):
 			name += tagData + " "
 	if name:
 		rawVCard["FN"] = name
-	vCardItems = []
+	vCardElements = []
 	for i in xrange(len(VCARD_TAGS)):
 		tagName, tagDesc = VCARD_TAGS[i]
 		tagData = rawVCard.get(tagName)
 		if tagData:
-			vCardItems.append(u"%s: %s" % (tagDesc, tagData))
-	return "\n".join(vCardItems)
+			vCardElements.append(u"%s: %s" % (tagDesc, tagData))
+	return "\n".join(vCardElements)
 
 registerCommand(showVCard, u"визитка", 10, 
 				u"Показывает vCard указанного пользователя или сервера", 

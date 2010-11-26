@@ -66,12 +66,12 @@ def setLocalKey(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
 def searchLocalKey(msgType, conference, nick, param):
-	foundItems = []
+	foundElements = []
 	for key in gLocalBase[conference].keys():
 		if key.count(param):
-			foundItems.append(key)
-	if foundItems:
-		sendMsg(msgType, conference, nick, u"Найдено: %s" % (", ".join(foundItems)))
+			foundElements.append(key)
+	if foundElements:
+		sendMsg(msgType, conference, nick, u"Найдено: %s" % (", ".join(foundElements)))
 	else:
 		sendMsg(msgType, conference, nick, u"Не найдено!")
 

@@ -83,9 +83,9 @@ def delAutoVisitort(msgType, conference, nick, param):
 
 def showAutoVisitors(msgType, conference, nick, param):
 	if gVisitors[conference]:
-		items = [u"%d) %s" % (i + 1, moder) 
+		elements = [u"%d) %s" % (i + 1, moder) 
 				for i, moder in enumerate(sorted(gVisitors[conference]))]
-		message = u"Список автомодераторов:\n%s" % ("\n".join(items))
+		message = u"Список автомодераторов:\n%s" % ("\n".join(elements))
 		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"список автопосетителей пуст")

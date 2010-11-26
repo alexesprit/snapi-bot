@@ -57,11 +57,13 @@ def showUserNotes(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"А у тебя и так ничего нет :P")
 	elif not param:
 		if trueJid in gUserNotes:
-			message = u"Твои заметки:\n"
-			items = [u"%d) %s" % (i + 1, x) for i, x in enumerate(gUserNotes[trueJid])]
-			sendMsg(msgType, conference, nick, message + "\n".join(items))
+			elements = [u"%d) %s" % (i + 1, note) for i, note in enumerate(gUserNotes[trueJid])]
+			if protocol.TYPE_PUBLIC == msgType:
+				sendMsg(msgType, conference, nick, u"Ушли")
+			message = u"Твои заметки:\n%s" % ("\n".join(elements))
+			sendMsg(msgType, conference, nick, message)
 		else:
-			sendMsg(msgType, conference, nick, u"В твоём блокноте пусто")
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"В твоём блокноте пусто")
 
 registerEvent(loadUserNotes, EVT_STARTUP)
 

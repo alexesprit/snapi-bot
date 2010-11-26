@@ -14,15 +14,15 @@
 # GNU General Public License for more details.
 
 def showInMucUsers(msgType, conference, nick, param):
-	items = [u"%d) %s" % (i + 1, user) 
+	elements = [u"%d) %s" % (i + 1, user) 
 			for i, user in enumerate(sorted(getOnlineNicks(conference)))]
-	message = u"Я вижу здесь %d участников:\n%s" % (len(items), "\n".join(items))
+	message = u"Я вижу здесь %d участников:\n%s" % (len(elements), "\n".join(elements))
 	sendMsg(msgType, conference, nick, message)
 
 def showWhoWas(msgType, conference, nick, param):
-	items = [u"%d) %s" % (i + 1, user) 
+	elements = [u"%d) %s" % (i + 1, user) 
 			for i, user in enumerate(sorted(getNicks(conference)))]
-	message = u"Я видела здесь %d участников:\n%s" % (len(items), "\n".join(items))
+	message = u"Я видела здесь %d участников:\n%s" % (len(elements), "\n".join(elements))
 	sendMsg(msgType, conference, nick, message)
 	
 def showUserNicks(msgType, conference, nick, param):

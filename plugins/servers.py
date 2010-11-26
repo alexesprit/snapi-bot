@@ -16,13 +16,13 @@
 
 def _showServerStats(stanza, msgType, conference, nick, server):
 	if protocol.TYPE_RESULT == stanza.getType():
-		items = []
+		elements = []
 		for stat in stanza.getQueryChildren():
 			attrs = stat.getAttrs()
 			if len(attrs) == 3:
-				items.append(u"%(name)s: %(value)s %(units)s" % (attrs))
+				elements.append(u"%(name)s: %(value)s %(units)s" % (attrs))
 		if items:
-			message = u"Инфа о %s:\n%s" % (server, "\n".join(items))
+			message = u"Инфа о %s:\n%s" % (server, "\n".join(elements))
 			sendMsg(msgType, conference, nick, message)
 		else:
 			sendMsg(msgType, conference, nick, u"Нет информации")

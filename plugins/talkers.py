@@ -25,8 +25,7 @@ def showTopTalkersInfo(msgType, conference, nick):
 		sendMsg(msgType, conference, nick, u"База болтунов пуста")
 	else:
 		topList = []
-		replic = u"Статистика топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n"
-		topListLine = u"%d) %s, %d, %d, %d, %0.1f"
+		pattern = u"%d) %s, %d, %d, %d, %0.1f"
 		count = 10
 		for jid, info in base.items():
 			words = info["words"]
@@ -38,8 +37,10 @@ def showTopTalkersInfo(msgType, conference, nick):
 		topList.sort()
 		topList.reverse()
 		topList = topList[:10]
-		items = [topListLine % (i + 1, x[4], x[0], x[1], x[2], x[3]) for i, x in enumerate(topList)]
-		sendMsg(msgType, conference, nick, replic + "\n".join(items))
+		elements = [pattern % (i + 1, element[4], element[0], element[1], element[2], element[3]) 
+					for i, element in enumerate(topList)]
+		message = u"Список топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n%s" % ("\n".join(elements))
+		sendMsg(msgType, conference, nick, message)
 
 def clearTalkersInfo(msgType, conference, nick):
 	conference = source[1]
@@ -67,13 +68,13 @@ def showTalkerInfo(msgType, conference, nick, param):
 		base = gTalkersCache[conference]
 		if trueJid in base:
 			statistic = base[trueJid]
-			statisticLine = u"Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f"
+			pattern = u"Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f"
 			nick = statistic["nick"]
 			words = statistic["words"]
 			messages = statistic["messages"]
 			meMessages = statistic["mes"]
 			wordsPerMsg = (float(words)) / (messages + meMessages)
-			message = statisticLine % (nick, messages, meMessages, words, wordsPerMsg)
+			message = pattern % (nick, messages, meMessages, words, wordsPerMsg)
 			sendMsg(msgType, conference, nick, message)
 		else:
 			sendMsg(msgType, conference, nick, u"Нет информации")

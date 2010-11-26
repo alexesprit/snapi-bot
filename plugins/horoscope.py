@@ -52,9 +52,9 @@ def showHoroscope(msgType, conference, nick, param):
 			rawdate = u"today"
 
 		url = "http://img.ignio.com/r/export/utf/xml/daily/com.xml"
-		responce = getURL(url)
-		if responce:
-			rawxml = responce.read()
+		response = getURL(url)
+		if response:
+			rawxml = response.read()
 			xmlnode = simplexml.XML2Node(rawxml)
 			
 			horoNode = xmlnode.getTag(rawsign)

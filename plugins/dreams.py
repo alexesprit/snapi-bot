@@ -16,11 +16,11 @@
 def showDreamInfo(msgType, conference, nick, param):
 	url = "http://www.sonnik.ru/search.php"
 	qparam = {"key": param.encode("cp1251")}
-	responce = getURL(url, qparam)
-	if responce:
-		rawhtml = responce.read()
-		items = re.search(r"<div id=\"mntxt\">(.+?)</p>", rawhtml, re.DOTALL)
-		message = decode(items.group(1), "cp1251")
+	response = getURL(url, qparam)
+	if response:
+		rawhtml = response.read()
+		elements = re.search(r"<div id=\"mntxt\">(.+?)</p>", rawhtml, re.DOTALL)
+		message = decode(elements.group(1), "cp1251")
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушёл")
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)

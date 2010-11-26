@@ -53,38 +53,38 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 		for x in stanza.getQueryChildren():
 			itemCount += 1
 			attrs = x.getAttrs()
-			items = []
+			elements = []
 			if "name" in attrs:
-				items.append(attrs["name"])
+				elements.append(attrs["name"])
 				if not isJid(jid) and "jid" in attrs:
-					items.append(attrs["jid"])
+					elements.append(attrs["jid"])
 				if "node" in attrs:
-					items.append(attrs["node"])
+					elements.append(attrs["node"])
 			else:
-				items.append(attrs["jid"])
-			if len(items) == 3:
+				elements.append(attrs["jid"])
+			if len(elements) == 3:
 				if searchKey:
-					if not items[0].count(searchKey):
+					if not elements[0].count(searchKey):
 						continue
-				discoList.append(u"%d) %s (%s)" % (itemCount, items[0], items[2]))
-			elif len(items) == 2:
+				discoList.append(u"%d) %s (%s)" % (itemCount, elements[0], elements[2]))
+			elif len(elements) == 2:
 				if searchKey:
 					if searchKey.endswith("@"):
-						if not items[1].startswith(searchKey):
+						if not elements[1].startswith(searchKey):
 							continue
-						discoList.append(u"%d) %s\n%s" % (itemCount, items[1], items[0]))
+						discoList.append(u"%d) %s\n%s" % (itemCount, elements[1], elements[0]))
 						break
 					else:
-						if not items[0].count(searchKey):
+						if not elements[0].count(searchKey):
 							continue
-						discoList.append(u"%d) %s\n%s" % (itemCount, items[1], items[0]))
+						discoList.append(u"%d) %s\n%s" % (itemCount, elements[1], elements[0]))
 				else:
-					discoList.append(u"%d) %s\n%s" % (itemCount, items[1], items[0]))
-			elif len(items) == 1:
+					discoList.append(u"%d) %s\n%s" % (itemCount, elements[1], elements[0]))
+			elif len(elements) == 1:
 				if searchKey:
-					if not items[0].count(searchKey):
+					if not elements[0].count(searchKey):
 						continue
-				discoList.append(u"%d) %s" % (itemCount, items[0]))
+				discoList.append(u"%d) %s" % (itemCount, elements[0]))
 		if discoList:
 			if 0 == maxCount:
 				sendMsg(msgType, conference, nick, u"Всего %d пунктов" % (itemCount))

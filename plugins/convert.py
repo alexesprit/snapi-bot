@@ -23,9 +23,9 @@ def loadValuesForConvert():
 
 def convertValues(msgType, conference, nick, param):
 	if param.lower() == u"валюты":
-		values = [u"%s - %s" % (name, desc) for name, desc in CONV_VALUES.items()]
-		values.sort()
-		sendMsg(msgType, conference, nick, "\n".join(values))
+		elements = [u"%s - %s" % (name, desc) for name, desc in CONV_VALUES.items()]
+		elements.sort()
+		sendMsg(msgType, conference, nick, "\n".join(elements))
 	else:
 		if len(param.split()) == 3:
 			param = param.upper().split()
@@ -47,13 +47,13 @@ def convertValues(msgType, conference, nick, param):
 					"tid_to": target,
 					"summa": value
 				}
-				responce = getURL(url, qparam)
-				if responce:
-					rawhtml = responce.read()
-					items = re.search("<TD><B>.+?</B>.+?<TD><B>(.+?)</B>.+?<TD><B>(.+?)</B></TD>", rawhtml, re.DOTALL)
-					if items:
-						sourceValue = unicode(items.group(2), "cp1251")
-						targetValue = unicode(items.group(1), "cp1251")
+				response = getURL(url, qparam)
+				if response:
+					rawhtml = response.read()
+					elements = re.search("<TD><B>.+?</B>.+?<TD><B>(.+?)</B>.+?<TD><B>(.+?)</B></TD>", rawhtml, re.DOTALL)
+					if elements:
+						sourceValue = unicode(elements.group(2), "cp1251")
+						targetValue = unicode(elements.group(1), "cp1251")
 						message = u"%s %s = %s %s\n1 %s = %s %s" % (value, source, sourceValue, target, source, targetValue, target)
 						message = message.replace("BASE", "RUR")
 						sendMsg(msgType, conference, nick, message)

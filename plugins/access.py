@@ -157,9 +157,9 @@ def showGlobalAccesses(msgType, conference, nick, param):
 	else:
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли")
-		items = [u"%d) %s [%d]" % (i + 1, item, gGlobalAccess[item]) 
+		elements = [u"%d) %s [%d]" % (i + 1, item, gGlobalAccess[item]) 
 				for i, item in enumerate(sorted(gGlobalAccess))]
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Глобальные уровни доступа:\n%s" % ("\n".join(items)))
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Глобальные уровни доступа:\n%s" % ("\n".join(elements)))
 
 def showLocalAccesses(msgType, conference, nick, param):
 	if not gPermAccess[conference]:
@@ -168,9 +168,9 @@ def showLocalAccesses(msgType, conference, nick, param):
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли")
 		accesses = gPermAccess[conference]
-		items = [u"%d) %s [%d]" % (i + 1, item, accesses[item]) 
+		elements = [u"%d) %s [%d]" % (i + 1, item, accesses[item]) 
 				for i, item in enumerate(sorted(accesses))]
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Локальные уровни доступа:\n%s" % ("\n".join(items)))
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Локальные уровни доступа:\n%s" % ("\n".join(elements)))
 
 def loadGlobalAccesses():
 	global gGlobalAccess

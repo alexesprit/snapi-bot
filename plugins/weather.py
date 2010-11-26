@@ -62,9 +62,9 @@ def showWeather(msgType, conference, nick, param):
 	if rawData:
 		city, code = rawData
 		url = "http://informer.gismeteo.ru/xml/%s.xml" % (code.strip())
-		responce = getURL(url)
-		if responce:
-			rawxml = responce.read()
+		response = getURL(url)
+		if response:
+			rawxml = response.read()
 			node = simplexml.XML2Node(rawxml)
 			node = node.getTag("REPORT").getTag("TOWN")
 			message = u"Погода в городе %s:\n" % (city.decode("utf-8"))

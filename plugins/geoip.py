@@ -18,13 +18,13 @@ def showGeoIPInfo(msgType, conference, nick, param):
 	host = param or PROFILE_HOST
 	url = "http://www.and-rey.ru/geoip/ie.php"
 	qparam = {"host": host.encode("utf-8")}
-	responce = getURL(url, qparam)
-	if responce:
-		rawhtml = responce.read()
+	response = getURL(url, qparam)
+	if response:
+		rawhtml = response.read()
 		rawhtml = unicode(rawhtml, "cp1251")
-		items = re.findall("<td class=red>(.+?)</td><td class=blue>(.+?)</td>", rawhtml)
-		items = [u"%s %s" % (item[0], item[1]) for item in items]
-		message = u"Инфо о %s:\n%s" % (host, decode("\n".join(items)))
+		elements = re.findall("<td class=red>(.+?)</td><td class=blue>(.+?)</td>", rawhtml)
+		elements = [u"%s %s" % (element[0], element[1]) for element in elements]
+		message = u"Инфо о %s:\n%s" % (host, decode("\n".join(elements)))
 		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"Ошибка!")

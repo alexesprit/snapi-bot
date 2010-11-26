@@ -22,7 +22,7 @@ def joinConf(msgType, conference, nick, param):
 		else:
 			password = (len(param) == 2) and param[1] or None
 			addConference(conf)
-			joinConference(conf, PROFILE_NICK, getConferenceConfigKey(conf, "password"))
+			joinConference(conf, PROFILE_NICK, password)
 			saveConferenceConfig(conf)
 			saveConferences()
 			sendMsg(msgType, conference, nick, u"Зашла")

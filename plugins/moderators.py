@@ -83,9 +83,9 @@ def delAutoModerator(msgType, conference, nick, param):
 
 def showAutoModerators(msgType, conference, nick, param):
 	if gModerators[conference]:
-		items = [u"%d) %s" % (i + 1, moder) 
+		elements = [u"%d) %s" % (i + 1, moder) 
 				for i, moder in enumerate(sorted(gModerators[conference]))]
-		message = u"Список автомодераторов:\n%s" % ("\n".join(items))
+		message = u"Список автомодераторов:\n%s" % ("\n".join(elements))
 		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"Список автомодераторов пуст")

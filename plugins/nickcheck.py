@@ -14,11 +14,14 @@
 # GNU General Public License for more details.
 
 def checkNick(stanza, conference, nick, trueJid):
-	code = stanza.getStatusCode()
-	nick = ("303" != code) and nick or stanza.getNick()
-	if nick.strip():
-		command = nick.split()[0].strip().lower()
-		if isCommand(command) or gMacros.hasMacros(command, conference) or gMacros.hasMacros(command):
-			setMUCRole(conference, nick, protocol.ROLE_NONE, u"Меняй ник!")
+	if protocol.TYPE_ERROR != stanza.getType():
+		code = stanza.getStatusCode()
+		nick = ("303" != code) and nick or stanza.getNick()
+		if nick.strip():
+			cmd = nick.split()[0].strip().lower()
+			_isCommand = isCommand(cmd) and isCommandType(cmd, CMD_CONFERENCE)
+			_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd)
+			if _isCommand or _isMacros:
+				setMUCRole(conference, nick, protocol.ROLE_NONE, u"Меняй ник!")
 
 registerPresenceHandler(checkNick, H_CONFERENCE)

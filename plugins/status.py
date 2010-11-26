@@ -33,12 +33,13 @@ def showUserStatus(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"А это кто?")
 
 def updateStatus(stanza, conference, nick, trueJid):
-	if isNickOnline(conference, nick):
-		show = stanza.getShow() or u"online"
-		status = stanza.getStatus()
-		setNickKey(conference, nick, NICK_SHOW, show)
-		if status:
-			setNickKey(conference, nick, NICK_STATUS, status)
+	if protocol.TYPE_ERROR != stanza.getType():
+		if isNickOnline(conference, nick):
+			show = stanza.getShow() or u"online"
+			status = stanza.getStatus()
+			setNickKey(conference, nick, NICK_SHOW, show)
+			if status:
+				setNickKey(conference, nick, NICK_STATUS, status)
 
 registerPresenceHandler(updateStatus, H_CONFERENCE)
 

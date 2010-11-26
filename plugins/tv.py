@@ -51,12 +51,12 @@ def getTVChannelCode(channelName):
 def getTVForChannel(channelCode):
 	url = "http://tv.yandex.ru/"
 	qparam = getTVQueryParam(channelCode)
-	responce = getURL(url, qparam)
-	if responce:
-		rawHTML = responce.read()
-		items = re.findall(r"<div>(.+?)\n", rawHTML)
-		if items:
-			rawtext = "\n".join(items)
+	response = getURL(url, qparam)
+	if response:
+		rawHTML = response.read()
+		elements = re.findall(r"<div>(.+?)\n", rawHTML)
+		if elements:
+			rawtext = "\n".join(elements)
 			return decode(rawtext, "utf-8")
 	return None
 
@@ -65,9 +65,9 @@ def getTVForCategory(category):
 	url = "http://tv.yandex.ru/"
 	qparam = getTVQueryParam(channels, category)
 
-	responce = getURL(url, qparam)
-	if responce:
-		rawhtml = unicode(responce.read(), "utf-8")
+	response = getURL(url, qparam)
+	if response:
+		rawhtml = unicode(response.read(), "utf-8")
 		pattern = re.compile(r"<table.+?class=\"channel\".+?>(.+?)</table>", re.DOTALL)
 		nameptrn = re.compile(r"<br><b>(.+?)</b><br><br>")
 		itemptrn = re.compile(r"<div>(.+?)\n")

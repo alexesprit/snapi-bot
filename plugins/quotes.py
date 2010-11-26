@@ -19,13 +19,13 @@ def showBashQuote(msgType, conference, nick, param):
 		url = "http://bash.org.ru/quote/%s" % (param)
 	else:
 		url = "http://bash.org.ru/random"
-	responce = getURL(url)
-	if responce:
-		rawhtml = responce.read()
-		items = re.search("quote/(\d+).+?<div>(.+?)</div>", rawhtml, re.DOTALL)
-		if items:
-			url = "http://bash.org.ru/quote/%s" % (items.group(1))
-			quote = decode(items.group(2), "cp1251")
+	response = getURL(url)
+	if response:
+		rawhtml = response.read()
+		elements = re.search("quote/(\d+).+?<div>(.+?)</div>", rawhtml, re.DOTALL)
+		if elements:
+			url = "http://bash.org.ru/quote/%s" % (elements.group(1))
+			quote = decode(elements.group(2), "cp1251")
 			sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
 		else:
 			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
@@ -34,13 +34,13 @@ def showBashQuote(msgType, conference, nick, param):
 
 def showAbyssQuote(msgType, conference, nick, param):
 	url = "http://bash.org.ru/abysstop"
-	responce = getURL(url)
-	if responce:
-		rawhtml = responce.read()
-		items = re.findall("<div class=\"vote\">(.+?)<div>(.+?)</div>", rawhtml, re.DOTALL)
-		if items:
-			items = [i[1] for i in items]
-			rawquote = random.choice(items)
+	response = getURL(url)
+	if response:
+		rawhtml = response.read()
+		elements = re.findall("<div class=\"vote\">(.+?)<div>(.+?)</div>", rawhtml, re.DOTALL)
+		if elements:
+			elements = [i[1] for i in elements]
+			rawquote = random.choice(elements)
 			message = decode(rawquote, "cp1251")
 			sendMsg(msgType, conference, nick, message)
 		else:
@@ -53,13 +53,13 @@ def showItHappensQuote(msgType, conference, nick, param):
 		url = "http://ithappens.ru/story/%s" % (param)
 	else:
 		url = "http://ithappens.ru/random"
-	responce = getURL(url)
-	if responce:
-		rawhtml = responce.read()
-		items = re.search(r"<div class.+?#(\d+).+?<p class=\"text\">(.+?)</p>", rawhtml, re.DOTALL)
-		if items:
-			url = "http://ithappens.ru/story/%s/" % (items.group(1))
-			quote = decode(items.group(2), "cp1251")
+	response = getURL(url)
+	if response:
+		rawhtml = response.read()
+		elements = re.search(r"<div class.+?#(\d+).+?<p class=\"text\">(.+?)</p>", rawhtml, re.DOTALL)
+		if elements:
+			url = "http://ithappens.ru/story/%s/" % (elements.group(1))
+			quote = decode(elements.group(2), "cp1251")
 			sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
 		else:
 			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
@@ -71,13 +71,13 @@ def showIBashQuote(msgType, conference, nick, param):
 		url = "http://ibash.org.ru/quote.php?id=%s" % (param)
 	else:
 		url = "http://ibash.org.ru/random.php"
-	responce = getURL(url)
-	if responce:
-		rawhtml = responce.read()
-		items = re.search(r"<b>#(\d+).+?<div class=\"quotbody\">(.+?)</div>", rawhtml, re.DOTALL)
-		if items:
-			url = "http://ibash.org.ru/quote.php?id=%s" % (items.group(1))
-			quote = decode(items.group(2), "cp1251")
+	response = getURL(url)
+	if response:
+		rawhtml = response.read()
+		elements = re.search(r"<b>#(\d+).+?<div class=\"quotbody\">(.+?)</div>", rawhtml, re.DOTALL)
+		if elements:
+			url = "http://ibash.org.ru/quote.php?id=%s" % (elements.group(1))
+			quote = decode(elements.group(2), "cp1251")
 			sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
 		else:
 			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
@@ -89,14 +89,14 @@ def showJabberQuote(msgType, conference, nick, param):
 		url = "http://jabber-quotes.ru/id%s" % (param)
 	else:
 		url = "http://jabber-quotes.ru/random"
-	responce = getURL(url)
-	if responce:
-		rawhtml = responce.read()
-		items = re.search(r"#(\d+).+?<blockquote>(.+?)</blockquote>", rawhtml)
-		if items:
-			quote = items.group(2)
+	response = getURL(url)
+	if response:
+		rawhtml = response.read()
+		elements = re.search(r"#(\d+).+?<blockquote>(.+?)</blockquote>", rawhtml)
+		if elements:
+			quote = elements.group(2)
 			quote = decode(quote.replace("<br><br>", "\n"), "cp1251")
-			url = "http://jabber-quotes.ru/id%s/" % (items.group(1))
+			url = "http://jabber-quotes.ru/id%s/" % (elements.group(1))
 			sendMsg(msgType, conference, nick, u"%s\n\n%s" % (quote, url))
 		else:
 			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
@@ -106,14 +106,14 @@ def showJabberQuote(msgType, conference, nick, param):
 def showCinemaQuote(msgType, conference, nick, param):
 	pageNum = random.randrange(1, 39)
 	url = "http://skio.ru/afofilms/kino%d.php" % (pageNum)
-	responce = getURL(url)
-	if responce:
-		rawhtml = responce.read()
-		items = re.search("<ul type=\"circle\"(.+?)</ul>", rawhtml, re.DOTALL)
-		if items:
-			rawhtml = items.group(1)
-			items = re.findall("<li>(.+?)<li>", rawhtml, re.DOTALL)
-			quote = random.choice(items)
+	response = getURL(url)
+	if response:
+		rawhtml = response.read()
+		elements = re.search("<ul type=\"circle\"(.+?)</ul>", rawhtml, re.DOTALL)
+		if elements:
+			rawhtml = elements.group(1)
+			elements = re.findall("<li>(.+?)<li>", rawhtml, re.DOTALL)
+			quote = random.choice(elements)
 			quote = decode(quote, "cp1251")
 			sendMsg(msgType, conference, nick, quote)
 		else:

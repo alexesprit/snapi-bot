@@ -128,13 +128,14 @@ def showScoreList(msgType, conference, nick=None):
 		scores.sort()
 		scores.reverse()
 		scores = scores[:10]
-		items = [u"%s) %s, %s, %s" % (i + 1, x[2], x[0], x[1]) for i, x in enumerate(scores)]
+		elements = [u"%s) %s, %s, %s" % (i + 1, element[2], element[0], element[1]) 
+					for i, x in enumerate(scores)]
 		if nick:
 			message = u"Статистика по игре:\nНик, счет, ответов\n"
-			sendMsg(msgType, conference, nick, message + "\n".join(items))
+			sendMsg(msgType, conference, nick, message + "\n".join(elements))
 		else:
 			message = u"(*) Счёт:\nНик, счет, ответов\n"
-			sendToConference(conference, message + "\n".join(items))
+			sendToConference(conference, message + "\n".join(elements))
 	else:
 		if nick:
 			sendMsg(msgType, conference, nick, u"Статистика по игре отсутствует")

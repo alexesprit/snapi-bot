@@ -20,17 +20,17 @@ def getTrainTable(cityFrom, cityTo, dateForward):
 		"cityTo": cityTo.encode("utf-8"),
 		"dateForward": dateForward.encode("utf-8")
 	}
-	responce = getURL(url, qparam)
-	if responce:
-		rawhtml = responce.read()
+	response = getURL(url, qparam)
+	if response:
+		rawhtml = response.read()
 		rawhtml = unicode(rawhtml, "utf-8")
-		items = re.findall(u"<tr class=\"{(.+?)</tr>", rawhtml, re.DOTALL)
+		elements = re.findall(u"<tr class=\"{(.+?)</tr>", rawhtml, re.DOTALL)
 		tableList = []
-		for info in items:
-			trainName = re.search("<a href=\".+?>(.+?)</a>", info, re.DOTALL)
+		for element in elements:
+			trainName = re.search("<a href=\".+?>(.+?)</a>", element, re.DOTALL)
 			trainName = decode(trainName.group(1)).strip()
 
-			dispatch, arrive = re.findall(r"<span class=\"point\">(.+?)</span>", info, re.DOTALL)
+			dispatch, arrive = re.findall(r"<span class=\"point\">(.+?)</span>", element, re.DOTALL)
 			
 			timePtrn = re.compile(r"<strong(.+?)</strong>")
 			namePtrn = re.compile(r"<a href=\".+?>(.+?)</a>", re.DOTALL)
@@ -45,10 +45,10 @@ def getTrainTable(cityFrom, cityTo, dateForward):
 			arrName = namePtrn.search(arrive)
 			arrName = decode(arrName.group(1)).strip()
 			
-			travelTime = re.search(r"td class=\"{raw:.+?>.+?</i>(.+?)</td>", info, re.DOTALL)
+			travelTime = re.search(r"td class=\"{raw:.+?>.+?</i>(.+?)</td>", element, re.DOTALL)
 			travelTime = decode(travelTime.group(1)).strip()
 
-			if info.find("tickets\": \"yes") != -1:
+			if element.find("tickets\": \"yes") != -1:
 				places = u"есть"
 			else:
 				places = u"нет"

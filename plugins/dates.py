@@ -15,9 +15,9 @@
 
 def showDates(msgType, conference, nick, param):
 	url = "http://wap.n-urengoy.ru/cgi-bin/wappr.pl"
-	responce = getURL(url)
-	if responce:
-		rawhtml = responce.read()
+	response = getURL(url)
+	if response:
+		rawhtml = response.read()
 		rawhtml = unicode(rawhtml, "utf-8")
 		dates = rawhtml.split("<br/>-----<br/>")
 		dates = dates[1:-1]

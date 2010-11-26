@@ -41,12 +41,12 @@ AFOR_PAGES = (
 def showAforism(msgType, conference, nick, param):
 	randPage = random.choice(AFOR_PAGES)
 	url = "http://skio.ru/quotes/%s" % (randPage)
-	responce = getURL(url)
-	if responce:
-		rawhtml = responce.read()
-		items = re.search("<p><div align=\"center\">(.+?)</div>", rawhtml, re.DOTALL)
-		if items:
-			aforism = unicode(items.group(1), "cp1251")
+	response = getURL(url)
+	if response:
+		rawhtml = response.read()
+		elements = re.search("<p><div align=\"center\">(.+?)</div>", rawhtml, re.DOTALL)
+		if elements:
+			aforism = unicode(elements.group(1), "cp1251")
 			sendMsg(msgType, conference, nick, aforism)
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")

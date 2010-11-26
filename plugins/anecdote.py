@@ -15,12 +15,12 @@
 
 def showAnecdote(msgType, conference, nick, param):
 	url = "http://anekdot.odessa.ua/rand-anekdot.php"
-	responce = getURL(url)
-	if responce:
-		rawhtml = responce.read()
-		items = re.search("color:#FFFFFF'>(.+?)<a href", rawhtml, re.DOTALL)
-		if items:
-			rawtext = items.group(1).replace("<br />", "")
+	response = getURL(url)
+	if response:
+		rawhtml = response.read()
+		elements = re.search("color:#FFFFFF'>(.+?)<a href", rawhtml, re.DOTALL)
+		if elements:
+			rawtext = elements.group(1).replace("<br />", "")
 			anecdote = decode(rawtext, "cp1251")
 			sendMsg(msgType, conference, nick, anecdote)
 		else:

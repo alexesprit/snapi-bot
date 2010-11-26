@@ -153,9 +153,9 @@ def manageLoggingValue(msgType, conference, nick, param):
 	else:
 		conferences = getConferences()
 		if conferences:
-			items = [u"%d) %s [%d]" % (i + 1, c, getConferenceConfigKey(c, "log")) 
+			elements = [u"%d) %s [%d]" % (i + 1, c, getConferenceConfigKey(c, "log")) 
 						for i, c in enumerate(sorted(conferences))]
-			sendMsg(msgType, conference, nick, u"Список конференций:\n%s" % ("\n".join(items)))
+			sendMsg(msgType, conference, nick, u"Список конференций:\n%s" % ("\n".join(elements)))
 		else:
 			sendMsg(msgType, conference, nick, u"Сейчас меня нет ни в одной конференции")
 

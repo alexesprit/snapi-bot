@@ -1,4 +1,5 @@
 # coding: utf-8
+# coding: utf-8
 
 # rss.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -58,9 +59,9 @@ def cleanRSSCache(conference):
 
 def sendRSSNews(conference, url, onlyFirst=False):
 	#printf("loading %s" % (url))
-	responce = getURL(url)
-	if responce:
-		rawXML = responce.read()
+	response = getURL(url)
+	if response:
+		rawXML = response.read()
 		xmlNode = protocol.simplexml.XML2Node(rawXML)
 		if "feed" == xmlNode.getName():
 			rssType = TYPE_ATOM

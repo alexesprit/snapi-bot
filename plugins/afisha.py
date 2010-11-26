@@ -101,9 +101,9 @@ def getFullSchedule(city):
 			return gAfishaCache[city]["schedule"]
 	schedule = []
 	url = "http://www.afisha.ru/%s/schedule_cinema/" % (city)
-	responce = getURL(url)
-	if responce:
-		rawhtml = unicode(responce.read(), "utf-8")
+	response = getURL(url)
+	if response:
+		rawhtml = unicode(response.read(), "utf-8")
 		getcinema = re.compile(u"class=\"b-td-item\">(?:[^>]+)>([^<]+)</a")
 		gettime = re.compile(u"<span (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")
 		gettime2 = re.compile(u"<a (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")

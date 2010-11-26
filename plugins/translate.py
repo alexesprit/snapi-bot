@@ -34,9 +34,9 @@ def getTranslatedText(text, source, target):
 	url = "http://ajax.googleapis.com/ajax/services/language/translate"
 	langpair = "%s|%s" % (source, target)
 	qparam = getTranslateQuery(text, langpair)
-	responce = getURL(url, qparam)
-	if responce:
-		answer = simplejson.load(responce)
+	response = getURL(url, qparam)
+	if response:
+		answer = simplejson.load(response)
 		if answer["responseData"]:
 			return answer["responseData"]["translatedText"]
 	return None
@@ -44,19 +44,19 @@ def getTranslatedText(text, source, target):
 def detectLanguage(text):
 	url = "http://ajax.googleapis.com/ajax/services/language/detect"
 	qparam = getTranslateQuery(text)
-	responce = getURL(url, qparam)
-	if responce:
-		answer = simplejson.load(responce)
+	response = getURL(url, qparam)
+	if response:
+		answer = simplejson.load(response)
 		if answer["responseData"]:
 			return answer["responseData"]["language"]
 	return None
 
 def translateText(msgType, conference, nick, param):
 	if param.lower() == u"языки":
-		langs = [u"%s - %s" % (lang, name)
+		elements = [u"%s - %s" % (lang, name)
 				for lang, name in TRANSL_LANGS.items()]
-		langs.sort()
-		message = u"Доступные языки:\n%s" % ("\n".join(langs))
+		elements.sort()
+		message = u"Доступные языки:\n%s" % ("\n".join(elements))
 		sendMsg(msgType, conference, nick, message)
 	else:
 		param = param.split(None, 2)

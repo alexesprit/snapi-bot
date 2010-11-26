@@ -15,12 +15,13 @@
 
 def _showMUCList(stanza, msgType, conference, nick):
 	if protocol.TYPE_RESULT == stanza.getType():
-		items = [u"%d) %s" % (i + 1, p.getAttrs()["jid"]) for i, p in enumerate(stanza.getQueryChildren())]
-		if items:
-			message = u"Смотри, что я нашла:\n"
+		elements = [u"%d) %s" % (i + 1, p.getAttrs()["jid"]) 
+					for i, p in enumerate(stanza.getQueryChildren())]
+		if elements:
 			if msgType == protocol.TYPE_PUBLIC:
 				sendMsg(msgType, conference, nick, u"Ушёл")
-			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message + "\n".join(items))
+			message = u"Смотри, что я нашла:\n%s" % ("\n".join(elements))
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 		else:
 			sendMsg(msgType, conference, nick, u"Список пуст")
 	else:

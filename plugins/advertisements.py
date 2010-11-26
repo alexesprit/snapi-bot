@@ -16,12 +16,12 @@
 def showAdvert(msgType, conference, nick, param):
 	pageNum = random.randrange(1, 13)
 	url = "http://skio.ru/funnyad/%d.php" % (pageNum)
-	responce = getURL(url)
-	if responce:
-		rawhtml = responce.read()
-		items = re.findall(r"<tr><td>(.+?)</td></tr>", rawhtml, re.DOTALL)
-		if items:
-			adv = random.choice(items)
+	response = getURL(url)
+	if response:
+		rawhtml = response.read()
+		elements = re.findall(r"<tr><td>(.+?)</td></tr>", rawhtml, re.DOTALL)
+		if elements:
+			adv = random.choice(elements)
 			adv = decode(adv, "cp1251")
 			sendMsg(msgType, conference, nick, adv)
 		else:

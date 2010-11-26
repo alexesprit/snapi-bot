@@ -16,9 +16,9 @@
 def showWhereIsBot(msgType, conference, nick, param):
 	conferences = getConferences()
 	if conferences:
-		items = [u"%d) %s [%d]" % (i + 1, conf, len(getOnlineNicks(conf)))
+		elements = [u"%d) %s [%d]" % (i + 1, conf, len(getOnlineNicks(conf)))
 					for i, conf in enumerate(sorted(conferences))]
-		message = u"Я нахожусь в %d конференциях:\n%s" % (len(conferences), "\n".join(items))
+		message = u"Я нахожусь в %d конференциях:\n%s" % (len(conferences), "\n".join(elements))
 		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"Сейчас меня нет ни в одной конференции")

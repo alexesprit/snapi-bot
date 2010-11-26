@@ -24,12 +24,12 @@ def decipherExpression(msgType, conference, nick, param):
 			"a": "analiz_nick",
 			"word": param.encode("cp1251")
 		}
-		responce = getURL(url, qparam)
-		if responce:
-			rawhtml = responce.read()
-			items = re.search(r"<div style='text-align:center;'><b>(.*?)</b></div>", rawhtml, re.DOTALL)
-			if items:
-				text = items.group(1)
+		response = getURL(url, qparam)
+		if response:
+			rawhtml = response.read()
+			elements = re.search(r"<div style='text-align:center;'><b>(.*?)</b></div>", rawhtml, re.DOTALL)
+			if elements:
+				text = elements.group(1)
 				sendMsg(msgType, conference, nick, unicode(text, "cp1251"))
 			else:
 				sendMsg(msgType, conference, nick, u"Ошибка!")
