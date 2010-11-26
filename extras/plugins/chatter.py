@@ -1,4 +1,5 @@
 # coding: utf-8
+# coding: utf-8
 
 # chatter.py
 # Initial Copyright (с) 2010 -Esprit-
@@ -26,8 +27,8 @@ gChatterCache = {}
 gUpdateCount = {}
 
 def setDefChatterValue(conference):
-	if getConfigKey(conference, "chatter") is None:
-		setConfigKey(conference, "chatter", 0)
+	if getConferenceConfigKey(conference, "chatter") is None:
+		setConferenceConfigKey(conference, "chatter", 0)
 
 def loadChatterBase(conference):
 	path = getConfigPath(conference, CHATTERBOX_FILE)
@@ -52,7 +53,7 @@ def removeNicks(message, nickList):
 	return message
 
 def processChatter(stanza, msgType, conference, nick, trueJid, message):
-	if protocol.TYPE_PUBLIC == msgType and getConfigKey(conference, "chatter"):
+	if protocol.TYPE_PUBLIC == msgType and getConferenceConfigKey(conference, "chatter"):
 		if not nick: # topic
 			return
 		botNick = getBotNick(conference)
@@ -98,16 +99,16 @@ def manageChatterValue(msgType, conference, nick, param):
 		if param.isdigit():
 			param = int(param)
 			if param == 1:
-				setConfigKey(conference, "chatter", 1)
+				setConferenceConfigKey(conference, "chatter", 1)
 				sendMsg(msgType, conference, nick, u"болталка включена")
 			else:
-				setConfigKey(conference, "chatter", 0)
+				setConferenceConfigKey(conference, "chatter", 0)
 				sendMsg(msgType, conference, nick, u"болталка отключена")
 			saveConferenceConfig(conference)
 		else:
 			sendMsg(msgType, conference, nick, u"прочитай помощь по команде")
 	else:
-		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (getConfigKey(conference, "chatter")))
+		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (getConferenceConfigKey(conference, "chatter")))
 
 registerEvent(loadChatterBase, EVT_ADDCONFERENCE)
 registerEvent(freeChatterBase, EVT_DELCONFERENCE)

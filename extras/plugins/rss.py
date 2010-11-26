@@ -58,7 +58,6 @@ def cleanRSSCache(conference):
 			cache.pop()
 
 def sendRSSNews(conference, url, onlyFirst=False):
-	#printf("loading %s" % (url))
 	response = getURL(url)
 	if response:
 		rawXML = response.read()
@@ -112,7 +111,7 @@ def addRSSChannel(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"добавлено")
 		else:
 			sendMsg(msgType, conference, nick, u"заменено")
-		if getConfigKey(conference, "rss"):
+		if getConferenceConfigKey(conference, "rss"):
 			sendRSSNews(conference, url, True)
 		saveRSSChannels(conference)
 	else:
