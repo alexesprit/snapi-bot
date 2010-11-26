@@ -31,18 +31,20 @@ def addUserNote(msgType, conference, nick, param):
 def delUserNote(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick)
 	if trueJid in gUserNotes:
-		if param.isdigit():
+		try:
 			param = int(param) - 1
-			if param < len(gUserNotes[trueJid]):
+			if param >= 0:
 				del gUserNotes[trueJid][param]
 				if not gUserNotes[trueJid]:
 					del gUserNotes[trueJid]
 				gUserNotes.save()
 				sendMsg(msgType, conference, nick, u"Удалила")
 			else:
-				sendMsg(msgType, conference, nick, u"Нет такой заметки")
-		else:
-			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
+				raise IndexError
+		except ValueError:
+			sendMsg(msgType, conference, nick, u"Для удаления нужно указать номер заметки!")
+		except IndexError:
+			sendMsg(msgType, conference, nick, u"Нет такой заметки")
 	else:
 		sendMsg(msgType, conference, nick, u"В твоём блокноте пусто")
 

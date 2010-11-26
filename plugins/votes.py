@@ -53,12 +53,18 @@ def vote(msgType, conference, nick, param):
 				gVote[conference]["voted"][trueJid] = False
 			if not gVote[conference]["voted"][trueJid]:
 				try:
-					n = int(param) - 1
-					gVote[conference]["opinions"][n][1] += 1
-					gVote[conference]["voted"][trueJid] = True
-					saveVotes(conference)
-					sendMsg(msgType, conference, nick, u"Поняла")
-				except (IndexError, ValueError):
+					param = int(param) - 1
+					if param >= 0:
+						gVote[conference]["opinions"][param][1] += 1
+						gVote[conference]["voted"][trueJid] = True
+						saveVotes(conference)
+						
+						sendMsg(msgType, conference, nick, u"Поняла")
+					else:
+						raise IndexError
+				except ValueError:
+					sendMsg(msgType, conference, nick, u"Чтобы проголосовать, нужно указать номер мнения!")
+				except IndexError:
 					sendMsg(msgType, conference, nick, u"Нет такого пункта")
 			else:
 				sendMsg(msgType, conference, nick, u"2-ой раз голосовать не надо :P")
@@ -155,11 +161,17 @@ def delOpinion(msgType, conference, nick, param):
 			creatorJid = gVote[conference]["creatorjid"]
 			if creatorJid == trueJid or getAccess(conference, trueJid) >= 20:
 				try:
-					n = int(param) - 1
-					del gVote[conference]["opinions"][n]
-					saveVotes(conference)
-					sendMsg(msgType, conference, nick, u"Удалила")
-				except (KeyError, IndexError):
+					param = int(param) - 1
+					if param >= 0:
+						del gVote[conference]["opinions"][param]
+						saveVotes(conference)
+						
+						sendMsg(msgType, conference, nick, u"Удалила")
+					else:
+						raise IndexError
+				except ValueError:
+					sendMsg(msgType, conference, nick, u"Чтобы удалить пункт, нужно указать его номер!")
+				except IndexError:
 					sendMsg(msgType, conference, nick, u"Нет такого пункта")
 			else:
 				sendMsg(msgType, conference, nick, u"Недостаточно прав")
