@@ -22,11 +22,11 @@ PROFILE_SECURE = client.SECURE_AUTO
 PROFILE_USE_RESOLVER = False
 
 # список владельцев бота и пароль
-PROFILE_ADMINS = ["admin@server.tld"]
-PROFILE_ADMIN_PASSWORD = "secret"
+BOT_ADMINS = ["admin@server.tld"]
+BOT_ADMIN_PASSWORD = "secret"
 
 # перезагружаться при ошибках?
-PROFILE_RESTART = True
+RESTART_IF_ERROR = True
 
 # Описание флагов лога:
 # always - все типы флагов
@@ -34,7 +34,7 @@ PROFILE_RESTART = True
 # error - ошибки
 # success - успешные результаты
 # warning - предупреждения
-PROFILE_CORE_DBG = ["always"]
+CORE_DBG = ["always"]
 # always - все типы флагов
 # auth - авторизация
 # bind - назначение ресурса
@@ -42,7 +42,7 @@ PROFILE_CORE_DBG = ["always"]
 # roster - работа с ростером
 # socket - передаваемые данные
 # tls - включение TLS/SSL
-PROFILE_XMPP_DBG = []
+XMPP_DBG = []
 
 # папка для логов конференций
 PROFILE_LOG_DIR = ""
