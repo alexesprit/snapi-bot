@@ -624,7 +624,7 @@ def iqHandler(session, stanza):
 
 def writeSystemLog(text, logtype, show=False):
 	path = getFilePath(SYSLOG_DIR, time.strftime(LOG_TYPES[logtype]))
-	utils.writeFile(path, text + "\n", "a")
+	utils.writeFile(path, text.encode("utf-8") + "\n", "a")
 	if LOG_WARNINGS == logtype:
 		gInfo["warn"] += 1
 	else:
