@@ -19,9 +19,9 @@ def showWhoIs(msgType, conference, nick, param):
 	response = getURL(url, qparam)
 	if response:
 		rawhtml = response.read()
-		items = re.search("<blockquote>(.*?)</font></blockquote>", rawhtml, re.DOTALL)
+		elements = re.search("<blockquote>(.+?)</font></blockquote>", rawhtml, re.DOTALL)
 		if elements:
-			text = elements.group(0)
+			text = elements.group(1)
 			text = text.replace("<br />", "")
 			text = decode(text, "cp1251")
 			sendMsg(msgType, conference, nick, text)

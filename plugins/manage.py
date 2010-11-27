@@ -44,7 +44,7 @@ def leaveConf(msgType, conference, nick, param):
 registerCommand(joinConf, u"зайти", 100, 
 				u"Зайти в указанную конференцию", 
 				u"<конференция> [пароль]", 
-				(u"room@conference.server.tld", u"room@conference.server.tld"),
+				(u"room@conference.server.tld", u"room@conference.server.tld secret"),
 				CMD_ANY | CMD_PARAM)
 registerCommand(leaveConf, u"свали", 
 				30, u"Заставляет выйти из текущей или указанной конференции", 

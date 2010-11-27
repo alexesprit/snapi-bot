@@ -21,7 +21,7 @@ def _showServerStats(stanza, msgType, conference, nick, server):
 			attrs = stat.getAttrs()
 			if len(attrs) == 3:
 				elements.append(u"%(name)s: %(value)s %(units)s" % (attrs))
-		if items:
+		if elements:
 			message = u"Инфа о %s:\n%s" % (server, "\n".join(elements))
 			sendMsg(msgType, conference, nick, message)
 		else:
