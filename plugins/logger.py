@@ -113,12 +113,13 @@ def writeUserLeave(conference, nick, trueJid, reason, code):
 				writeLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты" % (nick))
 
 def writePresence(stanza, conference, nick, trueJid):
-	if getConferenceConfigKey(conference, "log"):
-		code = stanza.getStatusCode()
-		prsType = stanza.getType()
-		if code == "303":
-			newnick = stanza.getNick()
-			writeLog(protocol.TYPE_PUBLIC, conference, "@$$nick$$@", u"%s меняет ник на %s" % (nick, newnick))
+	if protocol.TYPE_ERROR != stanza.getType():
+		if getConferenceConfigKey(conference, "log"):
+			code = stanza.getStatusCode()
+			prsType = stanza.getType()
+			if code == "303":
+				newnick = stanza.getNick()
+				writeLog(protocol.TYPE_PUBLIC, conference, "@$$nick$$@", u"%s меняет ник на %s" % (nick, newnick))
 
 def manageLoggingValue(msgType, conference, nick, param):
 	if param:
