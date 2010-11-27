@@ -98,7 +98,7 @@ def setLocalAccess(msgType, conference, nick, param):
 				setPermAccess(conference, userJid, access)
 				sendMsg(msgType, conference, nick, u"Выдан постоянный доступ")
 		else:
-			sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
+			raise ValueError
 	except ValueError:
 		sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
 
@@ -141,10 +141,10 @@ def setGlobalAccess(msgType, conference, nick, param):
 		try:
 			access = int(param[1])
 			if -100 <= access <= 100:
-				setPermGlobalAccess(userJid, int(access))
-				sendMsg(msgType, conference, nick, u"Дала")
+				setPermGlobalAccess(userJid, access)
+				sendMsg(msgType, conference, nick, u"Выдан глобальный доступ")
 			else:
-				sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
+				raise ValueError
 		except ValueError:
 			sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
 	else:

@@ -397,6 +397,7 @@ def setPermAccess(conference, jid, level=0):
 	utils.writeFile(path, str(gPermAccess[conference]))
 
 def setPermGlobalAccess(jid, level=0):
+	path = getConfigPath(ACCESS_FILE)
 	tempAccess = eval(utils.readFile(path))
 	tempAccess[jid] = None
 	gGlobalAccess[jid] = None

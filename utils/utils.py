@@ -40,6 +40,8 @@ def unescapeXML(xml):
 
 def escapeXML(xml):
 	xml = xml.replace("&", "&amp;")
+	xml = xml.replace("\x0C", "")
+	xml = xml.replace("\x1B", "")
 	for esc, char in XML_ESC_MAP:
 		xml = xml.replace(char, esc)
 	return xml
