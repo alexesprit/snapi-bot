@@ -36,6 +36,15 @@ import simplejson
 from xmpp import client, debug, protocol, simplexml
 from utils import utils
 
+VER_MAJOR = 0
+VER_MINOR = 1
+
+IDENTITY_CAT = "bot"
+IDENTITY_TYPE = "pc"
+IDENTITY_NAME = "snapi"
+
+VER_CAPS = "http://snapi-bot.googlecode.com/caps"
+
 CSS_DIR = "css"
 CONFIG_DIR = "config"
 PLUGIN_DIR = "plugins"
@@ -115,6 +124,19 @@ STATUS_STRINGS = (
 	protocol.PRS_CHAT
 )
 
+BOT_FEATURES = (
+	protocol.NS_ACTIVITY,
+	protocol.NS_DISCO_INFO,
+	protocol.NS_DISCO_ITEMS,
+	protocol.NS_MOOD,
+	protocol.NS_MUC,
+	protocol.NS_VERSION,
+	protocol.NS_PING,
+	protocol.NS_RECEIPTS,
+	protocol.NS_ENTITY_TIME,
+	protocol.NS_VCARD
+)
+
 REJOIN_DELAY = 120
 RECONNECT_DELAY = 15
 RESTART_DELAY = 5
@@ -125,7 +147,7 @@ H_ROSTER = 0x2
 EVT_ADDCONFERENCE = 0x1
 EVT_DELCONFERENCE = 0x2
 EVT_STARTUP = 0x3
-EVT_INIT_2 = 0x4
+EVT_READY = 0x4
 EVT_SHUTDOWN = 0x5
 
 gBotMsgHandlers = []
@@ -138,7 +160,7 @@ gEventHandlers = {
 	EVT_ADDCONFERENCE: [], 
 	EVT_DELCONFERENCE: [], 
 	EVT_STARTUP: [], 
-	EVT_INIT_2: [], 
+	EVT_READY: [], 
 	EVT_SHUTDOWN: []
 }
 gPresenceHandlers = {
@@ -165,7 +187,6 @@ gIsJoined = {}
 gJokes = []
 
 gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "tmr": 0, "warn": 0}
-gVersion = ("Jimm", "0.6.4v [06.07.2010]", "NokiaE51-1/0.34.011")
 
 THR_SEMAPHORE = threading.BoundedSemaphore(30)
 
@@ -290,12 +311,10 @@ def addConference(conference):
 	gConferences[conference] = {}
 	gIsJoined[conference] = False
 	loadConferenceConfig(conference)
-	for function in gEventHandlers[EVT_ADDCONFERENCE]:
-		function(conference)
+	callEventHandlers(EVT_ADDCONFERENCE, (conference, ))
 
 def delConference(conference):
-	for function in gEventHandlers[EVT_DELCONFERENCE]:
-		function(conference)
+	callEventHandlers(EVT_DELCONFERENCE, (conference, ))
 	del gIsJoined[conference]
 	del gConferenceConfig[conference]
 	del gConferences[conference]
@@ -303,14 +322,11 @@ def delConference(conference):
 def joinConference(conference, nick, password):
 	setConferenceConfigKey(conference, "nick", nick)
 	setConferenceConfigKey(conference, "password", password)
-	prs = protocol.Presence("%s/%s" % (conference, nick), priority=PROFILE_PRIORITY)
+
 	status = getConferenceConfigKey(conference, "status")
 	show = getConferenceConfigKey(conference, "show")
-	if status:
-		prs.setStatus(status)
-	if show:
-		prs.setShow(show)
-	prs.addChild(node=gClient.getCapsNode())
+	prs = getPresenceNode(show, status, PROFILE_PRIORITY)
+	prs.setTo(u"%s/%s" % (conference, nick))
 	mucTag = prs.setTag("x", namespace=protocol.NS_MUC)
 	mucTag.addChild("history", {"maxchars": "0"})
 	if password:
@@ -326,7 +342,7 @@ def leaveConference(conference, status=None):
 
 def getBotNick(conference):
 	if conference in gConferences:
-		return getConferenceConfigKey(conference, "nick") or gBotNick
+		return getConferenceConfigKey(conference, "nick") or PROFILE_NICK
 	return gBotNick
 
 def isCommand(command):
@@ -361,9 +377,6 @@ def getNickByJid(conference, trueJid, offline=False):
 		if getNickKey(conference, nick, NICK_JID) == trueJid:
 			return nick
 	return None
-
-def getConferences():
-	return gConferences.keys()
 
 def getNickKey(conference, nick, key):
 	return gConferences[conference][nick].get(key)
@@ -428,6 +441,26 @@ def getAccess(conference, jid):
 	else:
 		return 10
 	return 0
+
+def getPresenceNode(show, status, priority):
+	prs = protocol.Presence(priority=priority)
+	prs.setAttr("ver", VER_FULL)
+	if status:
+		prs.setStatus(status)
+	if show:
+		prs.setShow(show)
+
+	caps = protocol.Node("c")
+	caps.setNamespace(protocol.NS_CAPS)
+	caps.setAttr("node", VER_CAPS)
+	caps.setAttr("ver", VER_HASH)
+	caps.setAttr("hash", "sha-1")
+
+	prs.addChild(node=caps)
+	return prs
+	
+def setStatus(show, status, priority):
+	gClient.send(getPresenceNode(show, status, priority))
 
 def sendTo(msgType, jid, text):
 	message = protocol.Message(jid)
@@ -621,6 +654,39 @@ def iqHandler(session, stanza):
 	if getAccess(bareJid, trueJid) == -100:
 		return
 	resource = fullJid.getResource()
+	if protocol.TYPE_ERROR != stanza.getType():
+		if stanza.getTags("query", {}, protocol.NS_VERSION):
+			iq = stanza.buildReply(protocol.TYPE_RESULT)
+			query = iq.getTag("query")
+			query.setTagData("name", "Snapi-Snup")
+			query.setTagData("version", VER_FULL)
+			query.setTagData("os", OS_NAME)
+		elif stanza.getTags("query", {}, protocol.NS_LAST):
+			iq = stanza.buildReply(protocol.TYPE_RESULT)
+			query = iq.getTag("query")
+			query.setAttr("seconds", int(time.time() - gInfo["start"]))
+		elif stanza.getTags("time", {}, protocol.NS_ENTITY_TIME):
+			tZone = time.altzone if time.localtime()[8] else time.timezone
+			sign = (tZone < 0) and "+" or "-"
+			tzo = "%s%02d:%02d" % (sign, abs(tZone) / 3600, abs(tZone) / 60 % 60)
+			utc = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+			iq = stanza.buildReply(protocol.TYPE_RESULT)
+			tNode = iq.addChild("time", {}, [], protocol.NS_ENTITY_TIME)
+			tNode.setTagData("tzo", tzo)
+			tNode.setTagData("utc", utc)
+		elif stanza.getTags("ping", {}, protocol.NS_PING):
+			iq = stanza.buildReply(protocol.TYPE_RESULT)
+		elif stanza.getTags("query", {}, protocol.NS_DISCO_INFO):
+			iq = stanza.buildReply(protocol.TYPE_RESULT)
+			query = iq.addChild("query", {}, [], protocol.NS_DISCO_ITEMS)
+			query.addChild("identity", {"category": IDENTITY_CAT, "type": IDENTITY_TYPE, "name": IDENTITY_NAME})
+			for feat in BOT_FEATURES:
+				query.addChild("feature", {"var": feat})
+		else:
+			iq = stanza.buildReply(protocol.TYPE_ERROR)
+			error = iq.addChild("error", {"type": "cancel"})
+			error.addChild("feature-not-implemented", {}, [], protocol.NS_STANZAS)
+		gClient.send(iq)
 	callIqHandlers(stanza, bareJid, resource)
 
 def writeSystemLog(text, logtype, show=False):
@@ -642,6 +708,26 @@ def loadMainConfig():
 	
 	global PROFILE_USERNAME, PROFILE_SERVER
 	PROFILE_USERNAME, PROFILE_SERVER = PROFILE_JID.split("@")
+
+def initVersions():
+	import base64, hashlib, platform
+	global OS_NAME, VER_HASH, VER_FULL
+
+	osinfo = platform.uname()
+	OS_NAME = u"%s %s" % (osinfo[0], osinfo[2])
+	
+	pipe = os.popen("svnversion")
+	rawrev = pipe.read()
+	pipe.close()
+
+	if not rawrev:
+		rawrev = 0
+		
+	VER_FULL = u"%d.%d.%s" % (VER_MAJOR, VER_MINOR, rawrev)
+		
+	features = "<".join(BOT_FEATURES)
+	string = u"%s/%s//%s<%s<" % (IDENTITY_TYPE, IDENTITY_CAT, IDENTITY_NAME, features)
+	VER_HASH = base64.b64encode(hashlib.sha1(string).digest())
 
 def initDebugger():
 	global gDebug
@@ -705,6 +791,7 @@ if __name__ == "__main__":
 
 	loadMainConfig()
 	initDebugger()
+	initVersions()
 
 	pid = findAnotherInstance()
 	if not pid:
@@ -740,6 +827,7 @@ if __name__ == "__main__":
 			printf("Handlers registered", FLAG_SUCCESS)
 
 			gRoster = gClient.getRoster()
+			gClient.setStatus = setStatus
 			gClient.setStatus(None, None, PROFILE_PRIORITY)
 
 			path = getConfigPath(CONF_FILE)
@@ -752,8 +840,8 @@ if __name__ == "__main__":
 					saveConferenceConfig(conference)
 				printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
-			callEventHandlers(EVT_INIT_2)
-			clearEventHandlers(EVT_INIT_2)
+			callEventHandlers(EVT_READY)
+			clearEventHandlers(EVT_READY)
 			
 			printf("Now I am ready to work :)")
 			while True:

@@ -182,14 +182,6 @@ class Client(CommonClient):
 			self.SASL.PlugOut()
 			return auth.AUTH_FAILURE
 
-	def getCapsNode(self):
-		caps = protocol.Node("c")
-		caps.setNamespace(protocol.NS_CAPS)
-		caps.setAttr("node", "http://jimm.net.ru/caps")
-		caps.setAttr("ver", "Nz009boXYEIrmRWk1N/Vsw==")
-		caps.setAttr("hash", "md5")
-		return caps
-
 	def getRoster(self):
 		""" Return the Roster instance, previously plugging it in and
 			requesting roster from server if needed.
@@ -204,5 +196,4 @@ class Client(CommonClient):
 			prs.setStatus(status)
 		if show:
 			prs.setShow(show)
-		prs.addChild(node=self.getCapsNode())
 		self.send(prs)

@@ -25,4 +25,4 @@ def changeRosterStatus():
 	timeout = 3600 * 8 + random.randrange(-800, 801)
 	startTimer(timeout, changeRosterStatus)
 
-registerEvent(changeRosterStatus, EVT_INIT_2)
+registerEvent(changeRosterStatus, EVT_READY)

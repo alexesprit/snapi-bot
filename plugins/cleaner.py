@@ -67,4 +67,4 @@ def cleanBases():
 def startCleanTimer():
 	startTimer(CLEAN_TIMEOUT, cleanBases)
 
-registerEvent(startCleanTimer, EVT_INIT_2)
+registerEvent(startCleanTimer, EVT_READY)

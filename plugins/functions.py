@@ -30,10 +30,8 @@ def getUniqueID(text):
 	gStanzaID += 1
 	return "%s_%d" % (text, gStanzaID)
 
-def getJidList(conference, offline=False):
-	nicks = offline and getNicks(conference) or getOnlineNicks(conference)
-	jidList = tuple(set([getTrueJid(conference,  nick) for nick in nicks]))
-	return jidList
+def getConferences():
+	return gConferences.keys()
 
 def getMUCSetRoleStanza(conference, user, role, reason=None):
 	iq = protocol.Iq(protocol.TYPE_SET)
@@ -64,13 +62,7 @@ def setMUCAffiliation(conference, user, itemType, aff, reason=None):
 	gClient.send(iq)
 
 def setConferenceStatus(conference, status, show):
-	prs = protocol.Presence(conference, priority=PROFILE_PRIORITY)
-	if status:
-		prs.setStatus(status)
-	if show:
-		prs.setShow(show)
-	prs.addChild(node=gClient.getCapsNode())
-	gClient.send(prs)
+	gClient.send(getPresenceNode(show, status, PROFILE_PRIORITY))
 
 def isJid(jid):
 	if USERJID_RE.search(jid):

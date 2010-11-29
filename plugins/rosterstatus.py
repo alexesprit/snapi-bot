@@ -51,7 +51,7 @@ def setRosterStatus(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, u"Запомнила")
 
 registerEvent(loadRosterStatusValue, EVT_STARTUP)
-registerEvent(updateRosterStatus, EVT_INIT_2)
+registerEvent(updateRosterStatus, EVT_READY)
 
 registerCommand(setRosterStatus, u"ростерстатус", 100, 
 				u"Устанавливает статус в ростере", 

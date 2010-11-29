@@ -23,4 +23,4 @@ def collectGarbage():
 	gc.collect()
 	startTimer(COLLECT_TIMEOUT, collectGarbage)
 
-registerEvent(collectGarbage, EVT_INIT_2)
+registerEvent(collectGarbage, EVT_READY)

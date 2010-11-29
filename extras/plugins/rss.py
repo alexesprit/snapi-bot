@@ -145,7 +145,7 @@ def showRSSChannels(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"нет такой ленты")
 
-registerEvent(startRSSQueries, EVT_INIT_2)
+registerEvent(startRSSQueries, EVT_READY)
 registerEvent(loadRSSChannels, EVT_ADDCONFERENCE)
 registerEvent(freeRSSChannels, EVT_DELCONFERENCE)
 
