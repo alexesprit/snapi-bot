@@ -20,10 +20,7 @@ def showFact(msgType, conference, nick, param):
 	if response:
 		rawhtml = response.read()
 		elements = re.findall("<li>(.+?)<br><br></li>", rawhtml)
-		#elements = re.search("<div style=.+?<ul>(.+?)</ul>", rawhtml, re.DOTALL)
 		if elements:
-			#rawhtml = elements.group(1)
-			#elements = re.findall("<li>(.+?)</li>", rawhtml, re.DOTALL)
 			fact = random.choice(elements)
 			sendMsg(msgType, conference, nick, decode(fact, "cp1251"))
 		else:

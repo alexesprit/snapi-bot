@@ -341,9 +341,7 @@ def leaveConference(conference, status=None):
 	delConference(conference)
 
 def getBotNick(conference):
-	if conference in gConferences:
-		return getConferenceConfigKey(conference, "nick") or PROFILE_NICK
-	return gBotNick
+	return getConferenceConfigKey(conference, "nick") or PROFILE_NICK
 
 def isCommand(command):
 	return command in gCommands

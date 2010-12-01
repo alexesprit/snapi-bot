@@ -45,7 +45,6 @@ def searchInGoogle(msgType, conference, nick, url, qparam):
 		if results:
 			if msgType == protocol.TYPE_PUBLIC:
 				results = results[:1]
-			print results
 			elements = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (result) for result in results]
 			sendMsg(msgType, conference, nick, decode("\n\n".join(elements)))
 		else:

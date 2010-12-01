@@ -15,23 +15,20 @@
 
 def searchInYandex(msgType, conference, nick, param):
 	url = "http://yandex.ru/msearch"
-	qparam = {
-		"s": "all",
-		"query": param.encode("utf-8")
-	}
+	qparam = {"query": param.encode("utf-8")}
 	response = getURL(url, qparam)
 	if response:
 		rawhtml = response.read()
 		rawhtml = unicode(rawhtml, "utf-8")
-		elements = re.findall("<li >(.+?)<p class=\"b-phone\">.+?<div class=\"www\">(.+?)</div>", rawhtml, re.DOTALL)
+		elements = re.findall("<li >\n(.+?)\n.+?<div class=\"www\">(.+?)</div>", rawhtml, re.DOTALL)
 		if elements:
 			if protocol.TYPE_PUBLIC == msgType:
 				elements = elements[0]
 			else:
 				elements = elements[:5]			
-			foundElements = [u"%s\nhttp://%s" % (element[0].strip(), element[1]) for element in elements[:5]]
+			foundElements = [u"%s\nhttp://%s" % (element[0], element[1]) for element in elements[:5]]
 			message = "\n\n".join(foundElements)
-			sendMsg(msgType, conference, nick, decode(foundElements))
+			sendMsg(msgType, conference, nick, decode(message))
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:
