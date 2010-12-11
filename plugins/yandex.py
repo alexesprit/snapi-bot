@@ -23,10 +23,10 @@ def searchInYandex(msgType, conference, nick, param):
 		elements = re.findall("<li >\n(.+?)\n.+?<div class=\"www\">(.+?)</div>", rawhtml, re.DOTALL)
 		if elements:
 			if protocol.TYPE_PUBLIC == msgType:
-				elements = elements[0]
+				elements = elements[:1]
 			else:
 				elements = elements[:5]			
-			foundElements = [u"%s\nhttp://%s" % (element[0], element[1]) for element in elements[:5]]
+			foundElements = [u"%s\nhttp://%s" % (element[0], element[1]) for element in elements]
 			message = "\n\n".join(foundElements)
 			sendMsg(msgType, conference, nick, decode(message))
 		else:
