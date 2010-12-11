@@ -44,7 +44,7 @@ def pokeUser(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u":-P")
 
-registerEvent(loadPokes, EVT_STARTUP)
+registerEventHandler(loadPokes, EVT_STARTUP)
 
 registerCommand(pokeUser, u"тык", 10, 
 				u"Тыкает пользователя. Заставляет его обратить внимание на вас", 

@@ -108,14 +108,14 @@ def addRSSChannel(msgType, conference, nick, param):
 		gRSSItems[conference][name] = url
 		gRSSCache[conference][url] = []
 		if name in gRSSItems[conference]:
-			sendMsg(msgType, conference, nick, u"добавлено")
+			sendMsg(msgType, conference, nick, u"Добавлено")
 		else:
-			sendMsg(msgType, conference, nick, u"заменено")
+			sendMsg(msgType, conference, nick, u"Заменено")
 		if getConferenceConfigKey(conference, "rss"):
 			sendRSSNews(conference, url, True)
 		saveRSSChannels(conference)
 	else:
-		sendMsg(msgType, conference, nick, u"читай справку по команде")
+		sendMsg(msgType, conference, nick, u"Читай справку по команде")
 	
 def delRSSChannel(msgType, conference, nick, param):
 	if param in gRSSItems[conference]:
@@ -123,9 +123,9 @@ def delRSSChannel(msgType, conference, nick, param):
 		del gRSSItems[conference][param]
 		del gRSSCache[conference][url]
 		saveRSSChannels(conference)
-		sendMsg(msgType, conference, nick, u"удалено")
+		sendMsg(msgType, conference, nick, u"Удалено")
 	else:
-		sendMsg(msgType, conference, nick, u"нет такой ленты")
+		sendMsg(msgType, conference, nick, u"Нет такой ленты")
 
 def showRSSChannels(msgType, conference, nick, param):
 	if not param:
@@ -136,18 +136,18 @@ def showRSSChannels(msgType, conference, nick, param):
 			message = u"RSS-ленты:\n%s" % (u"\n".join(info))
 			sendMsg(msgType, conference, nick, message)
 		else:
-			sendMsg(msgType, conference, nick, u"нет лент")
+			sendMsg(msgType, conference, nick, u"Нет лент")
 	else:
 		if param in gRSSItems[conference]:
 			url = gRSSItems[conference][param]
 			message = u"Инфо о ленте:\nНазвание: %s\nСсылка: %s" % (param, url)
 			sendMsg(msgType, conference, nick, message)
 		else:
-			sendMsg(msgType, conference, nick, u"нет такой ленты")
+			sendMsg(msgType, conference, nick, u"Нет такой ленты")
 
-registerEvent(startRSSQueries, EVT_READY)
-registerEvent(loadRSSChannels, EVT_ADDCONFERENCE)
-registerEvent(freeRSSChannels, EVT_DELCONFERENCE)
+registerEventHandler(startRSSQueries, EVT_READY)
+registerEventHandler(loadRSSChannels, EVT_ADDCONFERENCE)
+registerEventHandler(freeRSSChannels, EVT_DELCONFERENCE)
 
 registerCommand(addRSSChannel, u"рсс+", 30, 
 				u"Добавляет рсс-ленту", 

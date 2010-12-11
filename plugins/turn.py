@@ -21,6 +21,11 @@ SML_EN = u"qwertyuiop[]asdfghjkl;'zxcvbnm,./`"
 TABLE_BIG = dict(zip(BIG_RU + BIG_EN, BIG_EN + BIG_RU))
 TABLE_SML = dict(zip(SML_RU + SML_EN, SML_EN + SML_RU))
 
+del BIG_RU
+del BIG_EN
+del SML_RU
+del SML_EN
+
 gTurnMsgCache = {}
 
 def getBigChar(char):
@@ -35,14 +40,15 @@ def turnMessage(text):
 	return text
 
 def turnLastMessage(msgType, conference, nick, param):
-	if not msgType == protocol.TYPE_PUBLIC:
-		sendMsg(msgType, conference, nick, u"Только в чате")
-		return
 	if param:
 		sendMsg(msgType, conference, nick, turnMessage(param))
 	else:
+		if not msgType == protocol.TYPE_PUBLIC:
+			sendMsg(msgType, conference, nick, u"Только в чате")
+			return
 		trueJid = getTrueJid(conference, nick)
 		if trueJid not in gTurnMsgCache[conference]:
+			# TODO придумать реплику одинаковой для М и Ж 
 			sendMsg(msgType, conference, nick, u"А ты ещё ничего не говорил")
 		else:
 			savedMsg = gTurnMsgCache[conference][trueJid]
@@ -62,7 +68,7 @@ def turnLastMessage(msgType, conference, nick, param):
 
 def saveTurnMessage(stanza, msgType, conference, nick, trueJid, message):
 	if msgType == protocol.TYPE_PUBLIC:
-		if trueJid != PROFILE_JID and trueJid != conference:
+		if trueJid != gConfig.JID and trueJid != conference:
 			if "turn" != message.lower():
 				gTurnMsgCache[conference][trueJid] = message
 
@@ -76,12 +82,12 @@ def clearTurnCache(conference, nick, trueJid, reason, code):
 	if trueJid in gTurnMsgCache[conference]:
 		del gTurnMsgCache[conference][trueJid]
 
-registerEvent(initTurnCache, EVT_ADDCONFERENCE)
-registerEvent(freeTurnCache, EVT_DELCONFERENCE)
+registerEventHandler(initTurnCache, EVT_ADDCONFERENCE)
+registerEventHandler(freeTurnCache, EVT_DELCONFERENCE)
 
-registerLeaveHandler(clearTurnCache)
+registerEventHandler(clearTurnCache, EVT_USERLEAVE)
 
-registerMessageHandler(saveTurnMessage, H_CONFERENCE)
+registerEventHandler(saveTurnMessage, EVT_MSG | H_CONFERENCE)
 
 registerCommand(turnLastMessage, u"turn", 10, 
 				u"Переключает раскладку вашего последнего сообщения или текста в параметре команды", 

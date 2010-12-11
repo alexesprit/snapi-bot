@@ -67,12 +67,13 @@ def saveAllHereBases():
 			updateHereTimeInfo(conference, nick, trueJid)
 		gHereTime[conference].save()
 
-registerEvent(loadHereBase, EVT_ADDCONFERENCE)
-registerEvent(freeHereBase, EVT_DELCONFERENCE)
-registerEvent(saveAllHereBases, EVT_SHUTDOWN)
+registerEventHandler(loadHereBase, EVT_ADDCONFERENCE)
+registerEventHandler(freeHereBase, EVT_DELCONFERENCE)
 
-registerJoinHandler(updateJoinStatistic)
-registerLeaveHandler(updateLeaveStatistic)
+registerEventHandler(saveAllHereBases, EVT_SHUTDOWN)
+
+registerEventHandler(updateJoinStatistic, EVT_USERJOIN)
+registerEventHandler(updateLeaveStatistic, EVT_USERLEAVE)
 
 registerCommand(showHereStatistic, u"тута", 10, 
 				u"Показывает кол-во часов, проведённое в чатике, максимальное и среднее", 

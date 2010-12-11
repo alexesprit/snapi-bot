@@ -24,4 +24,4 @@ def checkNick(stanza, conference, nick, trueJid):
 			if _isCommand or _isMacros:
 				setMUCRole(conference, nick, protocol.ROLE_NONE, u"Меняй ник!")
 
-registerPresenceHandler(checkNick, H_CONFERENCE)
+registerEventHandler(checkNick, EVT_PRS | H_CONFERENCE)

@@ -16,7 +16,7 @@
 # GNU General Public License for more details.
 
 def serviceDiscovery(msgType, conference, nick, param):
-	param = param or PROFILE_SERVER
+	param = param or gConfig.SERVER
 	args = param.split(None, 2)
 	jid = args[0]
 	searchKey = None

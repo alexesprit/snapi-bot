@@ -100,21 +100,21 @@ def manageChatterValue(msgType, conference, nick, param):
 			param = int(param)
 			if param == 1:
 				setConferenceConfigKey(conference, "chatter", 1)
-				sendMsg(msgType, conference, nick, u"болталка включена")
+				sendMsg(msgType, conference, nick, u"Болталка включена")
 			else:
 				setConferenceConfigKey(conference, "chatter", 0)
-				sendMsg(msgType, conference, nick, u"болталка отключена")
+				sendMsg(msgType, conference, nick, u"Болталка отключена")
 			saveConferenceConfig(conference)
 		else:
-			sendMsg(msgType, conference, nick, u"прочитай помощь по команде")
+			sendMsg(msgType, conference, nick, u"Прочитай помощь по команде")
 	else:
-		sendMsg(msgType, conference, nick, u"текущее значение: %d" % (getConferenceConfigKey(conference, "chatter")))
+		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (getConferenceConfigKey(conference, "chatter")))
 
-registerEvent(loadChatterBase, EVT_ADDCONFERENCE)
-registerEvent(freeChatterBase, EVT_DELCONFERENCE)
-registerEvent(setDefChatterValue, EVT_ADDCONFERENCE)
+registerEventHandler(loadChatterBase, EVT_ADDCONFERENCE)
+registerEventHandler(freeChatterBase, EVT_DELCONFERENCE)
+registerEventHandler(setDefChatterValue, EVT_ADDCONFERENCE)
 
-registerMessageHandler(processChatter, H_CONFERENCE)
+registerEventHandler(processChatter, EVT_MSG | H_CONFERENCE)
 
 registerCommand(manageChatterValue, u"болталка", 30, 
 				u"Отключает (0) или включает (1) болталку. Без параметра покажет текущее значение", 

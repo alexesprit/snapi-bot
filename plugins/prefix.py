@@ -33,7 +33,7 @@ def managePrefixControl(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Префикс не установлен")
 
-registerEvent(setDefaultPrefixValue, EVT_ADDCONFERENCE)
+registerEventHandler(setDefaultPrefixValue, EVT_ADDCONFERENCE)
 registerCommand(managePrefixControl, u"префикс", 30, 
 				u"Устанавливает или отключает (если указать None) префикс для команд. Без параметра покажет текущее значение", 
 				u"[что-то]", 

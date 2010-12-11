@@ -1,8 +1,7 @@
 # coding: utf-8
 
-# gc.py
-# Garbage cleaner
-# Initial Copyright (с) ???
+# config.py
+# Initial Copyright (C) 2010 -Esprit-
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,13 +13,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import gc
+class Config:
+	def __init__(self, path):
+		f = file(path)
+		exec f in self.__dict__
 
-COLLECT_TIMEOUT = 600
-		
-def collectGarbage():
-	sys.exc_clear()
-	gc.collect()
-	startTimer(COLLECT_TIMEOUT, collectGarbage)
-
-registerEventHandler(collectGarbage, EVT_READY)
+		self.USERNAME, self.SERVER = self.JID.split("@")

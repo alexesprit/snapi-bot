@@ -50,9 +50,10 @@ def sendUserGreeting(conference, nick, trueJid, aff, role):
 	if trueJid in gGreets[conference]:
 		sendMsg(protocol.TYPE_PUBLIC, conference, nick, gGreets[conference][trueJid])
 
-registerEvent(loadGreetings, EVT_ADDCONFERENCE)
-registerEvent(freeGreetings, EVT_DELCONFERENCE)
-registerJoinHandler(sendUserGreeting)
+registerEventHandler(loadGreetings, EVT_ADDCONFERENCE)
+registerEventHandler(freeGreetings, EVT_DELCONFERENCE)
+
+registerEventHandler(sendUserGreeting, EVT_USERJOIN)
 
 registerCommand(setUserGreeting, u"приветствие", 30, 
 				u"Добавляет приветствие для определённого ника/жида", 

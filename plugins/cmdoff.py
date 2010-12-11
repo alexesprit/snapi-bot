@@ -15,19 +15,19 @@
 
 CMDOFF_FILE = "cmdoff.txt"
 
-def loadCommands(conference):
+def loadDisabledCommands(conference):
 	path = getConfigPath(conference, CMDOFF_FILE)
 	utils.createFile(path, "[]")
 	gCmdOff[conference] = eval(utils.readFile(path))
 
-def saveCommands(conference):
+def saveDisabledCommands(conference):
 	path = getConfigPath(conference, CMDOFF_FILE)
 	utils.writeFile(path, str(gCmdOff[conference]))
 
-def freeCommands(conference):
+def freeDisableCommands(conference):
 	del gCmdOff[conference]
 
-def cmdSwitchOff(msgType, conference, nick, param):
+def disableCommand(msgType, conference, nick, param):
 	if param:
 		validCmd, invalidCmd, alreadySwitched, nonSwitched = [], [], [], []
 		message = u""
@@ -58,7 +58,7 @@ def cmdSwitchOff(msgType, conference, nick, param):
 		if nonSwitched:
 			nonSwitched.sort()
 			message += u"\nНеотключаемы:\n * %s" % (", ".join(nonSwitched))
-		saveCommands(conference)
+		saveDisabledCommands(conference)
 	else:
 		switchedOn = [cmd for cmd in gCmdOff[conference]]
 		if switchedOn:
@@ -67,7 +67,7 @@ def cmdSwitchOff(msgType, conference, nick, param):
 			message = u"В этой конференции включены все команды"
 	sendMsg(msgType, conference, nick, message)
 
-def cmdSwitchOn(msgType, conference, nick, param):
+def enableCommand(msgType, conference, nick, param):
 	validCmd, invalidCmd, alreadySwitched = [], [], []
 	message = u""
 	param = param.split()
@@ -91,18 +91,18 @@ def cmdSwitchOn(msgType, conference, nick, param):
 	if invalidCmd:
 		invalidCmd.sort()
 		message += u"\nпНе являются командами:\n * %s" % (", ".join(invalidCmd))
-	saveCommands(conference)
+	saveDisabledCommands(conference)
 	sendMsg(msgType, conference, nick, message)
 
-registerEvent(loadCommands, EVT_ADDCONFERENCE)
-registerEvent(freeCommands, EVT_DELCONFERENCE)
+registerEventHandler(loadDisabledCommands, EVT_ADDCONFERENCE)
+registerEventHandler(freeDisableCommands, EVT_DELCONFERENCE)
 
-registerCommand(cmdSwitchOn, u"комвкл", 30, 
+registerCommand(enableCommand, u"комвкл", 30, 
 				u"Включает определённые команды для текущей конференции", 
 				u"<команды>", 
 				(u"тык диско версия пинг", ), 
 				CMD_CONFERENCE | CMD_FROZEN | CMD_PARAM)
-registerCommand(cmdSwitchOff, u"комвыкл", 30, 
+registerCommand(disableCommand, u"комвыкл", 30, 
 				u"Отключает определённые команды для текущей конференции. Без параметров показывает список отключенных команд", 
 				u"[команды]", 
 				(None, u"тык диско версия пинг", ), 

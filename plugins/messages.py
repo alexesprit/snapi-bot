@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def sendToAdmins(msgType, conference, nick, param):
-	for admin in PROFILE_ADMINS:
+	for admin in gConfig.ADMINS:
 		sendTo(protocol.TYPE_PRIVATE, admin, u"Сообщение от %s/%s:\n%s" % (conference, nick, param))
 	sendMsg(msgType, conference, nick, u"Ваше сообщение отправлено!")
 	

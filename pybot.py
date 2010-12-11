@@ -33,17 +33,15 @@ import database
 import macros
 import simplejson
 
-from xmpp import client, debug, protocol, simplexml
+from classes import config
+from classes import version
+
 from utils import utils
 
-VER_MAJOR = 0
-VER_MINOR = 1
-
-IDENTITY_CAT = "bot"
-IDENTITY_TYPE = "pc"
-IDENTITY_NAME = "snapi"
-
-VER_CAPS = "http://snapi-bot.googlecode.com/caps"
+from xmpp import client
+from xmpp import debug
+from xmpp import protocol
+from xmpp import simplexml
 
 CSS_DIR = "css"
 CONFIG_DIR = "config"
@@ -66,11 +64,11 @@ FLAG_ERROR = "error"
 FLAG_WARNING = "warning"
 FLAG_SUCCESS = "success"
 
-CMD_CONFERENCE = 0x0001
-CMD_ROSTER = 0x0002
-CMD_FROZEN = 0x0004
-CMD_NONPARAM = 0x0008
-CMD_PARAM = 0x0010
+CMD_CONFERENCE = 0x01
+CMD_ROSTER = 0x02
+CMD_FROZEN = 0x04
+CMD_NONPARAM = 0x08
+CMD_PARAM = 0x10
 CMD_ANY = CMD_CONFERENCE | CMD_ROSTER
 
 CMD_DESC = 0x1
@@ -141,36 +139,27 @@ REJOIN_DELAY = 120
 RECONNECT_DELAY = 15
 RESTART_DELAY = 5
 
-H_CONFERENCE = 0x1
-H_ROSTER = 0x2
+H_CONFERENCE = 0x0001
+H_ROSTER = 0x0002
 
-EVT_ADDCONFERENCE = 0x1
-EVT_DELCONFERENCE = 0x2
-EVT_STARTUP = 0x3
-EVT_READY = 0x4
-EVT_SHUTDOWN = 0x5
+EVT_IQ = 0x0004
+EVT_MSG = 0x0008
+EVT_PRS = 0x0010
 
-gBotMsgHandlers = []
-gJoinHandlers = []
-gLeaveHandlers = []
-gIqHandlers = []
+EVT_SELFMSG = 0x0020
+
+EVT_USERJOIN = 0x0040
+EVT_USERLEAVE = 0x0080
+
+EVT_ADDCONFERENCE = 0x0100
+EVT_DELCONFERENCE = 0x0200
+
+EVT_STARTUP = 0x0400
+EVT_READY = 0x0800
+EVT_SHUTDOWN = 0x1000
+
+gEventHandlers = {}
 gCmdHandlers = {}
-
-gEventHandlers = {
-	EVT_ADDCONFERENCE: [], 
-	EVT_DELCONFERENCE: [], 
-	EVT_STARTUP: [], 
-	EVT_READY: [], 
-	EVT_SHUTDOWN: []
-}
-gPresenceHandlers = {
-	H_ROSTER: [], 
-	H_CONFERENCE: []
-}
-gMessageHandlers = {
-	H_ROSTER: [], 
-	H_CONFERENCE: []
-}
 
 gGlobalAccess = {}
 gTempAccess = {}
@@ -188,75 +177,47 @@ gJokes = []
 
 gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "tmr": 0, "warn": 0}
 
+gDebug = debug.Debug([debug.DBG_ALWAYS], showFlags=False)
+gDebug.colors[FLAG_ERROR] = debug.colorBrightRed
+gDebug.colors[FLAG_WARNING] = debug.colorYellow
+gDebug.colors[FLAG_SUCCESS] = debug.colorBrightCyan
+
 THR_SEMAPHORE = threading.BoundedSemaphore(30)
-
-def clearEventHandlers(evtType):
-	gEventHandlers[evtType] = []
-
-def registerMessageHandler(function, msgType):
-	gMessageHandlers[msgType].append(function)
-
-def registerBotMessageHandler(function):
-	gBotMsgHandlers.append(function)
-
-def registerJoinHandler(function):
-	gJoinHandlers.append(function)
-
-def registerLeaveHandler(function):
-	gLeaveHandlers.append(function)
-
-def registerIqHandler(function):
-	gIqHandlers.append(function)
-
-def registerPresenceHandler(function, prsType):
-	gPresenceHandlers[prsType].append(function)
-
-def registerEvent(function, evtType):
-	gEventHandlers[evtType].append(function)
 
 def registerCommand(function, command, access, desc, syntax, examples, cmdType=CMD_ANY):
 	gCmdHandlers[command] = function
-	gCommands[command] = {CMD_ACCESS: access, CMD_DESC: desc, CMD_SYNTAX: syntax, CMD_EXAMPLE: examples, CMD_TYPE: cmdType}
+	gCommands[command] = {
+		CMD_ACCESS: access, 
+		CMD_DESC: desc, 
+		CMD_SYNTAX: syntax, 
+		CMD_EXAMPLE: examples, 
+		CMD_TYPE: cmdType
+	}
 
-def callBotMessageHandlers(msgType, jid, text):
-	for function in gBotMsgHandlers:
-		startThread(function, (msgType, jid, text))
+def registerEventHandler(function, evtType):
+	if evtType not in gEventHandlers:
+		gEventHandlers[evtType] = []
+	gEventHandlers[evtType].append(function)
 
-def callJoinHandlers(conference, nick, trueJid, aff, role):
-	for function in gJoinHandlers:
-		startThread(function, (conference, nick, trueJid, aff, role))
+def callEventHandlers(evtType, args=None, async=True):
+	if evtType in gEventHandlers:
+		if async:
+			if args:
+				for function in gEventHandlers[evtType]:
+					startThread(function, args)
+			else:
+				for function in gEventHandlers[evtType]:
+					startThread(function)
+		else:
+			if args:
+				for function in gEventHandlers[evtType]:
+					function(*args)
+			else:
+				for function in gEventHandlers[evtType]:
+					function()
 
-def callLeaveHandlers(conference, nick, trueJid, reason, code):
-	for function in gLeaveHandlers:
-		startThread(function, (conference, nick, trueJid, reason, code))
-
-def callMessageHandlers(hType, msgType, stanza, conference, nick, trueJid, body):
-	gInfo["msg"] += 1
-	for function in gMessageHandlers[hType]:
-		startThread(function, (stanza, msgType, conference, nick, trueJid, body))
-
-def callIqHandlers(stanza, jid, resource):
-	gInfo["iq"] += 1
-	for function in gIqHandlers:
-		startThread(function, (stanza, jid, resource))
-
-def callPresenceHandlers(hType, stanza, jid, resource, trueJid):
-	gInfo["prs"] += 1
-	for function in gPresenceHandlers[hType]:
-		startThread(function, (stanza, jid, resource, trueJid))
-
-def callEventHandlers(evtType, args=None):
-	if args:
-		for function in gEventHandlers[evtType]:
-			function(*args)
-	else:
-		for function in gEventHandlers[evtType]:
-			function()
-
-def callCommandHandlers(command, cmdType, jid, resource, param):
-	gInfo["cmd"] += 1
-	if command in gCmdHandlers:
-		startThread(gCmdHandlers[command], (cmdType, jid, resource, param))
+def clearEventHandlers(evtType):
+	del gEventHandlers[evtType]
 
 def startThread(function, args=None):
 	gInfo["thr"] += 1
@@ -311,10 +272,10 @@ def addConference(conference):
 	gConferences[conference] = {}
 	gIsJoined[conference] = False
 	loadConferenceConfig(conference)
-	callEventHandlers(EVT_ADDCONFERENCE, (conference, ))
+	callEventHandlers(EVT_ADDCONFERENCE, (conference, ), async=False)
 
 def delConference(conference):
-	callEventHandlers(EVT_DELCONFERENCE, (conference, ))
+	callEventHandlers(EVT_DELCONFERENCE, (conference, ), async=False)
 	del gIsJoined[conference]
 	del gConferenceConfig[conference]
 	del gConferences[conference]
@@ -325,7 +286,7 @@ def joinConference(conference, nick, password):
 
 	status = getConferenceConfigKey(conference, "status")
 	show = getConferenceConfigKey(conference, "show")
-	prs = getPresenceNode(show, status, PROFILE_PRIORITY)
+	prs = getPresenceNode(show, status, gConfig.PRIORITY)
 	prs.setTo(u"%s/%s" % (conference, nick))
 	mucTag = prs.setTag("x", namespace=protocol.NS_MUC)
 	mucTag.addChild("history", {"maxchars": "0"})
@@ -341,7 +302,7 @@ def leaveConference(conference, status=None):
 	delConference(conference)
 
 def getBotNick(conference):
-	return getConferenceConfigKey(conference, "nick") or PROFILE_NICK
+	return getConferenceConfigKey(conference, "nick") or gConfig.NICK
 
 def isCommand(command):
 	return command in gCommands
@@ -442,7 +403,7 @@ def getAccess(conference, jid):
 
 def getPresenceNode(show, status, priority):
 	prs = protocol.Presence(priority=priority)
-	prs.setAttr("ver", VER_FULL)
+	prs.setAttr("ver", gVerInfo.getVersion())
 	if status:
 		prs.setStatus(status)
 	if show:
@@ -450,8 +411,8 @@ def getPresenceNode(show, status, priority):
 
 	caps = protocol.Node("c")
 	caps.setNamespace(protocol.NS_CAPS)
-	caps.setAttr("node", VER_CAPS)
-	caps.setAttr("ver", VER_HASH)
+	caps.setAttr("node", gVerInfo.getCaps())
+	caps.setAttr("ver", gVerInfo.getFeaturesHash())
 	caps.setAttr("hash", "sha-1")
 
 	prs.addChild(node=caps)
@@ -467,7 +428,7 @@ def sendTo(msgType, jid, text):
 	if text:
 		message.setBody(text)
 	gClient.send(message)
-	callBotMessageHandlers(msgType, jid, text)
+	callEventHandlers(EVT_SELFMSG, (msgType, jid, text))
 
 def sendToConference(conference, text):
 	sendTo(protocol.TYPE_PUBLIC, conference, text)
@@ -480,7 +441,7 @@ def sendMsg(msgType, conference, nick, text, force=False):
 		else:
 			msgLimit = getConferenceConfigKey(conference, "msg")
 			if msgLimit and len(text) > msgLimit:
-				sendMsg(msgType, conference, nick, u"Смотри в привате (лимит %d символов)" % (msgLimit), True)
+				sendMsg(msgType, conference, nick, u"Смотри в привате (ограничение в %d символов)" % (msgLimit), True)
 				msgType = protocol.TYPE_PRIVATE
 	if protocol.TYPE_PUBLIC == msgType:
 		text = u"%s: %s" % (nick, text)
@@ -490,6 +451,7 @@ def sendMsg(msgType, conference, nick, text, force=False):
 	sendTo(msgType, jid, text)
 
 def messageHandler(session, stanza):
+	gInfo["msg"] += 1
 	msgType = stanza.getType()
 	if stanza.getTimestamp() or msgType in FORBIDDEN_TYPES:
 		return
@@ -534,7 +496,7 @@ def messageHandler(session, stanza):
 			gClient.send(reportMsg)
 	cmdType = isConference and CMD_CONFERENCE or CMD_ROSTER
 	hType = isConference and H_CONFERENCE or H_ROSTER
-	callMessageHandlers(hType, msgType, stanza, conference, nick, trueJid, message)
+	callEventHandlers(EVT_MSG | hType, (stanza, msgType, conference, nick, trueJid, message))
 	if isConference:
 		botNick = getBotNick(conference)
 		if botNick == nick:
@@ -576,11 +538,13 @@ def messageHandler(session, stanza):
 					return
 				if not param and isCommandType(command, CMD_PARAM):
 					return
-				callCommandHandlers(command, msgType, conference, nick, param)
+				gInfo["cmd"] += 1
+				startThread(gCmdHandlers[command], (msgType, conference, nick, param))
 			else:
 				sendMsg(msgType, conference, nick, u"Недостаточно прав")
 
 def presenceHandler(session, stanza):
+	gInfo["prs"] += 1
 	fullJid = stanza.getFrom()
 	prsType =  stanza.getType()
 	jid = fullJid.getBareJid()
@@ -604,7 +568,7 @@ def presenceHandler(session, stanza):
 				setNickKey(conference, nick, NICK_HERE, True)
 				setNickKey(conference, nick, NICK_JOINED, time.time())
 				if gIsJoined[conference]:
-					callJoinHandlers(conference, nick, trueJid, aff, role)
+					callEventHandlers(EVT_USERJOIN, (conference, nick, trueJid, aff, role))
 				else:
 					if nick == getBotNick(conference):
 						gIsJoined[conference] = True
@@ -622,7 +586,7 @@ def presenceHandler(session, stanza):
 				for key in (NICK_IDLE, NICK_MODER, NICK_STATUS, NICK_SHOW):
 					if key in gConferences[conference][nick]:
 						del gConferences[conference][nick][key]
-				callLeaveHandlers(conference, nick, trueJid, reason, code)
+				callEventHandlers(EVT_USERLEAVE, (conference, nick, trueJid, reason, code))
 		elif prsType == protocol.TYPE_ERROR:
 			errorCode = stanza.getErrorCode()
 			if errorCode == "409":
@@ -640,25 +604,26 @@ def presenceHandler(session, stanza):
 			elif errorCode in ("401", "403", "405"):
 				leaveConference(conference, u"got %s error code" % errorCode)
 				writeSystemLog(u"Got error in %s (%s)" % (conference, errorCode), LOG_WARNINGS, True)
-		callPresenceHandlers(H_CONFERENCE, stanza, conference, nick, trueJid)
+		callEventHandlers(EVT_PRS | H_CONFERENCE, (stanza, conference, nick, trueJid))
 	else:
 		resource = fullJid.getResource()
-		callPresenceHandlers(H_ROSTER, stanza, jid, resource, None)
+		callEventHandlers(EVT_PRS | H_ROSTER, (stanza, jid, resource, None))
 
 def iqHandler(session, stanza):
+	gInfo["iq"] += 1
 	fullJid = stanza.getFrom()
 	bareJid = fullJid.getBareJid()
 	trueJid = getTrueJid(fullJid)
 	if getAccess(bareJid, trueJid) == -100:
 		return
 	resource = fullJid.getResource()
-	if protocol.TYPE_ERROR != stanza.getType():
+	if protocol.TYPE_GET == stanza.getType():
 		if stanza.getTags("query", {}, protocol.NS_VERSION):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.getTag("query")
-			query.setTagData("name", "Snapi-Snup")
-			query.setTagData("version", VER_FULL)
-			query.setTagData("os", OS_NAME)
+			query.setTagData("name", gVerInfo.getAppName())
+			query.setTagData("version", gVerInfo.getVersion())
+			query.setTagData("os", gVerInfo.getOSName())
 		elif stanza.getTags("query", {}, protocol.NS_LAST):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.getTag("query")
@@ -677,7 +642,11 @@ def iqHandler(session, stanza):
 		elif stanza.getTags("query", {}, protocol.NS_DISCO_INFO):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.addChild("query", {}, [], protocol.NS_DISCO_ITEMS)
-			query.addChild("identity", {"category": IDENTITY_CAT, "type": IDENTITY_TYPE, "name": IDENTITY_NAME})
+			attrs = {
+				"category": version.IDENTITY_CAT, 
+				"type": version.IDENTITY_TYPE, 
+				"name": version.IDENTITY_NAME}
+			query.addChild("identity", attrs)
 			for feat in BOT_FEATURES:
 				query.addChild("feature", {"var": feat})
 		else:
@@ -685,11 +654,13 @@ def iqHandler(session, stanza):
 			error = iq.addChild("error", {"type": "cancel"})
 			error.addChild("feature-not-implemented", {}, [], protocol.NS_STANZAS)
 		gClient.send(iq)
-	callIqHandlers(stanza, bareJid, resource)
+	callEventHandlers(EVT_IQ, (stanza, bareJid, resource))
 
 def writeSystemLog(text, logtype, show=False):
 	path = getFilePath(SYSLOG_DIR, time.strftime(LOG_TYPES[logtype]))
-	utils.writeFile(path, text.encode("utf-8") + "\n", "a")
+	if isinstance(text, unicode):
+		text = text.encode("utf-8") 
+	utils.writeFile(path, text + "\n", "a")
 	if LOG_WARNINGS == logtype:
 		gInfo["warn"] += 1
 	else:
@@ -700,42 +671,7 @@ def writeSystemLog(text, logtype, show=False):
 		else:
 			printf(text, FLAG_ERROR)
 
-def loadMainConfig():
-	f = file(BOTCONFIG_FILE)
-	exec f in globals()
-	
-	global PROFILE_USERNAME, PROFILE_SERVER
-	PROFILE_USERNAME, PROFILE_SERVER = PROFILE_JID.split("@")
-
-def initVersions():
-	import base64, hashlib, platform
-	global OS_NAME, VER_HASH, VER_FULL
-
-	osinfo = platform.uname()
-	OS_NAME = u"%s %s" % (osinfo[0], osinfo[2])
-	
-	pipe = os.popen("svnversion")
-	rawrev = pipe.read()
-	pipe.close()
-
-	if not rawrev:
-		rawrev = 0
-		
-	VER_FULL = u"%d.%d.%s" % (VER_MAJOR, VER_MINOR, rawrev)
-		
-	features = "<".join(BOT_FEATURES)
-	string = u"%s/%s//%s<%s<" % (IDENTITY_TYPE, IDENTITY_CAT, IDENTITY_NAME, features)
-	VER_HASH = base64.b64encode(hashlib.sha1(string).digest())
-
-def initDebugger():
-	global gDebug
-	gDebug = debug.Debug(CORE_DBG, showFlags=False)
-	gDebug.colors[FLAG_ERROR] = debug.colorBrightRed
-	gDebug.colors[FLAG_WARNING] = debug.colorYellow
-	gDebug.colors[FLAG_SUCCESS] = debug.colorBrightCyan
-
 def loadPlugins():
-	printf("Loading plugins...")
 	validPlugins = 0
 	invalidPlugins = 0
 	plugins = os.listdir(PLUGIN_DIR)
@@ -767,7 +703,7 @@ def findAnotherInstance():
 
 def shutdown(restart=False):
 	gClient.disconnected()
-	callEventHandlers(EVT_SHUTDOWN)
+	callEventHandlers(EVT_SHUTDOWN, async=False)
 	if restart:
 		printf("Restarting...")
 		time.sleep(RESTART_DELAY)
@@ -779,30 +715,34 @@ def shutdown(restart=False):
 		os.abort()
 
 if __name__ == "__main__":
-	global gDebug, gClient, gRoster
-
-	gInfo["start"] = time.time()
-
 	currentDir = os.path.dirname(sys.argv[0])
 	if currentDir:
 		os.chdir(currentDir)
 
-	loadMainConfig()
-	initDebugger()
-	initVersions()
-
 	pid = findAnotherInstance()
 	if not pid:
+		global gConfig, gClient, gRoster
+		
+		gInfo["start"] = time.time()
+
 		try:
+			printf("Initialising data...")
+			gConfig = config.Config(BOTCONFIG_FILE)
+			
+			gClient = client.Client(server=gConfig.SERVER, port=gConfig.PORT)
+
+			gVerInfo = version.VersionInfo()
+			gVerInfo.createFeaturesHash(BOT_FEATURES)
+
+			printf("Loading plugins...")
 			loadPlugins()
 
 			printf("Connecting...")
-			gClient = client.Client(server=PROFILE_SERVER, port=PROFILE_PORT, debugFlags=XMPP_DBG)
-			if gClient.connect(secureMode=PROFILE_SECURE, useResolver=PROFILE_USE_RESOLVER):
+			if gClient.connect(secureMode=gConfig.SECURE, useResolver=gConfig.USE_RESOLVER):
 				printf("Connection established (%s)" % gClient.isConnected(), FLAG_SUCCESS)
 			else:
 				printf("Unable to connect", FLAG_ERROR)
-				if RESTART_IF_ERROR:
+				if gConfig.RESTART_IF_ERROR:
 					printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
 					time.sleep(RECONNECT_DELAY)
 					shutdown(True)
@@ -810,7 +750,7 @@ if __name__ == "__main__":
 					shutdown()
 
 			printf("Waiting for authentication...")
-			if gClient.auth(PROFILE_USERNAME, PROFILE_PASSWORD, PROFILE_RESOURCE):
+			if gClient.auth(gConfig.USERNAME, gConfig.PASSWORD, gConfig.RESOURCE):
 				printf("Connected", FLAG_SUCCESS)
 			else:
 				printf("Incorrect login/password", FLAG_ERROR)
@@ -826,7 +766,7 @@ if __name__ == "__main__":
 
 			gRoster = gClient.getRoster()
 			gClient.setStatus = setStatus
-			gClient.setStatus(None, None, PROFILE_PRIORITY)
+			gClient.setStatus(None, None, gConfig.PRIORITY)
 
 			path = getConfigPath(CONF_FILE)
 			utils.createFile(path, "[]")
@@ -847,7 +787,7 @@ if __name__ == "__main__":
 		except KeyboardInterrupt:
 			if gClient.isConnected():
 				prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-				prs.setStatus(u"Выключаюсь (CTRL+C)")
+				prs.setStatus(u"Выключаюсь... (CTRL+C)")
 				gClient.send(prs)
 			shutdown()
 		except protocol.SystemShutdown:
@@ -861,8 +801,8 @@ if __name__ == "__main__":
 			writeSystemLog(traceback.format_exc(), LOG_CRASHES)
 			if gClient.isConnected():
 				prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-				prs.setStatus(u"что-то сломалось...")
+				prs.setStatus(u"Что-то сломано...")
 				gClient.send(prs)
-			shutdown(RESTART_IF_ERROR)
+			shutdown(gConfig.RESTART_IF_ERROR)
 	else:
 		printf("Another instance is running (pid: %s)" % (pid), FLAG_ERROR)

@@ -90,9 +90,10 @@ def showAutoModerators(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Список автомодераторов пуст")
 
-registerEvent(loadAutoModerators, EVT_ADDCONFERENCE)
-registerEvent(freeAutoModerators, EVT_DELCONFERENCE)
-registerJoinHandler(setAutoModerator)
+registerEventHandler(loadAutoModerators, EVT_ADDCONFERENCE)
+registerEventHandler(freeAutoModerators, EVT_DELCONFERENCE)
+
+registerEventHandler(setAutoModerator, EVT_USERJOIN)
 
 registerCommand(addAutoModerator, u"модер+", 20, 
 				u"Добавляет ник или жид в список автомодераторов", 

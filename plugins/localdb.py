@@ -93,8 +93,8 @@ def saveLocalBase(conference):
 def freeLocalBase(conference):
 	del gLocalBase[conference]
 
-registerEvent(loadLocalBase, EVT_ADDCONFERENCE)
-registerEvent(freeLocalBase, EVT_DELCONFERENCE)
+registerEventHandler(loadLocalBase, EVT_ADDCONFERENCE)
+registerEventHandler(freeLocalBase, EVT_DELCONFERENCE)
 
 registerCommand(getLocalKeyToPublic, u"???", 10, 
 				u"Ищет значение по ключу в локальной базе", 

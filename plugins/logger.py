@@ -36,7 +36,7 @@ def writeHeader(fp, jid, (year, month, day)):
 	fp.write(header.encode("utf-8"))
 
 def getLogFile(msgType, jid, (year, month, day)):
-	path = u"%s/%s/%d/%02d/%02d.html" % (LOGGER_DIR, jid, year, month, day)
+	path = u"%s/%s/%d/%02d/%02d.html" % (gConfig.LOGGER_DIR, jid, year, month, day)
 	path = path.encode("utf-8")
 	if os.path.exists(path):
 		f = file(path, "a")
@@ -164,14 +164,14 @@ def setDefaultLoggingValue(conference):
 	if getConferenceConfigKey(conference, "log") is None:
 		setConferenceConfigKey(conference, "log", 1)
 
-if LOGGER_DIR:
-	registerJoinHandler(writeUserJoin)
-	registerLeaveHandler(writeUserLeave)
+if gConfig.LOGGER_DIR:
+	registerEventHandler(writeUserJoin, EVT_USERJOIN)
+	registerEventHandler(writeUserLeave, EVT_USERLEAVE)
 
-	registerPresenceHandler(writePresence, H_CONFERENCE)
-	registerMessageHandler(writeMessage, H_CONFERENCE)
+	registerEventHandler(writeMessage, EVT_MSG | H_CONFERENCE)
+	registerEventHandler(writePresence, EVT_PRS | H_CONFERENCE)
 
-	registerEvent(setDefaultLoggingValue, EVT_ADDCONFERENCE)
+	registerEventHandler(setDefaultLoggingValue, EVT_ADDCONFERENCE)
 	
 	registerCommand(manageLoggingValue, u"логирование", 100, 
 				u"Отключает (0) или включает (1) ведение логов для указанной/текущей конференции. Без параметра покажет значения для всех конференций, в которых сидит бот", 

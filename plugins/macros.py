@@ -232,9 +232,9 @@ def showMacrosList(msgType, conference, nick, parameters):
 	else:
 		sendMsg(msgType, conference, nick, u"Макросов нет :(")
 
-registerEvent(gMacros.loadMacroses, EVT_STARTUP)
-registerEvent(gMacros.loadMacroses, EVT_ADDCONFERENCE)
-registerEvent(gMacros.freeMacroses, EVT_DELCONFERENCE)
+registerEventHandler(gMacros.loadMacroses, EVT_STARTUP)
+registerEventHandler(gMacros.loadMacroses, EVT_ADDCONFERENCE)
+registerEventHandler(gMacros.freeMacroses, EVT_DELCONFERENCE)
 
 registerCommand(addLocalMacros, u"макроадд", 20, 
 				u"Добавляет локальный макрос", 

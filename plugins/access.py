@@ -29,9 +29,9 @@ ACCESS_DESC = {
 
 def login(msgType, conference, nick, param):
 	if msgType == protocol.TYPE_PRIVATE:
-		if param == BOT_ADMIN_PASSWORD:
+		if param == gConfig.ADMIN_PASSWORD:
 			trueJid = getTrueJid(conference, nick)
-			if trueJid not in BOT_ADMINS:
+			if trueJid not in gConfig.ADMINS:
 				BOT_ADMINS.append(trueJid)
 				setTempGlobalAccess(trueJid, 100)
 				sendMsg(msgType, conference, nick, u"Пароль принят, глобальный доступ выдан")
@@ -42,8 +42,8 @@ def login(msgType, conference, nick, param):
 
 def logout(msgType, conference, nick, parameters):
 	trueJid = getTrueJid(conference, nick)
-	if trueJid in BOT_ADMINS:
-		BOT_ADMINS.remove(trueJid)
+	if trueJid in gConfig.ADMINS:
+		gConfig.ADMINS.remove(trueJid)
 		setTempGlobalAccess(trueJid)
 		sendMsg(msgType, conference, nick, u"Глобальный доступ снят")
 	else:
@@ -177,7 +177,7 @@ def loadGlobalAccesses():
 	path = getConfigPath(ACCESS_FILE)
 	utils.createFile(path, "{}")
 	gGlobalAccess = eval(utils.readFile(path))
-	for jid in BOT_ADMINS:
+	for jid in gConfig.ADMINS:
 		gGlobalAccess[jid] = 100
 
 def loadLocalAccesses(conference):
@@ -190,9 +190,9 @@ def freeLocalAccesses(conference):
 	del gPermAccess[conference]
 	del gTempAccess[conference]
 
-registerEvent(loadGlobalAccesses, EVT_STARTUP)
-registerEvent(loadLocalAccesses, EVT_ADDCONFERENCE)
-registerEvent(freeLocalAccesses, EVT_DELCONFERENCE)
+registerEventHandler(loadGlobalAccesses, EVT_STARTUP)
+registerEventHandler(loadLocalAccesses, EVT_ADDCONFERENCE)
+registerEventHandler(freeLocalAccesses, EVT_DELCONFERENCE)
 
 registerCommand(login, u"логин", 0,
 				u"Авторизоваться как админиcтратор бота", 

@@ -32,7 +32,7 @@ def showUserStatus(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 
-def updateStatus(stanza, conference, nick, trueJid):
+def saveUserStatus(stanza, conference, nick, trueJid):
 	if protocol.TYPE_ERROR != stanza.getType():
 		if isNickOnline(conference, nick):
 			show = stanza.getShow() or u"online"
@@ -41,7 +41,7 @@ def updateStatus(stanza, conference, nick, trueJid):
 			if status:
 				setNickKey(conference, nick, NICK_STATUS, status)
 
-registerPresenceHandler(updateStatus, H_CONFERENCE)
+registerEventHandler(saveUserStatus, EVT_PRS | H_CONFERENCE)
 
 registerCommand(showUserStatus, u"статус", 10, 
 				u"Показывает статус указанного пользователя", 

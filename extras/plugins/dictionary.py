@@ -94,7 +94,7 @@ def searchInGoogleDict(msgType, conference, nick, param):
 		if len(param) == 3:
 			src, target, text = param
 			if not ("%s %s" % (src, target)) in DICTIONARY_LANGPAIRS:
-				sendMsg(msgType, conference, nick, u"читай справку по команде")
+				sendMsg(msgType, conference, nick, u"Читай справку по команде")
 				return
 			param = {
 				"q": text.encode("utf-8"), 
@@ -129,9 +129,9 @@ def searchInGoogleDict(msgType, conference, nick, param):
 							message.append(u" * %s" % (phrase))
 				sendMsg(msgType, conference, nick, u"\n".join(message))
 			else:
-				sendMsg(msgType, conference, nick, u"не найдено")
+				sendMsg(msgType, conference, nick, u"Не найдено")
 		else:
-			sendMsg(msgType, conference, nick, u"читай справку по команде")
+			sendMsg(msgType, conference, nick, u"Читай справку по команде")
 
 registerCommand(searchInGoogleDict, u"определение", 10, 
 				u"Поиск значения слова/выражения через Google Dictionary", 

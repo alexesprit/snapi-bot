@@ -37,23 +37,23 @@ def addExpression(msgType, conference, nick, param):
 		if exp and text:
 			if exp in gExpressions:
 				gExpressions[conference][exp] = text
-				sendMsg(msgType, conference, nick, u"заменила")
+				sendMsg(msgType, conference, nick, u"Заменила")
 			else:
 				gExpressions[conference][exp] = text
-				sendMsg(msgType, conference, nick, u"добавила")
+				sendMsg(msgType, conference, nick, u"Добавила")
 			saveExpressions(conference);
 		else:
-			sendMsg(msgType, conference, nick, u"ошибочный запрос")
+			sendMsg(msgType, conference, nick, u"Ошибочный запрос")
 	else:
-		sendMsg(msgType, conference, nick, u"читай справку по команде")
+		sendMsg(msgType, conference, nick, u"Читай справку по команде")
 
 def delExpression(msgType, conference, nick, param):
 	if param in gExpressions[conference]:
 		del gExpressions[conference][param]
 		saveExpressions(conference)
-		sendMsg(msgType, conference, nick, u"удалила")
+		sendMsg(msgType, conference, nick, u"Удалила")
 	else:
-		sendMsg(msgType, conference, nick, u"такого выражения нет")
+		sendMsg(msgType, conference, nick, u"Такого выражения нет")
 
 def showExpressions(msgType, conference, nick, param):
 	if gExpressions[conference]:
@@ -61,13 +61,13 @@ def showExpressions(msgType, conference, nick, param):
 		message = u"выражения:\n%s" % ("\n".join(items))
 		sendMsg(msgType, conference, nick, message)
 	else:
-		sendMsg(msgType, conference, nick, u"выражений нет");		
+		sendMsg(msgType, conference, nick, u"Выражений нет");		
 
 def showExprInfo(msgType, conference, nick, param):
 	if param in gExpressions[conference]:
 		sendMsg(msgType, conference, nick, gExpressions[conference][param])
 	else:
-		sendMsg(msgType, conference, nick, u"такого выражения нет")	
+		sendMsg(msgType, conference, nick, u"Такого выражения нет")	
 
 def processExpression(stanza, msgType, conference, nick, trueJid, text):
 	if nick != getBotNick(conference):
@@ -82,10 +82,10 @@ def processExpression(stanza, msgType, conference, nick, trueJid, text):
 				except re.error:
 					pass
 
-registerEvent(loadExpressions, EVT_ADDCONFERENCE)
-registerEvent(freeExpressions, EVT_DELCONFERENCE)
+registerEventHandler(loadExpressions, EVT_ADDCONFERENCE)
+registerEventHandler(freeExpressions, EVT_DELCONFERENCE)
 
-registerMessageHandler(processExpression, H_CONFERENCE)
+registerEventHandler(processExpression, EVT_MSG | H_CONFERENCE)
 
 registerCommand(addExpression, u"выражение+", 20, 
 				u"Добавить регулярное выражение", 

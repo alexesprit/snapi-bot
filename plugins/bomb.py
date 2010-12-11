@@ -97,9 +97,10 @@ def freeBombCache(conference):
 	del gBombTimers[conference]	
 
 
-registerEvent(initBombCache, EVT_ADDCONFERENCE)
-registerEvent(freeBombCache, EVT_DELCONFERENCE)
-registerMessageHandler(bombColorsListener, H_CONFERENCE)
+registerEventHandler(initBombCache, EVT_ADDCONFERENCE)
+registerEventHandler(freeBombCache, EVT_DELCONFERENCE)
+
+registerEventHandler(bombColorsListener, EVT_MSG | H_CONFERENCE)
 
 registerCommand(giveBomb, u"бомба", 15,
 				u"Вручает пользователю бомбу. Если пользователь не обезвредит её, то бот может выкинуть его из конференции или лишить голоса",

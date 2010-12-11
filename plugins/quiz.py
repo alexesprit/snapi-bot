@@ -37,7 +37,7 @@ def checkQuizIdle(conference):
 	sendToConference(conference, u"(!) Время вышло! Правильный ответ: %s" % (gQuizAnswer[conference]))
 	gQuizIdleCount[conference] += 1
 	if gQuizIdleCount[conference] == QUIZ_IDLE_LIMIT:
-		sendToConference(conference, u"(!) Викторина автоматичеки заверщена по бездействию!")
+		sendToConference(conference, u"(!) Викторина автоматичеки завершена по бездействию!")
 		quizStop(conference, False)
 	else:
 		askQuizQuestion(conference, resetIdle=False)
@@ -190,10 +190,10 @@ def loadQuizScores(conference):
 def freeQuizScores(conference):
 	del gQuizScores[conference]
 
-registerEvent(loadQuizScores, EVT_ADDCONFERENCE)
-registerEvent(freeQuizScores, EVT_DELCONFERENCE)
+registerEventHandler(loadQuizScores, EVT_ADDCONFERENCE)
+registerEventHandler(freeQuizScores, EVT_DELCONFERENCE)
 
-registerMessageHandler(quizAnswerListener, H_CONFERENCE)
+registerEventHandler(quizAnswerListener, EVT_MSG | H_CONFERENCE)
 
 registerCommand(startQuiz, u"старт", 10, 
 				u"Запуск игры", 

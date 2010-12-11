@@ -50,11 +50,12 @@ def showSeenTime(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 
-registerLeaveHandler(updateSeenTime)
+registerEventHandler(updateSeenTime, EVT_USERLEAVE)
 
-registerEvent(loadSeenBase, EVT_ADDCONFERENCE)
-registerEvent(freeSeenBase, EVT_DELCONFERENCE)
-registerEvent(saveAllSeenBases, EVT_SHUTDOWN)
+registerEventHandler(loadSeenBase, EVT_ADDCONFERENCE)
+registerEventHandler(freeSeenBase, EVT_DELCONFERENCE)
+
+registerEventHandler(saveAllSeenBases, EVT_SHUTDOWN)
 
 registerCommand(showSeenTime, u"когдабыл", 10, 
 				u"Показывает, сколько времени назад пользователь вышел из чата", 

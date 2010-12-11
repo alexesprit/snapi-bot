@@ -35,7 +35,7 @@ def manageMsgLimitValue(msgType, conference, nick, param):
 		limitValue = getConferenceConfigKey(conference, "msg")
 		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (limitValue))
 
-registerEvent(setDefaultMsgLimitValue, EVT_ADDCONFERENCE)
+registerEventHandler(setDefaultMsgLimitValue, EVT_ADDCONFERENCE)
 registerCommand(manageMsgLimitValue, u"мсглимит", 30, 
 				u"Устанавливает или отключает (если указать 0) лимит на длину сообщения бота (большие сообщения будут перенаправляться в приват). Без параметра покажет текущее значение", 
 				u"[число]", 

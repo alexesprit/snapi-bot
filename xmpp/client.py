@@ -54,27 +54,30 @@ class CommonClient:
 		self._owner = self
 		self.connected = False
 		
+		if not debugFlags:
+			debugFlags = []	
 		self.initDebugger(debugFlags)
 	
-	def initDebugger(self, debugFlags=None):
+	def initDebugger(self, debugFlags):
 		self._debug = debug.Debug(debugFlags, showFlags=False)
 		self.printf = self._debug.show
 		self.debugFlags = self._debug.debugFlags
 
-		self._debug.colors["auth"] = debug.colorYellow
-		self._debug.colors["bind"] = debug.colorBrown
-		self._debug.colors["dispatcher"] = debug.colorGreen
-		self._debug.colors["roster"] = debug.colorMagenta
-		self._debug.colors["socket"] = debug.colorBrightRed
-		self._debug.colors["tls"] = debug.colorBrightRed
+		if debugFlags:
+			self._debug.colors["auth"] = debug.colorYellow
+			self._debug.colors["bind"] = debug.colorBrown
+			self._debug.colors["dispatcher"] = debug.colorGreen
+			self._debug.colors["roster"] = debug.colorMagenta
+			self._debug.colors["socket"] = debug.colorBrightRed
+			self._debug.colors["tls"] = debug.colorBrightRed
 
-		self._debug.colors["ok"] = debug.colorBrightCyan
-		self._debug.colors["got"] = debug.colorBlue
-		self._debug.colors["sent"] = debug.colorBrown
-		self._debug.colors["stop"] = debug.colorDarkGray
-		self._debug.colors["warn"] = debug.colorYellow
-		self._debug.colors["error"] = debug.colorRed
-		self._debug.colors["start"] = debug.colorDarkGray
+			self._debug.colors["ok"] = debug.colorBrightCyan
+			self._debug.colors["got"] = debug.colorBlue
+			self._debug.colors["sent"] = debug.colorBrown
+			self._debug.colors["stop"] = debug.colorDarkGray
+			self._debug.colors["warn"] = debug.colorYellow
+			self._debug.colors["error"] = debug.colorRed
+			self._debug.colors["start"] = debug.colorDarkGray
 	
 	def registerDisconnectHandler(self, handler):
 		""" Register handler that will be called on disconnect.

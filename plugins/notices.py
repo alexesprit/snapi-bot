@@ -45,7 +45,7 @@ def setDefaultNoticeValue(conference):
 	if getConferenceConfigKey(conference, "notices") is None:
 		setConferenceConfigKey(conference, "notices", 1)
 
-registerEvent(setDefaultNoticeValue, EVT_ADDCONFERENCE)
+registerEventHandler(setDefaultNoticeValue, EVT_ADDCONFERENCE)
 
 registerCommand(noticeControl, u"оповещения", 30, 
 				u"Отключает (0) или включает (1) сообщения о новостях. Без параметра покажет текущее значение", 

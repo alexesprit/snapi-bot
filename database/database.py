@@ -18,18 +18,19 @@
 	чтобы поддерживать базы в чистом состоянии.
 """
 
-import os
 import time
 
 from utils import utils
 
 class DataBase:
 	def __init__(self, path):
-		utils.createFile(path, '{}')
-		utils.createFile(path + '.db', '{}')
-		self.base = eval(utils.readFile(path))
-		self.changes = eval(utils.readFile(path + '.db'))
 		self.path = path
+		self.ctpath = "%s.db" % (path)
+		
+		utils.createFile(self.path, "{}")
+		utils.createFile(self.ctpath, "{}")
+		self.base = eval(utils.readFile(self.path))
+		self.changes = eval(utils.readFile(self.ctpath))
 	
 	def __contains__(self, item):
 		return item in self.base
@@ -64,7 +65,7 @@ class DataBase:
 	
 	def save(self):
 		utils.writeFile(self.path, str(self.base))
-		utils.writeFile(self.path + '.db', str(self.changes))
+		utils.writeFile(self.ctpath, str(self.changes))
 		
 	def isEmpty(self):
 		return not self.base

@@ -14,6 +14,7 @@
 
 import os
 import re
+import threading
 
 HTML_ESC_MAP = (
 	("&gt;", u">"), 
@@ -31,6 +32,9 @@ XML_ESC_MAP = (
 	("&apos;", "'"),
 	("&quot;", "\""),
 )
+
+#mtx = threading.Lock()
+smph = threading.BoundedSemaphore(1)
 
 def unescapeXML(xml):
 	for esc, char in XML_ESC_MAP:
@@ -89,7 +93,8 @@ def readFile(path, encoding=None):
 	return data
 
 def writeFile(path, data, mode="w"):
-	path = path.encode("utf-8")
-	f = file(path, mode)
-	f.write(data)
-	f.close()
+	with smph:
+		path = path.encode("utf-8")
+		f = file(path, mode)
+		f.write(data)
+		f.close()

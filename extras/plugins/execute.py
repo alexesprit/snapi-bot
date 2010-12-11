@@ -27,4 +27,4 @@ def executeExternalCode():
 	else:
 		writeSystemLog("%s is not found!" % (path), LOG_WARNINGS, True)
 
-registerEvent(executeExternalCode, EVT_STARTUP)
+registerEventHandler(executeExternalCode, EVT_STARTUP)

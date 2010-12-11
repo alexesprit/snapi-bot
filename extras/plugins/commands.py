@@ -34,21 +34,24 @@ def changeCommandAccess(msgType, conference, nick, param):
 		command = param[0]
 		access = param[1]
 		if isCommand(command):
-			if access.isdigit() and -100 <= int(access) <= 100:
+			try:
 				access = int(access)
-				gCommandAccess[command] = access
-				gCommands[command][CMD_ACCESS] = access
-				saveCommandAccesses()
-				sendMsg(msgType, conference, nick, u'запомнила')
-			else:
-				sendMsg(msgType, conference, nick, u'ошибочный запрос')
-				return
+				if -100 <= access <= 100:
+					gCommandAccess[command] = access
+					gCommands[command][CMD_ACCESS] = access
+					saveCommandAccesses()
+					sendMsg(msgType, conference, nick, u"Запомнила")
+				else:
+					raise ValueError 
+			except ValueError:
+				sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
 		else:
-			sendMsg(msgType, conference, nick, u'не вижу команду')
+			sendMsg(msgType, conference, nick, u"Не вижу команду")
 	else:
-		sendMsg(msgType, conference, nick, u'читай справку по команде')
+		sendMsg(msgType, conference, nick, u"Ошибочный запрос!")
 
-registerEvent(loadCommandAccesses, EVT_STARTUP)
+registerEventHandler(loadCommandAccesses, EVT_STARTUP)
+
 registerCommand(changeCommandAccess, 
 				u'командоступ', 100, 
 				u'Меняет доступ для команды', 

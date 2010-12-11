@@ -90,9 +90,10 @@ def showAutoVisitors(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"список автопосетителей пуст")
 
-registerEvent(loadAutoVisitors, EVT_ADDCONFERENCE)
-registerEvent(freeAutoVisitors, EVT_DELCONFERENCE)
-registerJoinHandler(setAutoVisitor)
+registerEventHandler(loadAutoVisitors, EVT_ADDCONFERENCE)
+registerEventHandler(freeAutoVisitors, EVT_DELCONFERENCE)
+
+registerEventHandler(setAutoVisitor, EVT_USERJOIN)
 
 registerCommand(addAutoVisitor, u"девойс+", 15, 
 				u"Добавляет ник или жид в список автопосетителей", 

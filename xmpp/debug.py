@@ -77,8 +77,10 @@ colorWhite			= chr(27) + "[37;1m"
 
 		foo = Debug(dbgFlags)
 
+	---
+
 	NoDebug
-	-------
+
 	To speed code up, typically for product releases or such
 	use this class instead if you globaly want to disable debugging
 """

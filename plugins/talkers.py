@@ -81,7 +81,7 @@ def showTalkerInfo(msgType, conference, nick, param):
 
 def updateTalkersInfo(stanza, msgType, conference, nick, trueJid, body):
 	if msgType == protocol.TYPE_PUBLIC:
-		if trueJid != PROFILE_JID and trueJid != conference:
+		if trueJid != gConfig.JID and trueJid != conference:
 			base = gTalkersCache[conference]
 			if trueJid in base:
 				base[trueJid]["nick"] = nick
@@ -104,11 +104,12 @@ def saveAllTalkersBases():
 	for conference in getConferences():
 		gTalkersCache[conference].save()
 
-registerEvent(loadTalkersBase, EVT_ADDCONFERENCE)
-registerEvent(freeTalkersBase, EVT_DELCONFERENCE)
-registerEvent(saveAllTalkersBases, EVT_SHUTDOWN)
+registerEventHandler(loadTalkersBase, EVT_ADDCONFERENCE)
+registerEventHandler(freeTalkersBase, EVT_DELCONFERENCE)
 
-registerMessageHandler(updateTalkersInfo, H_CONFERENCE)
+registerEventHandler(saveAllTalkersBases, EVT_SHUTDOWN)
+
+registerEventHandler(updateTalkersInfo, EVT_MSG | H_CONFERENCE)
 
 registerCommand(showTalkerInfo, u"болтун", 10, 
 				u"Показывает статистику болтливости указанного пользователя. Параметр \"топ\" - список десяти самых болтливых. Параметр \"сброс\" - очистка статистики", 

@@ -107,7 +107,7 @@ def startVote(msgType, conference, nick, parameters):
 				saveVotes(conference)
 				sendToConference(conference, getVoteText(conference))
 			else:
-				sendMsg(msgType, conference, nick, u"Недостаточно прав")	  
+				sendMsg(msgType, conference, nick, u"Недостаточно прав")
 	else:
 		sendMsg(msgType, conference, nick, u"Сейчас нет никаких голосований")
 
@@ -123,7 +123,7 @@ def stopVote(msgType, conference, nick, param):
 				saveVotes(conference)
 				sendMsg(msgType, conference, nick, u"Голосование приостановлено")
 			else:
-				sendMsg(msgType, conference, nick, u"ага, щаззз")
+				sendMsg(msgType, conference, nick, u"Недостаточно прав")
 		else:
 			sendMsg(msgType, conference, nick, u"Голосование уже приостановлено")
 	else:
@@ -224,8 +224,13 @@ def loadVotes(conference):
 	utils.createFile(path, "{}")
 	gVote[conference] = eval(utils.readFile(path))
 
-registerJoinHandler(showVote)
-registerEvent(loadVotes, EVT_ADDCONFERENCE)
+def freeVotes(conference):
+	del gVote[conference]
+
+registerEventHandler(loadVotes, EVT_ADDCONFERENCE)
+registerEventHandler(freeVotes, EVT_DELCONFERENCE)
+
+registerEventHandler(showVote, EVT_USERJOIN)
 
 registerCommand(vote, u"мнение", 10, 
 				u"Для подачи мнения в текущем голосовании", 

@@ -54,9 +54,10 @@ def checkSendBase(conference, nick, trueJid, aff, role):
 		del base[trueJid]
 		base.save()
 
-registerEvent(loadSendBase, EVT_ADDCONFERENCE)
-registerEvent(freeSendBase, EVT_DELCONFERENCE)
-registerJoinHandler(checkSendBase)
+registerEventHandler(loadSendBase, EVT_ADDCONFERENCE)
+registerEventHandler(freeSendBase, EVT_DELCONFERENCE)
+
+registerEventHandler(checkSendBase, EVT_USERJOIN)
 
 registerCommand(addToSendBase, u"передать", 10, 
 				u"Запоминает сообщение и передаёт его указанному пользователю, как только он зайдёт в конференцию (или сразу, если указанный пользователь уже в конференции)", 

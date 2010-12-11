@@ -251,25 +251,25 @@ class Dispatcher(plugin.PlugIn):
 			else:
 				session.printf("Expected stanza arrived!", "ok")
 				session._expected[stanzaID] = stanza
-		else:
-			handlerList = ["default"]
-			if stanzaType in self.handlers[xmlns][name]:
-				handlerList.append(stanzaType)
-			for prop in stanzaProps:
-				if prop in self.handlers[xmlns][name]:
-					handlerList.append(prop)
-				if stanzaType and (stanzaType + prop) in self.handlers[xmlns][name]:
-					handlerList.append(stanzaType + prop)
+		#else:
+		handlerList = ["default"]
+		if stanzaType in self.handlers[xmlns][name]:
+			handlerList.append(stanzaType)
+		for prop in stanzaProps:
+			if prop in self.handlers[xmlns][name]:
+				handlerList.append(prop)
+			if stanzaType and (stanzaType + prop) in self.handlers[xmlns][name]:
+				handlerList.append(stanzaType + prop)
 
-			chain = self.handlers[xmlns]["default"]["default"]
-			for key in handlerList:
-				if key:
-					chain = chain + self.handlers[xmlns][name][key]
-			for handler in chain:
-				try:
-					handler(session, stanza)
-				except protocol.NodeProcessed:
-					return
+		chain = self.handlers[xmlns]["default"]["default"]
+		for key in handlerList:
+			if key:
+				chain = chain + self.handlers[xmlns][name][key]
+		for handler in chain:
+			try:
+				handler(session, stanza)
+			except protocol.NodeProcessed:
+				return
 
 	def waitForResponse(self, id, timeout=DEFAULT_TIMEOUT):
 		""" Block and wait until stanza with specific "id" attribute will come.

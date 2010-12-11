@@ -61,8 +61,7 @@ def searchForLyrics(msgType, conference, nick, param):
 				artist = element[0]
 				title = element[3]
 				url = u"%s%s" % (mainurl, element[1])
-				result = u"%s -%s\n%s" % (artist, title, getLyricsFromURL(url))			
-		
+				result = u"%s -%s\n\n%s" % (artist, title, getLyricsFromURL(url))			
 			else:
 				songs = []
 				for i, element in enumerate(elements):

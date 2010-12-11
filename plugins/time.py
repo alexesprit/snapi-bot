@@ -34,17 +34,20 @@ def _showUserTime(stanza, msgType, conference, nick, param):
 		tzo = timeNode.getTagData("tzo")
 		utc = timeNode.getTagData("utc")
 		if tzo and utc:
-			sign, tzHour, tzMin = re.match("(\+|-)?([0-9]+):([0-9]+)", tzo).groups()
-			offset = int(tzHour) * 3600 + int(tzMin) * 60
-			if sign == "-":
-				offset = -offset
-			rawTime = time.strptime(utc, "%Y-%m-%dT%H:%M:%SZ")
-			rawTime = time.mktime(rawTime) + offset
-			userTime = time.strftime("%H:%M:%S (%d.%m.%y)", time.localtime(rawTime))
-			if param:
-				sendMsg(msgType, conference, nick, u"У %s сейчас %s" % (param, userTime))
-			else:
-				sendMsg(msgType, conference, nick, u"У тебя сейчас %s" % (userTime))
+			try:
+				sign, tzHour, tzMin = re.match("(\+|-)?([0-9]+):([0-9]+)", tzo).groups()
+				offset = int(tzHour) * 3600 + int(tzMin) * 60
+				if sign == "-":
+					offset = -offset
+				rawTime = time.strptime(utc, "%Y-%m-%dT%H:%M:%SZ")
+				rawTime = time.mktime(rawTime) + offset
+				userTime = time.strftime("%H:%M:%S (%d.%m.%y)", time.localtime(rawTime))
+				if param:
+					sendMsg(msgType, conference, nick, u"У %s сейчас %s" % (param, userTime))
+				else:
+					sendMsg(msgType, conference, nick, u"У тебя сейчас %s" % (userTime))
+			except ValueError:
+				sendMsg(msgType, conference, nick, u"Твой клиент - глюк!")
 		else:
 			sendMsg(msgType, conference, nick, u"Клиент глюк, инфы не хватает")
 	else:

@@ -63,11 +63,11 @@ def showUserNotes(msgType, conference, nick, param):
 			if protocol.TYPE_PUBLIC == msgType:
 				sendMsg(msgType, conference, nick, u"Ушли")
 			message = u"Твои заметки:\n%s" % ("\n".join(elements))
-			sendMsg(msgType, conference, nick, message)
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 		else:
-			sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"В твоём блокноте пусто")
+			sendMsg(msgType, conference, nick, u"В твоём блокноте пусто")
 
-registerEvent(loadUserNotes, EVT_STARTUP)
+registerEventHandler(loadUserNotes, EVT_STARTUP)
 
 registerCommand(addUserNote, u"заметка+", 10, 
 				u"Добавляет запись в ваш блокнот", 

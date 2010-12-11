@@ -24,4 +24,4 @@ def processSubscriptions(stanza, jid, resource, trueJid):
 		gRoster.delItem(jid)
 		printf("%s is removed from roster" % (jid))
 
-registerPresenceHandler(processSubscriptions, H_ROSTER)
+registerEventHandler(processSubscriptions, EVT_PRS | H_ROSTER)

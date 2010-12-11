@@ -61,8 +61,10 @@ def setMUCAffiliation(conference, user, itemType, aff, reason=None):
 	iq = getMUCSetAffiliationStanza(conference, user, itemType, aff, reason)
 	gClient.send(iq)
 
-def setConferenceStatus(conference, status, show):
-	gClient.send(getPresenceNode(show, status, PROFILE_PRIORITY))
+def setConferenceStatus(conference, show, status):
+	prs = getPresenceNode(show, status, gConfig.PRIORITY)
+	prs.setTo(conference)
+	gClient.send(prs)
 
 def isJid(jid):
 	if USERJID_RE.search(jid):

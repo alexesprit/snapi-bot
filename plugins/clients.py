@@ -70,11 +70,12 @@ def saveAllClientsBases():
 	for conference in getConferences():
 		gUserClients[conference].save()
 
-registerEvent(loadClientsCache, EVT_ADDCONFERENCE)
-registerEvent(freeClientsCache, EVT_DELCONFERENCE)
-registerEvent(saveAllClientsBases, EVT_SHUTDOWN)
+registerEventHandler(loadClientsCache, EVT_ADDCONFERENCE)
+registerEventHandler(freeClientsCache, EVT_DELCONFERENCE)
 
-registerJoinHandler(saveUserClient)
+registerEventHandler(saveAllClientsBases, EVT_SHUTDOWN)
+
+registerEventHandler(saveUserClient, EVT_USERJOIN)
 
 registerCommand(showClients, u"клиенты", 10, 
 				u"Показывает, с каких клиентов заходил пользователь", 

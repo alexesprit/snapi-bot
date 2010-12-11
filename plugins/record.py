@@ -40,10 +40,10 @@ def loadRecordsBase(conference):
 def freeRecordsBase(conference):
 	del gRecords[conference]
 	
-registerJoinHandler(calculateRecord)
+registerEventHandler(calculateRecord, EVT_USERJOIN)
 
-registerEvent(loadRecordsBase, EVT_ADDCONFERENCE)
-registerEvent(freeRecordsBase, EVT_DELCONFERENCE)
+registerEventHandler(loadRecordsBase, EVT_ADDCONFERENCE)
+registerEventHandler(freeRecordsBase, EVT_DELCONFERENCE)
 
 registerCommand(showRecord, u"рекорд", 10, 
 				u"Показывает рекорд посещаемости конференции", 

@@ -76,14 +76,15 @@ def manageAuthValue(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (getConferenceConfigKey(conference, "auth")))
 
-registerEvent(setDefaultAuthValue, EVT_ADDCONFERENCE)
-registerEvent(initAuthCache, EVT_ADDCONFERENCE)
-registerEvent(freeAuthCache, EVT_DELCONFERENCE)
+registerEventHandler(setDefaultAuthValue, EVT_ADDCONFERENCE)
 
-registerJoinHandler(askAuthQuestion)
-registerLeaveHandler(clearAuthCache)
+registerEventHandler(initAuthCache, EVT_ADDCONFERENCE)
+registerEventHandler(freeAuthCache, EVT_DELCONFERENCE)
 
-registerMessageHandler(authAnswerListener, H_CONFERENCE)
+registerEventHandler(askAuthQuestion, EVT_USERJOIN)
+registerEventHandler(clearAuthCache, EVT_USERLEAVE)
+
+registerEventHandler(authAnswerListener, EVT_MSG | H_CONFERENCE)
 
 registerCommand(manageAuthValue, u"авторизация", 30, 
 				u"Отключает (0) или включает (1) проверку вошедшего пользователя на человечность. Без параметра покажет текущее значение", 

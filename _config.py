@@ -1,52 +1,32 @@
 # coding: utf-8
 
 # учётная запись и пароль
-PROFILE_JID = "username@server.tld"
-PROFILE_PASSWORD = "secret"
+JID = "username@server.tld"
+PASSWORD = "secret"
 
 # ресурс и приоритет
-PROFILE_RESOURCE = "Snapi-Snup"
-PROFILE_PRIORITY = 0
+RESOURCE = "Snapi-Snup"
+PRIORITY = 0
 
 # станд. ник для конференций
-PROFILE_NICK = u"Snapi-Snup"
+NICK = u"Snapi-Snup"
 
 # сервер и порт для подключения
-PROFILE_HOST = "server.tld"
-PROFILE_PORT = 5222
+HOST = "server.tld"
+PORT = 5222
 
-# client.SECURE_DISABLE - отключить SSL/TLS
-# client.SECURE_AUTO - автоопределение (SSL, если порт 443, 5223, иначе TLS)
-# client.SECURE_FORCE - форсировать (нестандартный порт)
-PROFILE_SECURE = client.SECURE_AUTO
-PROFILE_USE_RESOLVER = False
+# 0 - отключить SSL/TLS
+# 1 - автоопределение (SSL, если порт 443, 5223, иначе TLS)
+# 2 - форсировать (нестандартный порт)
+SECURE = 0
+USE_RESOLVER = False
 
 # список владельцев бота и пароль
-BOT_ADMINS = ["admin@server.tld"]
-BOT_ADMIN_PASSWORD = "secret"
+ADMINS = ["admin@server.tld"]
+ADMIN_PASSWORD = "secret"
 
 # перезагружаться при ошибках?
 RESTART_IF_ERROR = True
 
-# Описание флагов лога:
-# always - все типы флагов
-# info - различные инф. сообщения
-# error - ошибки
-# success - успешные результаты
-# warning - предупреждения
-CORE_DBG = ["always"]
-# always - все типы флагов
-# auth - авторизация
-# bind - назначение ресурса
-# dispatcher - обработка станз
-# roster - работа с ростером
-# socket - передаваемые данные
-# tls - включение TLS/SSL
-XMPP_DBG = []
-
 # папка для логов конференций
 LOGGER_DIR = ""
-
-# расскоментируйте, чтобы отключить логирование действий
-# лог ошибок по прежнему можно будет посмотреть в syslogs
-#debug.Debug = debug.NoDebug

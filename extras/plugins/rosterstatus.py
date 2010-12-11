@@ -21,8 +21,8 @@ def changeRosterStatus():
 		show = protocol.PRS_DND
 	elif hour >= 0:
 		show = protocol.PRS_NA
-	gClient.setStatus(show, None, PROFILE_PRIORITY)
+	gClient.setStatus(show, None, gConfig.PRIORITY)
 	timeout = 3600 * 8 + random.randrange(-800, 801)
 	startTimer(timeout, changeRosterStatus)
 
-registerEvent(changeRosterStatus, EVT_READY)
+registerEventHandler(changeRosterStatus, EVT_READY)

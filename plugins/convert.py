@@ -64,10 +64,10 @@ def convertValues(msgType, conference, nick, param):
 			else:
 				sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
-registerEvent(loadValuesForConvert, EVT_STARTUP)
+registerEventHandler(loadValuesForConvert, EVT_STARTUP)
 
 registerCommand(convertValues, u"перевести", 10, 
-				u"Перевод валют. Указав \"валюты\" в кач-ве параметра можно посмотреть доступные валюты для перевода", 
+				u"Перевод валют. Чтобы получить список доступных валют для перевода, укажите \"валюты\" в кач-ве параметра", 
 				u"<из> <в> <кол-во>", 
 				(u"валюты", u"RUR USD 100.5"), 
 				CMD_ANY | CMD_PARAM)
