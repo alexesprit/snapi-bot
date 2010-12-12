@@ -15,8 +15,14 @@
 
 def _showMUCList(stanza, msgType, conference, nick):
 	if protocol.TYPE_RESULT == stanza.getType():
-		elements = [u"%d) %s" % (i + 1, p.getAttrs()["jid"]) 
-					for i, p in enumerate(stanza.getQueryChildren())]
+		elements = []
+		for i, child in enumerate(stanza.getQueryChildren()):
+			jid = child.getAttr("jid")
+			reason = child.getTagData("reason")
+			if reason:
+				elements.append(u"%d) %s (%s)" % (i + 1, jid, reason))
+			else:
+				elements.append(u"%d) %s" % (i + 1, jid))
 		if elements:
 			if msgType == protocol.TYPE_PUBLIC:
 				sendMsg(msgType, conference, nick, u"Ушёл")

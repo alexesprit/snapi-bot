@@ -32,7 +32,7 @@ def login(msgType, conference, nick, param):
 		if param == gConfig.ADMIN_PASSWORD:
 			trueJid = getTrueJid(conference, nick)
 			if trueJid not in gConfig.ADMINS:
-				BOT_ADMINS.append(trueJid)
+				gConfig.ADMINS.append(trueJid)
 				setTempGlobalAccess(trueJid, 100)
 				sendMsg(msgType, conference, nick, u"Пароль принят, глобальный доступ выдан")
 			else:
