@@ -30,9 +30,9 @@ import protocol
 import roster
 import transports
 
-SECURE_AUTO = 0x0
-SECURE_FORCE = 0x1
-SECURE_DISABLE = 0x2
+SECURE_DISABLE = 0x0
+SECURE_AUTO = 0x1
+SECURE_FORCE = 0x2
 
 C_TCP = "TCP"
 C_TLS = "TLS"
