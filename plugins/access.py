@@ -79,28 +79,31 @@ def setLocalAccess(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"А кто это?")
 		return
-	try:
-		access = int(param[1])
-		if -100 <= access <= 100:
-			userAccess = getAccess(conference, userJid)
-			myJid = getTrueJid(conference, nick)
-			myAccess = getAccess(conference, myJid)
-			if access == userAccess:
-				sendMsg(msgType, conference, nick, u"Уровень доступа у %s уже %d!" % (user, access))
-				return				
-			if userAccess > myAccess or access > myAccess:
-				sendMsg(msgType, conference, nick, u"Недостаточно прав")
-				return
-			if len(param) == 2:
-				setTempAccess(conference, userJid, access)
-				sendMsg(msgType, conference, nick, u"Доступ выдан до выхода из конференции")
+	if 2 <= len(param):
+		try:
+			access = int(param[1])
+			if -100 <= access <= 100:
+				userAccess = getAccess(conference, userJid)
+				myJid = getTrueJid(conference, nick)
+				myAccess = getAccess(conference, myJid)
+				if access == userAccess:
+					sendMsg(msgType, conference, nick, u"Уровень доступа у %s уже %d!" % (user, access))
+					return				
+				if userAccess > myAccess or access > myAccess:
+					sendMsg(msgType, conference, nick, u"Недостаточно прав")
+					return
+				if len(param) == 2:
+					setTempAccess(conference, userJid, access)
+					sendMsg(msgType, conference, nick, u"Доступ выдан до выхода из конференции")
+				else:
+					setPermAccess(conference, userJid, access)
+					sendMsg(msgType, conference, nick, u"Выдан постоянный доступ")
 			else:
-				setPermAccess(conference, userJid, access)
-				sendMsg(msgType, conference, nick, u"Выдан постоянный доступ")
-		else:
-			raise ValueError
-	except ValueError:
-		sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
+				raise ValueError
+		except ValueError:
+			sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
+	else:
+		sendMsg(msgType, conference, nick, u"Ошибочный запрос!")
 
 def delLocalAccess(msgType, conference, nick, param):
 	user = param

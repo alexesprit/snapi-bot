@@ -20,6 +20,7 @@ def sendInvite(msgType, conference, nick, param):
 		if isNickInConference(conference, user):
 			trueJid = getTrueJid(conference, user)
 		else:
+			sendMsg(msgType, conference, nick, u"А кто это?")
 			return
 	else:
 		trueJid = user

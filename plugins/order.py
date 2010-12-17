@@ -21,12 +21,12 @@ def setUserRole(msgType, conference, nick, user, role):
 		sendMsg(msgType, conference, nick, u"Чего?")
 
 def setUserAffiliation(msgType, conference, nick, user, aff):
-	if isJid(user) or isServer(user):
-		iq = getMUCSetAffiliationStanza(conference, user, protocol.ITEM_JID, aff)
-		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
-	elif isNickInConference(conference, user):
+	if isNickInConference(conference, user):
 		iq = getMUCSetAffiliationStanza(conference, user, protocol.ITEM_NICK, aff)
 		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
+	elif isJid(user) or isServer(user):
+		iq = getMUCSetAffiliationStanza(conference, user, protocol.ITEM_JID, aff)
+		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))	
 	else:
 		sendMsg(msgType, conference, nick, u"Чего?")
 

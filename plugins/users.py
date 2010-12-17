@@ -33,9 +33,9 @@ def showUserNicks(msgType, conference, nick, param):
 				if trueJid == getTrueJid(conference, user)]
 		if len(nicks) < 2:
 			if param:
-				sendMsg(msgType, conference, nick, u"Я знаю тебя только как %s" % (userNick))
+				sendMsg(msgType, conference, nick, u"Я знаю %s только как %s" % (userNick, userNick))
 			else:
-				sendMsg(msgType, conference, nick, u"Я знаю %s только как %s")
+				sendMsg(msgType, conference, nick, u"Я знаю тебя только как %s" % (userNick))
 		else:
 			nicks.sort()
 			if param:
