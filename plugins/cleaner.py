@@ -49,13 +49,13 @@ def cleanBases():
 			base = globals()[item][conference]
 			cleanedKeys += _cleanBase(base, CHAT_KEEP_TIME)
 		if cleanedKeys:
-			printf(u"%d keys were removed from %s bases" % (cleanedKeys, conference))
+			printf(u"%d keys have been removed from %s bases" % (cleanedKeys, conference))
 	for item in SINGLE_BASES:
 		cleanedKeys = 0
 		base = globals()[item]
 		_cleanBase(base, SINGLE_KEEP_TIME)
 		if cleanedKeys:
-			printf(u"%d keys were removed from %s base" % (cleanedKeys, item))
+			printf(u"%d keys have been removed from %s base" % (cleanedKeys, item))
 	for log in os.listdir(SYSLOG_DIR):
 		path = os.path.join(SYSLOG_DIR, log)
 		if os.path.isfile(path):

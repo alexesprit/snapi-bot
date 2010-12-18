@@ -45,7 +45,7 @@ def addToSendBase(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"А это кто?")
 
-def checkSendBase(conference, nick, trueJid, aff, role):
+def sendMessagesToUser(conference, nick, trueJid, aff, role):
 	base = gSendCache[conference]
 	if trueJid in base:
 		for message in base[trueJid]:
@@ -57,7 +57,7 @@ def checkSendBase(conference, nick, trueJid, aff, role):
 registerEventHandler(loadSendBase, EVT_ADDCONFERENCE)
 registerEventHandler(freeSendBase, EVT_DELCONFERENCE)
 
-registerEventHandler(checkSendBase, EVT_USERJOIN)
+registerEventHandler(sendMessagesToUser, EVT_USERJOIN)
 
 registerCommand(addToSendBase, u"передать", 10, 
 				u"Запоминает сообщение и передаёт его указанному пользователю, как только он зайдёт в конференцию (или сразу, если указанный пользователь уже в конференции)", 

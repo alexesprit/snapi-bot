@@ -726,7 +726,6 @@ if __name__ == "__main__":
 		gInfo["start"] = time.time()
 
 		try:
-			printf("Initialising data...")
 			gConfig = config.Config(BOTCONFIG_FILE)
 			
 			gClient = client.Client(server=gConfig.SERVER, port=gConfig.PORT)
@@ -762,7 +761,6 @@ if __name__ == "__main__":
 			gClient.registerHandler("message", messageHandler)
 			gClient.registerHandler("presence", presenceHandler)
 			gClient.registerHandler("iq", iqHandler)
-			printf("Handlers registered", FLAG_SUCCESS)
 
 			gRoster = gClient.getRoster()
 			gClient.setStatus = setStatus

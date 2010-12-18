@@ -16,12 +16,16 @@
 def processSubscriptions(stanza, jid, resource, trueJid):
 	prsType = stanza.getType()
 	if protocol.PRS_SUBSCRIBE == prsType:
+		printf(u"%s has added me into his/her roster" % (jid))
 		gRoster.authorize(jid)
 		gRoster.subscribe(jid)
-		printf("%s is added into roster" % (jid))
 	elif protocol.PRS_UNSUBSCRIBE == prsType:
+		printf(u"%s has removed me into his/her roster" % (jid))
 		gRoster.unauthorize(jid)
 		gRoster.delItem(jid)
-		printf("%s is removed from roster" % (jid))
+	elif protocol.PRS_SUBSCRIBED == prsType:
+		printf(u"I've added %s into my roster" % (jid), FLAG_SUCCESS)
+	elif protocol.PRS_UNSUBSCRIBED == prsType:
+		printf(u"I've removed %s from my roster" % (jid), FLAG_SUCCESS)
 
 registerEventHandler(processSubscriptions, EVT_PRS | H_ROSTER)

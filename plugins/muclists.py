@@ -20,7 +20,7 @@ def _showMUCList(stanza, msgType, conference, nick):
 			jid = child.getAttr("jid")
 			reason = child.getTagData("reason")
 			if reason:
-				elements.append(u"%d) %s (%s)" % (i + 1, jid, reason))
+				elements.append(u"%d) %s (%s)" % (i + 1, jid, reason.strip()))
 			else:
 				elements.append(u"%d) %s" % (i + 1, jid))
 		if elements:

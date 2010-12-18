@@ -46,14 +46,14 @@ def setUserGreeting(msgType, conference, nick, param):
 		utils.writeFile(path, str(gGreets[conference]))
 		sendMsg(msgType, conference, nick, u"Запомнила")
 
-def sendUserGreeting(conference, nick, trueJid, aff, role):
+def sendGreetingToUser(conference, nick, trueJid, aff, role):
 	if trueJid in gGreets[conference]:
 		sendMsg(protocol.TYPE_PUBLIC, conference, nick, gGreets[conference][trueJid])
 
 registerEventHandler(loadGreetings, EVT_ADDCONFERENCE)
 registerEventHandler(freeGreetings, EVT_DELCONFERENCE)
 
-registerEventHandler(sendUserGreeting, EVT_USERJOIN)
+registerEventHandler(sendGreetingToUser, EVT_USERJOIN)
 
 registerCommand(setUserGreeting, u"приветствие", 30, 
 				u"Добавляет приветствие для определённого ника/жида", 
