@@ -29,11 +29,11 @@ import time
 import traceback
 
 import chardet
-import database
-import macros
 import simplejson
 
 from classes import config
+from classes import database
+from classes import macros
 from classes import version
 
 from utils import utils
@@ -43,7 +43,6 @@ from xmpp import debug
 from xmpp import protocol
 from xmpp import simplexml
 
-CSS_DIR = "css"
 CONFIG_DIR = "config"
 PLUGIN_DIR = "plugins"
 SYSLOG_DIR = "syslogs"

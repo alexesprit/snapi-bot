@@ -24,6 +24,7 @@ def pythonEval(msgType, conference, nick, param):
 def pythonExec(msgType, conference, nick, param):
 	try:
 		exec(unicode(param) + "\n") in globals()
+		sendMsg(msgType, conference, nick, u"Выполнено!")
 	except Exception:
 		sendMsg(msgType, conference, nick, traceback.format_exc())
 
@@ -37,6 +38,8 @@ def pythonShell(msgType, conference, nick, param):
 	if message:
 		enc = chardet.detect(message)["encoding"]
 		sendMsg(msgType, conference, nick, unicode(message, enc))
+	else:
+		sendMsg(msgType, conference, nick, u"Выполнено!")
 
 def pythonCalc(msgType, conference, nick, param):
 	if not re.sub("([0-9]+|[\+\-\/\*\^\.\(\)\|\&\^~])", "", param).strip():
