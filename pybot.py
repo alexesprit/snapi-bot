@@ -482,11 +482,12 @@ def messageHandler(session, stanza):
 		return
 	nick = fullJid.getResource()
 	if protocol.TYPE_PUBLIC == msgType:
-		if stanza.getTag("subject"):
+		if not stanza.getTag("subject"):
+			if nick:
+				setNickKey(conference, nick, NICK_IDLE, time.time())
+		else:
 			if not stanza.getSubject():
 				return
-		else:
-			setNickKey(conference, nick, NICK_IDLE, time.time())
 	else:
 		if stanza.getTag("request"):
 			reportMsg = protocol.Message(fullJid)
