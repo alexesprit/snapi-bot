@@ -21,9 +21,7 @@ gTalkersCache = {}
 
 def showTopTalkersInfo(msgType, conference, nick):
 	base = gTalkersCache[conference]
-	if base.isEmpty():
-		sendMsg(msgType, conference, nick, u"База болтунов пуста")
-	else:
+	if base:
 		topList = []
 		pattern = u"%d) %s, %d, %d, %d, %0.1f"
 		count = 10
@@ -41,6 +39,8 @@ def showTopTalkersInfo(msgType, conference, nick):
 					for i, element in enumerate(topList)]
 		message = u"Список топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n%s" % ("\n".join(elements))
 		sendMsg(msgType, conference, nick, message)
+	else:
+		sendMsg(msgType, conference, nick, u"База болтунов пуста")
 
 def clearTalkersInfo(msgType, conference, nick):
 	conference = source[1]

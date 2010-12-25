@@ -478,14 +478,14 @@ def messageHandler(session, stanza):
 		stanza.setType(protocol.TYPE_PUBLIC)
 		gClient.send(stanza)
 		return
-	if isConference:
-		if stanza.getTag("subject"):
-			message = stanza.getSubject()
 	if not message:
 		return
 	nick = fullJid.getResource()
 	if protocol.TYPE_PUBLIC == msgType:
-		if isNickInConference(conference, nick):
+		if stanza.getTag("subject"):
+			if not stanza.getSubject():
+				return
+		else:
 			setNickKey(conference, nick, NICK_IDLE, time.time())
 	else:
 		if stanza.getTag("request"):

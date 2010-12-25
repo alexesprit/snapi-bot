@@ -58,7 +58,7 @@ def showItHappensQuote(msgType, conference, nick, param):
 		rawhtml = response.read()
 		elements = re.search(r"<div class.+?#(\d+).+?<p class=\"text\">(.+?)</p>", rawhtml, re.DOTALL)
 		if elements:
-			url = "http://ithappens.ru/story/%s/" % (elements.group(1))
+			url = "http://ithappens.ru/story/%s" % (elements.group(1))
 			quote = decode(elements.group(2), "cp1251")
 			sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
 		else:
@@ -96,7 +96,7 @@ def showJabberQuote(msgType, conference, nick, param):
 		if elements:
 			quote = elements.group(2)
 			quote = decode(quote.replace("<br><br>", "\n"), "cp1251")
-			url = "http://jabber-quotes.ru/id%s/" % (elements.group(1))
+			url = "http://jabber-quotes.ru/id%s" % (elements.group(1))
 			sendMsg(msgType, conference, nick, u"%s\n\n%s" % (quote, url))
 		else:
 			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
@@ -141,7 +141,7 @@ registerCommand(showItHappensQuote, u"ит", 10,
 registerCommand(showJabberQuote, u"жк", 10, 
 				u"Показывает случайную/указанную цитату с jabber-quotes.ru", 
 				u"[номер]", 
-				(None, u"204"));
+				(None, u"204"))
 registerCommand(showCinemaQuote, u"киноцитата", 10, 
 				u"Показывает случайную цитату из кино", 
 				None, 

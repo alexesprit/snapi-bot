@@ -121,7 +121,7 @@ def quizAnswerListener(stanza, msgType, conference, nick, trueJid, text):
 
 def showScoreList(msgType, conference, nick=None):
 	base = gQuizScores[conference]
-	if not base.isEmpty():
+	if base:
 		scores = []
 		for jid, info in base.items():
 			scores.append([info[1], info[2], info[0]])

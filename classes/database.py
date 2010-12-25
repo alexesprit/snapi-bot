@@ -32,6 +32,11 @@ class DataBase:
 		self.base = eval(utils.readFile(self.path))
 		self.changes = eval(utils.readFile(self.ctpath))
 	
+	def __nonzero__(self):
+		if self.base:
+			return 1
+		return 0
+
 	def __contains__(self, item):
 		return item in self.base
 	
