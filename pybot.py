@@ -174,7 +174,7 @@ gIsJoined = {}
 
 gJokes = []
 
-gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "tmr": 0, "warn": 0}
+gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "tmr": 0}
 
 gDebug = debug.Debug([debug.DBG_ALWAYS], showFlags=False)
 gDebug.colors[FLAG_ERROR] = debug.colorBrightRed
@@ -239,7 +239,7 @@ def execute(function, args=None):
 				function()
 	except Exception:
 		printf("Exception in %s function" % (function.__name__), FLAG_ERROR)
-		writeSystemLog(traceback.format_exc(), LOG_ERRORS)
+		addTextToSysLog(traceback.format_exc(), LOG_ERRORS)
 
 def printf(text, flag=FLAG_INFO):
 	gDebug.show(text, flag, flag)
@@ -410,7 +410,7 @@ def getPresenceNode(show, status, priority):
 
 	caps = protocol.Node("c")
 	caps.setNamespace(protocol.NS_CAPS)
-	caps.setAttr("node", gVerInfo.getCaps())
+	caps.setAttr("node", version.CAPS)
 	caps.setAttr("ver", gVerInfo.getFeaturesHash())
 	caps.setAttr("hash", "sha-1")
 
@@ -482,12 +482,8 @@ def messageHandler(session, stanza):
 		return
 	nick = fullJid.getResource()
 	if protocol.TYPE_PUBLIC == msgType:
-		if not stanza.getTag("subject"):
-			if nick:
-				setNickKey(conference, nick, NICK_IDLE, time.time())
-		else:
-			if not stanza.getSubject():
-				return
+		if conference != trueJid:
+			setNickKey(conference, nick, NICK_IDLE, time.time())
 	else:
 		if stanza.getTag("request"):
 			reportMsg = protocol.Message(fullJid)
@@ -596,14 +592,14 @@ def presenceHandler(session, stanza):
 			elif errorCode == "404":
 				delConference(conference)
 				saveConferences()
-				writeSystemLog(u"%s is deleted (%s)" % (conference, errorCode), LOG_WARNINGS, True)
+				addTextToSysLog(u"%s is deleted (%s)" % (conference, errorCode), LOG_WARNINGS, True)
 			elif errorCode == "503":
 				botNick = getBotNick(conference)
 				password = getConferenceConfigKey(conference, "password")
 				startTimer(REJOIN_DELAY, conference, (conference, botNick, password))
 			elif errorCode in ("401", "403", "405"):
 				leaveConference(conference, u"got %s error code" % errorCode)
-				writeSystemLog(u"Got error in %s (%s)" % (conference, errorCode), LOG_WARNINGS, True)
+				addTextToSysLog(u"Got error in %s (%s)" % (conference, errorCode), LOG_WARNINGS, True)
 		callEventHandlers(EVT_PRS | H_CONFERENCE, (stanza, conference, nick, trueJid))
 	else:
 		resource = fullJid.getResource()
@@ -621,7 +617,7 @@ def iqHandler(session, stanza):
 		if stanza.getTags("query", {}, protocol.NS_VERSION):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.getTag("query")
-			query.setTagData("name", gVerInfo.getAppName())
+			query.setTagData("name", version.APP_NAME)
 			query.setTagData("version", gVerInfo.getVersion())
 			query.setTagData("os", gVerInfo.getOSName())
 		elif stanza.getTags("query", {}, protocol.NS_LAST):
@@ -656,14 +652,12 @@ def iqHandler(session, stanza):
 		gClient.send(iq)
 	callEventHandlers(EVT_IQ, (stanza, bareJid, resource))
 
-def writeSystemLog(text, logtype, show=False):
+def addTextToSysLog(text, logtype, show=False):
 	path = getFilePath(SYSLOG_DIR, time.strftime(LOG_TYPES[logtype]))
 	if isinstance(text, unicode):
 		text = text.encode("utf-8") 
 	utils.writeFile(path, text + "\n", "a")
-	if LOG_WARNINGS == logtype:
-		gInfo["warn"] += 1
-	else:
+	if LOG_ERRORS == logtype:
 		gInfo["err"] += 1
 	if show:
 		if LOG_WARNINGS == logtype:
@@ -684,7 +678,7 @@ def loadPlugins():
 				validPlugins += 1
 		except (SyntaxError, NameError):
 			printf("Exception in loadPlugins function", FLAG_ERROR)
-			writeSystemLog(traceback.format_exc(), LOG_ERRORS)
+			addTextToSysLog(traceback.format_exc(), LOG_ERRORS)
 			invalidPlugins += 1
 	if not invalidPlugins:
 		printf("Loaded %d plugins" % (validPlugins), FLAG_SUCCESS)
@@ -789,14 +783,14 @@ if __name__ == "__main__":
 				gClient.send(prs)
 			shutdown()
 		except protocol.SystemShutdown:
-			printf("Remote server was switched off", FLAG_WARNING)
+			printf("%s has been switched off" % (gConfig.SERVER), FLAG_WARNING)
 			shutdown()
 		except protocol.Conflict:
 			printf("Resource conflict", FLAG_WARNING)
 			shutdown()
 		except Exception:
 			printf("Exception in main thread", FLAG_ERROR)
-			writeSystemLog(traceback.format_exc(), LOG_CRASHES)
+			addTextToSysLog(traceback.format_exc(), LOG_CRASHES)
 			if gClient.isConnected():
 				prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
 				prs.setStatus(u"Что-то сломано...")

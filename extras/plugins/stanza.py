@@ -13,8 +13,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def sendStanza(source, conference, nick, param):
+def sendStanza(msgType, conference, nick, param):
 	gClient.send(param)
+	sendMessage(msgType, conference, nick, u"Отправлено!")
 
 registerCommand(sendStanza, u"станза", 100, 
 				u"Топка", 

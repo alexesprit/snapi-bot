@@ -1,5 +1,3 @@
-﻿# coding: utf-8
-
 # macros.py
 # Modification Copyright (c) -Esprit-
 
@@ -153,7 +151,7 @@ class Macros:
 			message = message.replace("  ", " ")
 		return message
 
-	def getRand(self, args, source):
+	def getRand(self, args, context):
 		try:
 			f = int(args[0])
 			t = int(args[1])
@@ -171,32 +169,30 @@ class Macros:
 			return ""
 
 	def charMap(self, x, i):
-		st = i["state"]
 		if i["esc"]:
 			i["esc"] = False
-			ret = i["level"]
+			return i["level"]
 		elif x == "\\":
 			i["esc"] = True
-			ret = 0
+			return 0
 		elif x == "%":
 			i["state"] = "cmd_p"
-			ret = 0
+			return 0
 		elif x == "(":
 			if i["state"] == "cmd_p":
 				i["level"] += 1
 				i["state"] = "args"
-			ret=0
+			return 0
 		elif x == ")":
 			if i["state"] == "args":
 				i["state"] = "null"
-			ret = 0
+			return 0
 		else:
 			if i["state"] == "args":
-				ret = i["level"]
+				return i["level"]
 			else:
 				i["state"] = "null"
-				ret = 0
-		return ret
+				return 0
 
 	def getMap(self, inp):
 		i = {"level": 0, "state": "null", "esc": False}

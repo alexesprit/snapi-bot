@@ -76,7 +76,6 @@ def createNewVote(msgType, conference, nick, param):
 		if gVote[conference] and gVote[conference]["state"] != VOTE_FINISHED:
 			sendMsg(msgType, conference, nick, u"Имеется неоконченное голосование")
 		else:
-			trueJid = getTrueJid(conference, nick)
 			gVote[conference] = {"state": VOTE_CREATED, "creator": nick, "creatorjid": getTrueJid(conference, nick), "text": param, "voted": {}, "opinions": []}
 			saveVotes(conference)
 			sendMsg(msgType, conference, nick, u"Голосование создано! Чтобы добавить пункты напиши \"пункт+ твой_пункт\", удалить - \"пункт- номер пункта\". Начать голосование - команда \"голосование+\". Посмотреть текущие результаты - команда \"мнения\". Окончить голосование - команда \"итоги\"")

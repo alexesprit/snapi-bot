@@ -15,8 +15,6 @@
 
 ROSTERSTATUS_FILE = "rosterstatus.txt"
 
-gRosterStatus = {}
-
 def loadRosterStatusValue():
 	global gRosterStatus
 	path = getConfigPath(ROSTERSTATUS_FILE)

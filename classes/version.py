@@ -1,5 +1,3 @@
-# coding: utf-8
-
 # version.py
 # Initial Copyright (C) 2010 -Esprit-
 
@@ -25,7 +23,7 @@ IDENTITY_CAT = "bot"
 IDENTITY_NAME = "snapi"
 IDENTITY_TYPE = "pc"
 
-CAPS_VER = "http://snapi-bot.googlecode.com/caps"
+CAPS = "http://snapi-bot.googlecode.com/caps"
 APP_NAME = "Snapi-Snup"
 
 class VersionInfo:
@@ -57,10 +55,3 @@ class VersionInfo:
 
 	def getFeaturesHash(self):
 		return self.verhash
-
-	def getAppName(self):
-		return APP_NAME
-
-	def getCaps(self):
-		return CAPS_VER
-

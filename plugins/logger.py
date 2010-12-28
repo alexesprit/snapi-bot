@@ -17,25 +17,28 @@ LOGCSS_FILE = "logger.css"
 
 LOGS_URL_NOINDEX = True
 
-def writeHeader(fp, jid, (year, month, day)):
+def writeLogHeader(f, conference, year, month, day):
 	date = "%.2i.%.2i.%.2i" % (day, month, year)
 	cssData = utils.readFile(getFilePath(RESOURCE_DIR, LOGCSS_FILE))
 	header = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dt\">
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>%s</title>
-<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-<style type=\"text/css\">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
 <!--%s-->
 </style>
 </head>
-<h1>%s<br>%s</h1>
+<body>
+<h1>%s<br/>%s</h1>
+<div>
 <tt>
-""" % (" - ".join([jid, date]), cssData, jid, date)
-	fp.write(header.encode("utf-8"))
+""" % (" - ".join([conference, date]), cssData, conference, date)
+	f.write(header.encode("utf-8"))
 
-def getLogFile(msgType, jid, (year, month, day)):
-	path = u"%s/%s/%d/%02d/%02d.html" % (gConfig.LOGGER_DIR, jid, year, month, day)
+def getLogFile(msgType, conference, year, month, day):
+	path = u"%s/%s/%d/%02d/%02d.html" % (gConfig.LOGGER_DIR, conference, year, month, day)
 	path = path.encode("utf-8")
 	if os.path.exists(path):
 		f = file(path, "a")
@@ -44,7 +47,7 @@ def getLogFile(msgType, jid, (year, month, day)):
 		if not os.path.exists(dirName):
 			os.makedirs(dirName)
 		f = file(path, "w")
-		writeHeader(f, jid, (year, month, day))
+		writeLogHeader(f, conference, year, month, day)
 	return f
 
 def regexUrl(matchobj):
@@ -54,15 +57,15 @@ def regexUrl(matchobj):
 	else:
 		return "<a href=\"%s\">%s</a>" % (url, url)
 	
-def writeLog(msgType, jid, nick, body, aff = 0):
-	(year, month, day, hour, minute, second, weekday, yearday, daylightsavings) = time.localtime()
+def addTextToLog(msgType, conference, nick, body, aff=0):
+	year, month, day, hour, minute, second = time.localtime()[:6]
 	body = utils.escapeXML(body)
 	body = URL_RE.sub(regexUrl, body)
 	body = body.replace("\n", "<br/>")
 	body = body.encode("utf-8")
 	nick = nick.encode("utf-8")
 	timestamp = "%02d:%02d:%02d" % (hour, minute, second)
-	fp = getLogFile(msgType, jid, (year, month, day, ))
+	fp = getLogFile(msgType, conference, year, month, day)
 	fp.write("<span class=\"timestamp\"><a id=\"%s\" href=\"#%s\">[%s]</a></span>" % (timestamp, timestamp, timestamp))
 	if not nick:
 		fp.write("<span class=\"system\"> %s</span><br />\n" % (body))
@@ -81,44 +84,43 @@ def writeLog(msgType, jid, nick, body, aff = 0):
 				fp.write("<span class=\"self\"> &lt;%s&gt;</span> %s<br />\n" % (nick, body))
 	fp.close()
 
-def writeMessage(stanza, msgType, conference, nick, trueJid, text):
+def addMessageToLog(stanza, msgType, conference, nick, trueJid, text):
 	if protocol.TYPE_PUBLIC == msgType and getConferenceConfigKey(conference, "log"):
 		aff = 0
 		if nick and getNickKey(conference, nick, NICK_MODER):
 			level = getAccess(conference, trueJid)
 			aff = (level >= 30) and 2 or 1
-		writeLog(msgType, conference, nick, text, aff)
+		addTextToLog(msgType, conference, nick, text, aff)
 
-def writeUserJoin(conference, nick, trueJid, aff, role):
+def addUserJoinToLog(conference, nick, trueJid, aff, role):
 	if getConferenceConfigKey(conference, "log"):
-		writeLog(protocol.TYPE_PUBLIC, conference, "@$$join$$@", u"%s заходит в комнату как %s и %s" % (nick, role, aff))
+		addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$join$$@", u"%s заходит в комнату как %s и %s" % (nick, role, aff))
 
-def writeUserLeave(conference, nick, trueJid, reason, code):
+def addUserLeaveToLog(conference, nick, trueJid, reason, code):
 	if getConferenceConfigKey(conference, "log"):
 		if "307" == code:
 			if reason:
-				writeLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты: %s" % (nick, reason))
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты: %s" % (nick, reason))
 			else:
-				writeLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты" % (nick));		
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты" % (nick));		
 		elif "301" == code:
 			if reason:
-				writeLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили: %s" % (nick, reason))
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили: %s" % (nick, reason))
 			else:
-				writeLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили" % (nick));	
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили" % (nick));	
 		else:
 			if reason:
-				writeLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты: %s" % (nick, reason))
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты: %s" % (nick, reason))
 			else:
-				writeLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты" % (nick))
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты" % (nick))
 
-def writePresence(stanza, conference, nick, trueJid):
+def addPresenceToLog(stanza, conference, nick, trueJid):
 	if protocol.TYPE_ERROR != stanza.getType():
 		if getConferenceConfigKey(conference, "log"):
 			code = stanza.getStatusCode()
-			prsType = stanza.getType()
 			if code == "303":
 				newnick = stanza.getNick()
-				writeLog(protocol.TYPE_PUBLIC, conference, "@$$nick$$@", u"%s меняет ник на %s" % (nick, newnick))
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$nick$$@", u"%s меняет ник на %s" % (nick, newnick))
 
 def manageLoggingValue(msgType, conference, nick, param):
 	if param:
@@ -164,11 +166,11 @@ def setDefaultLoggingValue(conference):
 		setConferenceConfigKey(conference, "log", 1)
 
 if gConfig.LOGGER_DIR:
-	registerEventHandler(writeUserJoin, EVT_USERJOIN)
-	registerEventHandler(writeUserLeave, EVT_USERLEAVE)
+	registerEventHandler(addUserJoinToLog, EVT_USERJOIN)
+	registerEventHandler(addUserLeaveToLog, EVT_USERLEAVE)
 
-	registerEventHandler(writeMessage, EVT_MSG | H_CONFERENCE)
-	registerEventHandler(writePresence, EVT_PRS | H_CONFERENCE)
+	registerEventHandler(addMessageToLog, EVT_MSG | H_CONFERENCE)
+	registerEventHandler(addPresenceToLog, EVT_PRS | H_CONFERENCE)
 
 	registerEventHandler(setDefaultLoggingValue, EVT_ADDCONFERENCE)
 	

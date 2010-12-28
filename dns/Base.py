@@ -9,9 +9,17 @@ This code is covered by the standard Python License.
     Base functionality. Request and Response classes, that sort of thing.
 """
 
-import socket, string, types, time, select
-import Type,Class,Opcode
 import asyncore
+import select
+import socket
+import string
+import types
+import time
+
+import Class
+import Opcode
+import Type
+
 #
 # This random generator is used for transaction ids and port selection.  This
 # is important to prevent spurious results from lost packets, and malicious

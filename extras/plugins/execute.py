@@ -23,8 +23,8 @@ def executeExternalCode():
 			exec f in globals()
 		except Exception:
 			printf("Error while executing %s!" % (path), FLAG_ERROR)
-			writeSystemLog(traceback.format_exc(), LOG_ERRORS)
+			addTextToSysLog(traceback.format_exc(), LOG_ERRORS)
 	else:
-		writeSystemLog("%s is not found!" % (path), LOG_WARNINGS, True)
+		addTextToSysLog("%s is not found!" % (path), LOG_WARNINGS, True)
 
 registerEventHandler(executeExternalCode, EVT_STARTUP)

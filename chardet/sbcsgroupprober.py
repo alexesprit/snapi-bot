@@ -26,7 +26,7 @@
 # 02110-1301  USA
 ######################### END LICENSE BLOCK #########################
 
-import constants, sys
+import constants
 from charsetgroupprober import CharSetGroupProber
 from sbcharsetprober import SingleByteCharSetProber
 from langcyrillicmodel import Win1251CyrillicModel, Koi8rModel, Latin5CyrillicModel, MacCyrillicModel, Ibm866Model, Ibm855Model

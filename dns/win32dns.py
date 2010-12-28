@@ -19,7 +19,8 @@
           License analog to the current Python license
 """
 
-import string, re
+import string
+
 import _winreg
 
 def binipdisplay(s):
@@ -75,10 +76,7 @@ def RegistryResolve():
             try:
                 n=_winreg.EnumKey(y,i)
                 z=_winreg.OpenKey(y,n)
-                dnscount,dnscounttype=_winreg.QueryValueEx(z,
-                                            'DNSServerAddressCount')
-                dnsvalues,dnsvaluestype=_winreg.QueryValueEx(z,
-                                            'DNSServerAddresses')
+                dnsvalues = _winreg.QueryValueEx(z, 'DNSServerAddresses')[0]
                 nameservers.extend(binipdisplay(dnsvalues))
                 _winreg.CloseKey(z)
             except EnvironmentError:

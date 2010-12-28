@@ -121,7 +121,7 @@ def getURL(url, param=None, data=None, headers=None):
 	try:
 		return urllib2.urlopen(request)
 	except IOError, e:
-		writeSystemLog(u"Unable to open %s (%s)" % (url, e), LOG_WARNINGS, True)
+		addTextToSysLog(u"Unable to open %s (%s)" % (url, e), LOG_WARNINGS, True)
 	return None
 
 def decode(text, encoding=None):

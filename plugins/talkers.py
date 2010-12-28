@@ -24,8 +24,7 @@ def showTopTalkersInfo(msgType, conference, nick):
 	if base:
 		topList = []
 		pattern = u"%d) %s, %d, %d, %d, %0.1f"
-		count = 10
-		for jid, info in base.items():
+		for info in base.values():
 			words = info["words"]
 			userNick = info["nick"]
 			messages = info["messages"]

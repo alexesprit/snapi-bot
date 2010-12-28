@@ -22,7 +22,6 @@
 """
 
 import time
-import sys
 
 import plugin
 import protocol

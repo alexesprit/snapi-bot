@@ -42,12 +42,11 @@ class Scanner(object):
         match = self.scanner.scanner(string, idx).match
         actions = self.actions
         lastend = idx
-        end = len(string)
         while True:
             m = match()
             if m is None:
                 break
-            matchbegin, matchend = m.span()
+            matchend = m.span()[1]
             if lastend == matchend:
                 break
             action = actions[m.lastindex]
@@ -59,7 +58,6 @@ class Scanner(object):
                     match = self.scanner.scanner(string, matchend).match
                 yield rval, matchend
             lastend = matchend
-
 
 def pattern(pattern, flags=FLAGS):
     def decorator(fn):

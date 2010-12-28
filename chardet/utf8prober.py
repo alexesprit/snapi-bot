@@ -25,7 +25,7 @@
 # 02110-1301  USA
 ######################### END LICENSE BLOCK #########################
 
-import constants, sys
+import constants
 from constants import eStart, eError, eItsMe
 from charsetprober import CharSetProber
 from codingstatemachine import CodingStateMachine

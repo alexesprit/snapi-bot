@@ -40,7 +40,7 @@ def login(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка! Неверный пароль!")
 
-def logout(msgType, conference, nick, parameters):
+def logout(msgType, conference, nick, param):
 	trueJid = getTrueJid(conference, nick)
 	if trueJid in gConfig.ADMINS:
 		gConfig.ADMINS.remove(trueJid)
@@ -50,7 +50,6 @@ def logout(msgType, conference, nick, parameters):
 		sendMsg(msgType, conference, nick, u"Ошибка! Вы не авторизованы!")
 
 def showUserAccess(msgType, conference, nick, param):
-	levelDesc = ""
 	user = param
 	if not param:
 		userJid = getTrueJid(conference, nick)

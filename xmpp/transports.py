@@ -22,7 +22,6 @@
 		TLS connection - TLS class. Can be used for SSL connections also.
 """
 
-import base64
 import select
 import socket
 import sys

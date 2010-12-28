@@ -1,7 +1,5 @@
-﻿# coding: utf-8
-
 # database.py
-# Initial Copyright (с) 2010 -Esprit-
+# Initial Copyright (c) 2010 -Esprit-
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,11 +10,6 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
-"""
-	Простая "база данных" для плагинов. Написана исключительно для того, 
-	чтобы поддерживать базы в чистом состоянии.
-"""
 
 import time
 
@@ -59,7 +52,7 @@ class DataBase:
 		return self.base.keys()
 
 	def values(self):
-		return self.base.items()
+		return self.base.values()
 
 	def items(self):
 		return self.base.items()
@@ -71,9 +64,6 @@ class DataBase:
 	def save(self):
 		utils.writeFile(self.path, str(self.base))
 		utils.writeFile(self.ctpath, str(self.changes))
-		
-	def isEmpty(self):
-		return not self.base
 		
 	def getChangeTime(self, item):
 		return self.changes[item]

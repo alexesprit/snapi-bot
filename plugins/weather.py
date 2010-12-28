@@ -83,7 +83,7 @@ def showWeather(msgType, conference, nick, param):
 						message += u", %s\n" % (PRECIPITATION[precipitation])
 				elif "8" == precipitation:
 					spower = weather["spower"]
-					if "0" == rpower:
+					if "0" == spower:
 						message += u", возможна %s\n" % (PRECIPITATION[precipitation])
 					else:
 						message += u", %s\n" % (PRECIPITATION[precipitation])

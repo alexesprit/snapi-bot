@@ -19,7 +19,6 @@ gHereTime = {}
 
 def updateHereTimeInfo(conference, nick, trueJid):
 	base = gHereTime[conference]
-	joinTime = getNickKey(conference, nick, "joined")
 	if trueJid in base:
 		hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
 		base[trueJid]["here"] += hereTime
