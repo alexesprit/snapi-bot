@@ -314,16 +314,16 @@ def getNicks(conference):
 def getOnlineNicks(conference):
 	return [x for x in gConferences[conference] if getNickKey(conference, x, NICK_HERE)]
 	
-def getTrueJid(jid, resource=None):
+def getTrueJID(jid, resource=None):
 	if jid in gConferences:
 		if isNickInConference(jid, resource):
 			jid = getNickKey(jid, resource, NICK_JID)
 	return jid
 
-def getNickByJid(conference, trueJid, offline=False):
+def getNickByJID(conference, truejid, offline=False):
 	nicks = offline and getNicks(conference) or getOnlineNicks(conference)
 	for nick in nicks:
-		if getNickKey(conference, nick, NICK_JID) == trueJid:
+		if getNickKey(conference, nick, NICK_JID) == truejid:
 			return nick
 	return None
 
@@ -445,15 +445,15 @@ def messageHandler(session, stanza):
 	msgType = stanza.getType()
 	if stanza.getTimestamp() or msgType in FORBIDDEN_TYPES:
 		return
-	fullJid = stanza.getFrom()
-	jid = fullJid.getBareJid()
+	fulljid = stanza.getFrom()
+	jid = fulljid.getBareJID()
 	isConference = isConferenceInList(jid)
 	if protocol.TYPE_PUBLIC == msgType and not isConference:
 		return
 	conference = jid
-	nick = fullJid.getResource()
-	trueJid = getTrueJid(conference, nick)
-	if getAccess(conference, trueJid) == -100:
+	nick = fulljid.getResource()
+	truejid = getTrueJID(conference, nick)
+	if getAccess(conference, truejid) == -100:
 		return
 	message = stanza.getBody() or ""
 	message = message.strip()
@@ -474,20 +474,20 @@ def messageHandler(session, stanza):
 	if not message:
 		return
 	if protocol.TYPE_PUBLIC == msgType:
-		if conference != trueJid:
+		if conference != truejid:
 			setNickKey(conference, nick, NICK_IDLE, time.time())
 	else:
 		if stanza.getTag("request"):
-			reportMsg = protocol.Message(fullJid)
+			reportMsg = protocol.Message(fulljid)
 			reportMsg.setID(stanza.getID())
 			reportMsg.addChild("received", None, None, protocol.NS_RECEIPTS)
 			gClient.send(reportMsg)
 	if isConference:
 		cmdType = CMD_CONFERENCE
-		callEventHandlers(EVT_MSG | H_CONFERENCE, (stanza, msgType, conference, nick, trueJid, message))
+		callEventHandlers(EVT_MSG | H_CONFERENCE, (stanza, msgType, conference, nick, truejid, message))
 	else:
 		cmdType = CMD_ROSTER
-		callEventHandlers(EVT_MSG | H_ROSTER, (stanza, msgType, conference, nick, trueJid, message))
+		callEventHandlers(EVT_MSG | H_ROSTER, (stanza, msgType, conference, nick, truejid, message))
 	if isConference:
 		botNick = getBotNick(conference)
 		if botNick == nick:
@@ -523,7 +523,7 @@ def messageHandler(session, stanza):
 		command = rawBody[0].lower()
 	if isCommand(command) and isAvailableCommand(conference, command):
 		if isCommandType(command, cmdType):
-			if getAccess(conference, trueJid) >= access:
+			if getAccess(conference, truejid) >= access:
 				param = (len(rawBody) == 2) and rawBody[1] or None
 				if param and isCommandType(command, CMD_NONPARAM):
 					return
@@ -536,17 +536,17 @@ def messageHandler(session, stanza):
 
 def presenceHandler(session, stanza):
 	gInfo["prs"] += 1
-	fullJid = stanza.getFrom()
-	jid = fullJid.getBareJid()
+	fulljid = stanza.getFrom()
+	jid = fulljid.getBareJID()
 	if isConferenceInList(jid):
 		conference = jid
-		trueJid = stanza.getJid()
-		nick = fullJid.getResource()
+		truejid = stanza.getJID()
+		nick = fulljid.getResource()
 		prsType = stanza.getType()
-		if trueJid:
-			trueJid = protocol.UserJid(trueJid).getBareJid()
+		if truejid:
+			truejid = protocol.UserJID(truejid).getBareJID()
 		if not prsType:
-			if not trueJid:
+			if not truejid:
 				leaveConference(conference, u"Без прав модератора работа невозможна!")
 				return
 			aff = stanza.getAffiliation()
@@ -554,30 +554,30 @@ def presenceHandler(session, stanza):
 			if not isNickOnline(conference, nick):
 				if not isNickInConference(conference, nick):
 					gConferences[conference][nick] = {}
-				setNickKey(conference, nick, NICK_JID, trueJid)
+				setNickKey(conference, nick, NICK_JID, truejid)
 				setNickKey(conference, nick, NICK_IDLE, time.time())
 				setNickKey(conference, nick, NICK_HERE, True)
 				setNickKey(conference, nick, NICK_JOINED, time.time())
 				if gIsJoined[conference]:
-					callEventHandlers(EVT_USERJOIN, (conference, nick, trueJid, aff, role))
+					callEventHandlers(EVT_USERJOIN, (conference, nick, truejid, aff, role))
 				else:
 					if nick == getBotNick(conference):
 						gIsJoined[conference] = True
 			roleAccess = ROLES[role]
 			affAccess = AFFILIATIONS[aff]
-			setTempAccess(conference, trueJid, roleAccess + affAccess)
+			setTempAccess(conference, truejid, roleAccess + affAccess)
 			setNickKey(conference, nick, NICK_MODER, role == protocol.ROLE_MODERATOR)
 		elif protocol.PRS_OFFLINE == prsType:
 			if isNickOnline(conference, nick):
 				code = stanza.getStatusCode()
 				reason = stanza.getReason() or stanza.getStatus()
 				setNickKey(conference, nick, NICK_HERE, False)
-				if not getNickByJid(conference, trueJid):
-					setTempAccess(conference, trueJid)
+				if not getNickByJID(conference, truejid):
+					setTempAccess(conference, truejid)
 				for key in (NICK_IDLE, NICK_MODER, NICK_STATUS, NICK_SHOW):
 					if key in gConferences[conference][nick]:
 						del gConferences[conference][nick][key]
-				callEventHandlers(EVT_USERLEAVE, (conference, nick, trueJid, reason, code))
+				callEventHandlers(EVT_USERLEAVE, (conference, nick, truejid, reason, code))
 		elif protocol.TYPE_ERROR == prsType:
 			errorCode = stanza.getErrorCode()
 			if errorCode == "409":
@@ -595,18 +595,18 @@ def presenceHandler(session, stanza):
 			elif errorCode in ("401", "403", "405"):
 				leaveConference(conference, u"got %s error code" % errorCode)
 				addTextToSysLog(u"Got error in %s (%s)" % (conference, errorCode), LOG_WARNINGS, True)
-		callEventHandlers(EVT_PRS | H_CONFERENCE, (stanza, conference, nick, trueJid))
+		callEventHandlers(EVT_PRS | H_CONFERENCE, (stanza, conference, nick, truejid))
 	else:
-		resource = fullJid.getResource()
+		resource = fulljid.getResource()
 		callEventHandlers(EVT_PRS | H_ROSTER, (stanza, jid, resource, None))
 
 def iqHandler(session, stanza):
 	gInfo["iq"] += 1
-	fullJid = stanza.getFrom()
-	jid = fullJid.getBareJid()
-	resource = fullJid.getResource()
-	trueJid = getTrueJid(jid, resource)
-	if getAccess(jid, trueJid) == -100:
+	fulljid = stanza.getFrom()
+	jid = fulljid.getBareJID()
+	resource = fulljid.getResource()
+	truejid = getTrueJID(jid, resource)
+	if getAccess(jid, truejid) == -100:
 		return
 	if protocol.TYPE_GET == stanza.getType():
 		if stanza.getTags("query", {}, protocol.NS_VERSION):

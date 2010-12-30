@@ -56,7 +56,7 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 			elements = []
 			if "name" in attrs:
 				elements.append(attrs["name"])
-				if not isJid(jid) and "jid" in attrs:
+				if not isJID(jid) and "jid" in attrs:
 					elements.append(attrs["jid"])
 				if "node" in attrs:
 					elements.append(attrs["node"])

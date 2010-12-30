@@ -48,10 +48,10 @@ def showCommands(msgType, conference, nick, param):
 	cmdType = isConferenceInList(conference) and CMD_CONFERENCE or CMD_ROSTER
 	availableCmds, disabledCmds = [], []
 	message = ""
-	trueJid = getTrueJid(conference, nick)
+	truejid = getTrueJID(conference, nick)
 	for cmd in gCommands:
 		if isCommandType(cmd, cmdType):
-			if getAccess(conference, trueJid) >= gCommands[cmd][CMD_ACCESS]:
+			if getAccess(conference, truejid) >= gCommands[cmd][CMD_ACCESS]:
 				if cmdType == CMD_ROSTER:
 					availableCmds.append(cmd)
 				else:

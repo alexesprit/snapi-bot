@@ -19,8 +19,7 @@ def executeExternalCode():
 	path = getConfigPath(EXECUTE_FILE)
 	if os.path.exists(path):
 		try:
-			f = file(path)
-			exec f in globals()
+			execfile(path, globals())
 		except Exception:
 			printf("Error while executing %s!" % (path), FLAG_ERROR)
 			addTextToSysLog(traceback.format_exc(), LOG_ERRORS)

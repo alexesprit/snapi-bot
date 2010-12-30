@@ -69,7 +69,7 @@ def showExprInfo(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Такого выражения нет")	
 
-def processExpression(stanza, msgType, conference, nick, trueJid, text):
+def processExpression(stanza, msgType, conference, nick, truejid, text):
 	if nick != getBotNick(conference):
 		text = text.lower()
 		command = text.split()[0]

@@ -106,12 +106,12 @@ def turnLastMessage(msgType, conference, nick, param):
 		if not msgType == protocol.TYPE_PUBLIC:
 			sendMsg(msgType, conference, nick, u"Только в конференции!")
 			return
-		trueJid = getTrueJid(conference, nick)
-		if trueJid not in gTurnMsgCache[conference]:
+		truejid = getTrueJID(conference, nick)
+		if truejid not in gTurnMsgCache[conference]:
 			# TODO придумать реплику одинаковой для М и Ж 
 			sendMsg(msgType, conference, nick, u"А ты ещё ничего не говорил")
 		else:
-			savedMsg = gTurnMsgCache[conference][trueJid]
+			savedMsg = gTurnMsgCache[conference][truejid]
 			receiver = None
 			for userNick in getNicks(conference):
 				if savedMsg.startswith(userNick):
@@ -126,11 +126,11 @@ def turnLastMessage(msgType, conference, nick, param):
 			else:
 				sendMsg(msgType, conference, nick, turnMessage(savedMsg))
 
-def saveTurnMessage(stanza, msgType, conference, nick, trueJid, message):
+def saveTurnMessage(stanza, msgType, conference, nick, truejid, message):
 	if msgType == protocol.TYPE_PUBLIC:
-		if trueJid != gConfig.JID and trueJid != conference:
+		if truejid != gConfig.JID and truejid != conference:
 			if "turn" != message.lower():
-				gTurnMsgCache[conference][trueJid] = message
+				gTurnMsgCache[conference][truejid] = message
 
 def initTurnCache(conference):
 	gTurnMsgCache[conference] = {}
@@ -138,9 +138,9 @@ def initTurnCache(conference):
 def freeTurnCache(conference):
 	del gTurnMsgCache[conference]
 
-def clearTurnCache(conference, nick, trueJid, reason, code):
-	if trueJid in gTurnMsgCache[conference]:
-		del gTurnMsgCache[conference][trueJid]
+def clearTurnCache(conference, nick, truejid, reason, code):
+	if truejid in gTurnMsgCache[conference]:
+		del gTurnMsgCache[conference][truejid]
 
 registerEventHandler(initTurnCache, EVT_ADDCONFERENCE)
 registerEventHandler(freeTurnCache, EVT_DELCONFERENCE)

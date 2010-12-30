@@ -271,8 +271,6 @@ class JSONDecoder(object):
     """
 
     _scanner = Scanner(ANYTHING)
-    __all__ = ['__init__', 'decode', 'raw_decode']
-
     def __init__(self, encoding=None, object_hook=None, parse_float=None,
             parse_int=None, parse_constant=None, strict=True):
         """``encoding`` determines the encoding used to interpret any ``str``

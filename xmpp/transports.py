@@ -26,9 +26,7 @@ import select
 import socket
 import sys
 
-isPython26 = sys.version[:3] == "2.6"
-
-if isPython26:
+if sys.hexversion >= 0x20600f0:
 	import ssl
 
 import dispatcher
@@ -132,14 +130,6 @@ class TCPSocket(plugin.PlugIn):
 		except Exception:
 			received = ""
 
-		while self.pending_data(0):
-			try:
-				add = self._recv(BUFLEN)
-			except Exception:
-				add = ""
-			received += add
-			if not add:
-				break
 		# length of 0 means disconnect
 		if len(received):
 			self._seen_data = 1
@@ -150,19 +140,19 @@ class TCPSocket(plugin.PlugIn):
 			raise IOError("Disconnected from server")
 		return received
 
-	def send(self, rawData):
+	def send(self, rawdata):
 		""" Writes raw outgoing data. Blocks until done.
 			If supplied data is unicode string, encodes it to utf-8 before send.
 		"""
-		if isinstance(rawData, unicode):
-			rawData = rawData.encode("utf-8")
-		elif not isinstance(rawData, str):
-			rawData = ustr(rawData).encode("utf-8")
+		if isinstance(rawdata, unicode):
+			rawdata = rawdata.encode("utf-8")
+		elif not isinstance(rawdata, str):
+			rawdata = ustr(rawdata).encode("utf-8")
 		try:
-			self._send(rawData)
+			self._send(rawdata)
 			# Avoid printing messages that are empty keepalive packets.
-			if rawData.strip():
-				self.printf(rawData, "sent")
+			if rawdata.strip():
+				self.printf(rawdata, "sent")
 		# TODO Make better
 		except Exception:
 			self.printf("Socket error while sending data", "error")
@@ -224,7 +214,7 @@ class TLS(plugin.PlugIn):
 
 	def _startSSL(self):
 		tcpsock = self._owner.Connection
-		if isPython26:
+		if sys.hexversion >= 0x20600f0:
 			tcpsock._sslObj = ssl.wrap_socket(tcpsock._sock, None, None)
 		else:
 			tcpsock._sslObj = socket.ssl(tcpsock._sock, None, None)

@@ -163,18 +163,18 @@ class Client(CommonClient):
 		else:
 			return None
 
-	def auth(self, user, password, resource=None):
+	def auth(self, username, password, resource=None):
 		""" Authenticate connnection and bind resource. If resource is not provided
 			random one or library name used.
 		"""
-		self._user, self._password, self._resource = user, password, resource
+		self.username, self.password, self.resource = username, password, resource
 		while not self.Dispatcher.Stream._document_attrs and self.process(1):
 			pass
 		# If we get version 1.0 stream the features tag MUST BE presented
 		if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
 			while not self.Dispatcher.Stream.features and self.process(1):
 				pass
-		auth.SASL(user, password).PlugIn(self)
+		auth.SASL(username, password).PlugIn(self)
 		self.SASL.auth()
 		while auth.AUTH_WAITING == self.SASL.state and self.process(1):
 			pass

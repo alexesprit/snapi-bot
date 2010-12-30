@@ -48,15 +48,15 @@ def vote(msgType, conference, nick, param):
 		elif gVote[conference]["state"] == VOTE_CREATED:
 			sendMsg(msgType, conference, nick, u"Голосование ещё не запущено")
 		else:
-			trueJid = getTrueJid(conference, nick)
-			if not trueJid in gVote[conference]["voted"]:
-				gVote[conference]["voted"][trueJid] = False
-			if not gVote[conference]["voted"][trueJid]:
+			truejid = getTrueJID(conference, nick)
+			if not truejid in gVote[conference]["voted"]:
+				gVote[conference]["voted"][truejid] = False
+			if not gVote[conference]["voted"][truejid]:
 				try:
 					param = int(param) - 1
 					if param >= 0:
 						gVote[conference]["opinions"][param][1] += 1
-						gVote[conference]["voted"][trueJid] = True
+						gVote[conference]["voted"][truejid] = True
 						saveVotes(conference)
 						
 						sendMsg(msgType, conference, nick, u"Поняла")
@@ -76,7 +76,7 @@ def createNewVote(msgType, conference, nick, param):
 		if gVote[conference] and gVote[conference]["state"] != VOTE_FINISHED:
 			sendMsg(msgType, conference, nick, u"Имеется неоконченное голосование")
 		else:
-			gVote[conference] = {"state": VOTE_CREATED, "creator": nick, "creatorjid": getTrueJid(conference, nick), "text": param, "voted": {}, "opinions": []}
+			gVote[conference] = {"state": VOTE_CREATED, "creator": nick, "creatorjid": getTrueJID(conference, nick), "text": param, "voted": {}, "opinions": []}
 			saveVotes(conference)
 			sendMsg(msgType, conference, nick, u"Голосование создано! Чтобы добавить пункты напиши \"пункт+ твой_пункт\", удалить - \"пункт- номер пункта\". Начать голосование - команда \"голосование+\". Посмотреть текущие результаты - команда \"мнения\". Окончить голосование - команда \"итоги\"")
 	else:
@@ -99,9 +99,9 @@ def startVote(msgType, conference, nick, parameters):
 		elif not gVote[conference]["opinions"]:
 			sendMsg(msgType, conference, nick, u"Голосование не имеет пунктов")
 		else:
-			trueJid = getTrueJid(conference, nick)
-			creatorJid = gVote[conference]["creatorjid"]
-			if creatorJid == trueJid or getAccess(conference, trueJid) >= 20:
+			truejid = getTrueJID(conference, nick)
+			creatorjid = gVote[conference]["creatorjid"]
+			if creatorjid == truejid or getAccess(conference, truejid) >= 20:
 				gVote[conference]["state"] = VOTE_STARTED
 				saveVotes(conference)
 				sendToConference(conference, getVoteText(conference))
@@ -115,9 +115,9 @@ def stopVote(msgType, conference, nick, param):
 		if gVote[conference]["state"] == VOTE_FINISHED:
 			sendMsg(msgType, conference, nick, u"Неприменимо к оконченному голосованию")
 		elif gVote[conference]["state"] == VOTE_STARTED:
-			trueJid = getTrueJid(conference, nick)
-			creatorJid = gVote[conference]["creatorjid"]
-			if creatorJid == trueJid or getAccess(conference, trueJid) >= 20:
+			truejid = getTrueJID(conference, nick)
+			creatorjid = gVote[conference]["creatorjid"]
+			if creatorjid == truejid or getAccess(conference, truejid) >= 20:
 				gVote[conference]["state"] = VOTE_CREATED
 				saveVotes(conference)
 				sendMsg(msgType, conference, nick, u"Голосование приостановлено")
@@ -135,9 +135,9 @@ def addOpinion(msgType, conference, nick, param):
 		elif gVote[conference]["state"] == VOTE_FINISHED:
 			sendMsg(msgType, conference, nick, u"Неприменимо к оконченному голосованию")
 		else:
-			trueJid = getTrueJid(conference, nick)
-			creatorJid = gVote[conference]["creatorjid"]
-			if creatorJid == trueJid or getAccess(conference, trueJid) >= 20:
+			truejid = getTrueJID(conference, nick)
+			creatorjid = gVote[conference]["creatorjid"]
+			if creatorjid == truejid or getAccess(conference, truejid) >= 20:
 				if param in [x[0] for x in gVote[conference]["opinions"]]:
 					sendMsg(msgType, conference, nick, u"уже есть такой пункт")
 				else:
@@ -156,9 +156,9 @@ def delOpinion(msgType, conference, nick, param):
 		elif gVote[conference]["state"] == VOTE_FINISHED:
 			sendMsg(msgType, conference, nick, u"Неприменимо к оконченному голосованию")
 		else:
-			trueJid = getTrueJid(conference, nick)
-			creatorJid = gVote[conference]["creatorjid"]
-			if creatorJid == trueJid or getAccess(conference, trueJid) >= 20:
+			truejid = getTrueJID(conference, nick)
+			creatorjid = gVote[conference]["creatorjid"]
+			if creatorjid == truejid or getAccess(conference, truejid) >= 20:
 				try:
 					param = int(param) - 1
 					if param >= 0:
@@ -182,9 +182,9 @@ def showOpinions(msgType, conference, nick, param):
 		if gVote[conference]["state"] == VOTE_FINISHED:
 			sendMsg(msgType, conference, nick, getVoteResults(conference))
 		else:
-			trueJid = getTrueJid(conference, nick)
-			creatorJid = gVote[conference]["creatorjid"]
-			if creatorJid == trueJid or getAccess(conference, trueJid) >= 20:
+			truejid = getTrueJID(conference, nick)
+			creatorjid = gVote[conference]["creatorjid"]
+			if creatorjid == truejid or getAccess(conference, truejid) >= 20:
 				if protocol.TYPE_PUBLIC == msgType:
 					sendMsg(msgType, conference, nick, u"Ушли")
 				sendMsg(protocol.TYPE_PRIVATE, conference, nick, getVoteResults(conference))
@@ -198,9 +198,9 @@ def endVote(msgType, conference, nick, param):
 		if gVote[conference]["state"] == VOTE_FINISHED:
 			sendMsg(msgType, conference, nick, u"Голосование уже закончено, просмотр мнений - команда \"мнения\"")
 		else:
-			trueJid = getTrueJid(conference, nick)
-			creatorJid = gVote[conference]["creatorjid"]
-			if creatorJid == trueJid or getAccess(conference, trueJid) >= 20:
+			truejid = getTrueJID(conference, nick)
+			creatorjid = gVote[conference]["creatorjid"]
+			if creatorjid == truejid or getAccess(conference, truejid) >= 20:
 				gVote[conference]["state"] = VOTE_FINISHED
 				del gVote[conference]["voted"]
 				saveVotes(conference)
@@ -210,11 +210,11 @@ def endVote(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Сейчас нет никаких голосований")
 
-def showVote(conference, nick, trueJid, aff, role):
+def showVote(conference, nick, truejid, aff, role):
 	if gVote[conference]:
 		if gVote[conference]["state"] == VOTE_STARTED:
-			if not trueJid in gVote[conference]["voted"]:
-				gVote[conference]["voted"][trueJid] = False
+			if not truejid in gVote[conference]["voted"]:
+				gVote[conference]["voted"][truejid] = False
 				saveVotes(conference)
 				sendMsg(protocol.TYPE_PRIVATE, conference, nick, getVoteText(conference))
 

@@ -113,7 +113,6 @@ class JSONEncoder(object):
     implementation (to raise ``TypeError``).
 
     """
-    __all__ = ['__init__', 'default', 'encode', 'iterencode']
     item_separator = ', '
     key_separator = ': '
     def __init__(self, skipkeys=False, ensure_ascii=True,

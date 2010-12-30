@@ -42,13 +42,13 @@ class Dispatcher(plugin.PlugIn):
 		self.handlers = {}
 		self._expected = {}
 		self._exportedMethods = (
+			self.disconnect,
 			self.process,
 			self.registerHandler,
 			self.unregisterHandler,
-			self.sendAndWaitForResponse,
 			self.waitForResponse,
 			self.send,
-			self.disconnect,
+			self.sendAndWaitForResponse,
 			self.sendAndCallForResponse
 		)
 
@@ -64,9 +64,15 @@ class Dispatcher(plugin.PlugIn):
 		"""
 		self.handlers = handlers
 
-	def _init(self):
-		""" Registers default namespaces/protocols/handlers. Used internally.
+	def plugin(self, owner):
+		""" Plug the Dispatcher instance into Client class instance and send 
+			initial stream header. Used internally.
 		"""
+		for method in self._oldMethods:
+			if method.__name__ == "send":
+				self._owner_send = method
+				break
+
 		self.registerNamespace(protocol.NS_STREAMS)
 		self.registerNamespace(self._owner.namespace)
 		self.registerStanza("iq", protocol.Iq)
@@ -74,15 +80,6 @@ class Dispatcher(plugin.PlugIn):
 		self.registerStanza("message", protocol.Message)
 		self.registerHandler("error", self.streamErrorHandler, xmlns=protocol.NS_STREAMS)
 
-	def plugin(self, owner):
-		""" Plug the Dispatcher instance into Client class instance and send 
-			initial stream header. Used internally.
-		"""
-		self._init()
-		for method in self._oldMethods:
-			if method.__name__ == "send":
-				self._owner_send = method
-				break
 		self.initStream()
 
 	def plugout(self):
@@ -250,7 +247,6 @@ class Dispatcher(plugin.PlugIn):
 			else:
 				session.printf("Expected stanza arrived!", "ok")
 				session._expected[stanzaID] = stanza
-		#else:
 		handlerList = ["default"]
 		if stanzaType in self.handlers[xmlns][name]:
 			handlerList.append(stanzaType)

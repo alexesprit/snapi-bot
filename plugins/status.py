@@ -32,7 +32,7 @@ def showUserStatus(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 
-def saveUserStatus(stanza, conference, nick, trueJid):
+def saveUserStatus(stanza, conference, nick, truejid):
 	if protocol.TYPE_ERROR != stanza.getType():
 		if isNickOnline(conference, nick):
 			show = stanza.getShow() or u"online"

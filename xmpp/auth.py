@@ -204,10 +204,11 @@ class Bind(plugin.PlugIn):
 		if protocol.TYPE_RESULT == stanza.getType():
 			resource = stanza.getTag("bind").getTagData("jid")
 			self.printf("Successfully bound %s" % (resource), "ok")
-			jid = protocol.UserJid(stanza.getTag("bind").getTagData("jid"))
-			self._owner.User = jid.getNode()
-			self._owner.Resource = jid.getResource()
-			
+
+			jid = protocol.UserJID(stanza.getTag("bind").getTagData("jid"))
+			self._owner.username = jid.getNode()
+			self._owner.resource = jid.getResource()
+
 			sNode = protocol.Node("session", attrs={"xmlns": protocol.NS_SESSION})
 			iq = protocol.Iq(typ=protocol.TYPE_SET, payload=[sNode])
 			stanza = self._owner.sendAndWaitForResponse(iq)

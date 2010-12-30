@@ -23,7 +23,7 @@ def showRecord(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Нет информации")
 		
-def calculateRecord(conference, nick, trueJid, aff, role):
+def calculateRecord(conference, nick, truejid, aff, role):
 	userCount = len(getOnlineNicks(conference))
 	lastCount = gRecords[conference] and gRecords[conference]["count"] or 0
 	if userCount >= lastCount:

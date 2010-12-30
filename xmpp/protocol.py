@@ -252,19 +252,19 @@ streamExceptions = {
 	"xml-not-well-formed": XMLNotWellFormed
 }
 
-class UserJid:
-	""" UserJid object. UserJid can be built from string, modified, 
+class UserJID:
+	""" UserJID object. UserJID can be built from string, modified, 
 		compared, serialised into string.
 	"""
 	def __init__(self, jid=None, node="", domain="", resource=""):
-		""" Constructor. Jid can be specified as string (jid argument) or as separate parts.
+		""" Constructor. JID can be specified as string (jid argument) or as separate parts.
 			Examples:
-				foo = UserJid("node@domain/resource")
-				foo = UserJid(node="node", domain="domain.org")
+				foo = UserJID("node@domain/resource")
+				foo = UserJID(node="node", domain="domain.org")
 		"""
 		if not jid and not domain:
-			raise ValueError("UserJid must contain at least domain name")
-		elif isinstance(jid, UserJid):
+			raise ValueError("UserJID must contain at least domain name")
+		elif isinstance(jid, UserJID):
 			self.node = jid.node
 			self.domain = jid.domain
 			self.resource= jid.resource
@@ -310,13 +310,13 @@ class UserJid:
 		"""
 		self.resource = resource
 
-	def getBareJid(self):
+	def getBareJID(self):
 		""" Return the bare representation of jid. I.e. string value w/o resource.
 		"""
 		return self.__str__(0)
 
 	def __str__(self, showResource=True):
-		""" Serialise UserJid into string.
+		""" Serialise UserJID into string.
 		"""
 		if self.node:
 			jid = "%s@%s" % (self.node, self.domain)
@@ -327,7 +327,7 @@ class UserJid:
 		return jid
 
 	def __hash__(self):
-		""" Produce hash of UserJid, Allows to use UserJid objects as keys of the dictionary.
+		""" Produce hash of UserJID, Allows to use UserJID objects as keys of the dictionary.
 		"""
 		return hash(self.__str__())
 
@@ -365,7 +365,7 @@ class Stanza(Node):
 	def setFrom(self, value):
 		""" Set the value of the "from" attribute.
 		"""
-		self.setAttr("from", UserJid(value))
+		self.setAttr("from", UserJID(value))
 
 	def getFrom(self):
 		""" Return value of the "from" attribute.
@@ -380,7 +380,7 @@ class Stanza(Node):
 	def setTo(self, value):
 		""" Set the value of the "to" attribute.
 		"""
-		self.setAttr("to", UserJid(value))
+		self.setAttr("to", UserJID(value))
 
 	def getID(self):
 		""" Return the value of the "id" attribute.
@@ -559,7 +559,7 @@ class Presence(Stanza):
 		"""
 		return self._muc_getItemAttr("item", "nick")
 	
-	def getJid(self):
+	def getJID(self):
 		"""Returns the presence jid.
 		"""
 		return self._muc_getItemAttr("item", "jid")

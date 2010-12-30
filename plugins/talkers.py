@@ -43,8 +43,8 @@ def showTopTalkersInfo(msgType, conference, nick):
 
 def clearTalkersInfo(msgType, conference, nick):
 	conference = source[1]
-	trueJid = getTrueJid(conference, nick)
-	if getAccess(conference, trueJid) >= 20:
+	truejid = getTrueJID(conference, nick)
+	if getAccess(conference, truejid) >= 20:
 		base = gTalkersCache[conference]
 		base.clear()
 		base.save()
@@ -59,14 +59,14 @@ def showTalkerInfo(msgType, conference, nick, param):
 		clearTalkersInfo(msgType, conference, nick)
 	else:
 		if not param:
-			trueJid = getTrueJid(conference, nick)
+			truejid = getTrueJID(conference, nick)
 		elif isNickInConference(conference, param):
-			trueJid = getTrueJid(conference, param)
+			truejid = getTrueJID(conference, param)
 		else:
 			return
 		base = gTalkersCache[conference]
-		if trueJid in base:
-			statistic = base[trueJid]
+		if truejid in base:
+			statistic = base[truejid]
 			pattern = u"Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f"
 			nick = statistic["nick"]
 			words = statistic["words"]
@@ -78,19 +78,19 @@ def showTalkerInfo(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Нет информации")
 
-def updateTalkersInfo(stanza, msgType, conference, nick, trueJid, body):
+def updateTalkersInfo(stanza, msgType, conference, nick, truejid, body):
 	if msgType == protocol.TYPE_PUBLIC:
-		if trueJid != gConfig.JID and trueJid != conference:
+		if truejid != gConfig.JID and truejid != conference:
 			base = gTalkersCache[conference]
-			if trueJid in base:
-				base[trueJid]["nick"] = nick
+			if truejid in base:
+				base[truejid]["nick"] = nick
 			else:
-				base[trueJid] = {"nick": nick, "words": 0, "messages": 0, "mes": 0}
+				base[truejid] = {"nick": nick, "words": 0, "messages": 0, "mes": 0}
 			if body.startswith("/me"):
-				base[trueJid]["mes"] += 1
+				base[truejid]["mes"] += 1
 			else:
-				base[trueJid]["messages"] += 1
-			base[trueJid]["words"] += len(body.split())
+				base[truejid]["messages"] += 1
+			base[truejid]["words"] += len(body.split())
 
 def loadTalkersBase(conference):
 	path = getConfigPath(conference, TALKERS_FILE)

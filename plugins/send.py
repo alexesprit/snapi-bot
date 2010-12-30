@@ -35,23 +35,23 @@ def addToSendBase(msgType, conference, nick, param):
 			sendMsg(protocol.TYPE_PRIVATE, conference, userNick, message)
 			sendMsg(msgType, conference, nick, u"Передала")
 		elif isNickInConference(conference, userNick):
-			trueJid = getTrueJid(conference, userNick)
+			truejid = getTrueJID(conference, userNick)
 			base = gSendCache[conference]
-			if trueJid not in base:
-				base[trueJid] = []
-			base[trueJid].append(message)
+			if truejid not in base:
+				base[truejid] = []
+			base[truejid].append(message)
 			base.save()
 			sendMsg(msgType, conference, nick, u"Передам")
 		else:
 			sendMsg(msgType, conference, nick, u"А это кто?")
 
-def sendMessagesToUser(conference, nick, trueJid, aff, role):
+def sendMessagesToUser(conference, nick, truejid, aff, role):
 	base = gSendCache[conference]
-	if trueJid in base:
-		for message in base[trueJid]:
+	if truejid in base:
+		for message in base[truejid]:
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 			time.sleep(0.5)
-		del base[trueJid]
+		del base[truejid]
 		base.save()
 
 registerEventHandler(loadSendBase, EVT_ADDCONFERENCE)

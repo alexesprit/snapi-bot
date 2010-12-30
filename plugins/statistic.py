@@ -30,28 +30,28 @@ def updateBotMessageStats(msgType, conference, text):
 	if protocol.TYPE_PUBLIC == msgType and text:
 		gConferenceStats[conference]["mymsg"] += 1
 
-def updateMessageStats(stanza, msgType, conference, nick, trueJid, text):
+def updateMessageStats(stanza, msgType, conference, nick, truejid, text):
 	if nick != getBotNick(conference):
 		gConferenceStats[conference][msgType] += 1
 
-def updateJoinStats(conference, nick, trueJid, aff, role):
-	if not trueJid in gStatsJoined[conference]:
-		gStatsJoined[conference].append(trueJid)
+def updateJoinStats(conference, nick, truejid, aff, role):
+	if not truejid in gStatsJoined[conference]:
+		gStatsJoined[conference].append(truejid)
 		gConferenceStats[conference]["join"] += 1
 		gConferenceStats[conference][role] += 1
 
-def updateLeaveStats(conference, nick, trueJid, reason, code):
-	if not trueJid in gStatsLeaved[conference]:
-		gStatsLeaved[conference].append(trueJid)
+def updateLeaveStats(conference, nick, truejid, reason, code):
+	if not truejid in gStatsLeaved[conference]:
+		gStatsLeaved[conference].append(truejid)
 		gConferenceStats[conference]["leave"] += 1
-	if code == "307" and not trueJid in gStatsKicked[conference]:
+	if code == "307" and not truejid in gStatsKicked[conference]:
 		gConferenceStats[conference]["kick"] += 1
-		gStatsKicked[conference].append(trueJid)
-	elif code == "301" and not trueJid in gStatsBanned[conference]:
+		gStatsKicked[conference].append(truejid)
+	elif code == "301" and not truejid in gStatsBanned[conference]:
 		gConferenceStats[conference]["ban"] += 1
-		gStatsBanned[conference].append(trueJid)
+		gStatsBanned[conference].append(truejid)
 
-def updatePresenceStats(stanza, conference, nick, trueJid):
+def updatePresenceStats(stanza, conference, nick, truejid):
 	if protocol.TYPE_ERROR != stanza.getType():
 		if "303" == stanza.getStatusCode():
 			gConferenceStats[conference]["nick"] += 1

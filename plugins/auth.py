@@ -37,26 +37,26 @@ def initAuthCache(conference):
 def freeAuthCache(conference):
 	del gAuthAnswer[conference]
 
-def askAuthQuestion(conference, nick, trueJid, aff, role):
+def askAuthQuestion(conference, nick, truejid, aff, role):
 	if getConferenceConfigKey(conference, "auth"):
 		if aff == protocol.AFF_NONE:
 			question, answer = random.choice(AUTH_QUESTIONS)
 			setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Неавторизованый участник")
 			message = u"Чтобы получить голос, реши пример: %s. Как решишь, напиши мне ответ" % (question)
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
-			gAuthAnswer[conference][trueJid] = answer
+			gAuthAnswer[conference][truejid] = answer
 
-def clearAuthCache(conference, nick, trueJid, reason, code):
-	if trueJid in gAuthAnswer[conference]:
-		del gAuthAnswer[conference][trueJid]
+def clearAuthCache(conference, nick, truejid, reason, code):
+	if truejid in gAuthAnswer[conference]:
+		del gAuthAnswer[conference][truejid]
 
-def authAnswerListener(stanza, msgType, conference, nick, trueJid, body):
+def authAnswerListener(stanza, msgType, conference, nick, truejid, body):
 	if protocol.TYPE_PRIVATE == msgType:
-		if trueJid in gAuthAnswer[conference]:
-			if gAuthAnswer[conference][trueJid] == body:
+		if truejid in gAuthAnswer[conference]:
+			if gAuthAnswer[conference][truejid] == body:
 				sendMsg(msgType, conference, nick, u"Признаю - ты не бот :)")
 				setMUCRole(conference, nick, protocol.ROLE_PARTICIPANT, u"Авторизация пройдена")
-				del gAuthAnswer[conference][trueJid]
+				del gAuthAnswer[conference][truejid]
 			else:
 				sendMsg(msgType, conference, nick, u"Неправильный ответ")
 

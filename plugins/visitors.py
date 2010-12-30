@@ -29,27 +29,27 @@ def loadAutoVisitors(conference):
 def freeAutoVisitors(conference):
 	del gVisitors[conference]
 
-def setAutoVisitor(conference, nick, trueJid, aff, role):
-	if trueJid in gVisitors[conference]:
+def setAutoVisitor(conference, nick, truejid, aff, role):
+	if truejid in gVisitors[conference]:
 		setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Автопосетитель")
 
 def addAutoVisitor(msgType, conference, nick, param):
 	user = param
 	setVisitorRole = False
 	if isNickInConference(conference, user):
-		trueJid = getTrueJid(conference, user)
+		truejid = getTrueJID(conference, user)
 		if getNickKey(conference, user, NICK_HERE):
 			setVisitorRole = True
-	elif isJid(user):
-		trueJid = user
-		user = getNickByJid(conference, trueJid)
+	elif isJID(user):
+		truejid = user
+		user = getNickByJID(conference, truejid)
 		if user:
 			setVisitorRole = True
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 		return
-	if trueJid not in gVisitors[conference]:
-		gVisitors[conference].append(trueJid)
+	if truejid not in gVisitors[conference]:
+		gVisitors[conference].append(truejid)
 		saveAutoVisitors(conference)
 		sendMsg(msgType, conference, nick, u"Добавила")
 		if setVisitorRole:
@@ -61,19 +61,19 @@ def delAutoVisitort(msgType, conference, nick, param):
 	user = param
 	setParticipantRole = False
 	if isNickInConference(conference, user):
-		trueJid = getTrueJid(conference, user)
+		truejid = getTrueJID(conference, user)
 		if getNickKey(conference, user, NICK_HERE):
 			setParticipantRole = True
-	elif isJid(user):
-		trueJid = user
-		user = getNickByJid(conference, trueJid)
+	elif isJID(user):
+		truejid = user
+		user = getNickByJID(conference, truejid)
 		if user:
 			setParticipantRole = True
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 		return
-	if trueJid in gVisitors[conference]:
-		gVisitors[conference].remove(trueJid)
+	if truejid in gVisitors[conference]:
+		gVisitors[conference].remove(truejid)
 		saveAutoVisitors(conference)
 		sendMsg(msgType, conference, nick, u"Удалила")
 		if setParticipantRole:

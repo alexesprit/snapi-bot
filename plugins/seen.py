@@ -28,16 +28,16 @@ def saveAllSeenBases():
 	for conference in getConferences():
 		gSeenCache[conference].save()
 
-def updateSeenTime(conference, nick, trueJid, reason, code):
+def updateSeenTime(conference, nick, truejid, reason, code):
 	if "303" != code:
-		gSeenCache[conference][trueJid] = time.time()
+		gSeenCache[conference][truejid] = time.time()
 
 def showSeenTime(msgType, conference, nick, param):
 	userNick = param or nick
 	if isNickInConference(conference, userNick):
-		trueJid = getTrueJid(conference, userNick)
-		if trueJid in gSeenCache[conference]:
-			rawtime = gSeenCache[conference][trueJid]
+		truejid = getTrueJID(conference, userNick)
+		if truejid in gSeenCache[conference]:
+			rawtime = gSeenCache[conference][truejid]
 			seenDate = time.strftime("%H:%M, %d.%m.%Y", time.localtime(rawtime))
 			seenTime = getTimeStr(time.time() - rawtime)
 			if not param:

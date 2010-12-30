@@ -7,7 +7,7 @@
 		* debug - Jacob Lundquist's debugging module. Very handy if you like colored debug
 		* dispatcher - decision-making logic. Handles all hooks. The first who takes control 
 		  over fresh stanzas
-		* protocol: jabber-objects (I.e. UserJid and different stanzas and sub-stanzas)
+		* protocol: jabber-objects (I.e. UserJID and different stanzas and sub-stanzas)
 		* roster - simple roster for use in clients
 		* simplexml - XML handling routines
 		* transports - low level connection handling. TCP and TLS currently. HTTP support planned

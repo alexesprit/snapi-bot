@@ -20,23 +20,23 @@ def loadUserNotes():
 	gUserNotes = database.DataBase(getConfigPath(NOTE_FILE))
 
 def addUserNote(msgType, conference, nick, param):
-	trueJid = getTrueJid(conference, nick)
-	if trueJid not in gUserNotes:
-		gUserNotes[trueJid] = []
+	truejid = getTrueJID(conference, nick)
+	if truejid not in gUserNotes:
+		gUserNotes[truejid] = []
 	text = u"%s\n%s" % (time.strftime("[%d.%m.%y, %H:%M]"), param)
-	gUserNotes[trueJid].append(text)
+	gUserNotes[truejid].append(text)
 	gUserNotes.save()
 	sendMsg(msgType, conference, nick, u"Записала")
 
 def delUserNote(msgType, conference, nick, param):
-	trueJid = getTrueJid(conference, nick)
-	if trueJid in gUserNotes:
+	truejid = getTrueJID(conference, nick)
+	if truejid in gUserNotes:
 		try:
 			param = int(param) - 1
 			if param >= 0:
-				del gUserNotes[trueJid][param]
-				if not gUserNotes[trueJid]:
-					del gUserNotes[trueJid]
+				del gUserNotes[truejid][param]
+				if not gUserNotes[truejid]:
+					del gUserNotes[truejid]
 				gUserNotes.save()
 				sendMsg(msgType, conference, nick, u"Удалила")
 			else:
@@ -49,17 +49,17 @@ def delUserNote(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"В твоём блокноте пусто")
 
 def showUserNotes(msgType, conference, nick, param):
-	trueJid = getTrueJid(conference, nick)
+	truejid = getTrueJID(conference, nick)
 	if param == u"сброс":
-		if trueJid in gUserNotes:
-			del gUserNotes[trueJid]
+		if truejid in gUserNotes:
+			del gUserNotes[truejid]
 			gUserNotes.save()
 			sendMsg(msgType, conference, nick, u"Удалила")
 		else:
 			sendMsg(msgType, conference, nick, u"А у тебя и так ничего нет :P")
 	elif not param:
-		if trueJid in gUserNotes:
-			elements = [u"%d) %s" % (i + 1, note) for i, note in enumerate(gUserNotes[trueJid])]
+		if truejid in gUserNotes:
+			elements = [u"%d) %s" % (i + 1, note) for i, note in enumerate(gUserNotes[truejid])]
 			if protocol.TYPE_PUBLIC == msgType:
 				sendMsg(msgType, conference, nick, u"Ушли")
 			message = u"Твои заметки:\n%s" % ("\n".join(elements))

@@ -27,9 +27,9 @@ def freeClientsCache(conference):
 def showClients(msgType, conference, nick, param):
 	userNick = param or nick
 	if isNickInConference(conference, userNick):
-		trueJid = getTrueJid(conference, userNick)
-		if trueJid in gUserClients[conference]:
-			clients = gUserClients[conference][trueJid]
+		truejid = getTrueJID(conference, userNick)
+		if truejid in gUserClients[conference]:
+			clients = gUserClients[conference][truejid]
 			if clients:
 				clients.sort()
 				if not param:
@@ -44,27 +44,27 @@ def showClients(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 
-def saveUserClient(conference, nick, trueJid, aff, role):
+def saveUserClient(conference, nick, truejid, aff, role):
 	base = gUserClients[conference]
-	if trueJid not in base:
-		base[trueJid] = []
+	if truejid not in base:
+		base[truejid] = []
 	else:
-		base.updateChangeTime(trueJid)
+		base.updateChangeTime(truejid)
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.addChild("query", {}, [], protocol.NS_VERSION)
 	iq.setTo(conference + "/" + nick)
 	iq.setID(getUniqueID("cli_id"))
-	gClient.sendAndCallForResponse(iq, _saveUserClient, (conference, trueJid))
+	gClient.sendAndCallForResponse(iq, _saveUserClient, (conference, truejid))
 
-def _saveUserClient(stanza, conference, trueJid):
+def _saveUserClient(stanza, conference, truejid):
 	if protocol.TYPE_RESULT == stanza.getType():
 		base = gUserClients[conference]
 		query = stanza.getQueryNode()
 		if query:
 			name = query.getTagData("name")
 			if name:
-				if not name in base[trueJid]:
-					base[trueJid].append(name)
+				if not name in base[truejid]:
+					base[truejid].append(name)
 
 def saveAllClientsBases():
 	for conference in getConferences():

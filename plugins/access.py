@@ -30,10 +30,10 @@ ACCESS_DESC = {
 def login(msgType, conference, nick, param):
 	if msgType == protocol.TYPE_PRIVATE:
 		if param == gConfig.ADMIN_PASSWORD:
-			trueJid = getTrueJid(conference, nick)
-			if trueJid not in gConfig.ADMINS:
-				gConfig.ADMINS.append(trueJid)
-				setTempGlobalAccess(trueJid, 100)
+			truejid = getTrueJID(conference, nick)
+			if truejid not in gConfig.ADMINS:
+				gConfig.ADMINS.append(truejid)
+				setTempGlobalAccess(truejid, 100)
 				sendMsg(msgType, conference, nick, u"Пароль принят, глобальный доступ выдан")
 			else:
 				sendMsg(msgType, conference, nick, u"Ошибка! Вы уже авторизованы!")
@@ -41,10 +41,10 @@ def login(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Ошибка! Неверный пароль!")
 
 def logout(msgType, conference, nick, param):
-	trueJid = getTrueJid(conference, nick)
-	if trueJid in gConfig.ADMINS:
-		gConfig.ADMINS.remove(trueJid)
-		setTempGlobalAccess(trueJid)
+	truejid = getTrueJID(conference, nick)
+	if truejid in gConfig.ADMINS:
+		gConfig.ADMINS.remove(truejid)
+		setTempGlobalAccess(truejid)
 		sendMsg(msgType, conference, nick, u"Глобальный доступ снят")
 	else:
 		sendMsg(msgType, conference, nick, u"Ошибка! Вы не авторизованы!")
@@ -52,16 +52,16 @@ def logout(msgType, conference, nick, param):
 def showUserAccess(msgType, conference, nick, param):
 	user = param
 	if not param:
-		userJid = getTrueJid(conference, nick)
+		userjid = getTrueJID(conference, nick)
 	else:
 		if isConferenceInList(conference) and isNickInConference(conference, user):
-			userJid = getTrueJid(conference, user)
-		elif isJid(user):
-			userJid = user
+			userjid = getTrueJID(conference, user)
+		elif isJID(user):
+			userjid = user
 		else:
 			sendMsg(msgType, conference, nick, u"А кто это?")
 			return
-	access = getAccess(conference, userJid)
+	access = getAccess(conference, userjid)
 	if access in ACCESS_DESC:
 		accDesc = ACCESS_DESC[access]
 		sendMsg(msgType, conference, nick, u"%d (%s)" % (access, accDesc))
@@ -72,9 +72,9 @@ def setLocalAccess(msgType, conference, nick, param):
 	param = param.split(None, 2)
 	user = param[0].strip()
 	if isNickInConference(conference, user):
-		userJid = getTrueJid(conference, user)
-	elif isJid(user):
-		userJid = getTrueJid(conference, user)
+		userjid = getTrueJID(conference, user)
+	elif isJID(user):
+		userjid = getTrueJID(conference, user)
 	else:
 		sendMsg(msgType, conference, nick, u"А кто это?")
 		return
@@ -86,22 +86,22 @@ def setLocalAccess(msgType, conference, nick, param):
 		else:
 			newAccess = 0
 		
-		userAccess = getAccess(conference, userJid)
-		senderJid = getTrueJid(conference, nick)
-		senderAccess = getAccess(conference, senderJid)
+		userAccess = getAccess(conference, userjid)
+		senderjid = getTrueJID(conference, nick)
+		senderAccess = getAccess(conference, senderjid)
 
 		if newAccess > senderAccess or senderAccess < userAccess:
 			sendMsg(msgType, conference, nick, u"Недостаточно прав")
 			return
 		if newAccess != 0:
 			if len(param) == 2:
-				setTempAccess(conference, userJid, newAccess)
+				setTempAccess(conference, userjid, newAccess)
 				sendMsg(msgType, conference, nick, u"Доступ выдан до выхода из конференции")
 			else:
-				setPermAccess(conference, userJid, newAccess)
+				setPermAccess(conference, userjid, newAccess)
 				sendMsg(msgType, conference, nick, u"Выдан постоянный доступ")
 		else:
-			setPermAccess(conference, userJid, newAccess)
+			setPermAccess(conference, userjid, newAccess)
 			sendMsg(msgType, conference, nick, u"Постоянный доступ снят")
 	except ValueError:
 		sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
@@ -111,15 +111,15 @@ def setGlobalAccess(msgType, conference, nick, param):
 	user = param[0].strip()
 	if isConferenceInList(conference):
 		if isNickInConference(conference, user):
-			userJid = getTrueJid(conference, user)
-		elif isJid(user):
-			userJid = user
+			userjid = getTrueJID(conference, user)
+		elif isJID(user):
+			userjid = user
 		else:
 			sendMsg(msgType, conference, nick, u"А это кто?")
 			return
 	else:
-		if isJid(user):
-			userJid = user
+		if isJID(user):
+			userjid = user
 		else:
 			sendMsg(msgType, conference, nick, u"А это кто?")
 			return
@@ -130,7 +130,7 @@ def setGlobalAccess(msgType, conference, nick, param):
 				raise ValueError
 		else:
 			newAccess = 0
-		setPermGlobalAccess(userJid, newAccess)
+		setPermGlobalAccess(userjid, newAccess)
 		if newAccess != 0:
 			sendMsg(msgType, conference, nick, u"Выдан глобальный доступ")
 		else:

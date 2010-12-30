@@ -34,39 +34,38 @@ class Macros:
 
 	def loadMacroses(self, conference=None):
 		if conference:
-			macrosFileName = os.path.join(self.path, conference, MACROS_FILE)
-			accessFileName = os.path.join(self.path, conference, MACCESS_FILE)
-			
-			utils.createFile(macrosFileName, "{}")
-			utils.createFile(accessFileName, "{}")
+			path = os.path.join(self.path, conference, MACROS_FILE)
+			utils.createFile(path, "{}")
+			self.macrosList[conference] = eval(utils.readFile(path))
 
-			self.macrosList[conference] = eval(utils.readFile(macrosFileName))
-			self.accessList[conference] = eval(utils.readFile(accessFileName))
+			path = os.path.join(self.path, conference, MACCESS_FILE)
+			utils.createFile(path, "{}")
+			self.accessList[conference] = eval(utils.readFile(path))
 		else:
-			macrosFileName = os.path.join(self.path, MACROS_FILE)
-			accessFileName = os.path.join(self.path, MACCESS_FILE)
+			path = os.path.join(self.path, MACROS_FILE)
+			utils.createFile(path, "{}")
+			self.gMacrosList = eval(utils.readFile(path))
 
-			utils.createFile(macrosFileName, "{}")
-			utils.createFile(accessFileName, "{}")
-
-			self.gMacrosList = eval(utils.readFile(macrosFileName))
-			self.gAccessList = eval(utils.readFile(accessFileName))
+			path = os.path.join(self.path, MACCESS_FILE)			
+			utils.createFile(path, "{}")			
+			self.gAccessList = eval(utils.readFile(path))
 
 	def saveMacroses(self, conference=None):
 		if conference:
-			macrosFileName = os.path.join(self.path, conference, MACROS_FILE)
-			accessFileName = os.path.join(self.path, conference, MACCESS_FILE)
-			utils.writeFile(macrosFileName, str(self.macrosList[conference]))
-			utils.writeFile(accessFileName, str(self.accessList[conference]))
+			path = os.path.join(self.path, conference, MACROS_FILE)
+			utils.writeFile(path, str(self.macrosList[conference]))
+
+			path = os.path.join(self.path, conference, MACCESS_FILE)
+			utils.writeFile(path, str(self.accessList[conference]))
 		else:
-			macrosFileName = os.path.join(self.path, MACROS_FILE)
-			accessFileName = os.path.join(self.path, MACCESS_FILE)
-			utils.writeFile(macrosFileName, str(self.gMacrosList))
-			utils.writeFile(accessFileName, str(self.gAccessList))
+			path = os.path.join(self.path, MACROS_FILE)
+			utils.writeFile(path, str(self.gMacrosList))
+
+			path = os.path.join(self.path, MACCESS_FILE)
+			utils.writeFile(path, str(self.gAccessList))
 			
 	def freeMacroses(self, conference):
-		if conference in self.macrosList:
-			del self.macrosList[conference]
+		del self.macrosList[conference]
 
 	def getMacrosList(self, conference=None):
 		if conference:

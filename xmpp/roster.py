@@ -96,14 +96,14 @@ class Roster(plugin.PlugIn):
 		""" Presence tracker. Used internally for setting items' resources state
 			in internal roster representation.
 		"""
-		fullJid = stanza.getFrom()
-		bareJid = fullJid.getBareJid()
-		if bareJid in self.rosterData:
+		fulljid = stanza.getFrom()
+		barejid = fulljid.getBareJID()
+		if barejid in self.rosterData:
 			prsType = stanza.getType()
-			resource = fullJid.getResource()
-			item = self.rosterData[bareJid]
+			resource = fulljid.getResource()
+			item = self.rosterData[barejid]
 			if not prsType:
-				self.printf("Setting roster item %s for resource %s" % (bareJid, resource), "ok")
+				self.printf("Setting roster item %s for resource %s" % (barejid, resource), "ok")
 				show = stanza.getShow()
 				status = stanza.getStatus()
 				priority = stanza.getPriority() or "0"
@@ -116,22 +116,22 @@ class Roster(plugin.PlugIn):
 		""" Return specific jid's representation in internal format. 
 			Used internally.
 		"""
-		jid = protocol.UserJid(jid).getBareJid()
+		jid = protocol.UserJID(jid).getBareJID()
 		return self.rosterData[jid][field]
 
 	def _getResourceData(self, jid, field):
 		""" Return specific jid's resource representation in internal format. 
 			Used internally.
 		"""
-		fullJid = protocol.UserJid(jid)
-		bareJid = fullJid.getBareJid()
-		resource = fullJid.getResource()
+		fulljid = protocol.UserJID(jid)
+		barejid = fulljid.getBareJID()
+		resource = fulljid.getResource()
 		if resource:
-			if resource in self.rosterData[bareJid]["resources"]:
-				return self.rosterData[bareJid]["resources"][resource][field]
-		elif self.rosterData[bareJid]["resources"]:
+			if resource in self.rosterData[barejid]["resources"]:
+				return self.rosterData[barejid]["resources"][resource][field]
+		elif self.rosterData[barejid]["resources"]:
 			lastPriority = -129
-			resources = self.rosterData[bareJid]["resources"]
+			resources = self.rosterData[barejid]["resources"]
 			for r in resources:
 				priority = resources[r]["priority"]
 				if priority > lastPriority:
@@ -149,17 +149,17 @@ class Roster(plugin.PlugIn):
 		return self._getItemData(jid, "name")
 
 	def getPriority(self, jid):
-		""" Returns priority of jid. Jid should be a full (not bare).
+		""" Returns priority of jid. JID should be a full (not bare).
 		"""
 		return self._getResourceData(jid, "priority")
 
 	def getShow(self, jid):
-		""" Returns "show" value of jid. Jid should be a full (not bare).
+		""" Returns "show" value of jid. JID should be a full (not bare).
 		"""
 		return self._getResourceData(jid, "show")
 
 	def getStatus(self, jid):
-		""" Returns "status" value of jid. Jid should be a full (not bare).
+		""" Returns "status" value of jid. JID should be a full (not bare).
 		"""
 		return self._getResourceData(jid, "status")
 
@@ -170,9 +170,9 @@ class Roster(plugin.PlugIn):
 	def getResources(self, jid):
 		""" Returns list of connected resources of jid.
 		"""
-		fullJid = protocol.UserJid(jid)
-		bareJid = fullJid.getBareJid()
-		return self.rosterData[bareJid]["resources"].keys()
+		fulljid = protocol.UserJID(jid)
+		barejid = fulljid.getBareJID()
+		return self.rosterData[barejid]["resources"].keys()
 
 	def setItem(self, jid, name=None, groups=None):
 		""" Creates/renames jid and sets the groups list that it now belongs to.

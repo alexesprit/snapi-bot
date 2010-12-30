@@ -13,16 +13,16 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def showTrueJid(msgType, conference, nick, param):
+def showTrueJID(msgType, conference, nick, param):
 	if isNickInConference(conference, param):
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Смотри в привате")
-		trueJid = getTrueJid(conference, param)
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Жид %s: %s" % (param, trueJid))
+		truejid = getTrueJID(conference, param)
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Жид %s: %s" % (param, truejid))
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 
-registerCommand(showTrueJid, u"тружид", 20, 
+registerCommand(showTrueJID, u"тружид", 20, 
 				u"Показывает реальный жид указанного ника", 
 				u"<ник>", 
 				(u"Nick", ), 

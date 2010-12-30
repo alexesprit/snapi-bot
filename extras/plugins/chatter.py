@@ -52,7 +52,7 @@ def removeNicks(message, nickList):
 			break
 	return message
 
-def processChatter(stanza, msgType, conference, nick, trueJid, message):
+def processChatter(stanza, msgType, conference, nick, truejid, message):
 	if protocol.TYPE_PUBLIC == msgType and getConferenceConfigKey(conference, "chatter"):
 		if not nick: # topic
 			return

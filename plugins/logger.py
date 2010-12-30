@@ -84,19 +84,19 @@ def addTextToLog(msgType, conference, nick, body, aff=0):
 				fp.write("<span class=\"self\"> &lt;%s&gt;</span> %s<br />\n" % (nick, body))
 	fp.close()
 
-def addMessageToLog(stanza, msgType, conference, nick, trueJid, text):
+def addMessageToLog(stanza, msgType, conference, nick, truejid, text):
 	if protocol.TYPE_PUBLIC == msgType and getConferenceConfigKey(conference, "log"):
 		aff = 0
 		if nick and getNickKey(conference, nick, NICK_MODER):
-			level = getAccess(conference, trueJid)
+			level = getAccess(conference, truejid)
 			aff = (level >= 30) and 2 or 1
 		addTextToLog(msgType, conference, nick, text, aff)
 
-def addUserJoinToLog(conference, nick, trueJid, aff, role):
+def addUserJoinToLog(conference, nick, truejid, aff, role):
 	if getConferenceConfigKey(conference, "log"):
 		addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$join$$@", u"%s заходит в комнату как %s и %s" % (nick, role, aff))
 
-def addUserLeaveToLog(conference, nick, trueJid, reason, code):
+def addUserLeaveToLog(conference, nick, truejid, reason, code):
 	if getConferenceConfigKey(conference, "log"):
 		if "307" == code:
 			if reason:
@@ -114,7 +114,7 @@ def addUserLeaveToLog(conference, nick, trueJid, reason, code):
 			else:
 				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты" % (nick))
 
-def addPresenceToLog(stanza, conference, nick, trueJid):
+def addPresenceToLog(stanza, conference, nick, truejid):
 	if protocol.TYPE_ERROR != stanza.getType():
 		if getConferenceConfigKey(conference, "log"):
 			code = stanza.getStatusCode()

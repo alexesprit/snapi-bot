@@ -16,19 +16,19 @@
 def sendInvite(msgType, conference, nick, param):
 	param = param.split(None, 1)
 	user = param[0]
-	if not isJid(user):
+	if not isJID(user):
 		if isNickInConference(conference, user):
-			trueJid = getTrueJid(conference, user)
+			truejid = getTrueJID(conference, user)
 		else:
 			sendMsg(msgType, conference, nick, u"А кто это?")
 			return
 	else:
-		trueJid = user
+		truejid = user
 	reason = (len(param) == 2) and param[1] or None
 	msg = protocol.Message(to=conference)
 	x = protocol.Node("x")
 	x.setNamespace(protocol.NS_MUC_USER)
-	inv = x.addChild("invite", {"to": trueJid})
+	inv = x.addChild("invite", {"to": truejid})
 	if reason:
 		inv.setTagData("reason", reason)
 	else:

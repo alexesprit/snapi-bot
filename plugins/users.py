@@ -28,9 +28,9 @@ def showWhoWas(msgType, conference, nick, param):
 def showUserNicks(msgType, conference, nick, param):
 	userNick = param or nick
 	if isNickInConference(conference, userNick):
-		trueJid = getTrueJid(conference, userNick)
+		truejid = getTrueJID(conference, userNick)
 		nicks = [user for user in getNicks(conference) 
-				if trueJid == getTrueJid(conference, user)]
+				if truejid == getTrueJID(conference, user)]
 		if len(nicks) < 2:
 			if param:
 				sendMsg(msgType, conference, nick, u"Я знаю %s только как %s" % (userNick, userNick))

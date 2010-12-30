@@ -66,7 +66,7 @@ def setConferenceStatus(conference, show, status):
 	prs.setTo(conference)
 	gClient.send(prs)
 
-def isJid(jid):
+def isJID(jid):
 	if USERJID_RE.search(jid):
 		return True
 	return False

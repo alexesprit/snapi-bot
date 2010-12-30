@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def checkNick(stanza, conference, nick, trueJid):
+def checkNick(stanza, conference, nick, truejid):
 	if protocol.TYPE_ERROR != stanza.getType():
 		code = stanza.getStatusCode()
 		nick = ("303" != code) and nick or stanza.getNick()

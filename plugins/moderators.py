@@ -29,27 +29,27 @@ def loadAutoModerators(conference):
 def freeAutoModerators(conference):
 	del gModerators[conference]
 
-def setAutoModerator(conference, nick, trueJid, aff, role):
-	if trueJid in gModerators[conference]:
+def setAutoModerator(conference, nick, truejid, aff, role):
+	if truejid in gModerators[conference]:
 		setMUCRole(conference, nick, protocol.ROLE_MODERATOR, u"Автомодератор")
 
 def addAutoModerator(msgType, conference, nick, param):
 	user = param
 	setModeratorRole = False
 	if isNickInConference(conference, user):
-		trueJid = getTrueJid(conference, user)
+		truejid = getTrueJID(conference, user)
 		if getNickKey(conference, user, NICK_HERE):
 			setModeratorRole = True
-	elif isJid(user):
-		trueJid = user
-		user = getNickByJid(conference, trueJid)
+	elif isJID(user):
+		truejid = user
+		user = getNickByJID(conference, truejid)
 		if user:
 			setModeratorRole = True
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 		return
-	if trueJid not in gModerators[conference]:
-		gModerators[conference].append(trueJid)
+	if truejid not in gModerators[conference]:
+		gModerators[conference].append(truejid)
 		saveAutoModerators(conference)
 		sendMsg(msgType, conference, nick, u"Добавила")
 		if setModeratorRole:
@@ -61,19 +61,19 @@ def delAutoModerator(msgType, conference, nick, param):
 	user = param
 	setParticipantRole = False
 	if isNickInConference(conference, user):
-		trueJid = getTrueJid(conference, user)
+		truejid = getTrueJID(conference, user)
 		if getNickKey(conference, user, NICK_HERE):
 			setParticipantRole = True
-	elif isJid(user):
-		trueJid = user
-		user = getNickByJid(conference, trueJid)
+	elif isJID(user):
+		truejid = user
+		user = getNickByJID(conference, truejid)
 		if user:
 			setParticipantRole = True
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 		return
-	if trueJid in gModerators[conference]:
-		gModerators[conference].remove(trueJid)
+	if truejid in gModerators[conference]:
+		gModerators[conference].remove(truejid)
 		saveAutoModerators(conference)
 		sendMsg(msgType, conference, nick, u"Удалила")
 		if setParticipantRole:

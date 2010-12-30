@@ -24,7 +24,7 @@ QUIZ_COEF = 3
 
 gQuizScores = {}
 
-gQuizEnable = {}
+gQuizEnabled = {}
 gQuizAnswer = {}
 gQuizQuestion = {}
 gQuizHint = {}
@@ -73,14 +73,14 @@ def askQuizQuestion(conference, lastAnswer=None, resetIdle=True):
 		gQuizIdleCount[conference] = 0
 	gQuizAskTime[conference] = time.time()
 	resetQuizTimer(conference)
-	gQuizEnable[conference] = True
+	gQuizEnabled[conference] = True
 	if lastAnswer:
 		sendToConference(conference, u"(!) Правильный ответ: %s, cмена вопроса:\n%s" % (lastAnswer, question))
 	else:
 		sendToConference(conference, u"(?) Внимание вопрос:\n%s" % (question))
 
 def quizStop(conference, showScores=True):
-	gQuizEnable[conference] = False
+	gQuizEnabled[conference] = False
 	del gQuizAnswer[conference]
 	del gQuizQuestion[conference]
 	del gQuizHint[conference]
@@ -92,11 +92,11 @@ def quizStop(conference, showScores=True):
 	if showScores:
 		showScoreList(protocol.TYPE_PUBLIC, conference)
 
-def checkQuizAnswer(conference, nick, trueJid, answer):
+def checkQuizAnswer(conference, nick, truejid, answer):
 	rightAnswer = gQuizAnswer[conference].lower()
 	userAnswer = answer.lower()
 	if rightAnswer == userAnswer:	
-		gQuizEnable[conference] = False
+		gQuizEnabled[conference] = False
 		answerTime = time.time() - gQuizAskTime[conference]
 		wLength = len(gQuizHint[conference])
 		closedLetters = gQuizHint[conference].count("*")
@@ -106,18 +106,18 @@ def checkQuizAnswer(conference, nick, trueJid, answer):
 		else:
 			sendToConference(conference, u"(!) %s, поздравляю! Верный ответ: %s" % (nick, rightAnswer))
 		base = gQuizScores[conference]
-		if trueJid in base:
-			base[trueJid][0] = nick
-			base[trueJid][1] += points
-			base[trueJid][2] += 1
+		if truejid in base:
+			base[truejid][0] = nick
+			base[truejid][1] += points
+			base[truejid][2] += 1
 		else:
-			base[trueJid] = [nick, points, 1]
+			base[truejid] = [nick, points, 1]
 		base.save()
 		askQuizQuestion(conference)
 
-def quizAnswerListener(stanza, msgType, conference, nick, trueJid, text):
-	if gQuizEnable[conference]:
-		checkQuizAnswer(conference, nick, trueJid, text)
+def quizAnswerListener(stanza, msgType, conference, nick, truejid, text):
+	if gQuizEnabled[conference]:
+		checkQuizAnswer(conference, nick, truejid, text)
 
 def showScoreList(msgType, conference, nick=None):
 	base = gQuizScores[conference]
@@ -141,22 +141,22 @@ def showScoreList(msgType, conference, nick=None):
 			sendMsg(msgType, conference, nick, u"Статистика по игре отсутствует")
 
 def startQuiz(msgType, conference, nick, param):
-	if gQuizEnable[conference]:
+	if gQuizEnabled[conference]:
 		sendMsg(msgType, conference, nick, u"Викторина уже существует!")
 	else:
 		askQuizQuestion(conference)
 
 def stopQuiz(msgType, conference, nick, param):
-	if gQuizEnable[conference]:
+	if gQuizEnabled[conference]:
 		sendToConference(conference, u"(!) Викторина остановлена")
 		quizStop(conference)
 
 def showNextQuestion(msgType, conference, nick, param):
-	if gQuizEnable[conference]:
+	if gQuizEnabled[conference]:
 		askQuizQuestion(conference, gQuizAnswer[conference])
 
 def showQuizHint(msgType, conference, nick, param):
-	if gQuizEnable[conference]:
+	if gQuizEnabled[conference]:
 		answer = gQuizAnswer[conference]
 		hint = gQuizHint[conference]
 		hiddenLetters = ""
@@ -179,13 +179,13 @@ def showQuizScores(msgType, conference, nick, param):
 	showScoreList(msgType, conference, nick)
 
 def showQuizQuestion(msgType, conference, nick, param):
-	if gQuizEnable[conference]:
+	if gQuizEnabled[conference]:
 		sendMsg(msgType, conference, nick, u"(*) Текущий вопрос: \n" + gQuizQuestion[conference])
 		
 def loadQuizScores(conference):
 	path = getConfigPath(conference, QUIZ_SCORES_FILE)
 	gQuizScores[conference] = database.DataBase(path)
-	gQuizEnable[conference] = False
+	gQuizEnabled[conference] = False
 
 def freeQuizScores(conference):
 	del gQuizScores[conference]

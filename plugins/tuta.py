@@ -17,24 +17,24 @@ HERE_FILE = "tuta.txt"
 
 gHereTime = {}
 
-def updateHereTimeInfo(conference, nick, trueJid):
+def updateHereTimeInfo(conference, nick, truejid):
 	base = gHereTime[conference]
-	if trueJid in base:
+	if truejid in base:
 		hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
-		base[trueJid]["here"] += hereTime
-		base[trueJid]["record"] = max(base[trueJid]["record"], hereTime)
+		base[truejid]["here"] += hereTime
+		base[truejid]["record"] = max(base[truejid]["record"], hereTime)
 
 def showHereStatistic(msgType, conference, nick, param):
 	userNick = param or nick
 	if isNickOnline(conference, userNick):
 		base = gHereTime[conference]
-		trueJid = getTrueJid(conference, userNick)
-		if trueJid in base:
-			joinCount = base[trueJid]["count"]
+		truejid = getTrueJID(conference, userNick)
+		if truejid in base:
+			joinCount = base[truejid]["count"]
 			hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
-			totalTime = base[trueJid]["here"] + hereTime
+			totalTime = base[truejid]["here"] + hereTime
 			averageTime = totalTime / joinCount
-			record = max(base[trueJid]["record"], hereTime)
+			record = max(base[truejid]["record"], hereTime)
 			message = param and userNick or u"Ты"
 			message = u"%s всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d" % (message, getTimeStr(totalTime), getTimeStr(record), getTimeStr(averageTime), joinCount)
 			sendMsg(msgType, conference, nick, message)
@@ -43,14 +43,14 @@ def showHereStatistic(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 	
-def updateJoinStatistic(conference, nick, trueJid, aff, role):
+def updateJoinStatistic(conference, nick, truejid, aff, role):
 	base = gHereTime[conference]
-	if trueJid not in base:
-		base[trueJid] = {"record": 0, "count": 0, "here": 0}
-	base[trueJid]["count"] += 1
+	if truejid not in base:
+		base[truejid] = {"record": 0, "count": 0, "here": 0}
+	base[truejid]["count"] += 1
 
-def updateLeaveStatistic(conference, nick, trueJid, reason, code):
-	updateHereTimeInfo(conference, nick, trueJid)
+def updateLeaveStatistic(conference, nick, truejid, reason, code):
+	updateHereTimeInfo(conference, nick, truejid)
 
 def loadHereBase(conference):
 	path = getConfigPath(conference, HERE_FILE)
@@ -62,8 +62,8 @@ def freeHereBase(conference):
 def saveAllHereBases():
 	for conference in getConferences():
 		for nick in getOnlineNicks(conference):
-			trueJid = getTrueJid(conference, nick)
-			updateHereTimeInfo(conference, nick, trueJid)
+			truejid = getTrueJID(conference, nick)
+			updateHereTimeInfo(conference, nick, truejid)
 		gHereTime[conference].save()
 
 registerEventHandler(loadHereBase, EVT_ADDCONFERENCE)

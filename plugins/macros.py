@@ -15,11 +15,11 @@
 # GNU General Public License for more details.
 
 def addLocalMacros(msgType, conference, nick, param):
-	rawMacros = param.split("=", 1)
-	if len(rawMacros) != 2:
+	rawdata = param.split("=", 1)
+	if len(rawdata) != 2:
 		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 	else:
-		macros, body = rawMacros
+		macros, body = rawdata
 		macros = macros.strip()
 		body = body.strip()
 		if macros and body:
@@ -38,8 +38,8 @@ def addLocalMacros(msgType, conference, nick, param):
 				else:
 					sendMsg(msgType, conference, nick, u"Не вижу команду внутри макроса")
 					return
-				trueJid = getTrueJid(conference, nick)
-				if access <= getAccess(conference, trueJid):
+				truejid = getTrueJID(conference, nick)
+				if access <= getAccess(conference, truejid):
 					if gMacros.hasMacros(macros, conference):
 						sendMsg(msgType, conference, nick, u"Заменила")
 					else:
@@ -52,11 +52,11 @@ def addLocalMacros(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
 def addGlobalMacros(msgType, conference, nick, param):
-	rawMacros = param.split("=", 1)
-	if len(rawMacros) != 2:
+	rawdata = param.split("=", 1)
+	if len(rawdata) != 2:
 		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 	else:
-		macros, body = rawMacros
+		macros, body = rawdata
 		macros = macros.strip()
 		body = body.strip()
 		if macros and body:
@@ -84,8 +84,8 @@ def addGlobalMacros(msgType, conference, nick, param):
 def delLocalMacros(msgType, conference, nick, param):
 	if gMacros.hasMacros(param, conference):
 		access = gMacros.getAccess(macros, conference)
-		trueJid = getTrueJid(conference, nick)
-		if getAccess(conference, trueJid) >= access:
+		truejid = getTrueJID(conference, nick)
+		if getAccess(conference, truejid) >= access:
 			gMacros.remove(param, conference)
 			gMacros.saveMacroses(conference)
 
@@ -108,8 +108,8 @@ def expandLocalMacros(msgType, conference, nick, param):
 	macros = param.split()[0].lower()
 	if gMacros.hasMacros(macros, conference):
 		access = gMacros.getAccess(macros, conference)
-		trueJid = getTrueJid(conference, nick)
-		if access <= getAccess(conference, trueJid):
+		truejid = getTrueJID(conference, nick)
+		if access <= getAccess(conference, truejid):
 			sendMsg(msgType, conference, nick, gMacros.expand(param, (conference, nick), conference))
 		else:
 			sendMsg(msgType, conference, nick, u"Недостаточно прав")
@@ -126,8 +126,8 @@ def expandGlobalMacros(msgType, conference, nick, param):
 def showLocalMacrosInfo(msgType, conference, nick, param):
 	if gMacros.hasMacros(param, conference):
 		access = gMacros.getAccess(macros, conference)
-		trueJid = getTrueJid(conference, nick)
-		if access <= getAccess(conference, trueJid):
+		truejid = getTrueJID(conference, nick)
+		if access <= getAccess(conference, truejid):
 			sendMsg(msgType, conference, nick, gMacros.getMacros(param, conference))
 		else:
 			sendMsg(msgType, conference, nick, u"Недостаточно прав")
@@ -147,8 +147,8 @@ def showLocalMacroAccess(msgType, conference, nick, param):
 	if gMacros.hasMacros(macros, conference):
 		if len(param) == 2:
 			access = gMacros.getAccess(macros, conference)
-			trueJid = getTrueJid(conference, nick)
-			if getAccess(conference, trueJid) >= access:
+			truejid = getTrueJID(conference, nick)
+			if getAccess(conference, truejid) >= access:
 				access = param[1]
 				if access.isdigit():
 					access = int(param[1])
@@ -188,13 +188,13 @@ def showGlobalMacroAccess(msgType, conference, nick, param):
 
 def showMacrosList(msgType, conference, nick, parameters):
 	message, disMacroses, macroses = u"", [], []
-	trueJid = getTrueJid(conference, nick)
+	truejid = getTrueJID(conference, nick)
 	isConference = isConferenceInList(conference)
 	if isConference:
 		for macros in gMacros.getMacrosList(conference):
 			if isAvailableCommand(conference, macros):
 				access = gMacros.getAccess(macros, conference)
-				if access <= getAccess(conference, trueJid):
+				if access <= getAccess(conference, truejid):
 					macroses.append(macros)
 			else:
 				disMacroses.append(macros)
@@ -210,13 +210,13 @@ def showMacrosList(msgType, conference, nick, parameters):
 		if isConference:
 			if isAvailableCommand(conference, macros):
 				access = gMacros.getAccess(macros)
-				if access <= getAccess(conference, trueJid):
+				if access <= getAccess(conference, truejid):
 					macroses.append(macros)
 			else:
 				disMacroses.append(macros)
 		else:
 			access = gMacros.getAccess(macros)
-			if access <= getAccess(conference, trueJid):
+			if access <= getAccess(conference, truejid):
 				macroses.append(macros)
 	if macroses:
 		macroses.sort()

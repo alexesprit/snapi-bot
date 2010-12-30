@@ -15,7 +15,7 @@
 
 def joinConf(msgType, conference, nick, param):
 	param = param.split()
-	if param and isJid(param[0]):
+	if param and isJID(param[0]):
 		conf = param[0]
 		if isConferenceInList(conf):
 			sendMsg(msgType, conference, nick, u"Я уже там!")

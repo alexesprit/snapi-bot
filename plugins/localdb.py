@@ -27,20 +27,20 @@ def getLocalKeyToPublic(msgType, conference, nick, param):
 
 def getLocalKeyToPrivate(msgType, conference, nick, param):
 	param = param.split()
-	confJid = ""
+	receiverjid = None
 	if len(param) == 2:
 		userNick = param[0].strip()
 		if isNickOnline(conference, userNick):
-			confJid = conference + "/" + userNick
+			receiverjid = conference + "/" + userNick
 			key = param[1].lower()
 	elif len(param) == 1:
-		confJid = conference + "/" + nick
+		receiverjid = conference + "/" + nick
 		key = param[0].lower()
-	if confJid:
+	if receiverjid:
 		if key in gLocalBase[conference]:
 			if protocol.TYPE_PUBLIC == msgType:
 				sendMsg(msgType, conference, nick, u"Ушло")
-			sendTo(protocol.TYPE_PRIVATE, confJid, u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key]))
+			sendTo(protocol.TYPE_PRIVATE, receiverjid, u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key]))
 		else:
 			sendMsg(msgType, conference, nick, u"Я не знаю, что такое %s :(" % key)
 	else:
