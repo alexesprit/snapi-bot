@@ -96,12 +96,12 @@ registerEventHandler(freeAutoVisitors, EVT_DELCONFERENCE)
 registerEventHandler(setAutoVisitor, EVT_USERJOIN)
 
 registerCommand(addAutoVisitor, u"девойс+", 15, 
-				u"Добавляет ник или жид в список автопосетителей", 
+				u"Добавляет пользователя в список автопосетителей", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(delAutoVisitort, u"девойс-", 15, 
-				u"Удаляет ник или жид из списка автопосетителей", 
+				u"Удаляет пользователя из списка автопосетителей", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)

@@ -23,11 +23,11 @@ def messageToChat(msgType, conference, nick, param):
 
 registerCommand(sendToAdmins, u"мессага_админу", 10, 
 				u"Отправляет сообщение всем администраторам бота", 
-				u"<сообщение>", 
+				u"<текст>", 
 				(u"привет!11", ), 
 				CMD_ANY | CMD_PARAM)
 registerCommand(messageToChat, u"сказать", 20, 
 				u"Сказать через бота в конференции", 
-				u"<сообщение>", 
+				u"<текст>", 
 				(u"Всем привет!!!", ), 
 				CMD_CONFERENCE | CMD_PARAM)

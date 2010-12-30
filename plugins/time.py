@@ -54,6 +54,6 @@ def _showUserTime(stanza, msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 registerCommand(showUserTime, u"часики", 10, 
-				u"Показывает время указанного пользователя или сервера", 
+				u"Показывает время указанного пользователя или jabber-сервера", 
 				u"[ник|сервер]", 
 				(None, u"Nick", u"server.tld", u"user@server.tld"))

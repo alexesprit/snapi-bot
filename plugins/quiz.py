@@ -196,12 +196,12 @@ registerEventHandler(freeQuizScores, EVT_DELCONFERENCE)
 registerEventHandler(quizAnswerListener, EVT_MSG | H_CONFERENCE)
 
 registerCommand(startQuiz, u"старт", 10, 
-				u"Запуск игры", 
+				u"Запуск викторины", 
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(stopQuiz, u"стоп", 10, 
-				u"Остановка игры", 
+				u"Остановка викторины", 
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)
@@ -211,17 +211,17 @@ registerCommand(showQuizScores, u"счет", 10,
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showQuizHint, u"х", 10, 
-				u"Показать подсказку", 
+				u"Показывает подсказку", 
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showQuizQuestion, u"повтор", 10, 
-				u"Повтор текущего вопроса", 
+				u"Повторяет текущий вопрос", 
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showNextQuestion, u"сл", 10, 
-				u"Следущий вопрос", 
+				u"Показывает следущий вопрос", 
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)

@@ -26,12 +26,17 @@ ANY = 255       # any class
 
 _names = dir()
 classmap = {}
+
 for _name in _names:
-    if _name[0] != '_': classmap[eval(_name)] = _name
+    if _name[0] != '_':
+		classmap[eval(_name)] = _name
+del _names
 
 def classstr(klass):
-    if classmap.has_key(klass): return classmap[klass]
-    else: return `klass`
+    if klass in classmap:
+		return classmap[klass]
+    else:
+		return `klass`
 
 #
 # $Log: Class.py,v $

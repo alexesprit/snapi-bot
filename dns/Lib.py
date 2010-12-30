@@ -22,15 +22,10 @@
 #             DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION
 # ------------------------------------------------------------------------
 
-
-import string
-import types
-
 import Type
 import Class
 import Opcode
 import Status
-#import dns
 
 from Base import DNSError
 
@@ -97,15 +92,15 @@ class Packer:
         # The case of the first occurrence of a name is preserved.
         # Redundant dots are ignored.
         list = []
-        for label in string.splitfields(name, '.'):
+        for label in name.split('.'):
             if not label:
                 raise PackError, 'empty label'
             list.append(label)
         keys = []
         for i in range(len(list)):
-            key = string.upper(string.joinfields(list[i:], '.'))
+            key = ".".join(list[i:]).upper()
             keys.append(key)
-            if self.index.has_key(key):
+            if key in self.index:
                 pointer = self.index[key]
                 break
         else:
@@ -345,11 +340,11 @@ class RRpacker(Packer):
         self.add32bit(expire)
         self.add32bit(minimum)
         self.endRR()
-    def addTXT(self, name, klass, ttl, list):
+    def addTXT(self, name, klass, ttl, elements):
         self.addRRheader(name, Type.TXT, klass, ttl)
-        if type(list) is types.StringType:
-            list = [list]
-        for txtdata in list:
+        if isinstance(elements, basestring):
+            elements = [elements]
+        for txtdata in elements:
             self.addstring(txtdata)
         self.endRR()
     # Internet specific RRs (section 3.4) -- class = IN
@@ -547,7 +542,7 @@ class DnsResult:
             h['opcode'],h['status'],h['id'])
         flags=filter(lambda x,h=h:h[x],('qr','aa','rd','ra','tc'))
         print ';; flags: %s; Ques: %d, Ans: %d, Auth: %d, Addit: %d'%(
-            string.join(flags),h['qdcount'],h['ancount'],h['nscount'],
+            "".join(flags),h['qdcount'],h['ancount'],h['nscount'],
             h['arcount'])
         print ';; QUESTIONS:'
         for q in self.questions:
@@ -569,7 +564,7 @@ class DnsResult:
             print '%-20s    %-6s  %-6s  %s'%(a['name'],`a['ttl']`,a['typename'],
                 a['data'])
         print
-        if self.args.has_key('elapsed'):
+        if 'elapsed' in self.args:
             print ';; Total query time: %d msec'%self.args['elapsed']
         print ';; To SERVER: %s'%(self.args['server'])
         print ';; WHEN: %s'%time.ctime(time.time())

@@ -46,12 +46,17 @@ ANY = 255       # A request for all records
 
 _names = dir()
 typemap = {}
+
 for _name in _names:
-    if _name[0] != '_': typemap[eval(_name)] = _name
+    if _name[0] != '_':
+		typemap[eval(_name)] = _name
+del _names
 
 def typestr(type):
-    if typemap.has_key(type): return typemap[type]
-    else: return `type`
+    if type in typemap:
+		return typemap[type]
+    else:
+		return `type`
 #
 # $Log: Type.py,v $
 # Revision 1.6.2.2  2009/06/09 18:39:06  customdesigned

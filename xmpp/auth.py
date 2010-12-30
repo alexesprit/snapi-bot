@@ -129,7 +129,7 @@ class SASL(plugin.PlugIn):
 			if value[:1] == "\"" and value[-1:] == "\"":
 				value = value[1:-1]
 			chal[key] = value
-		if chal.has_key("qop") and "auth" in [x.strip() for x in chal["qop"].split(", ")]:
+		if "qop" in chal and "auth" in [x.strip() for x in chal["qop"].split(", ")]:
 			resp={}
 			resp["username"] = self.username
 			resp["realm"] = self._owner.server
@@ -155,7 +155,7 @@ class SASL(plugin.PlugIn):
 			saslData = base64.encodestring(saslData[:-1]).replace("\r", "").replace("\n", "")
 			node = protocol.Node("response", attrs={"xmlns": protocol.NS_SASL}, payload=[saslData])
 			self._owner.send(node.__str__())
-		elif chal.has_key("rspauth"):
+		elif "rspauth" in chal:
 			self._owner.send(protocol.Node("response", attrs={"xmlns": protocol.NS_SASL}).__str__())
 		else: 
 			self.state = AUTH_FAILURE

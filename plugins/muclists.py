@@ -53,22 +53,22 @@ def showOwnersList(msgType, conference, nick, param):
 	showMUCList(msgType, conference, nick, protocol.AFF_OWNER)
 
 registerCommand(showOutcastsList, u"банлист", 20, 
-				u"Показывает список забаненных", 
+				u"Показывает список забаненных участников конференции", 
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showMembersList, u"мемберлист", 20, 
-				u"Показывает список мемберов", 
+				u"Показывает список постоянных участников конференции", 
 				None, 
 				None,  
 				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showAdminsList, u"админлист", 20, 
-				u"Показывает список админов", 
+				u"Показывает список администраторов конференции", 
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showOwnersList, u"овнерлист", 20, 
-				u"Показывает список овнеров", 
+				u"Показывает список владельцев конференции", 
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)

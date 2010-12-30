@@ -19,8 +19,6 @@
           License analog to the current Python license
 """
 
-import string
-
 import _winreg
 
 def binipdisplay(s):
@@ -34,7 +32,7 @@ def binipdisplay(s):
         ip=[]
         for j in s1:
             ip.append(str(ord(j)))
-        ol.append(string.join(ip,'.'))
+        ol.append(".".join(ip))
     return ol
 
 def stringdisplay(s):

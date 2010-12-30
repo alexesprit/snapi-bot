@@ -96,12 +96,12 @@ registerEventHandler(freeAutoModerators, EVT_DELCONFERENCE)
 registerEventHandler(setAutoModerator, EVT_USERJOIN)
 
 registerCommand(addAutoModerator, u"модер+", 20, 
-				u"Добавляет ник или жид в список автомодераторов", 
+				u"Добавляет пользователя в список автомодераторов", 
 				u"<ник|жид>", 
 				(u"Nick", u"nick@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(delAutoModerator, u"модер-", 20, 
-				u"Удаляет ник или жид из списка автомодераторов", 
+				u"Удаляет пользователя из списка автомодераторов", 
 				u"<ник|жид>", 
 				(u"Nick", u"nick@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)

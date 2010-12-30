@@ -13,6 +13,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+import simplejson
+
 def getGoogleSearchQuery(text, lang=None):
 	param = {
 		"v": "1.0",

@@ -45,15 +45,15 @@ class CommonClient:
 			the debug IDs that will go into debug output. You can either specifiy an "include"
 			or "exclude" list. The latter is done via adding "always" pseudo-ID to the list.
 		"""
-		self.defaultNamespace = protocol.NS_CLIENT
+		self.namespace = protocol.NS_CLIENT
 		self.disconnectHandlers = []
 
 		self.server = server
 		self.port = port
 
 		self._owner = self
-		self.connected = False
-		
+		self.connectType = None
+
 		if not debugFlags:
 			debugFlags = []	
 		self.initDebugger(debugFlags)
@@ -92,32 +92,35 @@ class CommonClient:
 	def disconnected(self):
 		""" Called on disconnection. Calls disconnect handlers and cleans things up.
 		"""
-		self.connected = False
+		self.connectType = None
 		for instance in self.disconnectHandlers:
 			instance()
 		if hasattr(self, "TLS"):
 			self.TLS.PlugOut()
 
+	def getConnectType():
+		return self.connnection
+
 	def isConnected(self):
-		""" Returns connection state. F.e.: None, "TCP", "TLS", "SSL".
+		""" Returns "true" if connection state is not "None".
 		"""
-		return self.connected
+		return self.connectType != None
 
 	def connect(self, secureMode=SECURE_DISABLE, useResolver=True):
 		""" Make a TCP/IP connection, protect it with TLS/SSL if possible and start XMPP stream.
 			Returns None, "TCP", "TLS" or "SSL", depending on the result.
 		"""
 		sock = transports.TCPSocket(useResolver)
-		connected = sock.PlugIn(self)
-		if not connected: 
+		connectType = sock.PlugIn(self)
+		if not connectType: 
 			sock.PlugOut()
 			return None
-		self.connected = C_TCP
+		self.connectType = C_TCP
 		if (secureMode == SECURE_AUTO and self.port in (5223, 443)) or secureMode == SECURE_FORCE:
 			# FIXME. This should be done in transports.py
 			try:
 				transports.TLS().PlugIn(self, forceSSL=True)
-				self.connected = C_SSL
+				self.connectType = C_SSL
 			except socket.sslerror:
 				self.TLS.PlugOut()
 				return None
@@ -129,7 +132,7 @@ class CommonClient:
 		if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
 			while not self.Dispatcher.Stream.features and self.process(1):
 				pass	  
-		return self.connected
+		return self.connectType
 
 class Client(CommonClient):
 	""" Example client class, based on CommonClient. """
@@ -141,7 +144,7 @@ class Client(CommonClient):
 			Returns None or "TCP", "SSL" "TLS", depending on the result.
 		"""
 		if CommonClient.connect(self, secureMode, useResolver):
-			if self.connected != C_SSL and secureMode == SECURE_AUTO:
+			if self.connectType != C_SSL and secureMode == SECURE_AUTO:
 				transports.TLS().PlugIn(self)
 				if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
 					# If we get version 1.0 stream the features tag MUST BE presented
@@ -149,14 +152,14 @@ class Client(CommonClient):
 						pass
 					if transports.TLS_UNSUPPORTED == self.TLS.state:
 						self.TLS.PlugOut()
-						return self.connected
+						return self.connectType
 					while not self.TLS.state and self.process(1):
 						pass
 					if self.TLS.state != transports.TLS_SUCCESS:
 						self.TLS.PlugOut()
 						return None
-					self.connected = C_TLS
-			return self.connected
+					self.connectType = C_TLS
+			return self.connectType
 		else:
 			return None
 
@@ -180,10 +183,13 @@ class Client(CommonClient):
 			auth.Bind().PlugIn(self)
 			if auth.BIND_SUCCESS == self.Bind.bind(resource):
 				self.Bind.PlugOut()
-				return auth.AUTH_SUCCESS
+				return True
+			else:
+				self.Bind.PlugOut()
+				return False				
 		else:
 			self.SASL.PlugOut()
-			return auth.AUTH_FAILURE
+			return False
 
 	def getRoster(self):
 		""" Return the Roster instance, previously plugging it in and

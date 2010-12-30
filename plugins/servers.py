@@ -65,10 +65,10 @@ def showServerUptime(msgType, conference, nick, param):
 	gClient.sendAndCallForResponse(iq, _showServerUptime, (msgType, conference, nick, server))
 
 registerCommand(showServerInfo, u"инфа", 10, 
-				u"Возвращает статистику о сервере", 
+				u"Возвращает статистику jabber-сервера", 
 				u"[сервер]", 
 				(u"server.tld", ))
 registerCommand(showServerUptime, u"аптайм", 10, 
-				u"Показывает аптайм определённого сервера", 
+				u"Показывает аптайм jabber-сервера", 
 				u"[сервер]", 
 				(u"server.tld", ))

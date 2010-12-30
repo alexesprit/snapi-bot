@@ -14,6 +14,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+import simplejson
+
 TRANSL_LANGS_FILE = "transllangs.txt"
 
 def loadLangsForTranslate():

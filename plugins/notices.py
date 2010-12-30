@@ -48,12 +48,12 @@ def setDefaultNoticeValue(conference):
 registerEventHandler(setDefaultNoticeValue, EVT_ADDCONFERENCE)
 
 registerCommand(noticeControl, u"оповещения", 30, 
-				u"Отключает (0) или включает (1) сообщения о новостях. Без параметра покажет текущее значение", 
+				u"Отключает (0) или включает (1) сообщения от администраторов бота. Без параметра покажет текущее значение", 
 				u"[0|1]", 
 				(None, u"0"), 
 				CMD_CONFERENCE)
 registerCommand(sendNotices, u"оповещение", 100, 
-				u"Отправляет сообщение по всем конференциям, в которых сидит бот", 
-				u"<сообщение>", 
+				u"Отправляет сообщение во все конференции, в которых находится бот", 
+				u"<текст>", 
 				(u"привет!11", ), 
 				CMD_ANY | CMD_PARAM)

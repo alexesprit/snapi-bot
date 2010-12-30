@@ -68,7 +68,7 @@ class Dispatcher(plugin.PlugIn):
 		""" Registers default namespaces/protocols/handlers. Used internally.
 		"""
 		self.registerNamespace(protocol.NS_STREAMS)
-		self.registerNamespace(self._owner.defaultNamespace)
+		self.registerNamespace(self._owner.namespace)
 		self.registerStanza("iq", protocol.Iq)
 		self.registerStanza("presence", protocol.Presence)
 		self.registerStanza("message", protocol.Message)
@@ -101,7 +101,7 @@ class Dispatcher(plugin.PlugIn):
 		self.Stream.stream_header_received = self._checkStreamStart
 		self.Stream.features = None
 		metastream = protocol.Node("stream:stream")
-		metastream.setNamespace(self._owner.defaultNamespace)
+		metastream.setNamespace(self._owner.namespace)
 		metastream.setAttr("version", "1.0")
 		metastream.setAttr("xmlns:stream", protocol.NS_STREAMS)
 		metastream.setAttr("to", self._owner.server)
@@ -146,7 +146,7 @@ class Dispatcher(plugin.PlugIn):
 		   Iq, Message and Presence stanzas are registered by default. 
 		"""
 		if not xmlns:
-			xmlns = self._owner.defaultNamespace
+			xmlns = self._owner.namespace
 		self.printf("Registering %s as %s (%s)" % (tagName, stanza, xmlns), order)
 		self.handlers[xmlns][tagName] = {"type": stanza, "default": []}
 
@@ -163,7 +163,7 @@ class Dispatcher(plugin.PlugIn):
 				"namespace" - namespace of child that stanza must contain.
 		"""
 		if not xmlns:
-			xmlns = self._owner.defaultNamespace
+			xmlns = self._owner.namespace
 		self.printf("Registering %s for %s type: %s, namespace: %s (%s)" % (handler, name, htype, namespace, xmlns))
 		if not htype and not namespace:
 			htype = "default"
@@ -181,7 +181,7 @@ class Dispatcher(plugin.PlugIn):
 			exactly the same as with registering.
 		"""
 		if not xmlns:
-			xmlns = self._owner.defaultNamespace
+			xmlns = self._owner.namespace
 		self.printf("Unregistering handler %s for %s type: %s, namespace: %s (%s)" % (handler, name, htype, namespace, xmlns), "stop")
 		if xmlns not in self.handlers:
 			return
@@ -303,18 +303,19 @@ class Dispatcher(plugin.PlugIn):
 		""" Serialise stanza and put it on the wire. Assign an unique ID to it before send.
 			Returns assigned ID.
 		"""
-		if isinstance(stanza, basestring):
-			return self._owner_send(stanza)
-		if not isinstance(stanza, protocol.Stanza): 
-			stanzaID = None
-		elif not stanza.getID():
-			global gID
-			gID += 1
-			stanzaID = str(gID)
-			stanza.setID(stanzaID)
-		else:
+		if isinstance(stanza, protocol.Stanza):
 			stanzaID = stanza.getID()
-		stanza.setNamespace(self._owner.defaultNamespace)
+			if not stanzaID:
+				global gID
+				gID += 1
+				stanzaID = str(gID)
+				stanza.setID(stanzaID)
+		else:
+			if isinstance(stanza, basestring):
+				return self._owner_send(stanza)
+			else:
+				stanzaID = None
+		stanza.setNamespace(self._owner.namespace)
 		self._owner_send(stanza)
 		return stanzaID
 

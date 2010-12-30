@@ -98,6 +98,6 @@ def _showFeatures(stanza, msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Не могу :(")
 		
 registerCommand(showFeatures, u"фичи", 10, 
-				u"Показывает, какие XEP-ы подерживает клиент указанного пользователя или сервер", 
+				u"Показывает, какие расширения подерживает клиент указанного пользователя или jabber-сервер", 
 				u"[ник|жид|сервер]", 
 				(None, u"Nick", u"server.tld", u"user@server.tld"))

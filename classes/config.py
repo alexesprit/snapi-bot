@@ -15,7 +15,6 @@
 
 class Config:
 	def __init__(self, path):
-		f = file(path)
-		exec f in self.__dict__
+		execfile(path, self.__dict__)
 
 		self.USERNAME, self.SERVER = self.JID.split("@")

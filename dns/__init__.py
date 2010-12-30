@@ -12,10 +12,11 @@
 __version__ = '2.3.4'
 
 import Class
-import Type, Opcode, Status, Class
+import Opcode
+import Status
+import Type
+
 from Base import DiscoverNameServers, DnsRequest, DNSError
-from Lib import DnsResult
-#from Lib import LABEL_UTF8, LABEL_ENCODING
 
 #
 # $Log: __init__.py,v $

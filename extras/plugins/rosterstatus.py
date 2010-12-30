@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def changeRosterStatus():
+def updateRosterStatus():
 	hour = time.localtime()[3]
 	if hour >= 16:
 		show = protocol.PRS_CHAT
@@ -25,4 +25,4 @@ def changeRosterStatus():
 	timeout = 3600 * 8 + random.randrange(-800, 801)
 	startTimer(timeout, changeRosterStatus)
 
-registerEventHandler(changeRosterStatus, EVT_READY)
+registerEventHandler(updateRosterStatus, EVT_READY)

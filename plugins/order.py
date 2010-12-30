@@ -64,47 +64,47 @@ def setModerator(msgType, conference, nick, param):
 	setUserRole(msgType, conference, nick, param, protocol.ROLE_MODERATOR)
 
 registerCommand(setOutcast, u"бан", 20, 
-				u"Банит пользователя", 
+				u"Добавляет пользователя в список забаненных участников", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setNone, u"избани", 20, 
-				u"Разбанивает пользователя", 
+				u"Удаляет пользователя из списка забаненных участников", 
 				u"<ник/жид>", 
 				(u"Nick", u"user@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setMember, u"мембер", 20, 
-				u"Дает мембера", 
+				u"Добавляет пользователя в список постоянных участников", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setAdmin, u"админ", 30, 
-				u"Дает админа", 
+				u"Добавляет пользователя в список администраторов конференции", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setOwner, u"овнер", 30, 
-				u"Дает овнера", 
+				u"Добавляет пользователя в список владельцев конференции", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setKick, u"кик", 15, 
-				u"Кикает", 
+				u"Выгоняет пользователя из конференции", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setVisitor, u"девойс", 15, 
-				u"Отнимает голос", 
+				u"Лишает участника конференции голоса", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setParticipant, u"войс", 15, 
-				u"Даёт голос", 
+				u"Даёт участнику конференции право голоса", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(setModerator, u"модер", 20, 
-				u"Даёт модера", 
+				u"Даёт участнику право модерировать коференцию", 
 				u"<ник|жид>", 
 				(u"Nick", u"user@server.tld"), 
 				CMD_CONFERENCE | CMD_PARAM)

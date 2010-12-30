@@ -75,7 +75,7 @@ registerEventHandler(updateJoinStatistic, EVT_USERJOIN)
 registerEventHandler(updateLeaveStatistic, EVT_USERLEAVE)
 
 registerCommand(showHereStatistic, u"тута", 10, 
-				u"Показывает кол-во часов, проведённое в чатике, максимальное и среднее", 
+				u"Показывает общее, рекордное и среднее время, проведённое в конференции", 
 				u"[ник]", 
 				(None, u"Nick"), 
 				CMD_CONFERENCE);

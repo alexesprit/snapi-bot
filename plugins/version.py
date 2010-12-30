@@ -52,6 +52,6 @@ def _showVersion(stanza, msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 registerCommand(showVersion, u"версия", 10, 
-				u"Показывает информацию о версии ПО указанного пользователя или сервера", 
+				u"Показывает информацию о версии ПО указанного пользователя или jabber-сервера", 
 				u"[ник|жид|сервер]", 
 				(None, u"Nick", u"server.tld", u"user@server.tld"))

@@ -56,6 +56,6 @@ def showPing(msgType, conference, nick, param):
 	gClient.sendAndCallForResponse(iq, _showPing, (t0, msgType, conference, nick, param))
 
 registerCommand(showPing, u"пинг", 10, 
-				u"Пингует тебя, определённый ник или сервер", 
+				u"Пингует указанного пользователя или jabber-сервер", 
 				u"[ник|жид|сервер]", 
 				(None, u"Nick", u"server.tld", u"user@server.tld"))

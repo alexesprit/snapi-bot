@@ -242,7 +242,7 @@ registerCommand(createNewVote, u"голосование", 11,
 				(None, u"винды - сакс!"), 
 				CMD_CONFERENCE)
 registerCommand(startVote, u"голосование+", 11, 
-				u"Возобновляет голосование", 
+				u"Запускает голосование (если оно создано и имеет пункты)", 
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)

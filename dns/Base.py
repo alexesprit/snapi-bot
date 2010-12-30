@@ -12,8 +12,6 @@ This code is covered by the standard Python License.
 import asyncore
 import select
 import socket
-import string
-import types
 import time
 
 import Class
@@ -46,12 +44,11 @@ defaults['server']=[]
 def ParseResolvConf(resolv_path="/etc/resolv.conf"):
     "parses the /etc/resolv.conf file and sets defaults for name servers"
     global defaults
-    lines=open(resolv_path).readlines()
-    for line in lines:
-        line = string.strip(line)
+    for line in open(resolv_path):
+        line = line.strip()
         if not line or line[0]==';' or line[0]=='#':
             continue
-        fields=string.split(line)
+        fields = line.split()
         if len(fields) < 2: 
             continue
         if fields[0]=='domain' and len(fields) > 1:
@@ -84,21 +81,21 @@ class DnsRequest:
         self.tid = 0
 
     def argparse(self,name,args):
-        if not name and self.defaults.has_key('name'):
+        if not name and 'name' in self.defaults:
             args['name'] = self.defaults['name']
-        if type(name) is types.StringType:
+        if isinstance(name, basestring):
             args['name']=name
         else:
             if len(name) == 1:
                 if name[0]:
                     args['name']=name[0]
         for i in defaults.keys():
-            if not args.has_key(i):
-                if self.defaults.has_key(i):
+            if i not in args:
+                if i in self.defaults:
                     args[i]=self.defaults[i]
                 else:
                     args[i]=defaults[i]
-        if type(args['server']) == types.StringType:
+        if isinstance(args['server'], basestring):
             args['server'] = [args['server']]
         self.args=args
 
@@ -187,14 +184,14 @@ class DnsRequest:
         opcode = self.args['opcode']
         rd = self.args['rd']
         server=self.args['server']
-        if type(self.args['qtype']) == types.StringType:
+        if isinstance(self.args['qtype'], basestring):
             try:
-                qtype = getattr(Type, string.upper(self.args['qtype']))
+                qtype = getattr(Type, self.args['qtype'].upper())
             except AttributeError:
                 raise DNSError,'unknown query type'
         else:
             qtype=self.args['qtype']
-        if not self.args.has_key('name'):
+        if 'name' not in self.args:
             print self.args
             raise DNSError,'nothing to lookup'
         qname = self.args['name']
@@ -296,7 +293,7 @@ class DnsAsyncRequest(DnsRequest,asyncore.dispatcher_with_send):
     def __init__(self,*name,**args):
         DnsRequest.__init__(self, *name, **args)
         # XXX todo
-        if args.has_key('done') and args['done']:
+        if 'done' in args and args['done']:
             self.donefunc=args['done']
         else:
             self.donefunc=self.showResult
@@ -306,7 +303,7 @@ class DnsAsyncRequest(DnsRequest,asyncore.dispatcher_with_send):
         self.getSource()
         self.connect((self.ns,self.port))
         self.time_start=time.time()
-        if self.args.has_key('start') and self.args['start']:
+        if 'start' in self.args and self.args['start']:
             asyncore.dispatcher.go(self)
     def socketInit(self,a,b):
         self.create_socket(a,b)

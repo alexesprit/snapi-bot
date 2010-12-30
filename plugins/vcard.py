@@ -97,6 +97,6 @@ def getVCard(rawVCard):
 	return "\n".join(vCardElements)
 
 registerCommand(showVCard, u"визитка", 10, 
-				u"Показывает vCard указанного пользователя или сервера", 
+				u"Показывает vCard указанного пользователя или jabber-сервера", 
 				u"[ник|жид|сервер]", 
 				(None, u"Nick", u"server.tld", u"user@server.tld"))

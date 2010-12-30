@@ -28,9 +28,6 @@ import threading
 import time
 import traceback
 
-import chardet
-import simplejson
-
 from classes import config
 from classes import database
 from classes import macros
@@ -41,7 +38,6 @@ from utils import utils
 from xmpp import client
 from xmpp import debug
 from xmpp import protocol
-from xmpp import simplexml
 
 CONFIG_DIR = "config"
 PLUGIN_DIR = "plugins"
@@ -319,11 +315,6 @@ def getOnlineNicks(conference):
 	return [x for x in gConferences[conference] if getNickKey(conference, x, NICK_HERE)]
 	
 def getTrueJid(jid, resource=None):
-	if isinstance(jid, protocol.UserJid):
-		jid = unicode(jid)
-	if not resource:
-		if jid.find("/") > -1:
-			jid, resource = jid.split("/", 1)
 	if jid in gConferences:
 		if isNickInConference(jid, resource):
 			jid = getNickKey(jid, resource, NICK_JID)
@@ -455,11 +446,13 @@ def messageHandler(session, stanza):
 	if stanza.getTimestamp() or msgType in FORBIDDEN_TYPES:
 		return
 	fullJid = stanza.getFrom()
-	conference = fullJid.getBareJid()
-	isConference = isConferenceInList(conference)
+	jid = fullJid.getBareJid()
+	isConference = isConferenceInList(jid)
 	if protocol.TYPE_PUBLIC == msgType and not isConference:
 		return
-	trueJid = getTrueJid(fullJid)
+	conference = jid
+	nick = fullJid.getResource()
+	trueJid = getTrueJid(conference, nick)
 	if getAccess(conference, trueJid) == -100:
 		return
 	message = stanza.getBody() or ""
@@ -470,7 +463,7 @@ def messageHandler(session, stanza):
 			time.sleep(1)
 		elif errorCode == "406":
 			addConference(conference)
-			joinConference(conference, gBotNick, getConferenceConfigKey(conference, "password"))
+			joinConference(conference, gConfig.NICK, getConferenceConfigKey(conference, "password"))
 			time.sleep(0.5)
 		else:
 			return
@@ -480,7 +473,6 @@ def messageHandler(session, stanza):
 		return
 	if not message:
 		return
-	nick = fullJid.getResource()
 	if protocol.TYPE_PUBLIC == msgType:
 		if conference != trueJid:
 			setNickKey(conference, nick, NICK_IDLE, time.time())
@@ -490,9 +482,12 @@ def messageHandler(session, stanza):
 			reportMsg.setID(stanza.getID())
 			reportMsg.addChild("received", None, None, protocol.NS_RECEIPTS)
 			gClient.send(reportMsg)
-	cmdType = isConference and CMD_CONFERENCE or CMD_ROSTER
-	hType = isConference and H_CONFERENCE or H_ROSTER
-	callEventHandlers(EVT_MSG | hType, (stanza, msgType, conference, nick, trueJid, message))
+	if isConference:
+		cmdType = CMD_CONFERENCE
+		callEventHandlers(EVT_MSG | H_CONFERENCE, (stanza, msgType, conference, nick, trueJid, message))
+	else:
+		cmdType = CMD_ROSTER
+		callEventHandlers(EVT_MSG | H_ROSTER, (stanza, msgType, conference, nick, trueJid, message))
 	if isConference:
 		botNick = getBotNick(conference)
 		if botNick == nick:
@@ -542,12 +537,12 @@ def messageHandler(session, stanza):
 def presenceHandler(session, stanza):
 	gInfo["prs"] += 1
 	fullJid = stanza.getFrom()
-	prsType =  stanza.getType()
 	jid = fullJid.getBareJid()
 	if isConferenceInList(jid):
 		conference = jid
 		trueJid = stanza.getJid()
 		nick = fullJid.getResource()
+		prsType = stanza.getType()
 		if trueJid:
 			trueJid = protocol.UserJid(trueJid).getBareJid()
 		if not prsType:
@@ -583,7 +578,7 @@ def presenceHandler(session, stanza):
 					if key in gConferences[conference][nick]:
 						del gConferences[conference][nick][key]
 				callEventHandlers(EVT_USERLEAVE, (conference, nick, trueJid, reason, code))
-		elif prsType == protocol.TYPE_ERROR:
+		elif protocol.TYPE_ERROR == prsType:
 			errorCode = stanza.getErrorCode()
 			if errorCode == "409":
 				newNick = getBotNick(conference) + "."
@@ -608,11 +603,11 @@ def presenceHandler(session, stanza):
 def iqHandler(session, stanza):
 	gInfo["iq"] += 1
 	fullJid = stanza.getFrom()
-	bareJid = fullJid.getBareJid()
-	trueJid = getTrueJid(fullJid)
-	if getAccess(bareJid, trueJid) == -100:
-		return
+	jid = fullJid.getBareJid()
 	resource = fullJid.getResource()
+	trueJid = getTrueJid(jid, resource)
+	if getAccess(jid, trueJid) == -100:
+		return
 	if protocol.TYPE_GET == stanza.getType():
 		if stanza.getTags("query", {}, protocol.NS_VERSION):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
@@ -641,7 +636,8 @@ def iqHandler(session, stanza):
 			attrs = {
 				"category": version.IDENTITY_CAT, 
 				"type": version.IDENTITY_TYPE, 
-				"name": version.IDENTITY_NAME}
+				"name": version.IDENTITY_NAME
+			}
 			query.addChild("identity", attrs)
 			for feat in BOT_FEATURES:
 				query.addChild("feature", {"var": feat})
@@ -650,7 +646,7 @@ def iqHandler(session, stanza):
 			error = iq.addChild("error", {"type": "cancel"})
 			error.addChild("feature-not-implemented", {}, [], protocol.NS_STANZAS)
 		gClient.send(iq)
-	callEventHandlers(EVT_IQ, (stanza, bareJid, resource))
+	callEventHandlers(EVT_IQ, (stanza, jid, resource))
 
 def addTextToSysLog(text, logtype, show=False):
 	path = getFilePath(SYSLOG_DIR, time.strftime(LOG_TYPES[logtype]))
@@ -673,8 +669,7 @@ def loadPlugins():
 		try:
 			path = os.path.join(PLUGIN_DIR, plugin)
 			if os.path.isfile(path):
-				f = file(path)
-				exec f in globals()
+				execfile(path, globals())
 				validPlugins += 1
 		except (SyntaxError, NameError):
 			printf("Exception in loadPlugins function", FLAG_ERROR)
@@ -696,8 +691,9 @@ def findAnotherInstance():
 	return None
 
 def shutdown(restart=False):
-	gClient.disconnected()
-	callEventHandlers(EVT_SHUTDOWN, async=False)
+	if gClient.isConnected():
+		callEventHandlers(EVT_SHUTDOWN, async=False)
+		gClient.disconnected()
 	if restart:
 		printf("Restarting...")
 		time.sleep(RESTART_DELAY)
@@ -716,12 +712,12 @@ if __name__ == "__main__":
 	pid = findAnotherInstance()
 	if not pid:
 		global gConfig, gClient, gRoster
-		
+
 		gInfo["start"] = time.time()
 
 		try:
 			gConfig = config.Config(BOTCONFIG_FILE)
-			
+
 			gClient = client.Client(server=gConfig.SERVER, port=gConfig.PORT)
 
 			gVerInfo = version.VersionInfo()
@@ -732,7 +728,7 @@ if __name__ == "__main__":
 
 			printf("Connecting...")
 			if gClient.connect(secureMode=gConfig.SECURE, useResolver=gConfig.USE_RESOLVER):
-				printf("Connection established (%s)" % gClient.isConnected(), FLAG_SUCCESS)
+				printf("Connection established (%s)" % gClient.connectType, FLAG_SUCCESS)
 			else:
 				printf("Unable to connect", FLAG_ERROR)
 				if gConfig.RESTART_IF_ERROR:

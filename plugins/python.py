@@ -15,6 +15,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+import chardet
+
 def pythonEval(msgType, conference, nick, param):
 	try:
 		sendMsg(msgType, conference, nick, unicode(eval(param)))
@@ -23,7 +25,7 @@ def pythonEval(msgType, conference, nick, param):
 
 def pythonExec(msgType, conference, nick, param):
 	try:
-		exec(unicode(param) + "\n") in globals()
+		exec(unicode(param) + "\n", globals())
 		sendMsg(msgType, conference, nick, u"Выполнено!")
 	except Exception:
 		sendMsg(msgType, conference, nick, traceback.format_exc())

@@ -15,6 +15,7 @@
 # GNU General Public License for more details.
 
 import hashlib
+from xmpp import simplexml
 
 RSSITEMS_FILE = 'rssitems.txt'
 RSSCACHE_FILE = 'rsscache.txt'

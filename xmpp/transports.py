@@ -82,7 +82,7 @@ class TCPSocket(plugin.PlugIn):
 		else:
 			server = self._server
 		if not self.connect(server):
-			return
+			return None
 		self._owner.Connection = self
 		return "ok"
 
