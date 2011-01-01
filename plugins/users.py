@@ -56,7 +56,7 @@ registerCommand(showWhoWas, u"хтобыл", 10,
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)
 registerCommand(showUserNicks, u"ники", 10, 
-				u"Выводит все ники пользователя", 
+				u"Показывает все ники пользователя",
 				u"[ник]", 
 				(None, u"Nick"),
 				CMD_CONFERENCE)

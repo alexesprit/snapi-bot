@@ -31,10 +31,11 @@ def getTranslatedText(text, source, target):
 		"langpair": "%s|%s" % (source, target)
 	}
 	response = getURL(url, qparam)
+	# TODO разобраться с этим... 
 	if response:
-		answer = simplejson.load(response)
-		if answer["responseData"]:
-			return answer["responseData"]["translatedText"]
+		rawdata = simplejson.load(response)
+		if rawdata["responseData"]:
+			return rawdata["responseData"]["translatedText"]
 	return None
 
 def translateText(msgType, conference, nick, param):
@@ -70,7 +71,7 @@ def translateText(msgType, conference, nick, param):
 registerEventHandler(loadLangsForTranslate, EVT_STARTUP)
 
 registerCommand(translateText, u"перевод", 10, 
-				u"Перевод текста с одного языка на другой. Чтобы получить список доступных языков для перевода, укажите \"языки\" в кач-ве параметра", 
+				u"Переводит текст с одного языка на другой. Чтобы получить список доступных языков для перевода, укажите \"языки\" в кач-ве параметра",
 				u"[исходный_язык] <нужный_язык> <фраза>", 
 				(u"языки", u"en привет", u"en ru hello"), 
 				CMD_ANY | CMD_PARAM)

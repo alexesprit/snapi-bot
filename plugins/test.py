@@ -17,7 +17,7 @@ def showTest(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, u"Две полоски o_O")
 
 registerCommand(showTest, u"тест", 10, 
-				u"Тест на беременность", 
+				u"Показывает результаты теста на беременность",
 				None, 
 				None, 
 				CMD_ANY | CMD_NONPARAM)

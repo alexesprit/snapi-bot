@@ -29,18 +29,6 @@ REPLICS_FOR_ME = (
 	u"Опа! Что я откопала! Это же твой понг:"
 )
 
-def _showPing(stanza, t0, msgType, conference, nick, param):
-	if protocol.TYPE_RESULT == stanza.getType():
-		ping = time.time() - t0
-		if param:
-			message = random.choice(REPLICS_FOR_OTHER) % (param);  
-		else:
-			message = random.choice(REPLICS_FOR_ME)
-		message += u" %s сек." % (str(round(ping , 3)))
-		sendMsg(msgType, conference, nick, message)
-	else:
-		sendMsg(msgType, conference, nick, u"не пингуется :(")
-
 def showPing(msgType, conference, nick, param):
 	if param:
 		if isConferenceInList(conference) and isNickOnline(conference, param):
@@ -53,7 +41,19 @@ def showPing(msgType, conference, nick, param):
 	iq.setTo(jid)
 	iq.setID(getUniqueID("ping_id"))
 	t0 = time.time()
-	gClient.sendAndCallForResponse(iq, _showPing, (t0, msgType, conference, nick, param))
+	gClient.sendAndCallForResponse(iq, showPing_, (t0, msgType, conference, nick, param))
+
+def showPing_(stanza, t0, msgType, conference, nick, param):
+	if protocol.TYPE_RESULT == stanza.getType():
+		ping = time.time() - t0
+		if param:
+			message = random.choice(REPLICS_FOR_OTHER) % (param);  
+		else:
+			message = random.choice(REPLICS_FOR_ME)
+		message += u" %s сек." % (str(round(ping , 3)))
+		sendMsg(msgType, conference, nick, message)
+	else:
+		sendMsg(msgType, conference, nick, u"не пингуется :(")
 
 registerCommand(showPing, u"пинг", 10, 
 				u"Пингует указанного пользователя или jabber-сервер", 

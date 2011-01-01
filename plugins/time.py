@@ -26,9 +26,9 @@ def showUserTime(msgType, conference, nick, param):
 	iq.addChild("time", {}, [], protocol.NS_ENTITY_TIME)
 	iq.setTo(jid)
 	iq.setID(getUniqueID("time_id"))
-	gClient.sendAndCallForResponse(iq, _showUserTime, (msgType, conference, nick, param))
+	gClient.sendAndCallForResponse(iq, showUserTime_, (msgType, conference, nick, param))
 
-def _showUserTime(stanza, msgType, conference, nick, param):
+def showUserTime_(stanza, msgType, conference, nick, param):
 	if protocol.TYPE_RESULT == stanza.getType():
 		timeNode = stanza.getTag("time")
 		tzo = timeNode.getTagData("tzo")

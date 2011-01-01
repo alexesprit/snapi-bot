@@ -27,38 +27,15 @@ AUTH_QUESTIONS = (
 
 gAuthAnswer = {}
 
-def setDefaultAuthValue(conference):
-	if getConferenceConfigKey(conference, "auth") is None:
-		setConferenceConfigKey(conference, "auth", 0)
-
 def initAuthCache(conference):
 	gAuthAnswer[conference] = {}
 
 def freeAuthCache(conference):
 	del gAuthAnswer[conference]
 
-def askAuthQuestion(conference, nick, truejid, aff, role):
-	if getConferenceConfigKey(conference, "auth"):
-		if aff == protocol.AFF_NONE:
-			question, answer = random.choice(AUTH_QUESTIONS)
-			setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Неавторизованый участник")
-			message = u"Чтобы получить голос, реши пример: %s. Как решишь, напиши мне ответ" % (question)
-			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
-			gAuthAnswer[conference][truejid] = answer
-
-def clearAuthCache(conference, nick, truejid, reason, code):
-	if truejid in gAuthAnswer[conference]:
-		del gAuthAnswer[conference][truejid]
-
-def authAnswerListener(stanza, msgType, conference, nick, truejid, body):
-	if protocol.TYPE_PRIVATE == msgType:
-		if truejid in gAuthAnswer[conference]:
-			if gAuthAnswer[conference][truejid] == body:
-				sendMsg(msgType, conference, nick, u"Признаю - ты не бот :)")
-				setMUCRole(conference, nick, protocol.ROLE_PARTICIPANT, u"Авторизация пройдена")
-				del gAuthAnswer[conference][truejid]
-			else:
-				sendMsg(msgType, conference, nick, u"Неправильный ответ")
+def setDefaultAuthValue(conference):
+	if getConferenceConfigKey(conference, "auth") is None:
+		setConferenceConfigKey(conference, "auth", 0)
 
 def manageAuthValue(msgType, conference, nick, param):
 	if param:
@@ -74,17 +51,40 @@ def manageAuthValue(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Прочитай помощь по команде")
 	else:
-		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (getConferenceConfigKey(conference, "auth")))
+		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (getConferenceConfigKey(conference, "auth")))		
 
-registerEventHandler(setDefaultAuthValue, EVT_ADDCONFERENCE)
+def askAuthQuestion(conference, nick, truejid, aff, role):
+	if getConferenceConfigKey(conference, "auth"):
+		if aff == protocol.AFF_NONE:
+			question, answer = random.choice(AUTH_QUESTIONS)
+			setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Неавторизованый участник")
+			message = u"Чтобы получить голос, реши пример: %s. Как решишь, напиши мне ответ" % (question)
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
+			gAuthAnswer[conference][truejid] = answer
+
+def authAnswerListener(stanza, msgType, conference, nick, truejid, body):
+	if protocol.TYPE_PRIVATE == msgType:
+		if truejid in gAuthAnswer[conference]:
+			if gAuthAnswer[conference][truejid] == body:
+				sendMsg(msgType, conference, nick, u"Признаю - ты не бот :)")
+				setMUCRole(conference, nick, protocol.ROLE_PARTICIPANT, u"Авторизация пройдена")
+				del gAuthAnswer[conference][truejid]
+			else:
+				sendMsg(msgType, conference, nick, u"Неправильный ответ")
+
+def clearAuthCache(conference, nick, truejid, reason, code):
+	if truejid in gAuthAnswer[conference]:
+		del gAuthAnswer[conference][truejid]
 
 registerEventHandler(initAuthCache, EVT_ADDCONFERENCE)
 registerEventHandler(freeAuthCache, EVT_DELCONFERENCE)
 
-registerEventHandler(askAuthQuestion, EVT_USERJOIN)
-registerEventHandler(clearAuthCache, EVT_USERLEAVE)
+registerEventHandler(setDefaultAuthValue, EVT_ADDCONFERENCE)
 
+registerEventHandler(askAuthQuestion, EVT_USERJOIN)
 registerEventHandler(authAnswerListener, EVT_MSG | H_CONFERENCE)
+
+registerEventHandler(clearAuthCache, EVT_USERLEAVE)
 
 registerCommand(manageAuthValue, u"авторизация", 30, 
 				u"Отключает (0) или включает (1) проверку вошедшего пользователя на человечность. Без параметра покажет текущее значение", 

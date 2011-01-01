@@ -60,7 +60,7 @@ registerEventHandler(freeSendBase, EVT_DELCONFERENCE)
 registerEventHandler(sendMessagesToUser, EVT_USERJOIN)
 
 registerCommand(addToSendBase, u"передать", 10, 
-				u"Запоминает сообщение и передаёт его указанному пользователю, как только он зайдёт в конференцию (или сразу, если указанный пользователь уже в конференции)", 
+				u"Запоминает и передаёт сообщение указанному пользователю, как только он зайдёт в конференцию (или сразу, если указанный пользователь уже в конференции)",
 				u"<кому> <что>", 
 				(u"Nick хай!", ), 
 				CMD_CONFERENCE | CMD_PARAM)

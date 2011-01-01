@@ -42,11 +42,11 @@ def leaveConf(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Ошибка! Необходимо указать конференцию")
 
 registerCommand(joinConf, u"зайти", 100, 
-				u"Зайти в указанную конференцию", 
+				u"Заставляет бота войти в указанную конференцию",
 				u"<конференция> [пароль]", 
 				(u"room@conference.server.tld", u"room@conference.server.tld secret"),
 				CMD_ANY | CMD_PARAM)
 registerCommand(leaveConf, u"свали", 
-				30, u"Заставляет выйти из текущей или указанной конференции", 
+				30, u"Заставляет бота выйти из указанной конференции",
 				u"[конференция]", 
 				(None, u"room@conference.server.tld"))

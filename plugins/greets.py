@@ -56,7 +56,7 @@ registerEventHandler(freeGreetings, EVT_DELCONFERENCE)
 registerEventHandler(sendGreetingToUser, EVT_USERJOIN)
 
 registerCommand(setUserGreeting, u"приветствие", 30, 
-				u"Добавляет приветствие для определённого ника/жида", 
+				u"Устанавливает приветствие для определённого ника/жида",
 				u"<ник|жид> = [текст]", 
 				(u"Nick = Привет!", u"user@server.tld = Привет!"), 
 				CMD_CONFERENCE | CMD_PARAM)

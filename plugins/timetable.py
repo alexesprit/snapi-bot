@@ -79,7 +79,7 @@ def showTrainTable(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
 registerCommand(showTrainTable, u"расписание", 10, 
-				u"Расписание поездов", 
+				u"Показывает расписание поездов",
 				u"<дата> <место_отправления > место прибытия>", 
 				(u"12.09 Котлас > Ярославль", ), 
 				CMD_ANY | CMD_PARAM)

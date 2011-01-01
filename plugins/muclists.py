@@ -13,7 +13,14 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def _showMUCList(stanza, msgType, conference, nick):
+def showMUCList(msgType, conference, nick, aff):
+	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_MUC_ADMIN)
+	iq.setQueryPayload([protocol.Node("item", {"affiliation": aff})])
+	iq.setTo(conference)
+	iq.setID(getUniqueID("muc_id"))
+	gClient.sendAndCallForResponse(iq, showMUCList_, (msgType, conference, nick))
+
+def showMUCList_(stanza, msgType, conference, nick):
 	if protocol.TYPE_RESULT == stanza.getType():
 		elements = []
 		for i, child in enumerate(stanza.getQueryChildren()):
@@ -32,13 +39,6 @@ def _showMUCList(stanza, msgType, conference, nick):
 			sendMsg(msgType, conference, nick, u"Список пуст")
 	else:
 		sendMsg(msgType, conference, nick, u"Не могу :(")
-
-def showMUCList(msgType, conference, nick, aff):
-	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_MUC_ADMIN)
-	iq.setQueryPayload([protocol.Node("item", {"affiliation": aff})])
-	iq.setTo(conference)
-	iq.setID(getUniqueID("muc_id"))
-	gClient.sendAndCallForResponse(iq, _showMUCList, (msgType, conference, nick))
 
 def showOutcastsList(msgType, conference, nick, param):
 	showMUCList(msgType, conference, nick, protocol.AFF_OUTCAST)

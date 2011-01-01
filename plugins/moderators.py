@@ -17,10 +17,6 @@ MODERATORS_FILE = "moderators.txt"
 
 gModerators = {}
 
-def saveAutoModerators(conference):
-	path = getConfigPath(conference, MODERATORS_FILE)
-	utils.writeFile(path, str(gModerators[conference]))
-
 def loadAutoModerators(conference):
 	path = getConfigPath(conference, MODERATORS_FILE)
 	utils.createFile(path, "[]")
@@ -28,6 +24,10 @@ def loadAutoModerators(conference):
 
 def freeAutoModerators(conference):
 	del gModerators[conference]
+
+def saveAutoModerators(conference):
+	path = getConfigPath(conference, MODERATORS_FILE)
+	utils.writeFile(path, str(gModerators[conference]))
 
 def setAutoModerator(conference, nick, truejid, aff, role):
 	if truejid in gModerators[conference]:

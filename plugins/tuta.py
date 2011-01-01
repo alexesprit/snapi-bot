@@ -17,12 +17,19 @@ HERE_FILE = "tuta.txt"
 
 gHereTime = {}
 
-def updateHereTimeInfo(conference, nick, truejid):
-	base = gHereTime[conference]
-	if truejid in base:
-		hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
-		base[truejid]["here"] += hereTime
-		base[truejid]["record"] = max(base[truejid]["record"], hereTime)
+def loadHereBase(conference):
+	path = getConfigPath(conference, HERE_FILE)
+	gHereTime[conference] = database.DataBase(path)
+
+def freeHereBase(conference):
+	del gHereTime[conference]
+
+def saveAllHereBases():
+	for conference in getConferences():
+		for nick in getOnlineNicks(conference):
+			truejid = getTrueJID(conference, nick)
+			updateHereTimeInfo(conference, nick, truejid)
+		gHereTime[conference].save()
 
 def showHereStatistic(msgType, conference, nick, param):
 	userNick = param or nick
@@ -42,7 +49,14 @@ def showHereStatistic(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Нет информации")
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
-	
+
+def updateHereTimeInfo(conference, nick, truejid):
+	base = gHereTime[conference]
+	if truejid in base:
+		hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
+		base[truejid]["here"] += hereTime
+		base[truejid]["record"] = max(base[truejid]["record"], hereTime)
+		
 def updateJoinStatistic(conference, nick, truejid, aff, role):
 	base = gHereTime[conference]
 	if truejid not in base:
@@ -51,20 +65,6 @@ def updateJoinStatistic(conference, nick, truejid, aff, role):
 
 def updateLeaveStatistic(conference, nick, truejid, reason, code):
 	updateHereTimeInfo(conference, nick, truejid)
-
-def loadHereBase(conference):
-	path = getConfigPath(conference, HERE_FILE)
-	gHereTime[conference] = database.DataBase(path)
-
-def freeHereBase(conference):
-	del gHereTime[conference]
-
-def saveAllHereBases():
-	for conference in getConferences():
-		for nick in getOnlineNicks(conference):
-			truejid = getTrueJID(conference, nick)
-			updateHereTimeInfo(conference, nick, truejid)
-		gHereTime[conference].save()
 
 registerEventHandler(loadHereBase, EVT_ADDCONFERENCE)
 registerEventHandler(freeHereBase, EVT_DELCONFERENCE)

@@ -60,9 +60,9 @@ def getAverageValue(attr):
 
 def showWeather(msgType, conference, nick, param):
 	city = param.capitalize()
-	rawData = getWCodeByName(city)
-	if rawData:
-		city, code = rawData
+	rawdata = getWCodeByName(city)
+	if rawdata:
+		city, code = rawdata
 		url = "http://informer.gismeteo.ru/xml/%s.xml" % (code.strip())
 		response = getURL(url)
 		if response:

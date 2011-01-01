@@ -14,7 +14,24 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def _showServerStats(stanza, msgType, conference, nick, server):
+def showServerInfo(msgType, conference, nick, param):
+	server = param or gConfig.SERVER
+	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_STATS)
+	iq.setTo(server)
+	iq.setID(getUniqueID("info_id"))
+	gClient.sendAndCallForResponse(iq, showServerInfo_, (msgType, conference, nick, server))
+
+def showServerInfo_(stanza, msgType, conference, nick, server):
+	if protocol.TYPE_RESULT == stanza.getType():
+		iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_STATS)
+		iq.setQueryPayload(stanza.getQueryChildren())
+		iq.setTo(server)
+		iq.setID(getUniqueID("info_id"))
+		gClient.sendAndCallForResponse(iq, showServerStats_, (msgType, conference, nick, server))
+	else:
+		sendMsg(msgType, conference, nick, u"Не получается :(")
+
+def showServerStats_(stanza, msgType, conference, nick, server):
 	if protocol.TYPE_RESULT == stanza.getType():
 		elements = []
 		for stat in stanza.getQueryChildren():
@@ -29,24 +46,14 @@ def _showServerStats(stanza, msgType, conference, nick, server):
 	else:
 		sendMsg(msgType, conference, nick, u"Не получается :(")
 
-def _showServerInfo(stanza, msgType, conference, nick, server):
-	if protocol.TYPE_RESULT == stanza.getType():
-		iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_STATS)
-		iq.setQueryPayload(stanza.getQueryChildren())
-		iq.setTo(server)
-		iq.setID(getUniqueID("info_id"))
-		gClient.sendAndCallForResponse(iq, _showServerStats, (msgType, conference, nick, server))
-	else:
-		sendMsg(msgType, conference, nick, u"Не получается :(")
-
-def showServerInfo(msgType, conference, nick, param):
+def showServerUptime(msgType, conference, nick, param):
 	server = param or gConfig.SERVER
-	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_STATS)
+	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_LAST)
 	iq.setTo(server)
-	iq.setID(getUniqueID("info_id"))
-	gClient.sendAndCallForResponse(iq, _showServerInfo, (msgType, conference, nick, server))
+	iq.setID(getUniqueID("uptime_id"))
+	gClient.sendAndCallForResponse(iq, showServerUptime_, (msgType, conference, nick, server))
 
-def _showServerUptime(stanza, msgType, conference, nick, server):
+def showServerUptime_(stanza, msgType, conference, nick, server):
 	if protocol.TYPE_RESULT == stanza.getType():
 		child = stanza.getFirstChild()
 		seconds = int(child.getAttr("seconds"))
@@ -56,13 +63,6 @@ def _showServerUptime(stanza, msgType, conference, nick, server):
 			sendMsg(msgType, conference, nick, u"Нет информации")
 	else:
 		sendMsg(msgType, conference, nick, u"Не получается :(")
-
-def showServerUptime(msgType, conference, nick, param):
-	server = param or gConfig.SERVER
-	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_LAST)
-	iq.setTo(server)
-	iq.setID(getUniqueID("uptime_id"))
-	gClient.sendAndCallForResponse(iq, _showServerUptime, (msgType, conference, nick, server))
 
 registerCommand(showServerInfo, u"инфа", 10, 
 				u"Возвращает статистику jabber-сервера", 

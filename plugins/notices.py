@@ -13,7 +13,11 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def noticeControl(msgType, conference, nick, param):
+def setDefaultNoticeValue(conference):
+	if getConferenceConfigKey(conference, "notices") is None:
+		setConferenceConfigKey(conference, "notices", 1)
+
+def manageNoticeValue(msgType, conference, nick, param):
 	if param:
 		if param.isdigit():
 			param = int(param)
@@ -41,13 +45,9 @@ def sendNotices(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Некому рассылать :(")
 
-def setDefaultNoticeValue(conference):
-	if getConferenceConfigKey(conference, "notices") is None:
-		setConferenceConfigKey(conference, "notices", 1)
-
 registerEventHandler(setDefaultNoticeValue, EVT_ADDCONFERENCE)
 
-registerCommand(noticeControl, u"оповещения", 30, 
+registerCommand(manageNoticeValue, u"оповещения", 30, 
 				u"Отключает (0) или включает (1) сообщения от администраторов бота. Без параметра покажет текущее значение", 
 				u"[0|1]", 
 				(None, u"0"), 

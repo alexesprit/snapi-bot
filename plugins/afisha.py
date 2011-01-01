@@ -20,57 +20,57 @@
 
 AFISHA_CITIES = {
 	u"москва": "msk",
-	u"петербург":"spb", 
-	u"волгоград":"volgograd",
-	u"воронеж":"voronezh", 
-	u"екатеринбург":"ekaterinburg",
-	u"иркутск":"irkutsk",
-	u"казань":"kazan",
-	u"калининград":"kaliningrad",
-	u"краснодар":"krasnodar",
-	u"липецк":"lipetsk",
-	u"мурманск":"murmansk",
-	u"новгород":"nnovgorod",
-	u"новосибирск":"novosibirsk",
-	u"пермь":"perm",
-	u"петрозаводск":"petrozavidsk",
-	u"ростов-на-дону":"rostov-na-donu",
-	u"самара":"samara",
-	u"сочи":"sochi",
-	u"ставрополь":"stavropol",
-	u"тула":"tula",
-	u"уфа":"ufa",
-	u"челябинск":"chelyabinsk",
-	u"ярославль":"yaroslavl"
+	u"петербург": "spb", 
+	u"волгоград": "volgograd",
+	u"воронеж": "voronezh", 
+	u"екатеринбург": "ekaterinburg",
+	u"иркутск": "irkutsk",
+	u"казань": "kazan",
+	u"калининград": "kaliningrad",
+	u"краснодар": "krasnodar",
+	u"липецк": "lipetsk",
+	u"мурманск": "murmansk",
+	u"новгород": "nnovgorod",
+	u"новосибирск": "novosibirsk",
+	u"пермь": "perm",
+	u"петрозаводск": "petrozavidsk",
+	u"ростов-на-дону": "rostov-na-donu",
+	u"самара": "samara",
+	u"сочи": "sochi",
+	u"ставрополь": "stavropol",
+	u"тула": "tula",
+	u"уфа": "ufa",
+	u"челябинск": "chelyabinsk",
+	u"ярославль": "yaroslavl"
+}
+
+TIME_OFFSET = {
+	"msk": 3,
+	"spb": 3,
+	"volgograd": 3,
+	"voronezh": 3,
+	"ekaterinburg": 5,
+	"irkutsk": 3,
+	"kazan": 3,
+	"kaliningrad": 2,
+	"krasnodar": 3,
+	"lipetsk": 3,
+	"murmansk": 3,
+	"nnovgorod": 3,
+	"novosibirsk": 6,
+	"perm": 5,
+	"petrozavodsk": 3,
+	"rostov-na-donu": 3,
+	"samara": 3, 
+	"sochi": 3,
+	"stavropol": 3,
+	"tula": 3,
+	"ufa": 5,
+	"chelyabinsk": 5,
+	"yaroslavl": 3
 }
 
 gAfishaCache = {}
-
-TIME_OFFSET = {
-	"msk": +3,
-	"spb": +3,
-	"volgograd": +3,
-	"voronezh": +3,
-	"ekaterinburg": +5,
-	"irkutsk": +3,
-	"kazan": +3,
-	"kaliningrad": +2,
-	"krasnodar": +3,
-	"lipetsk": +3,
-	"murmansk": +3,
-	"nnovgorod": +3,
-	"novosibirsk": +6,
-	"perm": +5,
-	"petrozavodsk": +3,
-	"rostov-na-donu": +3,
-	"samara": +3, 
-	"sochi": +3,
-	"stavropol": +3,
-	"tula": +3,
-	"ufa": +5,
-	"chelyabinsk": +5,
-	"yaroslavl": +3
-}
 
 def CompareTimes(x, y):
 	if (x[3]>y[3] and (y[3]>3 or (y[3]<=3 and x[3]<=3))) or (x[3]==y[3] and x[4]>y[4]) or (x[3]<=3 and y[3]>3):
@@ -217,7 +217,7 @@ def showAfisha(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, kinoAfisha(param))
 	
 registerCommand(showAfisha, u"афиша", 10, 
-				u"Расписание кино", 
+				u"Показывает расписание кинотеатров",
 				u"<город> [время] [фильм|кинотеатр]", 
 				(u"Уфа", u"Уфа 19:00", u"Уфа Семья", u"Уфа 08:00 Терминатор 4"), 
 				CMD_ANY | CMD_PARAM)

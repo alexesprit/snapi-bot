@@ -27,6 +27,24 @@ ACCESS_DESC = {
 	-100: u"игнор"
 }
 
+def loadGlobalAccesses():
+	global gGlobalAccess
+	path = getConfigPath(ACCESS_FILE)
+	utils.createFile(path, "{}")
+	gGlobalAccess = eval(utils.readFile(path))
+	for jid in gConfig.ADMINS:
+		gGlobalAccess[jid] = 100
+
+def loadLocalAccesses(conference):
+	path = getConfigPath(conference, ACCESS_FILE)
+	utils.createFile(path, "{}")
+	gPermAccess[conference] = eval(utils.readFile(path))
+	gTempAccess[conference] = {}
+
+def freeLocalAccesses(conference):
+	del gPermAccess[conference]
+	del gTempAccess[conference]
+
 def login(msgType, conference, nick, param):
 	if msgType == protocol.TYPE_PRIVATE:
 		if param == gConfig.ADMIN_PASSWORD:
@@ -159,25 +177,8 @@ def showLocalAccesses(msgType, conference, nick, param):
 				for i, item in enumerate(sorted(accesses))]
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Локальные уровни доступа:\n%s" % ("\n".join(elements)))
 
-def loadGlobalAccesses():
-	global gGlobalAccess
-	path = getConfigPath(ACCESS_FILE)
-	utils.createFile(path, "{}")
-	gGlobalAccess = eval(utils.readFile(path))
-	for jid in gConfig.ADMINS:
-		gGlobalAccess[jid] = 100
-
-def loadLocalAccesses(conference):
-	path = getConfigPath(conference, ACCESS_FILE)
-	utils.createFile(path, "{}")
-	gPermAccess[conference] = eval(utils.readFile(path))
-	gTempAccess[conference] = {}
-
-def freeLocalAccesses(conference):
-	del gPermAccess[conference]
-	del gTempAccess[conference]
-
 registerEventHandler(loadGlobalAccesses, EVT_STARTUP)
+
 registerEventHandler(loadLocalAccesses, EVT_ADDCONFERENCE)
 registerEventHandler(freeLocalAccesses, EVT_DELCONFERENCE)
 

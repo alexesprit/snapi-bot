@@ -38,7 +38,7 @@ def sendInvite(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, u"Кинула инвайт")
 			
 registerCommand(sendInvite, u"призвать", 10, 
-				u"Приглашет заданного пользователя в конференцию", 
+				u"Приглашет указанного пользователя в конференцию",
 				u"<ник|жид> [причина]", 
 				(u"Nick", u"user@server.tld есть дело"), 
 				CMD_CONFERENCE | CMD_PARAM)

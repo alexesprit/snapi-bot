@@ -53,8 +53,8 @@ def changeCommandAccess(msgType, conference, nick, param):
 registerEventHandler(loadCommandAccesses, EVT_STARTUP)
 
 registerCommand(changeCommandAccess, 
-				u'командоступ', 100, 
-				u'Меняет доступ для команды', 
-				u'<команда> <число>', 
-				(u'пинг 100', ), 
+				u"командоступ", 100,
+				u"Устанавливает доступ для команды",
+				u"<команда> <доступ>",
+				(u"пинг 100", ),
 				CMD_ANY | CMD_PARAM)

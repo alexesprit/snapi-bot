@@ -79,7 +79,7 @@ def searchForLyrics(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(searchForLyrics, u"lyrics", 10, 
-				u"Поиск слов песен на pesenki.ru. Если найдено более одной песни, то покажет список найденных песен (для показа слов нужной Вам песни из списка нужно указать номер песни перед названием)", 
+				u"Ищет тексты песен на pesenki.ru. Если найдено более одной песни, то покажет список найденных песен (для показа слов нужной Вам песни из списка нужно указать номер песни перед названием)",
 				u"[номер] <название>", 
 				(u"Skin Deep", u"7 Skin Deep"), 
 				CMD_ANY | CMD_PARAM)

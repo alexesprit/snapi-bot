@@ -19,44 +19,63 @@ TALKERS_FILE = "talkers.txt"
 
 gTalkersCache = {}
 
-def showTopTalkersInfo(msgType, conference, nick):
-	base = gTalkersCache[conference]
-	if base:
-		topList = []
-		pattern = u"%d) %s, %d, %d, %d, %0.1f"
-		for info in base.values():
-			words = info["words"]
-			userNick = info["nick"]
-			messages = info["messages"]
-			meMessages = info["mes"]
-			wordsPerMsg = (float(words)) / (messages + meMessages)
-			topList.append([messages, meMessages, words, wordsPerMsg, userNick])
-		topList.sort()
-		topList.reverse()
-		topList = topList[:10]
-		elements = [pattern % (i + 1, element[4], element[0], element[1], element[2], element[3]) 
-					for i, element in enumerate(topList)]
-		message = u"Список топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n%s" % ("\n".join(elements))
-		sendMsg(msgType, conference, nick, message)
-	else:
-		sendMsg(msgType, conference, nick, u"База болтунов пуста")
+def loadTalkersBase(conference):
+	path = getConfigPath(conference, TALKERS_FILE)
+	gTalkersCache[conference] = database.DataBase(path)
 
-def clearTalkersInfo(msgType, conference, nick):
-	conference = source[1]
-	truejid = getTrueJID(conference, nick)
-	if getAccess(conference, truejid) >= 20:
-		base = gTalkersCache[conference]
-		base.clear()
-		base.save()
-		sendMsg(msgType, conference, nick, u"База данных очищена")
-	else:
-		sendMsg(msgType, conference, nick, u"Недостаточно прав")
+def freeTalkersBase(conference):
+	del gTalkersCache[conference]
+
+def saveAllTalkersBases():
+	for conference in getConferences():
+		gTalkersCache[conference].save()
+
+def updateTalkersInfo(stanza, msgType, conference, nick, truejid, body):
+	if msgType == protocol.TYPE_PUBLIC:
+		if truejid != gConfig.JID and truejid != conference:
+			base = gTalkersCache[conference]
+			if truejid in base:
+				base[truejid]["nick"] = nick
+			else:
+				base[truejid] = {"nick": nick, "words": 0, "messages": 0, "mes": 0}
+			if body.startswith("/me"):
+				base[truejid]["mes"] += 1
+			else:
+				base[truejid]["messages"] += 1
+			base[truejid]["words"] += len(body.split())
 
 def showTalkerInfo(msgType, conference, nick, param):
 	if param == u"топ":
-		showTopTalkersInfo(msgType, conference, nick)
+		base = gTalkersCache[conference]
+		if base:
+			topList = []
+			pattern = u"%d) %s, %d, %d, %d, %0.1f"
+			for info in base.values():
+				words = info["words"]
+				userNick = info["nick"]
+				messages = info["messages"]
+				meMessages = info["mes"]
+				wordsPerMsg = (float(words)) / (messages + meMessages)
+				topList.append([messages, meMessages, words, wordsPerMsg, userNick])
+			topList.sort()
+			topList.reverse()
+			topList = topList[:10]
+			elements = [pattern % (i + 1, element[4], element[0], element[1], element[2], element[3]) 
+						for i, element in enumerate(topList)]
+			message = u"Список топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n%s" % ("\n".join(elements))
+			sendMsg(msgType, conference, nick, message)
+		else:
+			sendMsg(msgType, conference, nick, u"База болтунов пуста")
 	elif param == u"сброс":
-		clearTalkersInfo(msgType, conference, nick)
+		conference = source[1]
+		truejid = getTrueJID(conference, nick)
+		if getAccess(conference, truejid) >= 20:
+			base = gTalkersCache[conference]
+			base.clear()
+			base.save()
+			sendMsg(msgType, conference, nick, u"База данных очищена")
+		else:
+			sendMsg(msgType, conference, nick, u"Недостаточно прав")
 	else:
 		if not param:
 			truejid = getTrueJID(conference, nick)
@@ -77,31 +96,6 @@ def showTalkerInfo(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, message)
 		else:
 			sendMsg(msgType, conference, nick, u"Нет информации")
-
-def updateTalkersInfo(stanza, msgType, conference, nick, truejid, body):
-	if msgType == protocol.TYPE_PUBLIC:
-		if truejid != gConfig.JID and truejid != conference:
-			base = gTalkersCache[conference]
-			if truejid in base:
-				base[truejid]["nick"] = nick
-			else:
-				base[truejid] = {"nick": nick, "words": 0, "messages": 0, "mes": 0}
-			if body.startswith("/me"):
-				base[truejid]["mes"] += 1
-			else:
-				base[truejid]["messages"] += 1
-			base[truejid]["words"] += len(body.split())
-
-def loadTalkersBase(conference):
-	path = getConfigPath(conference, TALKERS_FILE)
-	gTalkersCache[conference] = database.DataBase(path)
-
-def freeTalkersBase(conference):
-	del gTalkersCache[conference]
-
-def saveAllTalkersBases():
-	for conference in getConferences():
-		gTalkersCache[conference].save()
 
 registerEventHandler(loadTalkersBase, EVT_ADDCONFERENCE)
 registerEventHandler(freeTalkersBase, EVT_DELCONFERENCE)

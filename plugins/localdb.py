@@ -112,12 +112,12 @@ registerCommand(setLocalKey, u"!!!", 20,
 				(u"секрет =", u"секрет = :-P"), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(searchLocalKey, u"???поиск", 10, 
-				u"Поиск ключей по базе", 
+				u"Ищет ключи в локальной базе",
 				u"<ключ>", 
 				(u"секрет", ), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(showAllLocalKeys, u"???все", 10, 
-				u"Показывает все ключи базы", 
+				u"Показывает все ключи локальной базы",
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)

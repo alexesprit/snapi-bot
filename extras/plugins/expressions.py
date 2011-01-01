@@ -88,12 +88,12 @@ registerEventHandler(freeExpressions, EVT_DELCONFERENCE)
 registerEventHandler(processExpression, EVT_MSG | H_CONFERENCE)
 
 registerCommand(addExpression, u"выражение+", 20, 
-				u"Добавить регулярное выражение", 
+				u"Добавляет регулярное выражение",
 				u"<выражение=текст>", 
 				(u"где(.+)\?=гугли", ), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(delExpression, u"выражение-", 20, 
-				u"Удалить регулярное выражение", 
+				u"Удаляет регулярное выражение",
 				u"<выражение>", 
 				(u"где(.+)\?", ), 
 				CMD_CONFERENCE | CMD_PARAM)
@@ -102,7 +102,8 @@ registerCommand(showExpressions, u"выражения", 20,
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)
-registerCommand(showExprInfo, u"выражение*", 20, u"Показывает информацию о регулярном выражении", 
+registerCommand(showExprInfo, u"выражение*", 20,
+				u"Показывает информацию о регулярном выражении",
 				u"<выражение>", 
 				(u"где(.*?)?", ), 
 				CMD_CONFERENCE | CMD_PARAM)

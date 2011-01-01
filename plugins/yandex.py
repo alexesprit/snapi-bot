@@ -35,7 +35,7 @@ def searchInYandex(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 registerCommand(searchInYandex, u"яндекс", 10, 
-				u"Поиск через Yandex", 
+				u"Показывает результаты поиска через Yandex",
 				u"<текст>", 
 				(u"google", ), 
 				CMD_ANY | CMD_PARAM)

@@ -43,7 +43,7 @@ class Roster(plugin.PlugIn):
 		self.debugFlag = DBG_ROSTER
 		self.rosterData = {}
 		self.state = ROSTER_EMPTY
-		self._exportedMethods = [self.getRoster]
+		self._exportedMethods = (self.getRoster, )
 
 	def plugin(self, owner):
 		""" Register presence and subscription trackers in the owner's dispatcher.

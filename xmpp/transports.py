@@ -60,13 +60,16 @@ class TCPSocket(plugin.PlugIn):
 		import dns
 		host, port = server
 		query = "_xmpp-client._tcp.%s" % (host)
-		# ensure we haven't cached an old configuration
-		dns.DiscoverNameServers()
-		response = dns.DnsRequest().req(query, qtype='SRV')
-		if response.answers:
-			port, host = response.answers[0]['data'][2:4]
-			port = int(port)
-			server = (host, port)
+
+		try:
+			dns.DiscoverNameServers()
+			response = dns.DnsRequest().req(query, qtype="SRV")
+			if response.answers:
+				port, host = response.answers[0]['data'][2:4]
+				port = int(port)
+				server = (host, port)
+		except dns.DNSError:
+			pass
 		return server
 
 	def plugin(self, owner):

@@ -1,5 +1,4 @@
 # coding: utf-8
-# coding: utf-8
 
 # chatter.py
 # Initial Copyright (с) 2010 -Esprit-

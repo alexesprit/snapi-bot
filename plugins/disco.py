@@ -15,7 +15,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def serviceDiscovery(msgType, conference, nick, param):
+def showServiceDiscoveryResults(msgType, conference, nick, param):
 	param = param or gConfig.SERVER
 	args = param.split(None, 2)
 	jid = args[0]
@@ -44,9 +44,9 @@ def serviceDiscovery(msgType, conference, nick, param):
 	else:
 		iq.setTo(jid)
 	iq.setID(getUniqueID("disco_id"))
-	gClient.sendAndCallForResponse(iq, _serviceDiscovery, (msgType, conference, nick, jid, maxCount, searchKey))
+	gClient.sendAndCallForResponse(iq, showServiceDiscoveryResults_, (msgType, conference, nick, jid, maxCount, searchKey))
 
-def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKey):
+def showServiceDiscoveryResults_(stanza, msgType, conference, nick, jid, maxCount, searchKey):
 	if protocol.TYPE_RESULT == stanza.getType():
 		discoList = []
 		itemCount = 0
@@ -102,7 +102,7 @@ def _serviceDiscovery(stanza, msgType, conference, nick, jid, maxCount, searchKe
 	else:
 		sendMsg(msgType, conference, nick, u"не могу")
 
-registerCommand(serviceDiscovery, u"диско", 10, 
+registerCommand(showServiceDiscoveryResults, u"диско", 10, 
 				u"Показывает результаты обзора сервисов для указанного жида. Также можно выполнить запрос по узлу (\"жид#узел\") Второй или третий (если даётся ограничитель кол-ва) параметр - поиск (ищет заданное слово в жиде и описании элемента диско). Если поисковым словом задать имя конференции до названия сервера (например qwerty@), то покажет место этой конференции в общем рейтинге. В общий чат может дать до 50 результатов (10 - без указания кол-ва), в приват - 250 (50 - без указания кол-ва)", 
 				u"<жид> [кол-во результатов] [поисковая строка]", 
 				(u"server.tld", u"conference.server.tld qwerty", u"conference.server.tld 5 qwerty", u"conference.server.tld qwerty@"))

@@ -16,7 +16,7 @@
 
 import socket
 
-def getDNSAnswer(query):
+def getDNSResponse(query):
 	try:
 		if not re.sub(r"\d+\.\d+\.\d+\.\d+", "", query):
 			hostname = socket.gethostbyaddr(query)[0]
@@ -27,14 +27,14 @@ def getDNSAnswer(query):
 	except (socket.error):
 		return None
 
-def showServerDns(msgType, conference, nick, param):
-	answer = getDNSAnswer(param.encode("utf-8"))
-	if answer:
-		sendMsg(msgType, conference, nick, answer)
+def showDNSResponse(msgType, conference, nick, param):
+	response = getDNSResponse(param.encode("utf-8"))
+	if response:
+		sendMsg(msgType, conference, nick, response)
 	else:
 		sendMsg(msgType, conference, nick, u"Не могу")
 
-registerCommand(showServerDns, u"днс", 10, 
+registerCommand(showDNSResponse, u"днс", 10, 
 				u"Показывает ответ от DNS для определённого хоста или IP адреса", 
 				u"<хост|IP>", 
 				(u"server.tld", u"127.0.0.1"), 

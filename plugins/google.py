@@ -43,29 +43,29 @@ def searchInGoogle(msgType, conference, nick, url, qparam):
 	response = getURL(url, qparam)
 	if response:
 		response = simplejson.load(response)
-		results = response["responseData"]["results"]
-		if results:
+		rawdata = response["responseData"]["results"]
+		if rawdata:
 			if msgType == protocol.TYPE_PUBLIC:
-				results = results[:1]
-			elements = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (result) for result in results]
+				rawdata = rawdata[:1]
+			elements = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (element) for element in rawdata]
 			sendMsg(msgType, conference, nick, decode("\n\n".join(elements)))
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:
 		sendMsg(msgType, conference, nick, u"Ошибка!")
 
+registerCommand(searchInGoogleAll, u"гугль", 10, 
+				u"Показывает результаты поиска через Google",
+				u"<текст>", 
+				(u"yandex", ), 
+				CMD_ANY | CMD_PARAM)
 registerCommand(searchInGoogleEN, u"гугльен", 10, 
-				u"Поиск через Google по зарубежным сайтам", 
+				u"Показывает результаты поиска через Google (по зарубежным сайтам)",
 				u"<текст>", 
 				(u"yandex", ), 
 				CMD_ANY | CMD_PARAM)
 registerCommand(searchInGoogleRU, u"гугльру", 10, 
-				u"Поиск через Google по русскоязычным сайтам", 
-				u"<текст>", 
-				(u"yandex", ), 
-				CMD_ANY | CMD_PARAM)
-registerCommand(searchInGoogleAll, u"гугль", 10, 
-				u"Поиск через Google", 
+				u"Показывает результаты поиска через Google (по русскоязычным сайтам)",
 				u"<текст>", 
 				(u"yandex", ), 
 				CMD_ANY | CMD_PARAM)

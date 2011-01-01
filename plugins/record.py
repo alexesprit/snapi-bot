@@ -16,6 +16,14 @@
 REC_FILE = "record.txt"
 gRecords = {}
 
+def loadRecordsBase(conference):
+	path = getConfigPath(conference, REC_FILE)
+	utils.createFile(path, "{}")
+	gRecords[conference] = eval(utils.readFile(path))
+
+def freeRecordsBase(conference):
+	del gRecords[conference]
+
 def showRecord(msgType, conference, nick, param):
 	if gRecords[conference]:
 		sendMsg(msgType, conference, nick, 
@@ -31,14 +39,6 @@ def calculateRecord(conference, nick, truejid, aff, role):
 		gRecords[conference]["count"] = userCount
 		path = getConfigPath(conference, REC_FILE)
 		utils.writeFile(path, str(gRecords[conference]))
-
-def loadRecordsBase(conference):
-	path = getConfigPath(conference, REC_FILE)
-	utils.createFile(path, "{}")
-	gRecords[conference] = eval(utils.readFile(path))
-
-def freeRecordsBase(conference):
-	del gRecords[conference]
 	
 registerEventHandler(calculateRecord, EVT_USERJOIN)
 

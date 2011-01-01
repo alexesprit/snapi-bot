@@ -1,13 +1,13 @@
-.join {color: #5AA05A; font-style: italic}
-.leave {color: #A0A05A; font-style: italic}
-.kick {color: #646464; font-style: italic}
-.ban {color: #646464; font-style: italic}
-.nick {color: #5A5AA0; font-style: italic}
-.timestamp a {color: #5A5A5A; text-decoration: none}
-.system {color: #5A5AA0}
-.emote {color: #A05AA0}
-.self {color: #000080}
-.owner {color: #800000}
-.admin {color: #008000}
-.normal {color: #000080}
-h1 {color: #369; font-family: monospace; margin-left: 20pt; border-bottom: #246 solid 2pt}
+* {font-family: monospace}
+.join {color: #5F9F5F; font-style: italic}
+.leave {color: #9F9F5F; font-style: italic}
+.kick {color: #6F6F6F; font-style: italic}
+.ban {color: #6F6F6F; font-style: italic}
+.nick {color: #5F5FAF; font-style: italic}
+.time {color: #5F5F5F; text-decoration: none}
+.system {color: #5F5FAF}
+.me {color: #9F5F9F}
+.owner {color: #6F0000}
+.admin {color: #006F00}
+.normal {color: #00006F}
+h1 {color: #3F6F9F; border-bottom: #000000 solid 2pt}

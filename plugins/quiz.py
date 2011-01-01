@@ -33,6 +33,14 @@ gQuizTimer = {}
 gQuizAskTime = {}
 gQuizIdleCount = {}
 
+def loadQuizScores(conference):
+	path = getConfigPath(conference, QUIZ_SCORES_FILE)
+	gQuizScores[conference] = database.DataBase(path)
+	gQuizEnabled[conference] = False
+
+def freeQuizScores(conference):
+	del gQuizScores[conference]
+
 def checkQuizIdle(conference):
 	sendToConference(conference, u"(!) Время вышло! Правильный ответ: %s" % (gQuizAnswer[conference]))
 	gQuizIdleCount[conference] += 1
@@ -181,14 +189,6 @@ def showQuizScores(msgType, conference, nick, param):
 def showQuizQuestion(msgType, conference, nick, param):
 	if gQuizEnabled[conference]:
 		sendMsg(msgType, conference, nick, u"(*) Текущий вопрос: \n" + gQuizQuestion[conference])
-		
-def loadQuizScores(conference):
-	path = getConfigPath(conference, QUIZ_SCORES_FILE)
-	gQuizScores[conference] = database.DataBase(path)
-	gQuizEnabled[conference] = False
-
-def freeQuizScores(conference):
-	del gQuizScores[conference]
 
 registerEventHandler(loadQuizScores, EVT_ADDCONFERENCE)
 registerEventHandler(freeQuizScores, EVT_DELCONFERENCE)

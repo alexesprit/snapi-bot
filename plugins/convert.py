@@ -67,7 +67,7 @@ def convertValues(msgType, conference, nick, param):
 registerEventHandler(loadValuesForConvert, EVT_STARTUP)
 
 registerCommand(convertValues, u"перевести", 10, 
-				u"Перевод валют. Чтобы получить список доступных валют для перевода, укажите \"валюты\" в кач-ве параметра", 
+				u"Переводит валюты. Чтобы получить список доступных валют для перевода, укажите \"валюты\" в кач-ве параметра",
 				u"<из> <в> <кол-во>", 
 				(u"валюты", u"RUR USD 100.5"), 
 				CMD_ANY | CMD_PARAM)

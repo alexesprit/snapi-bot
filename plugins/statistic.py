@@ -99,7 +99,7 @@ registerEventHandler(updatePresenceStats, EVT_PRS | H_CONFERENCE)
 registerEventHandler(updateBotMessageStats, EVT_SELFMSG)
 
 registerCommand(showConferenceStats, u"статистика", 10, 
-				u"Статистика текущей конференции", 
+				u"Показывает статистику текущей конференции",
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)

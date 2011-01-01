@@ -17,110 +17,9 @@ LOGCSS_FILE = "logger.css"
 
 LOGS_URL_NOINDEX = True
 
-def writeLogHeader(f, conference, year, month, day):
-	date = "%.2i.%.2i.%.2i" % (day, month, year)
-	cssData = utils.readFile(getFilePath(RESOURCE_DIR, LOGCSS_FILE))
-	header = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>%s</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<style type="text/css">
-<!--%s-->
-</style>
-</head>
-<body>
-<h1>%s<br/>%s</h1>
-<div>
-<tt>
-""" % (" - ".join([conference, date]), cssData, conference, date)
-	f.write(header.encode("utf-8"))
-
-def getLogFile(msgType, conference, year, month, day):
-	path = u"%s/%s/%d/%02d/%02d.html" % (gConfig.LOGGER_DIR, conference, year, month, day)
-	path = path.encode("utf-8")
-	if os.path.exists(path):
-		f = file(path, "a")
-	else:
-		dirName = os.path.dirname(path)
-		if not os.path.exists(dirName):
-			os.makedirs(dirName)
-		f = file(path, "w")
-		writeLogHeader(f, conference, year, month, day)
-	return f
-
-def regexUrl(matchobj):
-	url = matchobj.group(0)
-	if LOGS_URL_NOINDEX:
-		return "<noindex><a href=\"%s\">%s</a></noindex>" % (url, url)
-	else:
-		return "<a href=\"%s\">%s</a>" % (url, url)
-	
-def addTextToLog(msgType, conference, nick, body, aff=0):
-	year, month, day, hour, minute, second = time.localtime()[:6]
-	body = utils.escapeXML(body)
-	body = URL_RE.sub(regexUrl, body)
-	body = body.replace("\n", "<br/>")
-	body = body.encode("utf-8")
-	nick = nick.encode("utf-8")
-	timestamp = "%02d:%02d:%02d" % (hour, minute, second)
-	fp = getLogFile(msgType, conference, year, month, day)
-	fp.write("<span class=\"timestamp\"><a id=\"%s\" href=\"#%s\">[%s]</a></span>" % (timestamp, timestamp, timestamp))
-	if not nick:
-		fp.write("<span class=\"system\"> %s</span><br />\n" % (body))
-	elif body.startswith("/me"):
-		fp.write("<span class=\"emote\"> * %s%s</span><br />\n" % (nick, body[3:]))
-	else:
-		if nick.startswith("@$$"):
-			className = nick[3:-3]
-			fp.write("<span class=\"%s\"> %s</span><br />\n" % (className, body))
-		else:
-			if aff == 2:
-				fp.write("<span class=\"owner\"> &lt;%s&gt;</span> %s<br />\n" % (nick, body))
-			elif aff == 1:
-				fp.write("<span class=\"admin\"> &lt;%s&gt;</span> %s<br />\n" % (nick, body))
-			else:
-				fp.write("<span class=\"self\"> &lt;%s&gt;</span> %s<br />\n" % (nick, body))
-	fp.close()
-
-def addMessageToLog(stanza, msgType, conference, nick, truejid, text):
-	if protocol.TYPE_PUBLIC == msgType and getConferenceConfigKey(conference, "log"):
-		aff = 0
-		if nick and getNickKey(conference, nick, NICK_MODER):
-			level = getAccess(conference, truejid)
-			aff = (level >= 30) and 2 or 1
-		addTextToLog(msgType, conference, nick, text, aff)
-
-def addUserJoinToLog(conference, nick, truejid, aff, role):
-	if getConferenceConfigKey(conference, "log"):
-		addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$join$$@", u"%s заходит в комнату как %s и %s" % (nick, role, aff))
-
-def addUserLeaveToLog(conference, nick, truejid, reason, code):
-	if getConferenceConfigKey(conference, "log"):
-		if "307" == code:
-			if reason:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты: %s" % (nick, reason))
-			else:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты" % (nick));		
-		elif "301" == code:
-			if reason:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили: %s" % (nick, reason))
-			else:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили" % (nick));	
-		else:
-			if reason:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты: %s" % (nick, reason))
-			else:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты" % (nick))
-
-def addPresenceToLog(stanza, conference, nick, truejid):
-	if protocol.TYPE_ERROR != stanza.getType():
-		if getConferenceConfigKey(conference, "log"):
-			code = stanza.getStatusCode()
-			if code == "303":
-				newnick = stanza.getNick()
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$nick$$@", u"%s меняет ник на %s" % (nick, newnick))
+def setDefaultLoggingValue(conference):
+	if getConferenceConfigKey(conference, "log") is None:
+		setConferenceConfigKey(conference, "log", 1)
 
 def manageLoggingValue(msgType, conference, nick, param):
 	if param:
@@ -161,9 +60,110 @@ def manageLoggingValue(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Сейчас меня нет ни в одной конференции")
 
-def setDefaultLoggingValue(conference):
-	if getConferenceConfigKey(conference, "log") is None:
-		setConferenceConfigKey(conference, "log", 1)
+def getLogFile(msgType, conference, year, month, day):
+	path = u"%s/%s/%d/%02d/%02d.html" % (gConfig.LOGGER_DIR, conference, year, month, day)
+	path = path.encode("utf-8")
+	if os.path.exists(path):
+		f = file(path, "a")
+	else:
+		dirName = os.path.dirname(path)
+		if not os.path.exists(dirName):
+			os.makedirs(dirName)
+		f = file(path, "w")
+		writeLogHeader(f, conference, year, month, day)
+	return f
+
+def regexUrl(matchobj):
+	url = matchobj.group(0)
+	if LOGS_URL_NOINDEX:
+		return "<noindex><a href=\"%s\">%s</a></noindex>" % (url, url)
+	else:
+		return "<a href=\"%s\">%s</a>" % (url, url)
+
+def writeLogHeader(f, conference, year, month, day):
+	date = "%.2i.%.2i.%.2i" % (day, month, year)
+	cssdata = utils.readFile(getFilePath(RESOURCE_DIR, LOGCSS_FILE))
+	header = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>%s</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+<!--%s-->
+</style>
+</head>
+<body>
+<h1>%s<br/>%s</h1>
+<div>
+<tt>
+""" % (" - ".join([conference, date]), cssdata, conference, date)
+	f.write(header.encode("utf-8"))
+
+def addTextToLog(msgType, conference, nick, body, aff=0):
+	year, month, day, hour, minute, second = time.localtime()[:6]
+	body = utils.escapeXML(body)
+	body = URL_RE.sub(regexUrl, body)
+	body = body.replace("\n", "<br/>")
+	body = body.encode("utf-8")
+	nick = nick.encode("utf-8")
+	timestamp = "%02d:%02d:%02d" % (hour, minute, second)
+	fp = getLogFile(msgType, conference, year, month, day)
+	fp.write("<span class=\"time\">[%s]</span>" % (timestamp))
+	if not nick:
+		fp.write("<span class=\"system\"> %s</span><br/>\n" % (body))
+	elif body.startswith("/me"):
+		fp.write("<span class=\"me\"> * %s%s</span><br/>\n" % (nick, body[3:]))
+	else:
+		if nick.startswith("@$$"):
+			className = nick[3:-3]
+			fp.write("<span class=\"%s\"> %s</span><br />\n" % (className, body))
+		else:
+			if aff == 2:
+				fp.write("<span class=\"owner\"> &lt;%s&gt;</span> %s<br/>\n" % (nick, body))
+			elif aff == 1:
+				fp.write("<span class=\"admin\"> &lt;%s&gt;</span> %s<br/>\n" % (nick, body))
+			else:
+				fp.write("<span class=\"normal\"> &lt;%s&gt;</span> %s<br/>\n" % (nick, body))
+	fp.close()
+
+def addMessageToLog(stanza, msgType, conference, nick, truejid, text):
+	if protocol.TYPE_PUBLIC == msgType and getConferenceConfigKey(conference, "log"):
+		aff = 0
+		if nick and getNickKey(conference, nick, NICK_MODER):
+			level = getAccess(conference, truejid)
+			aff = (level >= 30) and 2 or 1
+		addTextToLog(msgType, conference, nick, text, aff)
+
+def addUserJoinToLog(conference, nick, truejid, aff, role):
+	if getConferenceConfigKey(conference, "log"):
+		addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$join$$@", u"%s заходит в комнату как %s и %s" % (nick, role, aff))
+
+def addUserLeaveToLog(conference, nick, truejid, reason, code):
+	if getConferenceConfigKey(conference, "log"):
+		if "307" == code:
+			if reason:
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты: %s" % (nick, reason))
+			else:
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты" % (nick));		
+		elif "301" == code:
+			if reason:
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили: %s" % (nick, reason))
+			else:
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили" % (nick));	
+		else:
+			if reason:
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты: %s" % (nick, reason))
+			else:
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты" % (nick))
+
+def addPresenceToLog(stanza, conference, nick, truejid):
+	if protocol.TYPE_ERROR != stanza.getType():
+		if getConferenceConfigKey(conference, "log"):
+			code = stanza.getStatusCode()
+			if code == "303":
+				newnick = stanza.getNick()
+				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$nick$$@", u"%s меняет ник на %s" % (nick, newnick))
 
 if gConfig.LOGGER_DIR:
 	registerEventHandler(addUserJoinToLog, EVT_USERJOIN)
@@ -175,6 +175,6 @@ if gConfig.LOGGER_DIR:
 	registerEventHandler(setDefaultLoggingValue, EVT_ADDCONFERENCE)
 	
 	registerCommand(manageLoggingValue, u"логирование", 100, 
-				u"Отключает (0) или включает (1) ведение логов для указанной/текущей конференции. Без параметра покажет значения для всех конференций, в которых сидит бот", 
+				u"Отключает (0) или включает (1) ведение логов для указанной/текущей конференции. Без параметра покажет значения для всех конференций, в которых находится бот",
 				u"[<конференция> <0|1>]", 
 				(None, u"0", u"room@conference.server.tld 0"))

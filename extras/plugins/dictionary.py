@@ -134,7 +134,7 @@ def searchInGoogleDict(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Читай справку по команде")
 
 registerCommand(searchInGoogleDict, u"определение", 10, 
-				u"Поиск значения слова/выражения через Google Dictionary", 
+				u"Ищет значение слова/выражения через Google Dictionary",
 				u"<исходный_язык> <нужный_язык> <текст>", 
 				(u"en ru unity", ), 
 				CMD_ANY | CMD_PARAM)

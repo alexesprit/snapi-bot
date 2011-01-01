@@ -78,7 +78,7 @@ registerEventHandler(saveAllClientsBases, EVT_SHUTDOWN)
 registerEventHandler(saveUserClient, EVT_USERJOIN)
 
 registerCommand(showClients, u"клиенты", 10, 
-				u"Показывает, с каких клиентов заходил пользователь", 
+				u"Показывает названия клиентов, с которых заходил указанный пользователь",
 				u"[ник]", 
 				(None, u"Niсk"), 
 				CMD_CONFERENCE);

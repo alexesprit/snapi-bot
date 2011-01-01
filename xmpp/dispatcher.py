@@ -306,12 +306,9 @@ class Dispatcher(plugin.PlugIn):
 				gID += 1
 				stanzaID = str(gID)
 				stanza.setID(stanzaID)
+			stanza.setNamespace(self._owner.namespace)
 		else:
-			if isinstance(stanza, basestring):
-				return self._owner_send(stanza)
-			else:
-				stanzaID = None
-		stanza.setNamespace(self._owner.namespace)
+			stanzaID = None
 		self._owner_send(stanza)
 		return stanzaID
 

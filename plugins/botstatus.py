@@ -38,7 +38,7 @@ def manageBotStatusValue(msgType, conference, nick, param):
 registerEventHandler(setDefaultBotStatusValue, EVT_ADDCONFERENCE)
 
 registerCommand(manageBotStatusValue, u"ботстатус", 30, 
-				u"Меняет статус бота", 
+				u"Устанавливает статус бота",
 				u"<[статус] [текст]>", 
 				(u"away", u"away сплю"), 
 				CMD_CONFERENCE | CMD_PARAM)

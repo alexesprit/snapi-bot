@@ -17,10 +17,6 @@ VISITORS_FILE = "visitors.txt"
 
 gVisitors = {}
 
-def saveAutoVisitors(conference):
-	path = getConfigPath(conference, VISITORS_FILE)
-	utils.writeFile(path, str(gVisitors[conference]))
-
 def loadAutoVisitors(conference):
 	path = getConfigPath(conference, VISITORS_FILE)
 	utils.createFile(path, "[]")
@@ -28,6 +24,10 @@ def loadAutoVisitors(conference):
 
 def freeAutoVisitors(conference):
 	del gVisitors[conference]
+
+def saveAutoVisitors(conference):
+	path = getConfigPath(conference, VISITORS_FILE)
+	utils.writeFile(path, str(gVisitors[conference]))
 
 def setAutoVisitor(conference, nick, truejid, aff, role):
 	if truejid in gVisitors[conference]:

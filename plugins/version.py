@@ -25,11 +25,10 @@ def showVersion(msgType, conference, nick, param):
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_VERSION)
 	iq.setTo(jid)
 	iq.setID(getUniqueID("ver_id"))
-	gClient.sendAndCallForResponse(iq, _showVersion, (msgType, conference, nick, param))
+	gClient.sendAndCallForResponse(iq, showVersion_, (msgType, conference, nick, param))
 
-def _showVersion(stanza, msgType, conference, nick, param):
+def showVersion_(stanza, msgType, conference, nick, param):
 	if protocol.TYPE_RESULT == stanza.getType():
-		name, ver, os = "", "", ""
 		query = stanza.getQueryNode()
 		name = query.getTagData("name")
 		ver = query.getTagData("version")

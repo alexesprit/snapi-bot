@@ -74,9 +74,9 @@ def showFeatures(msgType, conference, nick, param):
 	iq.setTo(jid)
 	iq.addChild("query", {}, [], protocol.NS_DISCO_INFO)
 	iq.setID(getUniqueID("feat_id"))
-	gClient.sendAndCallForResponse(iq, _showFeatures, (msgType, conference, nick, param))
+	gClient.sendAndCallForResponse(iq, showFeatures_, (msgType, conference, nick, param))
 
-def _showFeatures(stanza, msgType, conference, nick, param):
+def showFeatures_(stanza, msgType, conference, nick, param):
 	if protocol.TYPE_RESULT == stanza.getType():
 		featureList = set()
 		queryNode = stanza.getQueryNode()
@@ -98,6 +98,6 @@ def _showFeatures(stanza, msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Не могу :(")
 		
 registerCommand(showFeatures, u"фичи", 10, 
-				u"Показывает, какие расширения подерживает клиент указанного пользователя или jabber-сервер", 
+				u"Показывает расширения, которые подерживает клиент указанного пользователя или jabber-сервер",
 				u"[ник|жид|сервер]", 
 				(None, u"Nick", u"server.tld", u"user@server.tld"))

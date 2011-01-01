@@ -22,6 +22,14 @@ VOTE_FINISHED = 0x3
 
 gVote = {}
 
+def loadVotes(conference):
+	path = getConfigPath(conference, VOTES_FILE)
+	utils.createFile(path, "{}")
+	gVote[conference] = eval(utils.readFile(path))
+
+def freeVotes(conference):
+	del gVote[conference]
+
 def getVoteText(conference):
 	voteText = u"Текущее голосование\nСоздатель: %(creator)s\n%(text)s\n" % (gVote[conference])
 	elements = [u" %d) %s" % (i + 1, x[0]) for i, x in enumerate(gVote[conference]["opinions"])]
@@ -76,7 +84,14 @@ def createNewVote(msgType, conference, nick, param):
 		if gVote[conference] and gVote[conference]["state"] != VOTE_FINISHED:
 			sendMsg(msgType, conference, nick, u"Имеется неоконченное голосование")
 		else:
-			gVote[conference] = {"state": VOTE_CREATED, "creator": nick, "creatorjid": getTrueJID(conference, nick), "text": param, "voted": {}, "opinions": []}
+			gVote[conference] = {
+				"state": VOTE_CREATED, 
+				"creator": nick, 
+				"creatorjid": getTrueJID(conference, nick), 
+				"text": param, 
+				"voted": {}, 
+				"opinions": []
+			}
 			saveVotes(conference)
 			sendMsg(msgType, conference, nick, u"Голосование создано! Чтобы добавить пункты напиши \"пункт+ твой_пункт\", удалить - \"пункт- номер пункта\". Начать голосование - команда \"голосование+\". Посмотреть текущие результаты - команда \"мнения\". Окончить голосование - команда \"итоги\"")
 	else:
@@ -217,14 +232,6 @@ def showVote(conference, nick, truejid, aff, role):
 				gVote[conference]["voted"][truejid] = False
 				saveVotes(conference)
 				sendMsg(protocol.TYPE_PRIVATE, conference, nick, getVoteText(conference))
-
-def loadVotes(conference):
-	path = getConfigPath(conference, VOTES_FILE)
-	utils.createFile(path, "{}")
-	gVote[conference] = eval(utils.readFile(path))
-
-def freeVotes(conference):
-	del gVote[conference]
 
 registerEventHandler(loadVotes, EVT_ADDCONFERENCE)
 registerEventHandler(freeVotes, EVT_DELCONFERENCE)

@@ -35,7 +35,6 @@ XML_ESC_MAP = (
 	("&quot;", "\""),
 )
 
-#mtx = threading.Lock()
 smph = threading.BoundedSemaphore(1)
 
 def unescapeXML(xml):
@@ -62,9 +61,6 @@ def unescapeHTML(html):
 	return re.sub("&#(\d+);", getEntityChar, html)
 
 def ustr(text):
-	"""Converts object "text" to unicode string using it's own 
-		"__str__" method if accessible or unicode method otherwise.
-	"""
 	if isinstance(text, unicode):
 		return text
 	try:

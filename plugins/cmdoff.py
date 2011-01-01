@@ -20,12 +20,12 @@ def loadDisabledCommands(conference):
 	utils.createFile(path, "[]")
 	gCmdOff[conference] = eval(utils.readFile(path))
 
+def freeDisableCommands(conference):
+	del gCmdOff[conference]
+
 def saveDisabledCommands(conference):
 	path = getConfigPath(conference, CMDOFF_FILE)
 	utils.writeFile(path, str(gCmdOff[conference]))
-
-def freeDisableCommands(conference):
-	del gCmdOff[conference]
 
 def disableCommand(msgType, conference, nick, param):
 	if param:
