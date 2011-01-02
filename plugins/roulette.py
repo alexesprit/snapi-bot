@@ -15,7 +15,7 @@
 # GNU General Public License for more details.
 
 def playRoulette(msgType, conference, nick, param):
-	if not getNickKey(conference, nick, NICK_MODER):
+	if not isNickModerator(conference, nick):
 		if not random.randrange(0, 6):
 			sendMsg(msgType, conference, nick, u"ЩЁЛК!")
 		else:

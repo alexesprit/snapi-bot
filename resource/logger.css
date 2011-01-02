@@ -9,5 +9,6 @@
 .me {color: #9F5F9F}
 .owner {color: #6F0000}
 .admin {color: #006F00}
-.normal {color: #00006F}
+.member {color: #00006F}
+.none {color: #6F6F6F}
 h1 {color: #3F6F9F; border-bottom: #000000 solid 2pt}

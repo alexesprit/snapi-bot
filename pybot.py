@@ -75,10 +75,11 @@ CMD_EXAMPLE = 0x5
 NICK_JID = "jid"
 NICK_IDLE = "idle"
 NICK_HERE = "here"
-NICK_MODER = "moder"
-NICK_JOINED = "joined"
+NICK_ROLE = "role"
+NICK_AFF = "aff"
 NICK_SHOW = "show"
 NICK_STATUS = "status"
+NICK_JOINED = "joined"
 
 LOG_ERRORS = 0x1
 LOG_CRASHES = 0x2
@@ -566,7 +567,8 @@ def presenceHandler(session, stanza):
 			roleAccess = ROLES[role]
 			affAccess = AFFILIATIONS[aff]
 			setTempAccess(conference, truejid, roleAccess + affAccess)
-			setNickKey(conference, nick, NICK_MODER, role == protocol.ROLE_MODERATOR)
+			setNickKey(conference, nick, NICK_AFF, aff)
+			setNickKey(conference, nick, NICK_ROLE, role)
 		elif protocol.PRS_OFFLINE == prsType:
 			if isNickOnline(conference, nick):
 				code = stanza.getStatusCode()
@@ -574,7 +576,7 @@ def presenceHandler(session, stanza):
 				setNickKey(conference, nick, NICK_HERE, False)
 				if not getNickByJID(conference, truejid):
 					setTempAccess(conference, truejid)
-				for key in (NICK_IDLE, NICK_MODER, NICK_STATUS, NICK_SHOW):
+				for key in (NICK_IDLE, NICK_AFF, NICK_ROLE, NICK_STATUS, NICK_SHOW):
 					if key in gConferences[conference][nick]:
 						del gConferences[conference][nick][key]
 				callEventHandlers(EVT_USERLEAVE, (conference, nick, truejid, reason, code))

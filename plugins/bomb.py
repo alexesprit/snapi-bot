@@ -77,7 +77,7 @@ def bombColorsListener(stanza, msgType, conference, nick, truejid, param):
 
 def bombDetonate(msgType, conference, nick):
 	num = random.randrange(0, 10)
-	if num < 1 or getNickKey(conference, nick, NICK_MODER):
+	if num < 1 or isNickModerator(conference, nick):
 		sendMsg(msgType, conference, nick, u"Бомба глюкнула...")
 	elif num < 7:
 		setMUCRole(conference, nick, protocol.ROLE_NONE, u"Бабах!!!")

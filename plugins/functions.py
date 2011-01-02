@@ -77,6 +77,12 @@ def isServer(server):
 			return True
 	return False
 
+def isConferenceInList(conference):
+	return conference in gConferences
+
+def isNickModerator(conference, nick):
+	return getNickKey(conference, nick, NICK_ROLE) == protocol.ROLE_MODERATOR
+
 def getUsedMemorySize():
 	if os.name == "posix":
 		pipe = os.popen("ps -o rss -p %s" % os.getpid())

@@ -17,6 +17,23 @@ LOGCSS_FILE = "logger.css"
 
 LOGS_URL_NOINDEX = True
 
+LOGTYPE_MSG = 0x0
+LOGTYPE_SYSTEM = 0x1
+LOGTYPE_JOIN = 0x2
+LOGTYPE_LEAVE = 0x3
+LOGTYPE_NICK = 0x4
+LOGTYPE_KICK = 0x5
+LOGTYPE_BAN = 0x6
+
+LOGTYPES = {
+	LOGTYPE_SYSTEM: "system", 
+	LOGTYPE_JOIN: "join", 
+	LOGTYPE_LEAVE: "leave", 
+	LOGTYPE_NICK: "nick", 
+	LOGTYPE_KICK: "kick", 
+	LOGTYPE_BAN: "ban", 
+}
+
 def setDefaultLoggingValue(conference):
 	if getConferenceConfigKey(conference, "log") is None:
 		setConferenceConfigKey(conference, "log", 1)
@@ -60,7 +77,7 @@ def manageLoggingValue(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Сейчас меня нет ни в одной конференции")
 
-def getLogFile(msgType, conference, year, month, day):
+def getLogFile(conference, year, month, day):
 	path = u"%s/%s/%d/%02d/%02d.html" % (gConfig.LOGGER_DIR, conference, year, month, day)
 	path = path.encode("utf-8")
 	if os.path.exists(path):
@@ -100,62 +117,59 @@ def writeLogHeader(f, conference, year, month, day):
 """ % (" - ".join([conference, date]), cssdata, conference, date)
 	f.write(header.encode("utf-8"))
 
-def addTextToLog(msgType, conference, nick, body, aff=0):
+def addTextToLog(logtype, conference, nick, text, aff=None):
 	year, month, day, hour, minute, second = time.localtime()[:6]
-	body = utils.escapeXML(body)
-	body = URL_RE.sub(regexUrl, body)
-	body = body.replace("\n", "<br/>")
-	body = body.encode("utf-8")
-	nick = nick.encode("utf-8")
-	timestamp = "%02d:%02d:%02d" % (hour, minute, second)
-	fp = getLogFile(msgType, conference, year, month, day)
-	fp.write("<span class=\"time\">[%s]</span>" % (timestamp))
-	if not nick:
-		fp.write("<span class=\"system\"> %s</span><br/>\n" % (body))
-	elif body.startswith("/me"):
-		fp.write("<span class=\"me\"> * %s%s</span><br/>\n" % (nick, body[3:]))
+
+	text = utils.escapeXML(text)
+	text = URL_RE.sub(regexUrl, text)
+	text = text.replace("\n", "<br/>")
+
+	if text.startswith("/me"):
+		rawtext = u"<span class=\"me\"> * %s%s</span><br/>" % (nick, text[3:])
 	else:
-		if nick.startswith("@$$"):
-			className = nick[3:-3]
-			fp.write("<span class=\"%s\"> %s</span><br />\n" % (className, body))
+		if logtype in LOGTYPES:
+			classname = LOGTYPES[logtype]
+			rawtext = u"<span class=\"%s\"> %s</span><br/>" % (classname, text)
 		else:
-			if aff == 2:
-				fp.write("<span class=\"owner\"> &lt;%s&gt;</span> %s<br/>\n" % (nick, body))
-			elif aff == 1:
-				fp.write("<span class=\"admin\"> &lt;%s&gt;</span> %s<br/>\n" % (nick, body))
-			else:
-				fp.write("<span class=\"normal\"> &lt;%s&gt;</span> %s<br/>\n" % (nick, body))
+			rawtext = u"<span class=\"%s\"> &lt;%s&gt;</span> %s<br/>" % (aff, nick, text)
+
+	timestamp = "%02d:%02d:%02d" % (hour, minute, second)
+
+	fp = getLogFile(conference, year, month, day)
+	fp.write("<span class=\"time\">[%s]</span>" % (timestamp))
+	fp.write(rawtext.encode("utf-8"))
+	fp.write("\n")
 	fp.close()
 
 def addMessageToLog(stanza, msgType, conference, nick, truejid, text):
 	if protocol.TYPE_PUBLIC == msgType and getConferenceConfigKey(conference, "log"):
-		aff = 0
-		if nick and getNickKey(conference, nick, NICK_MODER):
-			level = getAccess(conference, truejid)
-			aff = (level >= 30) and 2 or 1
-		addTextToLog(msgType, conference, nick, text, aff)
+		if truejid != conference:
+			aff = getNickKey(conference, nick, NICK_AFF)
+			addTextToLog(LOGTYPE_MSG, conference, nick, text, aff)
+		else:
+			addTextToLog(LOGTYPE_SYSTEM, conference, None, text)
 
 def addUserJoinToLog(conference, nick, truejid, aff, role):
 	if getConferenceConfigKey(conference, "log"):
-		addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$join$$@", u"%s заходит в комнату как %s и %s" % (nick, role, aff))
+		addTextToLog(LOGTYPE_JOIN, conference, None, u"%s заходит в комнату как %s и %s" % (nick, role, aff))
 
 def addUserLeaveToLog(conference, nick, truejid, reason, code):
 	if getConferenceConfigKey(conference, "log"):
 		if "307" == code:
 			if reason:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты: %s" % (nick, reason))
+				addTextToLog(LOGTYPE_KICK, conference, None, u"%s выгнали из комнаты: %s" % (nick, reason))
 			else:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$kick$$@", u"%s выгнали из комнаты" % (nick));		
+				addTextToLog(LOGTYPE_KICK, conference, None, u"%s выгнали из комнаты" % (nick));		
 		elif "301" == code:
 			if reason:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили: %s" % (nick, reason))
+				addTextToLog(LOGTYPE_BAN, conference, None, u"%s забанили: %s" % (nick, reason))
 			else:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$ban$$@", u"%s забанили" % (nick));	
+				addTextToLog(LOGTYPE_BAN, conference, None, u"%s забанили" % (nick));	
 		else:
 			if reason:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты: %s" % (nick, reason))
+				addTextToLog(LOGTYPE_LEAVE, conference, None, u"%s выходит из комнаты: %s" % (nick, reason))
 			else:
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$leave$$@", u"%s выходит из комнаты" % (nick))
+				addTextToLog(LOGTYPE_LEAVE, conference, None, u"%s выходит из комнаты" % (nick))
 
 def addPresenceToLog(stanza, conference, nick, truejid):
 	if protocol.TYPE_ERROR != stanza.getType():
@@ -163,7 +177,7 @@ def addPresenceToLog(stanza, conference, nick, truejid):
 			code = stanza.getStatusCode()
 			if code == "303":
 				newnick = stanza.getNick()
-				addTextToLog(protocol.TYPE_PUBLIC, conference, "@$$nick$$@", u"%s меняет ник на %s" % (nick, newnick))
+				addTextToLog(LOGTYPE_NICK, conference, None, u"%s меняет ник на %s" % (nick, newnick))
 
 if gConfig.LOGGER_DIR:
 	registerEventHandler(addUserJoinToLog, EVT_USERJOIN)
