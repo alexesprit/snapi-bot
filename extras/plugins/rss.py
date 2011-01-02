@@ -98,7 +98,7 @@ def startRSSQuery(conference):
 def startRSSQueries():
 	for conference in getConferences():
 		if gRSSItems[conference]:
-			startThread(startRSSQuery, (conference, ))
+			startThread(startRSSQuery, conference)
 	startTimer(RSS_UPDATE_TIME, startRSSQueries)
 
 def addRSSChannel(msgType, conference, nick, param):

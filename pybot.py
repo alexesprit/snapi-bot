@@ -59,6 +59,9 @@ FLAG_ERROR = "error"
 FLAG_WARNING = "warning"
 FLAG_SUCCESS = "success"
 
+MODE_ASYNC = 0x1
+MODE_SYNC = 0x2
+
 CMD_CONFERENCE = 0x01
 CMD_ROSTER = 0x02
 CMD_FROZEN = 0x04
@@ -195,45 +198,33 @@ def registerEventHandler(function, evtType):
 		gEventHandlers[evtType] = []
 	gEventHandlers[evtType].append(function)
 
-def callEventHandlers(evtType, args=None, async=True):
+def callEventHandlers(evtType, mode, *args):
 	if evtType in gEventHandlers:
-		if async:
-			if args:
-				for function in gEventHandlers[evtType]:
-					startThread(function, args)
-			else:
-				for function in gEventHandlers[evtType]:
-					startThread(function)
+		if MODE_ASYNC == mode:
+			for function in gEventHandlers[evtType]:
+				startThread(function, *args)
 		else:
-			if args:
-				for function in gEventHandlers[evtType]:
-					function(*args)
-			else:
-				for function in gEventHandlers[evtType]:
-					function()
+			for function in gEventHandlers[evtType]:
+				function(*args)
 
 def clearEventHandlers(evtType):
 	del gEventHandlers[evtType]
 
-def startThread(function, args=None):
+def startThread(function, *args):
 	gInfo["thr"] += 1
 	threading.Thread(None, execute, function.__name__, (function, args)).start()
 
-def startTimer(timeout, function, args=None):
+def startTimer(timeout, function, *args):
 	gInfo["tmr"] += 1
 	timer = threading.Timer(timeout, execute, (function, args))
 	timer.setName(function.__name__)
 	timer.start()
 	return timer
 
-def execute(function, args=None):
+def execute(function, args):
 	try:
-		if args:
-			with THR_SEMAPHORE:
-				function(*args)
-		else:
-			with THR_SEMAPHORE:
-				function()
+		with THR_SEMAPHORE:
+			function(*args)
 	except Exception:
 		printf("Exception in %s function" % (function.__name__), FLAG_ERROR)
 		addTextToSysLog(traceback.format_exc(), LOG_ERRORS)
@@ -268,10 +259,10 @@ def addConference(conference):
 	gConferences[conference] = {}
 	gIsJoined[conference] = False
 	loadConferenceConfig(conference)
-	callEventHandlers(EVT_ADDCONFERENCE, (conference, ), async=False)
+	callEventHandlers(EVT_ADDCONFERENCE, MODE_SYNC, conference)
 
 def delConference(conference):
-	callEventHandlers(EVT_DELCONFERENCE, (conference, ), async=False)
+	callEventHandlers(EVT_DELCONFERENCE, MODE_SYNC, conference)
 	del gIsJoined[conference]
 	del gConferenceConfig[conference]
 	del gConferences[conference]
@@ -307,7 +298,7 @@ def isCommandType(command, cmdType):
 	return gCommands[command][CMD_TYPE] & cmdType
 
 def isAvailableCommand(conference, command):
-	return not(conference in gCmdOff and command in gCmdOff[conference])
+	return command not in gCmdOff[conference]
 
 def getNicks(conference):
 	return gConferences[conference].keys()
@@ -333,9 +324,6 @@ def getNickKey(conference, nick, key):
 
 def setNickKey(conference, nick, key, value):
 	gConferences[conference][nick][key] = value
-
-def isConferenceInList(conference):
-	return conference in gConferences
 
 def isNickInConference(conference, nick):
 	return nick in gConferences[conference]
@@ -419,7 +407,7 @@ def sendTo(msgType, jid, text):
 	if text:
 		message.setBody(text)
 	gClient.send(message)
-	callEventHandlers(EVT_SELFMSG, (msgType, jid, text))
+	callEventHandlers(EVT_SELFMSG, MODE_ASYNC, msgType, jid, text)
 
 def sendToConference(conference, text):
 	sendTo(protocol.TYPE_PUBLIC, conference, text)
@@ -448,13 +436,18 @@ def messageHandler(session, stanza):
 		return
 	fulljid = stanza.getFrom()
 	jid = fulljid.getBareJID()
-	isConference = isConferenceInList(jid)
+	isConference = jid in gConferences
 	if protocol.TYPE_PUBLIC == msgType and not isConference:
 		return
-	conference = jid
-	nick = fulljid.getResource()
-	truejid = getTrueJID(conference, nick)
-	if getAccess(conference, truejid) == -100:
+	if isConference:
+		conference = jid
+		nick = fulljid.getResource()
+		truejid = getTrueJID(conference, nick)
+		userAccess = getAccess(conference, truejid)
+	else:
+		userAccess = getAccess(None, jid)
+		resource = fulljid.getResource()
+	if -100 == userAccess:
 		return
 	message = stanza.getBody() or ""
 	message = message.strip()
@@ -484,11 +477,9 @@ def messageHandler(session, stanza):
 			reportMsg.addChild("received", None, None, protocol.NS_RECEIPTS)
 			gClient.send(reportMsg)
 	if isConference:
-		cmdType = CMD_CONFERENCE
-		callEventHandlers(EVT_MSG | H_CONFERENCE, (stanza, msgType, conference, nick, truejid, message))
+		callEventHandlers(EVT_MSG | H_CONFERENCE, MODE_ASYNC, stanza, msgType, conference, nick, truejid, message)
 	else:
-		cmdType = CMD_ROSTER
-		callEventHandlers(EVT_MSG | H_ROSTER, (stanza, msgType, conference, nick, truejid, message))
+		callEventHandlers(EVT_MSG | H_ROSTER, MODE_ASYNC, stanza, msgType, jid, resource, message)
 	if isConference:
 		botNick = getBotNick(conference)
 		if botNick == nick:
@@ -506,40 +497,59 @@ def messageHandler(session, stanza):
 				return
 		if not message:
 			return
-	rawBody = message.split(None, 1)
-	command = rawBody[0].lower()
-	if isConference and not isAvailableCommand(conference, command):
-		return
-	if isCommand(command):
-		access = gCommands[command][CMD_ACCESS]
-	else:
-		if gMacros.hasMacros(command):
-			access = gMacros.getAccess(command)
-		elif isConference and gMacros.hasMacros(command, conference):
-			access = gMacros.getAccess(command, conference)
-		else:
-			return
-		message = gMacros.expand(message, (conference, nick), conference)
-		rawBody = message.split(None, 1)
-		command = rawBody[0].lower()
-	if isCommand(command) and isAvailableCommand(conference, command):
-		if isCommandType(command, cmdType):
-			if getAccess(conference, truejid) >= access:
-				param = (len(rawBody) == 2) and rawBody[1] or None
-				if param and isCommandType(command, CMD_NONPARAM):
-					return
-				if not param and isCommandType(command, CMD_PARAM):
-					return
-				gInfo["cmd"] += 1
-				startThread(gCmdHandlers[command], (msgType, conference, nick, param))
+	rawbody = message.split(None, 1)
+	command = rawbody[0].lower()
+	if isConference:
+		if isCommand(command):
+			if isAvailableCommand(conference, command):
+				cmdAccess = gCommands[command][CMD_ACCESS]
+				cmdType = CMD_CONFERENCE
 			else:
-				sendMsg(msgType, conference, nick, u"Недостаточно прав")
+				return
+		else:
+			if gMacros.hasMacros(command):
+				cmdAccess = gMacros.getAccess(command)
+			elif gMacros.hasMacros(command, conference):
+				cmdAccess = gMacros.getAccess(command, conference)
+			else:
+				return
+			message = gMacros.expand(message, (conference, nick), conference)
+			rawbody = message.split(None, 1)
+			command = rawbody[0].lower()
+			if not isCommand or not isAvailableCommand(conference, command):
+				return
+		cmdType = CMD_CONFERENCE
+	else:
+		if isCommand(command):
+			cmdAccess = gCommands[command][CMD_ACCESS]
+		elif gMacros.hasMacros(command):
+			cmdAccess = gMacros.getAccess(command)
+			message = gMacros.expand(message, (jid, resource))
+			rawbody = message.split(None, 1)
+			command = rawbody[0].lower()
+			if not isCommand:
+				return
+		cmdType = CMD_ROSTER
+	if isCommandType(command, cmdType):
+		if userAccess >= cmdAccess:
+			param = (len(rawbody) == 2) and rawbody[1] or None
+			if param and isCommandType(command, CMD_NONPARAM):
+				return
+			if not param and isCommandType(command, CMD_PARAM):
+				return
+			gInfo["cmd"] += 1
+			if isConference:
+				startThread(gCmdHandlers[command], msgType, conference, nick, param)
+			else:
+				startThread(gCmdHandlers[command], msgType, jid, resource, param)
+		else:
+			sendMsg(msgType, conference, nick, u"Недостаточно прав")
 
 def presenceHandler(session, stanza):
 	gInfo["prs"] += 1
 	fulljid = stanza.getFrom()
 	jid = fulljid.getBareJID()
-	if isConferenceInList(jid):
+	if jid in gConferences:
 		conference = jid
 		truejid = stanza.getJID()
 		nick = fulljid.getResource()
@@ -560,7 +570,7 @@ def presenceHandler(session, stanza):
 				setNickKey(conference, nick, NICK_HERE, True)
 				setNickKey(conference, nick, NICK_JOINED, time.time())
 				if gIsJoined[conference]:
-					callEventHandlers(EVT_USERJOIN, (conference, nick, truejid, aff, role))
+					callEventHandlers(EVT_USERJOIN, MODE_ASYNC, conference, nick, truejid, aff, role)
 				else:
 					if nick == getBotNick(conference):
 						gIsJoined[conference] = True
@@ -579,7 +589,7 @@ def presenceHandler(session, stanza):
 				for key in (NICK_IDLE, NICK_AFF, NICK_ROLE, NICK_STATUS, NICK_SHOW):
 					if key in gConferences[conference][nick]:
 						del gConferences[conference][nick][key]
-				callEventHandlers(EVT_USERLEAVE, (conference, nick, truejid, reason, code))
+				callEventHandlers(EVT_USERLEAVE, MODE_ASYNC, conference, nick, truejid, reason, code)
 		elif protocol.TYPE_ERROR == prsType:
 			errorCode = stanza.getErrorCode()
 			if errorCode == "409":
@@ -593,23 +603,30 @@ def presenceHandler(session, stanza):
 			elif errorCode == "503":
 				botNick = getBotNick(conference)
 				password = getConferenceConfigKey(conference, "password")
-				startTimer(REJOIN_DELAY, conference, (conference, botNick, password))
+				startTimer(REJOIN_DELAY, joinConference, conference, botNick, password)
 			elif errorCode in ("401", "403", "405"):
 				leaveConference(conference, u"got %s error code" % errorCode)
 				addTextToSysLog(u"Got error in %s (%s)" % (conference, errorCode), LOG_WARNINGS, True)
-		callEventHandlers(EVT_PRS | H_CONFERENCE, (stanza, conference, nick, truejid))
+		callEventHandlers(EVT_PRS | H_CONFERENCE, MODE_ASYNC, stanza, conference, nick, truejid)
 	else:
 		resource = fulljid.getResource()
-		callEventHandlers(EVT_PRS | H_ROSTER, (stanza, jid, resource, None))
+		callEventHandlers(EVT_PRS | H_ROSTER, MODE_ASYNC, stanza, jid, resource)
 
 def iqHandler(session, stanza):
 	gInfo["iq"] += 1
 	fulljid = stanza.getFrom()
 	jid = fulljid.getBareJID()
-	resource = fulljid.getResource()
-	truejid = getTrueJID(jid, resource)
-	if getAccess(jid, truejid) == -100:
-		return
+	isConference = jid in gConferences
+	if isConference:
+		conference = jid
+		nick = fulljid.getResource()
+		truejid = getTrueJID(conference, nick)
+		if getAccess(conference, truejid) == -100:
+			return
+	else:
+		if getAccess(None, jid) == -100:
+			return
+		resource = fulljid.getResource()
 	if protocol.TYPE_GET == stanza.getType():
 		if stanza.getTags("query", {}, protocol.NS_VERSION):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
@@ -648,7 +665,10 @@ def iqHandler(session, stanza):
 			error = iq.addChild("error", {"type": "cancel"})
 			error.addChild("feature-not-implemented", {}, [], protocol.NS_STANZAS)
 		gClient.send(iq)
-	callEventHandlers(EVT_IQ, (stanza, jid, resource))
+	if isConference:
+		callEventHandlers(EVT_IQ | H_CONFERENCE, MODE_ASYNC, stanza, conference, nick, truejid)
+	else:
+		callEventHandlers(EVT_IQ | H_ROSTER, MODE_ASYNC, stanza, jid, resource)
 
 def addTextToSysLog(text, logtype, show=False):
 	path = getFilePath(SYSLOG_DIR, time.strftime(LOG_TYPES[logtype]))
@@ -694,7 +714,7 @@ def findAnotherInstance():
 
 def shutdown(restart=False):
 	if gClient.isConnected():
-		callEventHandlers(EVT_SHUTDOWN, async=False)
+		callEventHandlers(EVT_SHUTDOWN, MODE_SYNC)
 		gClient.disconnected()
 	if restart:
 		printf("Restarting...")
@@ -747,7 +767,7 @@ if __name__ == "__main__":
 				printf("Incorrect login/password", FLAG_ERROR)
 				shutdown()
 
-			callEventHandlers(EVT_STARTUP)
+			callEventHandlers(EVT_STARTUP, MODE_ASYNC)
 			clearEventHandlers(EVT_STARTUP)
 
 			gClient.registerHandler("message", messageHandler)
@@ -768,7 +788,7 @@ if __name__ == "__main__":
 					saveConferenceConfig(conference)
 				printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
-			callEventHandlers(EVT_READY)
+			callEventHandlers(EVT_READY, MODE_ASYNC)
 			clearEventHandlers(EVT_READY)
 			
 			printf("Now I am ready to work :)")

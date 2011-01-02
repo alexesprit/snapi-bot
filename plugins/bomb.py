@@ -50,7 +50,7 @@ def giveBomb(msgType, conference, nick, param):
 				# это не баг, это фича :)
 				message = u"Хаха, тебе не повезло, у тебя бомба БЕЗ проводов! Она взорвётся через %s" % (getTimeStr(timeout))
 			sendMsg(msgType, conference, userNick, message)
-			gBombTimers[conference][truejid] = startTimer(timeout, bombExecute, (msgType, conference, userNick, truejid))
+			gBombTimers[conference][truejid] = startTimer(timeout, bombExecute, msgType, conference, userNick, truejid)
 	else:
 		sendMsg(msgType, conference, nick, u"а это кто?");			
 
@@ -84,7 +84,7 @@ def bombDetonate(msgType, conference, nick):
 	else:
 		setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Бабах!!!")
 		timeout = random.randrange(100, 501)
-		startTimer(timeout, setMUCRole, (conference, nick, protocol.ROLE_PARTICIPANT))
+		startTimer(timeout, setMUCRole, conference, nick, protocol.ROLE_PARTICIPANT)
 
 def initBombCache(conference):
 	gBombColors[conference] = {}

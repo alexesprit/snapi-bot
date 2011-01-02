@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 		
-def processSubscriptions(stanza, jid, resource, truejid):
+def processSubscriptions(stanza, jid, resource):
 	prsType = stanza.getType()
 	if protocol.PRS_SUBSCRIBE == prsType:
 		printf(u"%s has added me into his/her roster" % (jid))

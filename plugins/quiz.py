@@ -59,7 +59,7 @@ def isQuizTimerEnabled(conference):
 def resetQuizTimer(conference):
 	if isQuizTimerEnabled(conference):
 		gQuizTimer[conference].cancel()
-	gQuizTimer[conference] = startTimer(QUIZ_TIME_LIMIT, checkQuizIdle, (conference, ))
+	gQuizTimer[conference] = startTimer(QUIZ_TIME_LIMIT, checkQuizIdle, conference)
 
 def getQuizQuestion():
 	questionNum = random.randrange(0, QUIZ_TOTAL_LINES)
