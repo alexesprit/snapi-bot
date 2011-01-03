@@ -430,6 +430,7 @@ def sendMsg(msgType, conference, nick, text, force=False):
 	sendTo(msgType, jid, text)
 
 def messageHandler(session, stanza):
+	# TODO сделать из этой сотни строк что-то хорошее
 	gInfo["msg"] += 1
 	msgType = stanza.getType()
 	if stanza.getTimestamp() or msgType in FORBIDDEN_TYPES:
@@ -543,7 +544,10 @@ def messageHandler(session, stanza):
 			else:
 				startThread(gCmdHandlers[command], msgType, jid, resource, param)
 		else:
-			sendMsg(msgType, conference, nick, u"Недостаточно прав")
+			if isConference:
+				sendMsg(msgType, conference, nick, u"Недостаточно прав")
+			else:
+				sendMsg(msgType, jid, resource, u"Недостаточно прав")
 
 def presenceHandler(session, stanza):
 	gInfo["prs"] += 1
