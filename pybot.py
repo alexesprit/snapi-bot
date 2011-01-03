@@ -530,6 +530,8 @@ def messageHandler(session, stanza):
 			command = rawbody[0].lower()
 			if not isCommand:
 				return
+		else:
+			return
 		cmdType = CMD_ROSTER
 	if isCommandType(command, cmdType):
 		if userAccess >= cmdAccess:
