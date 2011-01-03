@@ -23,6 +23,6 @@ def updateRosterStatus():
 		show = protocol.PRS_NA
 	gClient.setStatus(show, None, gConfig.PRIORITY)
 	timeout = 3600 * 8 + random.randrange(-800, 801)
-	startTimer(timeout, changeRosterStatus)
+	startTimer(timeout, updateRosterStatus)
 
 registerEventHandler(updateRosterStatus, EVT_READY)
