@@ -44,7 +44,6 @@ PLUGIN_DIR = "plugins"
 SYSLOG_DIR = "syslogs"
 RESOURCE_DIR = "resource"
 
-PID_FILE = "pid.txt"
 BOTCONFIG_FILE = "config.py"
 
 ACCESS_FILE = "access.txt"
@@ -708,117 +707,107 @@ def loadPlugins():
 	else:
 		printf("Loaded %d plugins (%d with errors)" % (validPlugins, invalidPlugins), FLAG_WARNING)
 
-def findAnotherInstance():
-	if os.name == "posix":
-		try:
-			pid = int(utils.readFile(PID_FILE))
-			os.getsid(pid)
-			return pid
-		except (OSError, IOError):
-			utils.writeFile(PID_FILE, str(os.getpid()))
-	return None
-
 def shutdown(restart=False):
+	for thr in threading.enumerate():
+		if isinstance(thr, threading._Timer):
+			thr.cancel()
 	if gClient.isConnected():
 		callEventHandlers(EVT_SHUTDOWN, MODE_SYNC)
 		gClient.disconnected()
 	if restart:
 		printf("Restarting...")
 		time.sleep(RESTART_DELAY)
-		if os.path.exists(PID_FILE):
-			os.remove(PID_FILE)
 		os.execl(sys.executable, sys.executable, sys.argv[0])
 	else:
-		printf("Terminating...")
+		printf("Terminated", FLAG_SUCCESS)
 		os.abort()
 
-if __name__ == "__main__":
+def main():
 	currentDir = os.path.dirname(sys.argv[0])
 	if currentDir:
 		os.chdir(currentDir)
 
-	pid = findAnotherInstance()
-	if not pid:
-		global gConfig, gClient, gRoster
+	gInfo["start"] = time.time()
+	
+	try:
+		global gClient, gConfig
+		gConfig = config.Config(BOTCONFIG_FILE)
+		gClient = client.Client(server=gConfig.SERVER, port=gConfig.PORT)
 
-		gInfo["start"] = time.time()
-
-		try:
-			gConfig = config.Config(BOTCONFIG_FILE)
-
-			gClient = client.Client(server=gConfig.SERVER, port=gConfig.PORT)
-
-			gVerInfo = version.VersionInfo()
-			gVerInfo.createFeaturesHash(BOT_FEATURES)
-
-			printf("Loading plugins...")
-			loadPlugins()
-
-			printf("Connecting...")
-			if gClient.connect(secureMode=gConfig.SECURE, useResolver=gConfig.USE_RESOLVER):
-				printf("Connection established (%s)" % gClient.connectType, FLAG_SUCCESS)
+		printf("Loading plugins...")
+		loadPlugins()
+	
+		printf("Connecting...")
+		if gClient.connect(secureMode=gConfig.SECURE, useResolver=gConfig.USE_RESOLVER):
+			printf("Connection established (%s)" % gClient.connectType, FLAG_SUCCESS)
+		else:
+			printf("Unable to connect", FLAG_ERROR)
+			if gConfig.RESTART_IF_ERROR:
+				printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
+				time.sleep(RECONNECT_DELAY)
+				shutdown(True)
 			else:
-				printf("Unable to connect", FLAG_ERROR)
-				if gConfig.RESTART_IF_ERROR:
-					printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
-					time.sleep(RECONNECT_DELAY)
-					shutdown(True)
-				else:
-					shutdown()
-
-			printf("Waiting for authentication...")
-			if gClient.auth(gConfig.USERNAME, gConfig.PASSWORD, gConfig.RESOURCE):
-				printf("Connected", FLAG_SUCCESS)
-			else:
-				printf("Incorrect login/password", FLAG_ERROR)
 				shutdown()
 
-			callEventHandlers(EVT_STARTUP, MODE_ASYNC)
-			clearEventHandlers(EVT_STARTUP)
-
-			gClient.registerHandler("message", messageHandler)
-			gClient.registerHandler("presence", presenceHandler)
-			gClient.registerHandler("iq", iqHandler)
-
-			gRoster = gClient.getRoster()
-			gClient.setStatus = setStatus
-			gClient.setStatus(None, None, gConfig.PRIORITY)
-
-			path = getConfigPath(CONF_FILE)
-			utils.createFile(path, "[]")
-			conferences = eval(utils.readFile(path))
-			if conferences:
-				for conference in conferences:
-					addConference(conference)
-					joinConference(conference, getBotNick(conference), getConferenceConfigKey(conference, "password"))
-					saveConferenceConfig(conference)
-				printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
-
-			callEventHandlers(EVT_READY, MODE_ASYNC)
-			clearEventHandlers(EVT_READY)
-			
-			printf("Now I am ready to work :)")
-			while True:
-				gClient.process(10)
-		except KeyboardInterrupt:
-			if gClient.isConnected():
-				prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-				prs.setStatus(u"Выключаюсь... (CTRL+C)")
-				gClient.send(prs)
+		printf("Waiting for authentication...")
+		if gClient.auth(gConfig.USERNAME, gConfig.PASSWORD, gConfig.RESOURCE):
+			printf("Connected", FLAG_SUCCESS)
+		else:
+			printf("Incorrect login/password", FLAG_ERROR)
 			shutdown()
-		except protocol.SystemShutdown:
-			printf("%s has been switched off" % (gConfig.SERVER), FLAG_WARNING)
-			shutdown()
-		except protocol.Conflict:
-			printf("Resource conflict", FLAG_WARNING)
-			shutdown()
-		except Exception:
-			printf("Exception in main thread", FLAG_ERROR)
-			addTextToSysLog(traceback.format_exc(), LOG_CRASHES)
-			if gClient.isConnected():
-				prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-				prs.setStatus(u"Что-то сломано...")
-				gClient.send(prs)
-			shutdown(gConfig.RESTART_IF_ERROR)
-	else:
-		printf("Another instance is running (pid: %s)" % (pid), FLAG_ERROR)
+
+		gClient.registerHandler("message", messageHandler)
+		gClient.registerHandler("presence", presenceHandler)
+		gClient.registerHandler("iq", iqHandler)
+
+		callEventHandlers(EVT_STARTUP, MODE_ASYNC)
+		clearEventHandlers(EVT_STARTUP)
+
+		global gVerInfo
+		gVerInfo = version.VersionInfo()
+		gVerInfo.createFeaturesHash(BOT_FEATURES)
+
+		gClient.getRoster()
+		gClient.setStatus = setStatus
+		gClient.setStatus(None, None, gConfig.PRIORITY)
+
+		callEventHandlers(EVT_READY, MODE_ASYNC)
+		clearEventHandlers(EVT_READY)
+
+		path = getConfigPath(CONF_FILE)
+		utils.createFile(path, "[]")
+		conferences = eval(utils.readFile(path))
+		if conferences:
+			for conference in conferences:
+				addConference(conference)
+				joinConference(conference, getBotNick(conference), getConferenceConfigKey(conference, "password"))
+				saveConferenceConfig(conference)
+			printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
+
+		printf("Now I am ready to work :)")
+
+		while True:
+			gClient.process(10)
+	except KeyboardInterrupt:
+		if gClient.isConnected():
+			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
+			prs.setStatus(u"Выключаюсь... (CTRL+C)")
+			gClient.send(prs)
+		shutdown()
+	except protocol.SystemShutdown:
+		printf("%s has been switched off" % (gConfig.SERVER), FLAG_WARNING)
+		shutdown()
+	except protocol.Conflict:
+		printf("Resource conflict", FLAG_WARNING)
+		shutdown()
+	except Exception:
+		printf("Exception in main thread", FLAG_ERROR)
+		addTextToSysLog(traceback.format_exc(), LOG_CRASHES)
+		if gClient.isConnected():
+			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
+			prs.setStatus(u"Что-то сломано...")
+			gClient.send(prs)
+		shutdown(gConfig.RESTART_IF_ERROR)
+
+if __name__ == "__main__":
+	main()

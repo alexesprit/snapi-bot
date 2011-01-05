@@ -24,18 +24,18 @@ class DataBase:
 		self.ctpath = "%s.db" % (path)
 		utils.createFile(self.ctpath, "{}")
 		self.changes = eval(utils.readFile(self.ctpath))
-	
+
+		self.__contains__ = self.base.__contains__
+		self.__iter__ = self.base.__iter__
+		
+		self.items = self.base.items
+		self.keys = self.base.keys
+		self.values = self.base.values
+		
 	def __nonzero__(self):
 		if self.base:
 			return 1
 		return 0
-
-	def __contains__(self, item):
-		return item in self.base
-	
-	def __iter__(self):
-		for item in self.base:
-			yield item
 	
 	def __getitem__(self, item):
 		return self.base[item]
@@ -47,15 +47,6 @@ class DataBase:
 	def __delitem__(self, item):
 		del self.base[item]
 		del self.changes[item]
-
-	def keys(self):
-		return self.base.keys()
-
-	def values(self):
-		return self.base.values()
-
-	def items(self):
-		return self.base.items()
 	
 	def clear(self):
 		self.base = {}

@@ -1,4 +1,4 @@
-* {font-family: monospace}
+* {font-family: monospace; line-height: 135%}
 .join {color: #5F9F5F; font-style: italic}
 .leave {color: #9F9F5F; font-style: italic}
 .kick {color: #6F6F6F; font-style: italic}
