@@ -21,7 +21,7 @@ def loadLangsForDumpz():
 
 def uploadToDumpz(msgType, conference, nick, param):
 	if u"языки" == param.lower():
-		elements = [u"%s - %s" % (lang, name) \
+		elements = [u"%s - %s" % (name, lang)
 				for lang, name in DUMPZ_LANGS.items()]
 		elements.sort()
 		message = u"Доступные языки:\n%s" % ("\n".join(elements))

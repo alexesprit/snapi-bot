@@ -1,6 +1,6 @@
 # coding: utf-8
 
-# macros.py 
+# macros.py
 # Initial Copyright (c) 2007 dimichxp <dimichxp@gmail.com>
 # Modification Copyright (c) 2007 Als <Als@exploit.in>
 

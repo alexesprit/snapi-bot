@@ -31,16 +31,16 @@ def getTranslatedText(text, source, target):
 		"langpair": "%s|%s" % (source, target)
 	}
 	response = getURL(url, qparam)
-	# TODO разобраться с этим... 
 	if response:
 		rawdata = simplejson.load(response)
+		print rawdata
 		if rawdata["responseData"]:
 			return rawdata["responseData"]["translatedText"]
 	return None
 
 def translateText(msgType, conference, nick, param):
 	if param.lower() == u"языки":
-		elements = [u"%s - %s" % (lang, name)
+		elements = [u"%s - %s" % (name, lang)
 				for lang, name in TRANSL_LANGS.items()]
 		elements.sort()
 		message = u"Доступные языки:\n%s" % ("\n".join(elements))

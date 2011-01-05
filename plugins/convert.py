@@ -1,8 +1,9 @@
 # coding: utf-8
 
-# convert.py 
-# Based on convert.py from Isida-bot
+# convert.py
 # Initial Copyright (с) 2010 -Esprit-
+
+# Based on the same plugin of Isida-bot
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,16 +15,16 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-CONV_VALUES_FILE = "convvalues.txt"
+CONV_CURRENCIES_FILE = "currencies.txt"
 
-def loadValuesForConvert():
-	global CONV_VALUES
-	path = getFilePath(RESOURCE_DIR, CONV_VALUES_FILE)
-	CONV_VALUES = eval(utils.readFile(path, "utf-8"))
+def loadVCurrenciesForConvert():
+	global CONV_CURRENCIES
+	path = getFilePath(RESOURCE_DIR, CONV_CURRENCIES_FILE)
+	CONV_CURRENCIES = eval(utils.readFile(path, "utf-8"))
 
 def convertValues(msgType, conference, nick, param):
 	if param.lower() == u"валюты":
-		elements = [u"%s - %s" % (name, desc) for name, desc in CONV_VALUES.items()]
+		elements = [u"%s - %s" % (desc, name) for name, desc in CONV_CURRENCIES.items()]
 		elements.sort()
 		sendMsg(msgType, conference, nick, "\n".join(elements))
 	else:
@@ -36,7 +37,7 @@ def convertValues(msgType, conference, nick, param):
 				return
 			source = param[0]
 			target = param[1]
-			if source in CONV_VALUES and target in CONV_VALUES:
+			if source and target in CONV_CURRENCIES:
 				if source == "RUR":
 					source = "BASE"
 				if target == "RUR":
@@ -64,7 +65,7 @@ def convertValues(msgType, conference, nick, param):
 			else:
 				sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
-registerEventHandler(loadValuesForConvert, EVT_STARTUP)
+registerEventHandler(loadVCurrenciesForConvert, EVT_STARTUP)
 
 registerCommand(convertValues, u"перевести", 10, 
 				u"Переводит валюты. Чтобы получить список доступных валют для перевода, укажите \"валюты\" в кач-ве параметра",

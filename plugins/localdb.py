@@ -1,6 +1,6 @@
 # coding: utf-8
 
-# localdb.py 
+# localdb.py
 # Initial Copyright (c) 2002-2005 Mike Mintz <mikemintz@gmail.com>
 # Modification Copyright (c) 2007 Als <Als@exploit.in>
 

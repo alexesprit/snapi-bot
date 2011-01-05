@@ -1,6 +1,6 @@
 # coding: utf-8
 
-# servers.py
+# roulette.py
 # Initial Copyright (c) 2007 dimichxp <dimichxp@gmail.com>
 # Modification Copyright (c) 2007-2008 Als <Als@exploit.in>>
 

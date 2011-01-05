@@ -1,6 +1,6 @@
 # coding: utf-8
 
-# advertisement.py
+# advertisements.py
 # Initial Copyright (c) 2010 -Esprit-
 
 # This program is free software; you can redistribute it and/or modify
