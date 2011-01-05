@@ -305,11 +305,11 @@ def getNicks(conference):
 def getOnlineNicks(conference):
 	return [x for x in gConferences[conference] if getNickKey(conference, x, NICK_HERE)]
 	
-def getTrueJID(jid, resource=None):
-	if jid in gConferences:
-		if isNickInConference(jid, resource):
-			jid = getNickKey(jid, resource, NICK_JID)
-	return jid
+def getTrueJID(barejid, resource=None):
+	if barejid in gConferences:
+		if isNickInConference(barejid, resource):
+			return getNickKey(barejid, resource, NICK_JID)
+	return barejid
 
 def getNickByJID(conference, truejid, offline=False):
 	nicks = offline and getNicks(conference) or getOnlineNicks(conference)
@@ -428,25 +428,24 @@ def sendMsg(msgType, conference, nick, text, force=False):
 		jid = u"%s/%s" % (conference, nick)
 	sendTo(msgType, jid, text)
 
-def messageHandler(session, stanza):
-	# TODO сделать из этой сотни строк что-то хорошее
+def parseMessage(session, stanza):
 	gInfo["msg"] += 1
 	msgType = stanza.getType()
 	if stanza.getTimestamp() or msgType in FORBIDDEN_TYPES:
 		return
 	fulljid = stanza.getFrom()
-	jid = fulljid.getBareJID()
-	isConference = jid in gConferences
+	barejid = fulljid.getBareJID()
+	conference = barejid
+	isConference = conference in gConferences
 	if protocol.TYPE_PUBLIC == msgType and not isConference:
 		return
+	resource = fulljid.getResource()
+	nick = resource
 	if isConference:
-		conference = jid
-		nick = fulljid.getResource()
 		truejid = getTrueJID(conference, nick)
 		userAccess = getAccess(conference, truejid)
 	else:
-		userAccess = getAccess(None, jid)
-		resource = fulljid.getResource()
+		userAccess = getAccess(None, barejid)
 	if -100 == userAccess:
 		return
 	message = stanza.getBody() or ""
@@ -479,7 +478,7 @@ def messageHandler(session, stanza):
 	if isConference:
 		callEventHandlers(EVT_MSG | H_CONFERENCE, MODE_ASYNC, stanza, msgType, conference, nick, truejid, message)
 	else:
-		callEventHandlers(EVT_MSG | H_ROSTER, MODE_ASYNC, stanza, msgType, jid, resource, message)
+		callEventHandlers(EVT_MSG | H_ROSTER, MODE_ASYNC, stanza, msgType, barejid, resource, message)
 	if isConference:
 		botNick = getBotNick(conference)
 		if botNick == nick:
@@ -489,7 +488,7 @@ def messageHandler(session, stanza):
 				if message.startswith(x):
 					message = message.replace(x, "").strip()
 					break
-		prefix = getConferenceConfigKey(conference, "prefix")
+		prefix = getConferenceConfigKey(barejid, "prefix")
 		if prefix:
 			if message.startswith(prefix):
 				message = message[len(prefix):].strip()
@@ -500,38 +499,28 @@ def messageHandler(session, stanza):
 	rawbody = message.split(None, 1)
 	command = rawbody[0].lower()
 	if isConference:
-		if isCommand(command):
-			if isAvailableCommand(conference, command):
-				cmdAccess = gCommands[command][CMD_ACCESS]
-				cmdType = CMD_CONFERENCE
-			else:
-				return
+		if not isAvailableCommand(conference, command):
+			return
+	if isCommand(command):
+		cmdAccess = gCommands[command][CMD_ACCESS]
+	else:
+		if gMacros.hasMacros(command):
+			cmdAccess = gMacros.getAccess(command)
+			message = gMacros.expand(message, (barejid, nick))
 		else:
-			if gMacros.hasMacros(command):
-				cmdAccess = gMacros.getAccess(command)
-			elif gMacros.hasMacros(command, conference):
+			if isConference and gMacros.hasMacros(command, conference):
+				message = gMacros.expand(message, (conference, nick), conference)
 				cmdAccess = gMacros.getAccess(command, conference)
 			else:
 				return
-			message = gMacros.expand(message, (conference, nick), conference)
-			rawbody = message.split(None, 1)
-			command = rawbody[0].lower()
-			if not isCommand or not isAvailableCommand(conference, command):
-				return
-		cmdType = CMD_CONFERENCE
-	else:
-		if isCommand(command):
-			cmdAccess = gCommands[command][CMD_ACCESS]
-		elif gMacros.hasMacros(command):
-			cmdAccess = gMacros.getAccess(command)
-			message = gMacros.expand(message, (jid, resource))
-			rawbody = message.split(None, 1)
-			command = rawbody[0].lower()
-			if not isCommand:
-				return
-		else:
+		rawbody = message.split(None, 1)
+		command = rawbody[0].lower()
+		if not isCommand(command):
 			return
-		cmdType = CMD_ROSTER
+		if isConference:
+			if not isAvailableCommand(conference, command):
+				return
+	cmdType = isConference and CMD_CONFERENCE or CMD_ROSTER
 	if isCommandType(command, cmdType):
 		if userAccess >= cmdAccess:
 			param = (len(rawbody) == 2) and rawbody[1] or None
@@ -540,17 +529,11 @@ def messageHandler(session, stanza):
 			if not param and isCommandType(command, CMD_PARAM):
 				return
 			gInfo["cmd"] += 1
-			if isConference:
-				startThread(gCmdHandlers[command], msgType, conference, nick, param)
-			else:
-				startThread(gCmdHandlers[command], msgType, jid, resource, param)
+			startThread(gCmdHandlers[command], msgType, barejid, resource, param)
 		else:
-			if isConference:
-				sendMsg(msgType, conference, nick, u"Недостаточно прав")
-			else:
-				sendMsg(msgType, jid, resource, u"Недостаточно прав")
+			sendMsg(msgType, barejid, resource, u"Недостаточно прав")
 
-def presenceHandler(session, stanza):
+def parsePresence(session, stanza):
 	gInfo["prs"] += 1
 	fulljid = stanza.getFrom()
 	jid = fulljid.getBareJID()
@@ -617,21 +600,19 @@ def presenceHandler(session, stanza):
 		resource = fulljid.getResource()
 		callEventHandlers(EVT_PRS | H_ROSTER, MODE_ASYNC, stanza, jid, resource)
 
-def iqHandler(session, stanza):
+def parseIQ(session, stanza):
 	gInfo["iq"] += 1
 	fulljid = stanza.getFrom()
-	jid = fulljid.getBareJID()
-	isConference = jid in gConferences
+	barejid = fulljid.getBareJID()
+	resource = fulljid.getResource()
+	isConference = barejid in gConferences
 	if isConference:
-		conference = jid
-		nick = fulljid.getResource()
-		truejid = getTrueJID(conference, nick)
-		if getAccess(conference, truejid) == -100:
+		truejid = getTrueJID(barejid, resource)
+		if getAccess(barejid, truejid) == -100:
 			return
 	else:
-		if getAccess(None, jid) == -100:
+		if getAccess(None, barejid) == -100:
 			return
-		resource = fulljid.getResource()
 	if protocol.TYPE_GET == stanza.getType():
 		if stanza.getTags("query", {}, protocol.NS_VERSION):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
@@ -671,9 +652,9 @@ def iqHandler(session, stanza):
 			error.addChild("feature-not-implemented", {}, [], protocol.NS_STANZAS)
 		gClient.send(iq)
 	if isConference:
-		callEventHandlers(EVT_IQ | H_CONFERENCE, MODE_ASYNC, stanza, conference, nick, truejid)
+		callEventHandlers(EVT_IQ | H_CONFERENCE, MODE_ASYNC, stanza, barejid, resource, truejid)
 	else:
-		callEventHandlers(EVT_IQ | H_ROSTER, MODE_ASYNC, stanza, jid, resource)
+		callEventHandlers(EVT_IQ | H_ROSTER, MODE_ASYNC, stanza, barejid, resource)
 
 def addTextToSysLog(text, logtype, show=False):
 	path = getFilePath(SYSLOG_DIR, time.strftime(LOG_TYPES[logtype]))
@@ -756,9 +737,9 @@ def main():
 			printf("Incorrect login/password", FLAG_ERROR)
 			shutdown()
 
-		gClient.registerHandler("message", messageHandler)
-		gClient.registerHandler("presence", presenceHandler)
-		gClient.registerHandler("iq", iqHandler)
+		gClient.registerHandler("message", parseMessage)
+		gClient.registerHandler("presence", parsePresence)
+		gClient.registerHandler("iq", parseIQ)
 
 		callEventHandlers(EVT_STARTUP, MODE_ASYNC)
 		clearEventHandlers(EVT_STARTUP)

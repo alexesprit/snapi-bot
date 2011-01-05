@@ -79,7 +79,7 @@ class Macros:
 		else:
 			return self.gMacrosList.get(macros)
 		
-	def hasMacros(self, macros, conference = None):
+	def hasMacros(self, macros, conference=None):
 		if conference:
 			return macros in self.macrosList[conference]
 		else:
