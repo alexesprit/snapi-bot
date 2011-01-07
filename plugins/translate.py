@@ -33,7 +33,6 @@ def getTranslatedText(text, source, target):
 	response = getURL(url, qparam)
 	if response:
 		rawdata = simplejson.load(response)
-		print rawdata
 		if rawdata["responseData"]:
 			return rawdata["responseData"]["translatedText"]
 	return None
