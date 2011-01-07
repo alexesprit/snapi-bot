@@ -16,7 +16,7 @@
 def showRoster(msgType, conference, nick, param):
 	roster = gClient.getRoster()
 	elements = [u"%d) %s [%s]" % (i + 1, jid, roster.getSubscription(jid)) 
-			for i, jid in enumerate(sorted(gRoster.keys()))]
+			for i, jid in enumerate(sorted(roster.keys()))]
 	sendMsg(msgType, conference, nick,  u"Смотри, кто у меня есть:\n%s" % ("\n".join(elements)))
 
 registerCommand(showRoster, u"ростер", 100, 
