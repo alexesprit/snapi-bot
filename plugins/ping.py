@@ -53,7 +53,7 @@ def showPing_(stanza, t0, msgType, conference, nick, param):
 		message += u" %s сек." % (str(round(ping , 3)))
 		sendMsg(msgType, conference, nick, message)
 	else:
-		sendMsg(msgType, conference, nick, u"не пингуется :(")
+		sendMsg(msgType, conference, nick, u"Не пингуется :(")
 
 registerCommand(showPing, u"пинг", 10, 
 				u"Пингует указанного пользователя или jabber-сервер", 

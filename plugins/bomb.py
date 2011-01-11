@@ -52,7 +52,7 @@ def giveBomb(msgType, conference, nick, param):
 			sendMsg(msgType, conference, userNick, message)
 			gBombTimers[conference][truejid] = startTimer(timeout, bombExecute, msgType, conference, userNick, truejid)
 	else:
-		sendMsg(msgType, conference, nick, u"а это кто?");			
+		sendMsg(msgType, conference, nick, u"А это кто?")
 
 def bombExecute(msgType, conference, nick, truejid):
 	if isNickOnline(conference, nick):

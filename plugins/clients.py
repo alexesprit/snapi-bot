@@ -54,9 +54,9 @@ def saveUserClient(conference, nick, truejid, aff, role):
 	iq.addChild("query", {}, [], protocol.NS_VERSION)
 	iq.setTo(conference + "/" + nick)
 	iq.setID(getUniqueID("cli_id"))
-	gClient.sendAndCallForResponse(iq, _saveUserClient, (conference, truejid))
+	gClient.sendAndCallForResponse(iq, saveUserClient_, (conference, truejid))
 
-def _saveUserClient(stanza, conference, truejid):
+def saveUserClient_(stanza, conference, truejid):
 	if protocol.TYPE_RESULT == stanza.getType():
 		base = gUserClients[conference]
 		query = stanza.getQueryNode()
