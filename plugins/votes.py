@@ -77,7 +77,7 @@ def vote(msgType, conference, nick, param):
 			else:
 				sendMsg(msgType, conference, nick, u"2-ой раз голосовать не надо :P")
 	else:
-		sendMsg(msgType, conference, nick, u"сейчас нет никаких голосований")
+		sendMsg(msgType, conference, nick, u"Сейчас нет никаких голосований")
 
 def createNewVote(msgType, conference, nick, param):
 	if param:

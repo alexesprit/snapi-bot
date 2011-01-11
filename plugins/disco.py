@@ -91,16 +91,16 @@ def showServiceDiscoveryResults_(stanza, msgType, conference, nick, jid, maxCoun
 			else:
 				if itemCount > maxCount:
 					discoList = discoList[:maxCount]
-					discoList.append(u"всего %d пунктов" % (itemCount))
+					discoList.append(u"Всего %d пунктов" % (itemCount))
 				sendMsg(msgType, conference, nick, u"Надискаверила:\n" + u"\n".join(discoList))
 		else:
 			if searchKey and itemCount:
 				message = u"Текст \"%s\" не найден (всего %d пунктов)" % (searchKey, itemCount)
 				sendMsg(msgType, conference, nick, message)
 			else:
-				sendMsg(msgType, conference, nick, u"пустое диско")
+				sendMsg(msgType, conference, nick, u"Пустое диско")
 	else:
-		sendMsg(msgType, conference, nick, u"не могу")
+		sendMsg(msgType, conference, nick, u"Не могу")
 
 registerCommand(showServiceDiscoveryResults, u"диско", 10, 
 				u"Показывает результаты обзора сервисов для указанного жида. Также можно выполнить запрос по узлу (\"жид#узел\") Второй или третий (если даётся ограничитель кол-ва) параметр - поиск (ищет заданное слово в жиде и описании элемента диско). Если поисковым словом задать имя конференции до названия сервера (например qwerty@), то покажет место этой конференции в общем рейтинге. В общий чат может дать до 50 результатов (10 - без указания кол-ва), в приват - 250 (50 - без указания кол-ва)", 
