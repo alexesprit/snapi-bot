@@ -61,10 +61,10 @@ def showCommands(msgType, conference, nick, param):
 						disabledCmds.append(cmd)
 	if availableCmds:
 		availableCmds.sort()
-		message += u"Доступные команды:\n%s" % (u", ".join(availableCmds))
+		message += u"Доступные команды (%d):\n%s" % (len(availableCmds), u", ".join(availableCmds))
 	if disabledCmds:
 		disabledCmds.sort()
-		message += u"\n\nОтключенные команды:\n%s" % (", ".join(disabledCmds))
+		message += u"\n\nОтключенные команды (%d):\n%s" % (len(disabledCmds), ", ".join(disabledCmds))
 	if protocol.TYPE_PUBLIC == msgType:
 		sendMsg(msgType, conference, nick, u"Ушли")
 	sendMsg(protocol.TYPE_PRIVATE, conference, nick, message);	
