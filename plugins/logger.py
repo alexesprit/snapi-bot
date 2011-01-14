@@ -125,7 +125,7 @@ def addTextToLog(logtype, conference, nick, text, aff=None):
 	text = text.replace("\n", "<br/>")
 
 	if text.startswith("/me"):
-		rawtext = u"<span class=\"me\"> * %s%s</span><br/>" % (nick, text[3:])
+		rawtext = u"<span class=\"me\"> *%s%s</span><br/>" % (nick, text[3:])
 	else:
 		if logtype in LOGTYPES:
 			rawtext = u"<span class=\"%s\"> %s</span><br/>" % (logtype, text)
@@ -150,25 +150,25 @@ def addMessageToLog(stanza, msgType, conference, nick, truejid, text):
 
 def addUserJoinToLog(conference, nick, truejid, aff, role):
 	if getConferenceConfigKey(conference, "log"):
-		addTextToLog(LOGTYPE_JOIN, conference, None, u"%s заходит в комнату как %s и %s" % (nick, role, aff))
+		addTextToLog(LOGTYPE_JOIN, conference, None, u"*** %s заходит в комнату как %s и %s" % (nick, role, aff))
 
 def addUserLeaveToLog(conference, nick, truejid, reason, code):
 	if getConferenceConfigKey(conference, "log"):
 		if not code:
 			if reason:
-				addTextToLog(LOGTYPE_LEAVE, conference, None, u"%s выходит из комнаты: %s" % (nick, reason))
+				addTextToLog(LOGTYPE_LEAVE, conference, None, u"*** %s выходит из комнаты: %s" % (nick, reason))
 			else:
-				addTextToLog(LOGTYPE_LEAVE, conference, None, u"%s выходит из комнаты" % (nick))		
+				addTextToLog(LOGTYPE_LEAVE, conference, None, u"*** %s выходит из комнаты" % (nick))		
 		elif "307" == code:
 			if reason:
-				addTextToLog(LOGTYPE_KICK, conference, None, u"%s выгнали из комнаты: %s" % (nick, reason))
+				addTextToLog(LOGTYPE_KICK, conference, None, u"*** %s выгнали из комнаты: %s" % (nick, reason))
 			else:
-				addTextToLog(LOGTYPE_KICK, conference, None, u"%s выгнали из комнаты" % (nick));		
+				addTextToLog(LOGTYPE_KICK, conference, None, u"*** %s выгнали из комнаты" % (nick));		
 		elif "301" == code:
 			if reason:
-				addTextToLog(LOGTYPE_BAN, conference, None, u"%s забанили: %s" % (nick, reason))
+				addTextToLog(LOGTYPE_BAN, conference, None, u"*** %s забанили: %s" % (nick, reason))
 			else:
-				addTextToLog(LOGTYPE_BAN, conference, None, u"%s забанили" % (nick));	
+				addTextToLog(LOGTYPE_BAN, conference, None, u"*** %s забанили" % (nick));	
 
 def addPresenceToLog(stanza, conference, nick, truejid):
 	if protocol.TYPE_ERROR != stanza.getType():
@@ -176,7 +176,7 @@ def addPresenceToLog(stanza, conference, nick, truejid):
 			code = stanza.getStatusCode()
 			if code == "303":
 				newnick = stanza.getNick()
-				addTextToLog(LOGTYPE_NICK, conference, None, u"%s меняет ник на %s" % (nick, newnick))
+				addTextToLog(LOGTYPE_NICK, conference, None, u"*** %s меняет ник на %s" % (nick, newnick))
 
 if gConfig.LOGGER_DIR:
 	registerEventHandler(addUserJoinToLog, EVT_USERJOIN)
