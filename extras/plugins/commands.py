@@ -23,8 +23,7 @@ def saveCommandAccesses():
 def loadCommandAccesses():
 	global gCommandAccess
 	path = getConfigPath(CMDACCESS_FILE)
-	utils.createFile(path, '{}')
-	gCommandAccess = eval(utils.readFile(path))
+	gCommandAccess = eval(utils.readFile(path, "{}"))
 	for command in gCommandAccess:
 		gCommands[command][CMD_ACCESS] = gCommandAccess[command]
 

@@ -19,8 +19,7 @@ gGreets = {}
 
 def loadGreetings(conference):
 	path = getConfigPath(conference, GREET_FILE)
-	utils.createFile(path, "{}")
-	gGreets[conference] = eval(utils.readFile(path))
+	gGreets[conference] = eval(utils.readFile(path, "{}"))
 
 def freeGreetings(conference):
 	del gGreets[conference]

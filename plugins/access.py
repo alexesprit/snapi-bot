@@ -30,15 +30,13 @@ ACCESS_DESC = {
 def loadGlobalAccesses():
 	global gGlobalAccess
 	path = getConfigPath(ACCESS_FILE)
-	utils.createFile(path, "{}")
-	gGlobalAccess = eval(utils.readFile(path))
+	gGlobalAccess = eval(utils.readFile(path, "{}"))
 	for jid in gConfig.ADMINS:
 		gGlobalAccess[jid] = 100
 
 def loadLocalAccesses(conference):
 	path = getConfigPath(conference, ACCESS_FILE)
-	utils.createFile(path, "{}")
-	gPermAccess[conference] = eval(utils.readFile(path))
+	gPermAccess[conference] = eval(utils.readFile(path, "{}"))
 	gTempAccess[conference] = {}
 
 def freeLocalAccesses(conference):

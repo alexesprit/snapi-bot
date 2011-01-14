@@ -15,12 +15,10 @@
 
 POKES_FILE = "pokes.txt"
 
-gPokes = []
-
 def loadPokes():
 	global gPokes
 	path = getFilePath(RESOURCE_DIR, POKES_FILE)
-	gPokes = eval(utils.readFile(path, "utf-8"))
+	gPokes = eval(utils.readFile(path, encoding="utf-8"))
 
 def pokeUser(msgType, conference, nick, param):
 	if msgType == protocol.TYPE_PUBLIC:

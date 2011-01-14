@@ -18,12 +18,10 @@ from utils import utils
 class DataBase:
 	def __init__(self, path):
 		self.path = path		
-		utils.createFile(self.path, "{}")
-		self.base = eval(utils.readFile(self.path))
+		self.base = eval(utils.readFile(self.path, "{}"))
 
 		self.ctpath = "%s.db" % (path)
-		utils.createFile(self.ctpath, "{}")
-		self.changes = eval(utils.readFile(self.ctpath))
+		self.changes = eval(utils.readFile(self.ctpath, "{}"))
 
 		self.__contains__ = self.base.__contains__
 		self.__iter__ = self.base.__iter__

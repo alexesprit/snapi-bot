@@ -20,7 +20,7 @@ CONV_CURRENCIES_FILE = "currencies.txt"
 def loadVCurrenciesForConvert():
 	global CONV_CURRENCIES
 	path = getFilePath(RESOURCE_DIR, CONV_CURRENCIES_FILE)
-	CONV_CURRENCIES = eval(utils.readFile(path, "utf-8"))
+	CONV_CURRENCIES = eval(utils.readFile(path, encoding="utf-8"))
 
 def convertValues(msgType, conference, nick, param):
 	if param.lower() == u"валюты":

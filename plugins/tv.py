@@ -29,7 +29,7 @@ TV_CATEGORIES = {
 def loadTVChannels():
 	global TV_CHANNELS
 	path = getFilePath(RESOURCE_DIR, TVCODES_FILE)
-	TV_CHANNELS = eval(utils.readFile(path, "utf-8"))
+	TV_CHANNELS = eval(utils.readFile(path, encoding="utf-8"))
 
 def getTVQueryParam(channel, flag=None):
 	param = {

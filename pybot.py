@@ -241,8 +241,7 @@ def saveConferences():
 
 def loadConferenceConfig(conference):
 	path = getConfigPath(conference, CONFIG_FILE)
-	utils.createFile(path, "{}")
-	gConferenceConfig[conference] = eval(utils.readFile(path))
+	gConferenceConfig[conference] = eval(utils.readFile(path, "{}"))
 
 def saveConferenceConfig(conference):
 	path = getConfigPath(conference, CONFIG_FILE)
@@ -756,8 +755,7 @@ def main():
 		clearEventHandlers(EVT_READY)
 
 		path = getConfigPath(CONF_FILE)
-		utils.createFile(path, "[]")
-		conferences = eval(utils.readFile(path))
+		conferences = eval(utils.readFile(path, "[]"))
 		if conferences:
 			for conference in conferences:
 				addConference(conference)

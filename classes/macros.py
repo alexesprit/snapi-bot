@@ -35,20 +35,16 @@ class Macros:
 	def loadMacroses(self, conference=None):
 		if conference:
 			path = os.path.join(self.path, conference, MACROS_FILE)
-			utils.createFile(path, "{}")
-			self.macrosList[conference] = eval(utils.readFile(path))
+			self.macrosList[conference] = eval(utils.readFile(path, "{}"))
 
 			path = os.path.join(self.path, conference, MACCESS_FILE)
-			utils.createFile(path, "{}")
-			self.accessList[conference] = eval(utils.readFile(path))
+			self.accessList[conference] = eval(utils.readFile(path, "{}"))
 		else:
 			path = os.path.join(self.path, MACROS_FILE)
-			utils.createFile(path, "{}")
-			self.gMacrosList = eval(utils.readFile(path))
+			self.gMacrosList = eval(utils.readFile(path, "{}"))
 
-			path = os.path.join(self.path, MACCESS_FILE)			
-			utils.createFile(path, "{}")			
-			self.gAccessList = eval(utils.readFile(path))
+			path = os.path.join(self.path, MACCESS_FILE)
+			self.gAccessList = eval(utils.readFile(path, "{}"))
 
 	def saveMacroses(self, conference=None):
 		if conference:

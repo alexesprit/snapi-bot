@@ -26,8 +26,7 @@ def freeExpressions(conference):
 
 def loadExpressions(conference):
 	path = getConfigPath(conference, EXPRESSIONS_FILE)
-	utils.createFile(path, "{}")
-	gExpressions[conference] = eval(utils.readFile(path))
+	gExpressions[conference] = eval(utils.readFile(path, "{}"))
 
 def addExpression(msgType, conference, nick, param):
 	param = param.split("=", 1)

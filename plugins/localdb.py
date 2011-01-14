@@ -18,6 +18,17 @@ LOCALDB_FILE = "localdb.txt"
 
 gLocalBase = {}
 
+def loadLocalBase(conference):
+	path = getConfigPath(conference, LOCALDB_FILE)
+	gLocalBase[conference] = eval(utils.readFile(path, "{}"))
+
+def saveLocalBase(conference):
+	path = getConfigPath(conference, LOCALDB_FILE)
+	utils.writeFile(path, str(gLocalBase[conference]))
+
+def freeLocalBase(conference):
+	del gLocalBase[conference]
+
 def getLocalKeyToPublic(msgType, conference, nick, param):
 	param = param.lower()
 	if param in gLocalBase[conference]:
@@ -80,18 +91,6 @@ def showAllLocalKeys(msgType, conference, nick, parameters):
 		sendMsg(msgType, conference, nick, ", ".join(sorted(gLocalBase[conference].keys())))
 	else:
 		sendMsg(msgType, conference, nick, "База пуста!")
-
-def loadLocalBase(conference):
-	path = getConfigPath(conference, LOCALDB_FILE)
-	utils.createFile(path, "{}")
-	gLocalBase[conference] = eval(utils.readFile(path))
-
-def saveLocalBase(conference):
-	path = getConfigPath(conference, LOCALDB_FILE)
-	utils.writeFile(path, str(gLocalBase[conference]))
-
-def freeLocalBase(conference):
-	del gLocalBase[conference]
 
 registerEventHandler(loadLocalBase, EVT_ADDCONFERENCE)
 registerEventHandler(freeLocalBase, EVT_DELCONFERENCE)

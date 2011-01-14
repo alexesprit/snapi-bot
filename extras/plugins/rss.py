@@ -33,12 +33,10 @@ RSS_SEND_INTERVAL = 10
 
 def loadRSSChannels(conference):
 	path = getConfigPath(conference, RSSITEMS_FILE)
-	utils.createFile(path, '{}')
-	gRSSItems[conference] = eval(utils.readFile(path))
+	gRSSItems[conference] = eval(utils.readFile(path, "{}"))
 
 	path = getConfigPath(conference, RSSCACHE_FILE)
-	utils.createFile(path, '{}')
-	gRSSCache[conference] = eval(utils.readFile(path))
+	gRSSCache[conference] = eval(utils.readFile(path, "{}"))
 
 def freeRSSChannels(conference):
 	del gRSSItems[conference]

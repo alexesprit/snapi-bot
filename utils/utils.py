@@ -71,24 +71,21 @@ def ustr(text):
 		return unicode(text, "utf-8")
 	return text
 
-def createFile(path, data):
+def readFile(path, default=None, encoding=None):
 	path = path.encode("utf-8")
-	if not os.access(path, os.F_OK):
-		dirName = os.path.dirname(path)
-		if not os.path.exists(dirName):
-			os.makedirs(dirName)
-		f = file(path, "w")
-		f.write(data)
+	if os.path.exists(path):
+		f = file(path)
+		data = f.read()
 		f.close()
-
-def readFile(path, encoding=None):
-	path = path.encode("utf-8")
-	f = file(path)
-	data = f.read()
-	f.close()
-	if encoding:
-		data = data.decode(encoding)
-	return data
+		if encoding:
+			data = data.decode(encoding)
+		return data
+	else:
+		dirname = os.path.dirname(path)
+		if not os.path.exists(dirname):
+			os.makedirs(dirname)
+		writeFile(path, default)
+		return default
 
 def writeFile(path, data, mode="w"):
 	with smph:

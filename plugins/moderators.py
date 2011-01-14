@@ -19,8 +19,7 @@ gModerators = {}
 
 def loadAutoModerators(conference):
 	path = getConfigPath(conference, MODERATORS_FILE)
-	utils.createFile(path, "[]")
-	gModerators[conference] = eval(utils.readFile(path))
+	gModerators[conference] = eval(utils.readFile(path, "[]"))
 
 def freeAutoModerators(conference):
 	del gModerators[conference]

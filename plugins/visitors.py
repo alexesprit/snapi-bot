@@ -19,8 +19,7 @@ gVisitors = {}
 
 def loadAutoVisitors(conference):
 	path = getConfigPath(conference, VISITORS_FILE)
-	utils.createFile(path, "[]")
-	gVisitors[conference] = eval(utils.readFile(path))
+	gVisitors[conference] = eval(utils.readFile(path, "[]"))
 
 def freeAutoVisitors(conference):
 	del gVisitors[conference]

@@ -18,8 +18,7 @@ ROSTERSTATUS_FILE = "rosterstatus.txt"
 def loadRosterStatusValue():
 	global gRosterStatus
 	path = getConfigPath(ROSTERSTATUS_FILE)
-	utils.createFile(path, "{}")
-	gRosterStatus = eval(utils.readFile(path))
+	gRosterStatus = eval(utils.readFile(path, "{}"))
 
 def updateRosterStatus():
 	global gRosterStatus

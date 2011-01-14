@@ -21,7 +21,7 @@ TRANSL_LANGS_FILE = "transllangs.txt"
 def loadLangsForTranslate():
 	global TRANSL_LANGS
 	path = getFilePath(RESOURCE_DIR, TRANSL_LANGS_FILE)
-	TRANSL_LANGS = eval(utils.readFile(path, "utf-8"))
+	TRANSL_LANGS = eval(utils.readFile(path, encoding="utf-8"))
 
 def getTranslatedText(text, source, target):
 	url = "http://ajax.googleapis.com/ajax/services/language/translate"

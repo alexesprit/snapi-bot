@@ -24,8 +24,7 @@ gVote = {}
 
 def loadVotes(conference):
 	path = getConfigPath(conference, VOTES_FILE)
-	utils.createFile(path, "{}")
-	gVote[conference] = eval(utils.readFile(path))
+	gVote[conference] = eval(utils.readFile(path, "{}"))
 
 def freeVotes(conference):
 	del gVote[conference]

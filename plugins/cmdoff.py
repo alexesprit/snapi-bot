@@ -17,8 +17,7 @@ CMDOFF_FILE = "cmdoff.txt"
 
 def loadDisabledCommands(conference):
 	path = getConfigPath(conference, CMDOFF_FILE)
-	utils.createFile(path, "[]")
-	gCmdOff[conference] = eval(utils.readFile(path))
+	gCmdOff[conference] = eval(utils.readFile(path, "[]"))
 
 def freeDisableCommands(conference):
 	del gCmdOff[conference]

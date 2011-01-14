@@ -18,8 +18,7 @@ gRecords = {}
 
 def loadRecordsBase(conference):
 	path = getConfigPath(conference, REC_FILE)
-	utils.createFile(path, "{}")
-	gRecords[conference] = eval(utils.readFile(path))
+	gRecords[conference] = eval(utils.readFile(path, "{}"))
 
 def freeRecordsBase(conference):
 	del gRecords[conference]

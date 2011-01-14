@@ -31,8 +31,7 @@ def setDefChatterValue(conference):
 
 def loadChatterBase(conference):
 	path = getConfigPath(conference, CHATTERBOX_FILE)
-	utils.createFile(path, "[]")
-	gChatterCache[conference] = eval(utils.readFile(path))
+	gChatterCache[conference] = eval(utils.readFile(path, "[]"))
 	gUpdateCount[conference] = 0
 
 def freeChatterBase(conference):
