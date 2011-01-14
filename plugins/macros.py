@@ -187,30 +187,34 @@ def showGlobalMacroAccess(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Нет такого макроса")
 
 def showMacrosList(msgType, conference, nick, parameters):
-	message, disMacroses, macroses = u"", [], []
-	truejid = getTrueJID(conference, nick)
+	macroses, disMacroses = [], []
+	buf = []
+
 	isConference = isConferenceInList(conference)
+	truejid = getTrueJID(conference, nick)
+	access = getAccess(conference, truejid)
+
 	if isConference:
 		for macros in gMacros.getMacrosList(conference):
 			if isAvailableCommand(conference, macros):
-				access = gMacros.getAccess(macros, conference)
-				if access <= getAccess(conference, truejid):
+				if gMacros.getAccess(macros, conference) <= access:
 					macroses.append(macros)
 			else:
 				disMacroses.append(macros)
 		if macroses:
 			macroses.sort()
-			message += u"Локальные:\n%s\n" % (", ".join(macroses))
+			buf.append(u"Локальные (%d):\n%s" % (len(macroses), ", ".join(macroses)))
 		if disMacroses:
 			disMacroses.sort()
-			message += u"Отключённые локальные макросы:\n%s\n\n" % (", ".join(disMacroses))
-		macroses = []
-		disMacroses = [];	
+			buf.append(u"Отключённые (%d):\n%s" % (len(disMacroses), ", ".join(disMacroses)))
+
+		buf.append("")
+		macroses, disMacroses = [], []
+
 	for macros in gMacros.getMacrosList():
 		if isConference:
 			if isAvailableCommand(conference, macros):
-				access = gMacros.getAccess(macros)
-				if access <= getAccess(conference, truejid):
+				if gMacros.getAccess(macros) <= access:
 					macroses.append(macros)
 			else:
 				disMacroses.append(macros)
@@ -218,17 +222,19 @@ def showMacrosList(msgType, conference, nick, parameters):
 			access = gMacros.getAccess(macros)
 			if access <= getAccess(conference, truejid):
 				macroses.append(macros)
+
 	if macroses:
 		macroses.sort()
-		message += u"Глобальные:\n%s\n" % (", ".join(macroses))
+		buf.append(u"Глобальные (%d):\n%s" % (len(macroses), ", ".join(macroses)))
 	if isConference:
 		if disMacroses:
 			disMacroses.sort()
-			message += u"Отключённые глобальные макросы:\n%s\n\n" % (", ".join(disMacroses))
-	if message:
+			buf.append(u"Отключённые (%d):\n%s" % (len(disMacroses), ", ".join(disMacroses)))
+
+	if buf:
 		if msgType == protocol.TYPE_PUBLIC:
 			sendMsg(msgType, conference, nick, u"Ушёл")
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, "\n".join(buf))
 	else:
 		sendMsg(msgType, conference, nick, u"Макросов нет :(")
 

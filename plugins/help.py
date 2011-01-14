@@ -45,13 +45,16 @@ def showHelp(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Напишите \"%sкоманды\", чтобы узнать список всех команд, \"%sпомощь <команда>\" для получения справки по использованию команды" % (prefix, prefix))
 
 def showCommands(msgType, conference, nick, param):
-	cmdType = isConferenceInList(conference) and CMD_CONFERENCE or CMD_ROSTER
 	availableCmds, disabledCmds = [], []
-	message = ""
+	buf = []
+
+	cmdType = isConferenceInList(conference) and CMD_CONFERENCE or CMD_ROSTER
 	truejid = getTrueJID(conference, nick)
+	access = getAccess(conference, truejid)
+
 	for cmd in gCommands:
 		if isCommandType(cmd, cmdType):
-			if getAccess(conference, truejid) >= gCommands[cmd][CMD_ACCESS]:
+			if gCommands[cmd][CMD_ACCESS] <= access:
 				if cmdType == CMD_ROSTER:
 					availableCmds.append(cmd)
 				else:
@@ -59,15 +62,20 @@ def showCommands(msgType, conference, nick, param):
 						availableCmds.append(cmd)
 					else:
 						disabledCmds.append(cmd)
+
 	if availableCmds:
 		availableCmds.sort()
-		message += u"Доступные команды (%d):\n%s" % (len(availableCmds), u", ".join(availableCmds))
+		buf.append(u"Доступные команды (%d):\n%s" % (len(availableCmds), u", ".join(availableCmds)))
+
+	buf.append("")
+
 	if disabledCmds:
 		disabledCmds.sort()
-		message += u"\n\nОтключенные команды (%d):\n%s" % (len(disabledCmds), ", ".join(disabledCmds))
+		buf.append(u"Отключенные команды (%d):\n%s" % (len(disabledCmds), ", ".join(disabledCmds)))
+
 	if protocol.TYPE_PUBLIC == msgType:
 		sendMsg(msgType, conference, nick, u"Ушли")
-	sendMsg(protocol.TYPE_PRIVATE, conference, nick, message);	
+	sendMsg(protocol.TYPE_PRIVATE, conference, nick, "\n".join(buf))
 
 registerCommand(showHelp, u"помощь", 0, 
 				u"Показывает справку по использованию определённой команды. Без параметра или выводит общую справку",
