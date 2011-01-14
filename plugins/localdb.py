@@ -29,39 +29,41 @@ def saveLocalBase(conference):
 def freeLocalBase(conference):
 	del gLocalBase[conference]
 
-def getLocalKeyToPublic(msgType, conference, nick, param):
-	param = param.lower()
-	if param in gLocalBase[conference]:
-		sendMsg(msgType, conference, nick, u"Про %s я знаю следующее:\n%s" % (param, gLocalBase[conference][param]))
-	else:	
-		sendMsg(msgType, conference, nick, u"Я не знаю, что такое %s :(" % (param))
+def getLocalKeyToChat(msgType, conference, nick, param):
+	key = param.lower()
+	if key in gLocalBase[conference]:
+		message = u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key])
+		sendMsg(msgType, conference, nick, message)
+	else:
+		sendMsg(msgType, conference, nick, u"Я не знаю, что такое %s :(" % (key))
 
-def getLocalKeyToPrivate(msgType, conference, nick, param):
-	param = param.split()
+def getLocalKeyToPM(msgType, conference, nick, param):
+	args = param.split()
 	receiverjid = None
-	if len(param) == 2:
-		userNick = param[0].strip()
+	if len(args) == 2:
+		userNick = args[0].strip()
 		if isNickOnline(conference, userNick):
 			receiverjid = conference + "/" + userNick
-			key = param[1].lower()
-	elif len(param) == 1:
+			key = args[1].lower()
+	elif len(args) == 1:
 		receiverjid = conference + "/" + nick
-		key = param[0].lower()
+		key = args[0].lower()
 	if receiverjid:
 		if key in gLocalBase[conference]:
 			if protocol.TYPE_PUBLIC == msgType:
 				sendMsg(msgType, conference, nick, u"Ушло")
-			sendTo(protocol.TYPE_PRIVATE, receiverjid, u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key]))
+			message = u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key])
+			sendTo(protocol.TYPE_PRIVATE, receiverjid, message)
 		else:
 			sendMsg(msgType, conference, nick, u"Я не знаю, что такое %s :(" % key)
 	else:
 		sendMsg(msgType, conference, nick, u"Кому?")
 
 def setLocalKey(msgType, conference, nick, param):
-	param = param.split("=", 1)
-	if len(param) == 2:
-		key = param[0].lower().strip()
-		value = param[1].strip()
+	args = param.split("=", 1)
+	if len(args) == 2:
+		key = args[0].lower().strip()
+		value = args[1].strip()
 		if value:
 			gLocalBase[conference][key] = u"%s (от %s)" % (value, nick)
 			saveLocalBase(conference)
@@ -86,21 +88,31 @@ def searchLocalKey(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Не найдено!")
 
-def showAllLocalKeys(msgType, conference, nick, parameters):
+def showAllLocalKeysInChat(msgType, conference, nick, param):
 	if gLocalBase[conference]:
-		sendMsg(msgType, conference, nick, ", ".join(sorted(gLocalBase[conference].keys())))
+		message = ", ".join(sorted(gLocalBase[conference].keys()))
+		sendMsg(msgType, conference, nick, message)
+	else:
+		sendMsg(msgType, conference, nick, "База пуста!")
+
+def showAllLocalKeysInPM(msgType, conference, nick, param):
+	if gLocalBase[conference]:
+		if protocol.TYPE_PUBLIC == msgType:
+			sendMsg(msgType, conference, nick, u"Ушли")
+		message = ", ".join(sorted(gLocalBase[conference].keys()))
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, "База пуста!")
 
 registerEventHandler(loadLocalBase, EVT_ADDCONFERENCE)
 registerEventHandler(freeLocalBase, EVT_DELCONFERENCE)
 
-registerCommand(getLocalKeyToPublic, u"???", 10, 
+registerCommand(getLocalKeyToChat, u"???", 10, 
 				u"Ищет значение по ключу в локальной базе", 
 				u"<ключ>", 
 				(u"секрет", ), 
 				CMD_CONFERENCE | CMD_PARAM)
-registerCommand(getLocalKeyToPrivate, u"!??", 10, 
+registerCommand(getLocalKeyToPM, u"!??", 10, 
 				u"Ищет значение по ключу в локальной базе и посылает его в приват. Возможно указание ника отправителя", 
 				u"[ник] <ключ>", 
 				(u"секрет", u"Nick секрет"), 
@@ -115,8 +127,13 @@ registerCommand(searchLocalKey, u"???поиск", 10,
 				u"<ключ>", 
 				(u"секрет", ), 
 				CMD_CONFERENCE | CMD_PARAM)
-registerCommand(showAllLocalKeys, u"???все", 10, 
+registerCommand(showAllLocalKeysInChat, u"???все", 10, 
 				u"Показывает все ключи локальной базы",
+				None, 
+				None, 
+				CMD_CONFERENCE | CMD_NONPARAM)
+registerCommand(showAllLocalKeysInPM, u"!??все", 10, 
+				u"Отсылает список ключей локальной базы в приват",
 				None, 
 				None, 
 				CMD_CONFERENCE | CMD_NONPARAM)
