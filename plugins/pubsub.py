@@ -13,57 +13,74 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+def getMoodStanza(name=None, text=None):
+	stanza = protocol.Iq(protocol.TYPE_SET)
+	pubsub = stanza.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
+	pubNode = protocol.Node("publish", {"node": protocol.NS_MOOD})
+	moodNode = protocol.Node("mood", {"xmlns": protocol.NS_MOOD})
+	if name:
+		moodNode.addChild(node=protocol.Node(name))
+		if text: 
+			moodNode.setTagData("text", text)
+	pubNode.addChild("item", {}, [moodNode], "")
+	pubsub.addChild(node=pubNode)
+	return stanza
+
 def setBotMood(msgType, jid, resource, param):
-	if param == u"сброс" or param.count("|"):
-		iq = protocol.Iq(protocol.TYPE_SET)
-		iq.setType(protocol.TYPE_HEADLINE)
-		pubsub = iq.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
-		pubNode = protocol.Node("publish", {"node": protocol.NS_MOOD})
-		moodNode = protocol.Node("mood", {"xmlns": protocol.NS_MOOD})
-		if param.count("|"):
-			param = param.split("|")
-			moodNode.addChild(node = protocol.Node(param[0]))
-			moodNode.setTagData("text", param[1])
-		pubNode.addChild("item", {}, [moodNode], "")
-		pubsub.addChild(node = pubNode)
-		gClient.send(iq)
-		if param == u"сброс":
-			sendMsg(msgType, jid, resource, u"Сбросила")
+	if param != u"reset":
+		args = param.split(None, 1)
+		name = args[0]
+		if len(args) == 2:
+			text = args[1]
 		else:
-			sendMsg(msgType, jid, resource, u"Поставила")
+			text = None
+		gClient.send(getMoodStanza(name, text))
+		sendMsg(msgType, jid, resource, u"Запомнила")
 	else:
-		sendMsg(msgType, jid, resource, u"Читай помощь по команде")
+		gClient.send(getMoodStanza())
+		sendMsg(msgType, jid, resource, u"Сбросила")
+
+def getActivityStanza(name=None, exname=None, text=None):
+	stanza = protocol.Iq(protocol.TYPE_SET)
+	pubsub = stanza.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
+	pubNode = protocol.Node("publish", {"node": protocol.NS_ACTIVITY})
+	actNode = protocol.Node("activity", {"xmlns": protocol.NS_ACTIVITY})
+	if name:
+		act = actNode.addChild(node=protocol.Node(name))
+		if exname:
+			act.addChild(node=protocol.Node(exname))
+		if text:
+			actNode.setTagData("text", text)
+	pubNode.addChild("item", {}, [actNode], "")
+	pubsub.addChild(node = pubNode)
+	return stanza
 
 def setBoAtctivity(msgType, jid, resource, param):
-	if param == u"сброс" or param.count("|"):
-		iq = protocol.Iq(protocol.TYPE_SET)
-		iq.setType(protocol.TYPE_HEADLINE)
-		pubsub = iq.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
-		pubNode = protocol.Node("publish", {"node": protocol.NS_ACTIVITY})
-		actNode = protocol.Node("activity", {"xmlns": protocol.NS_ACTIVITY})
-		if param.count("|"):
-			param = param.split("|")
-			act = actNode.addChild(node = protocol.Node(param[0]))
-			if param[1]:
-				act.addChild(node = protocol.Node(param[1]))
-			actNode.setTagData("text", param[2])
-		pubNode.addChild("item", {}, [actNode], "")
-		pubsub.addChild(node = pubNode)
-		gClient.send(iq)
-		if param == u"сброс":
-			sendMsg(msgType, jid, resource, u"Сбросила")
+	if param != u"reset":
+		args = param.split(None, 2)
+		arglen = len(args)
+		if arglen >= 2:
+			name = args[0]
+			exname = args[1]
+			if arglen == 3:
+				text = args[2]
+			else:
+				text = None
+			gClient.send(getActivityStanza(name, exname, text))
+			sendMsg(msgType, jid, resource, u"Запомнила")
 		else:
-			sendMsg(msgType, jid, resource, u"Поставила")
+			sendMsg(msgType, jid, resource, u"Читай помощь по команде")
 	else:
-		sendMsg(msgType, jid, resource, u"Читай помощь по команде")
+		gClient.send(getActivityStanza())
+		sendMsg(msgType, jid, resource, u"Сбросила")		
 
-registerCommand(setBoAtctivity, u"активность", 100, 
-				u"Устанавливает активность для бота. \"Cброс\" в кач-ве параметра сбрасывает активность", 
-				u"<осн.|доп.|текст>", 
-				(u"doing_chores|doing_maintenance|ололо", ), 
+registerCommand(setBoAtctivity, u"activity", 100, 
+				u"Устанавливает активность для бота. \"reset\" в кач-ве параметра сбрасывает активность", 
+				u"<осн.> <доп.> [текст]", 
+				(u"doing_chores doing_maintenance ололо", ), 
 				CMD_ROSTER | CMD_PARAM)
-registerCommand(setBotMood, u"настроение", 100, 
-				u"Устанавливает настроение для бота. \"Cброс\" в кач-ве параметра сбрасывает настроение", 
-				u"<название|текст>", 
-				(u"calm|ололо", ), 
+registerCommand(setBotMood, u"mood", 100, 
+				u"Устанавливает настроение для бота. \"reset\" в кач-ве параметра сбрасывает настроение", 
+				u"<название> [текст]", 
+				(u"calm ололо", ), 
 				CMD_ROSTER | CMD_PARAM)
