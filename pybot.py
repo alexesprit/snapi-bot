@@ -569,6 +569,13 @@ def parsePresence(session, stanza):
 		elif protocol.PRS_OFFLINE == prsType:
 			if isNickOnline(conference, nick):
 				code = stanza.getStatusCode()
+				if "303" == code:
+					newNick = stanza.getNick()
+					if not isNickInConference(conference, newNick):
+						gConferences[conference][newNick] = {}
+					for key in gConferences[conference][nick]:
+						oldval = getNickKey(conference, nick, key)
+						setNickKey(conference, newNick, key, oldval)
 				reason = stanza.getReason() or stanza.getStatus()
 				setNickKey(conference, nick, NICK_HERE, False)
 				if not getNickByJID(conference, truejid):
