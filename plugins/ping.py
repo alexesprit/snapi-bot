@@ -15,18 +15,18 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-REPLICS_FOR_OTHER = (
-	u"Понг от %s составляет", 
-	u"Скорость отклика сервера для %s равна", 
-	u"Скорость отправки пакетов от %s составляет", 
-	u"Опа! Что я откопала! Это же понг от %s:"
+PONG_REPLICS_FOR_OTHER = (
+	u"Понг от %s составляет %s сек.", 
+	u"Скорость отклика сервера для %s равна %s сек.", 
+	u"Скорость отправки пакетов от %s составляет %s сек.", 
+	u"Опа! Что я откопала! Это же понг от %s: %s сек."
 )
 
-REPLICS_FOR_ME = (
-	u"Твой понг составляет", 
-	u"Скорость отклика сервера для тебя равна", 
-	u"Скорость отправки твоих пакетов равна", 
-	u"Опа! Что я откопала! Это же твой понг:"
+PONG_REPLICS_FOR_ME = (
+	u"Твой понг составляет %s сек.", 
+	u"Скорость отклика сервера для тебя равна %s сек.", 
+	u"Скорость отправки твоих пакетов равна %s сек.", 
+	u"Опа! Что я откопала! Это же твой понг: %s сек."
 )
 
 def showPing(msgType, conference, nick, param):
@@ -45,12 +45,11 @@ def showPing(msgType, conference, nick, param):
 
 def showPing_(stanza, t0, msgType, conference, nick, param):
 	if protocol.TYPE_RESULT == stanza.getType():
-		ping = time.time() - t0
+		pong = str(round(time.time() - t0 , 3))
 		if param:
-			message = random.choice(REPLICS_FOR_OTHER) % (param);  
+			message = random.choice(PONG_REPLICS_FOR_OTHER) % (param, pong)
 		else:
-			message = random.choice(REPLICS_FOR_ME)
-		message += u" %s сек." % (str(round(ping , 3)))
+			message = random.choice(PONG_REPLICS_FOR_ME) % (pong)
 		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"Не пингуется :(")
