@@ -94,7 +94,7 @@ def showTVProgram(msgType, conference, nick, param):
 	param = param.lower()
 	if u"каналы" == param:
 		if protocol.TYPE_PUBLIC == msgType:
-			sendMsg(msgType, conference, nick, u"Ушёл")
+			sendMsg(msgType, conference, nick, u"Ушли")
 		tvList = [u"%s - %s" % (code, name) for name, code in TV_CHANNELS.items()]
 		tvList.sort()
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Список каналов:\n%s" % ("\n".join(tvList)))		
