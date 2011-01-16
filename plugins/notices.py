@@ -31,7 +31,8 @@ def manageNoticeValue(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 	else:
-		sendMsg(msgType, conference, nick, u"Текущее значение: %s" % (getConferenceConfigKey(conference, "popups")))
+		noticesValue = getConferenceConfigKey(conference, "notices")
+		sendMsg(msgType, conference, nick, u"Текущее значение: %s" % (noticesValue))
 
 def sendNotices(msgType, conference, nick, param):
 	conferences = getConferences()
@@ -41,7 +42,8 @@ def sendNotices(msgType, conference, nick, param):
 			if getConferenceConfigKey(conf, "notices"):
 				sendToConference(conf, u"Новости от администрации:\n%s" % param)
 				count += 1
-		sendMsg(msgType, conference, nick, "Сообщение ушло в %d конференций из %d" % (count, len(conferences)))
+		sendMsg(msgType, conference, nick, 
+			"Сообщение ушло в %d конференций из %d" % (count, len(conferences)))
 	else:
 		sendMsg(msgType, conference, nick, u"Некому рассылать :(")
 

@@ -20,23 +20,26 @@ def showHelp(msgType, conference, nick, param):
 		command = param.lower()
 		cmdType = isConferenceInList(conference) and CMD_CONFERENCE or CMD_ROSTER
 		if isCommand(command) and isCommandType(command, cmdType):
-			message = gCommands[command][CMD_DESC]
+			buf = []
+			
+			buf.append(gCommands[command][CMD_DESC])
 			syntax = gCommands[command][CMD_SYNTAX]
 			if syntax:
-				message += u"\nСинтаксис: %s %s" % (command, syntax)
+				buf.append("\n")				
+				buf.append(u"Синтаксис: %s %s\n" % (command, syntax))
 			examples = gCommands[command][CMD_EXAMPLE]
 			if examples:
-				message += u"\nПримеры:"
+				buf.append(u"Примеры:\n")
 				for example in examples:
 					if example:
-						message += u"\n * %s %s" % (command, example)
+						buf.append(u" * %s %s\n" % (command, example))
 					else:
-						message += u"\n * %s" % (command)
+						buf.append(u" * %s\n" % (command))
 			if cmdType == CMD_CONFERENCE:
-				message += u"\nМин. уровень доступа: %d" % (gCommands[command][CMD_ACCESS])
+				buf.append(u"Мин. уровень доступа: %d\n" % (gCommands[command][CMD_ACCESS]))
 				if not isAvailableCommand(conference, command):
-					message += u"\nЭта команда отключена в этой конференции!"
-			sendMsg(msgType, conference, nick, message)
+					buf.append(u"Эта команда отключена в этой конференции!\n")
+			sendMsg(msgType, conference, nick, "".join(buf))
 	else:
 		if isConferenceInList(conference):
 			prefix = getConferenceConfigKey(conference, "prefix")
@@ -65,17 +68,15 @@ def showCommands(msgType, conference, nick, param):
 
 	if availableCmds:
 		availableCmds.sort()
-		buf.append(u"Доступные команды (%d):\n%s" % (len(availableCmds), u", ".join(availableCmds)))
-
-	buf.append("")
+		buf.append(u"Доступные команды (%d): %s\n\n" % (len(availableCmds), u", ".join(availableCmds)))
 
 	if disabledCmds:
 		disabledCmds.sort()
-		buf.append(u"Отключенные команды (%d):\n%s" % (len(disabledCmds), ", ".join(disabledCmds)))
+		buf.append(u"Отключенные команды (%d): %s\n" % (len(disabledCmds), ", ".join(disabledCmds)))
 
 	if protocol.TYPE_PUBLIC == msgType:
 		sendMsg(msgType, conference, nick, u"Ушли")
-	sendMsg(protocol.TYPE_PRIVATE, conference, nick, "\n".join(buf))
+	sendMsg(protocol.TYPE_PRIVATE, conference, nick, "".join(buf))
 
 registerCommand(showHelp, u"помощь", 0, 
 				u"Показывает справку по использованию определённой команды. Без параметра или выводит общую справку",

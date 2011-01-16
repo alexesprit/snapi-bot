@@ -19,10 +19,9 @@ def showHereTime(msgType, conference, nick, param):
 		rawtime = getNickKey(conference, userNick, NICK_JOINED)
 		joinTime = getTimeStr(time.time() - rawtime)
 		if not param:
-			message = u"Ты уже здесь %s" % (joinTime)
+			sendMsg(msgType, conference, nick, u"Ты уже здесь %s" % (joinTime))
 		else:
-			message = u"%s уже здесь %s" % (userNick, joinTime)
-		sendMsg(msgType, conference, nick, message)
+			sendMsg(msgType, conference, nick, u"%s уже здесь %s" % (userNick, joinTime))
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")
 

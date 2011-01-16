@@ -29,9 +29,10 @@ def saveDisabledCommands(conference):
 def disableCommand(msgType, conference, nick, param):
 	if param:
 		validCmd, invalidCmd, alreadySwitched, nonSwitched = [], [], [], []
-		message = u""
-		param = param.split()
-		for cmd in param:
+		buf = []
+
+		args = param.split()
+		for cmd in args:
 			_isCommand = isCommand(cmd) and isCommandType(cmd, CMD_CONFERENCE)
 			_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd)
 			if _isCommand or _isMacros:
@@ -45,32 +46,35 @@ def disableCommand(msgType, conference, nick, param):
 					nonSwitched.append(cmd)
 			else:
 				invalidCmd.append(cmd)
+		saveDisabledCommands(conference)
+
 		if validCmd:
 			validCmd.sort()
-			message += u"Были отключены:\n * %s" % (", ".join(validCmd))
+			buf.append(u"Отключены: %s\n" % (", ".join(validCmd)))
 		if alreadySwitched:
 			alreadySwitched.sort()
-			message += u"\nУже отключены:\n * %s" % (", ".join(alreadySwitched))
-		if invalidCmd:
-			invalidCmd.sort()
-			message += u"\nНе являются командами:\n * %s" % (", ".join(invalidCmd))
+			buf.append(u"Уже отключены: %\n" % (", ".join(alreadySwitched)))
 		if nonSwitched:
 			nonSwitched.sort()
-			message += u"\nНеотключаемы:\n * %s" % (", ".join(nonSwitched))
-		saveDisabledCommands(conference)
+			buf.append(u"Неотключаемы: %s\n" % (", ".join(nonSwitched)))
+		if invalidCmd:
+			invalidCmd.sort()
+			buf.append(u"Не являются командами: %s\n" % (", ".join(invalidCmd)))
+		sendMsg(msgType, conference, nick, "".join(buf))
 	else:
 		switchedOn = [cmd for cmd in gCmdOff[conference]]
 		if switchedOn:
-			message = u"Отключены следующие команды:\n * %s" % (", ".join(switchedOn))
+			sendMsg(msgType, conference, nick, 
+				u"Отключены следующие команды: %s" % (", ".join(switchedOn)))
 		else:
-			message = u"В этой конференции включены все команды"
-	sendMsg(msgType, conference, nick, message)
+			sendMsg(msgType, conference, nick, u"В этой конференции включены все команды")
 
 def enableCommand(msgType, conference, nick, param):
 	validCmd, invalidCmd, alreadySwitched = [], [], []
-	message = u""
-	param = param.split()
-	for cmd in param:
+	buf = []
+
+	args = param.split()
+	for cmd in args:
 		_isCommand = isCommand(cmd) and isCommandType(cmd, CMD_CONFERENCE)
 		_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd)
 		if _isCommand or _isMacros:
@@ -81,17 +85,18 @@ def enableCommand(msgType, conference, nick, param):
 				alreadySwitched.append(cmd)
 		else:
 			invalidCmd.append(cmd)
+	saveDisabledCommands(conference)
+
 	if validCmd:
 		validCmd.sort()
-		message += u"Были включены:\n * %s" % (", ".join(validCmd))
+		buf.append(u"Включены: %s\n" % (", ".join(validCmd)))
 	if alreadySwitched:
 		alreadySwitched.sort()
-		message += u"\nУже включены:\n * %s" % (", ".join(alreadySwitched))
+		buf.append(u"Уже включены: %s\n" % (", ".join(alreadySwitched)))
 	if invalidCmd:
 		invalidCmd.sort()
-		message += u"\nпНе являются командами:\n * %s" % (", ".join(invalidCmd))
-	saveDisabledCommands(conference)
-	sendMsg(msgType, conference, nick, message)
+		buf.append(u"Не являются командами: %s\n" % (", ".join(invalidCmd)))
+	sendMsg(msgType, conference, nick, "".join(buf))
 
 registerEventHandler(loadDisabledCommands, EVT_ADDCONFERENCE)
 registerEventHandler(freeDisableCommands, EVT_DELCONFERENCE)

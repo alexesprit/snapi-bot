@@ -55,12 +55,12 @@ def showVCard_(stanza, msgType, conference, nick, param):
 		if vCardNode:
 			rawVCard = {}
 			loadRawVCard(vCardNode, rawVCard)
-			message = getVCard(rawVCard)
-			if message:
+			vcardstr = getVCard(rawVCard)
+			if vcardstr:
 				if not param:
-					sendMsg(msgType, conference, nick, u"Про тебя я знаю следующее:\n%s" % (message))
+					sendMsg(msgType, conference, nick, u"Про тебя я знаю следующее:\n%s" % (vcardstr))
 				else:
-					sendMsg(msgType, conference, nick, u"Про %s я знаю следующее:\n%s" % (param, message))
+					sendMsg(msgType, conference, nick, u"Про %s я знаю следующее:\n%s" % (param, vcardstr))
 			else:
 				sendMsg(msgType, conference, nick, u"Пустой вкард")
 		else:

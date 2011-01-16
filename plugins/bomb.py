@@ -13,7 +13,17 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-COLORS = (u"красный", u"зеленый", u"черный", u"синий", u"белый", u"желтый", u"серый", u"оранжевый", u"фиолетовый")
+COLORS = (
+	u"красный", 
+	u"зеленый", 
+	u"черный", 
+	u"синий", 
+	u"белый", 
+	u"желтый", 
+	u"серый", 
+	u"оранжевый", 
+	u"фиолетовый"
+)
 
 gBombColors = {}
 gBombAnswer = {}
@@ -56,7 +66,8 @@ def giveBomb(msgType, conference, nick, param):
 
 def bombExecute(msgType, conference, nick, truejid):
 	if isNickOnline(conference, nick):
-		sendMsg(msgType, conference, nick, u"Надо было резать %s, чего тормозишь? :)" % (gBombAnswer[conference][truejid]))
+		sendMsg(msgType, conference, nick, 
+			u"Надо было резать %s, чего тормозишь? :)" % (gBombAnswer[conference][truejid]))
 		bombDetonate(msgType, conference, nick)
 	else:
 		sendMsg(msgType, conference, nick, u"Трус :/")
@@ -69,7 +80,8 @@ def bombColorsListener(stanza, msgType, conference, nick, truejid, param):
 			if color == gBombAnswer[conference][truejid]:
 				sendMsg(msgType, conference, nick, u"Бомба обезврежена!")
 			else:
-				sendMsg(msgType, conference, nick, u"Блин :-| надо было резать %s" % gBombAnswer[conference][truejid])
+				sendMsg(msgType, conference, nick, 
+					u"Блин :-| надо было резать %s" % gBombAnswer[conference][truejid])
 				bombDetonate(msgType, conference, nick)
 			del gBombAnswer[conference][truejid]
 			del gBombColors[conference][truejid]
@@ -83,6 +95,7 @@ def bombDetonate(msgType, conference, nick):
 		setMUCRole(conference, nick, protocol.ROLE_NONE, u"Бабах!!!")
 	else:
 		setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Бабах!!!")
+
 		timeout = random.randrange(100, 501)
 		startTimer(timeout, setMUCRole, conference, nick, protocol.ROLE_PARTICIPANT)
 

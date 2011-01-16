@@ -83,7 +83,8 @@ def askQuizQuestion(conference, lastAnswer=None, resetIdle=True):
 	resetQuizTimer(conference)
 	gQuizEnabled[conference] = True
 	if lastAnswer:
-		sendToConference(conference, u"(!) Правильный ответ: %s, cмена вопроса:\n%s" % (lastAnswer, question))
+		sendToConference(conference, 
+			u"(!) Правильный ответ: %s, cмена вопроса:\n%s" % (lastAnswer, question))
 	else:
 		sendToConference(conference, u"(?) Внимание вопрос:\n%s" % (question))
 
@@ -110,9 +111,11 @@ def checkQuizAnswer(conference, nick, truejid, answer):
 		closedLetters = gQuizHint[conference].count("*")
 		points = int(wLength * closedLetters * (QUIZ_COEF / answerTime))
 		if points:
-			sendToConference(conference, u"(!) %s, поздравляю! +%d в банк! Верный ответ: %s" % (nick, points, rightAnswer))
+			sendToConference(conference, 
+				u"(!) %s, поздравляю! +%d в банк! Верный ответ: %s" % (nick, points, rightAnswer))
 		else:
-			sendToConference(conference, u"(!) %s, поздравляю! Верный ответ: %s" % (nick, rightAnswer))
+			sendToConference(conference, 
+				u"(!) %s, поздравляю! Верный ответ: %s" % (nick, rightAnswer))
 		base = gQuizScores[conference]
 		if truejid in base:
 			base[truejid][0] = nick
@@ -188,7 +191,7 @@ def showQuizScores(msgType, conference, nick, param):
 
 def showQuizQuestion(msgType, conference, nick, param):
 	if gQuizEnabled[conference]:
-		sendMsg(msgType, conference, nick, u"(*) Текущий вопрос: \n" + gQuizQuestion[conference])
+		sendMsg(msgType, conference, nick, u"(*) Текущий вопрос: \n%s" % (gQuizQuestion[conference]))
 
 registerEventHandler(loadQuizScores, EVT_ADDCONFERENCE)
 registerEventHandler(freeQuizScores, EVT_DELCONFERENCE)

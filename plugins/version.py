@@ -33,18 +33,19 @@ def showVersion_(stanza, msgType, conference, nick, param):
 		name = query.getTagData("name")
 		ver = query.getTagData("version")
 		os = query.getTagData("os")
-		version = u""
+
+		buf = []
 		if name:
-			version += name
+			buf.append(name)
 		if ver:
-			version += u" " + ver
+			buf.append(ver)
 		if os:
-			version += u" в " + os
-		if version:
+			buf.append(u"/ %s" % (os))
+		if buf:
 			if not param:
-				sendMsg(msgType, conference, nick, u"Ты юзаешь %s" % (version))
+				sendMsg(msgType, conference, nick, u"Ты юзаешь %s" % (" ".join(buf)))
 			else:
-				sendMsg(msgType, conference, nick, u"%s юзает %s" % (param, version))
+				sendMsg(msgType, conference, nick, u"%s юзает %s" % (param, " ".join(buf)))
 		else:
 			sendMsg(msgType, conference, nick, u"Клиент глюк, инфы не хватает")
 	else:

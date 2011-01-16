@@ -203,12 +203,11 @@ def showMacrosList(msgType, conference, nick, parameters):
 				disMacroses.append(macros)
 		if macroses:
 			macroses.sort()
-			buf.append(u"Локальные (%d):\n%s" % (len(macroses), ", ".join(macroses)))
+			buf.append(u"Локальные (%d): %s\n" % (len(macroses), ", ".join(macroses)))
 		if disMacroses:
 			disMacroses.sort()
-			buf.append(u"Отключённые (%d):\n%s" % (len(disMacroses), ", ".join(disMacroses)))
-
-		buf.append("")
+			buf.append(u"Отключённые (%d): %s\n" % (len(disMacroses), ", ".join(disMacroses)))
+		buf.append("\n")
 		macroses, disMacroses = [], []
 
 	for macros in gMacros.getMacrosList():
@@ -225,16 +224,16 @@ def showMacrosList(msgType, conference, nick, parameters):
 
 	if macroses:
 		macroses.sort()
-		buf.append(u"Глобальные (%d):\n%s" % (len(macroses), ", ".join(macroses)))
+		buf.append(u"Глобальные (%d): %s\n" % (len(macroses), ", ".join(macroses)))
 	if isConference:
 		if disMacroses:
 			disMacroses.sort()
-			buf.append(u"Отключённые (%d):\n%s" % (len(disMacroses), ", ".join(disMacroses)))
+			buf.append(u"Отключённые (%d): %s\n" % (len(disMacroses), ", ".join(disMacroses)))
 
 	if buf:
 		if msgType == protocol.TYPE_PUBLIC:
 			sendMsg(msgType, conference, nick, u"Ушёл")
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, "\n".join(buf))
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, "".join(buf))
 	else:
 		sendMsg(msgType, conference, nick, u"Макросов нет :(")
 

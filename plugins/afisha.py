@@ -72,14 +72,20 @@ TIME_OFFSET = {
 
 gAfishaCache = {}
 
-def CompareTimes(x, y):
-	if (x[3]>y[3] and (y[3]>3 or (y[3]<=3 and x[3]<=3))) or (x[3]==y[3] and x[4]>y[4]) or (x[3]<=3 and y[3]>3):
-		return 1
-	if (y[3]>x[3] and (x[3]>3 or (x[3]<=3 and y[3]<=3))) or (y[3]==x[3] and y[4]>x[4]) or (y[3]<=3 and x[3]>3):
-		return -1
+def compareTimes(x, y):
+	if (x[3] > y[3] and \
+		(y[3] > 3 or (y[3] <= 3 and x[3] <= 3))) or	\
+		(x[3] == y[3] and x[4] > y[4]) or \
+		(x[3] <= 3 and y[3] > 3):
+			return 1
+	#if (y[3] > x[3] and (x[3] > 3 or \
+	#	(x[3] <= 3 and y[3] <= 3))) or \
+	#	(y[3] == x[3] and y[4] > x[4]) or \
+	#	(y[3] <= 3 and x[3] > 3):
+	#		return -1
 	return -1
 
-def CompareSchedules(a, b):
+def compareSchedules(a, b):
 	if isinstance(a, tuple):
 		a = time.strptime(a[2], "%H:%M")
 	elif isinstance(a, basestring):
@@ -88,17 +94,18 @@ def CompareSchedules(a, b):
 		b = time.strptime(b[2], "%H:%M")
 	elif isinstance(b, basestring):
 		b = time.strptime(b, "%H:%M")
-	return CompareTimes(a, b)
+	return compareTimes(a, b)
 
 def getFullSchedule(city):
 	now = time.localtime()
 	if city in gAfishaCache:
+		lastupdate = gAfishaCache[city]["update"]
 		x = time.localtime(gAfishaCache[city]["update"])
 		x1 = time.localtime(gAfishaCache[city]["update"] - 86400)
-		if (now[2] == x[2] and now[1] == x[1] and now[0] == x[0] \
-			and (x[3] > 3 and now[3] > 3 or x[3] <= 3 and now[3] <= 3)) \
-			or (now[2] == x1[2] and now[1] == x1[1] and now[0] == x1[0] and now[3] <= 3 and x1[3] > 3):
-			return gAfishaCache[city]["schedule"]
+		if (now[2] == x[2] and now[1] == x[1] and now[0] == x[0] and \
+			(x[3] > 3 and now[3] > 3 or x[3] <= 3 and now[3] <= 3)) or\
+			(now[2] == x1[2] and now[1] == x1[1] and now[0] == x1[0] and now[3] <= 3 and x1[3] > 3):
+				return gAfishaCache[city]["schedule"]
 	schedule = []
 	url = "http://www.afisha.ru/%s/schedule_cinema/" % (city)
 	response = getURL(url)
@@ -122,7 +129,7 @@ def getFullSchedule(city):
 					else:
 						if time1.find(":") > -1:
 							schedule.append((film[0], cinema[0], time1))
-		schedule.sort(CompareSchedules)
+		schedule.sort(compareSchedules)
 		gAfishaCache[city] = {}
 		gAfishaCache[city]["update"] = time.time()
 		gAfishaCache[city]["schedule"] = schedule
@@ -153,68 +160,76 @@ def getSchedule(city, now, cinema, film):
 	schedule = getFullSchedule(city)
 	n = 0
 	for i in schedule:
-		if (not cinema or cinema.lower() == i[1].lower()) and (not film or film.lower() == i[0].lower()) and (not now or CompareSchedules(i[2], now) == 1) and n < 10:
-			ls.append(i)
-			n += 1
+		if (not cinema or cinema.lower() == i[1].lower()) and (not film or film.lower() == i[0].lower()) and (not now or compareSchedules(i[2], now) == 1):
+				ls.append(i)
+				n += 1
+				if n > 9:
+					break
 	return ls
 
-def kinoAfisha(args):
-	hasDate = re.search(u"\d:\d", args)
+def showAfisha(msgType, conference, nick, param):
+	hasDate = re.search(u"\d:\d", param)
 	if hasDate:
-		args = args.split(None, 2)
+		args = param.split(None, 2)
 	else:
-		args = args.split(None, 1)
+		args = param.split(None, 1)
+	arglen = len(args)
+
 	city = args[0].lower()
-	if city in AFISHA_CITIES:
-		cityCode = AFISHA_CITIES[city]
-		city = city.capitalize()
-	else:
-		city = None
-	now = None
-	cinema = None
-	if not city:
-		return u"Укажите, пожалуйста, один из следующих городов: %s" % (u", ".join(city.capitalize() for city in getCities()))
-	if len(args) == 3:
+	if city not in AFISHA_CITIES:
+		citieslist = u", ".join(city.capitalize() for city in getCities())
+		sendMsg(msgType, conference, nick, 
+			u"Укажите, пожалуйста, один из следующих городов: %s" % (citieslist))
+		return
+	cityCode = AFISHA_CITIES[city]
+	city = city.capitalize()
+
+	if arglen > 1:
 		if hasDate:
 			try:
 				now = time.strptime(args[1], "%H:%M")
 			except ValueError:
-				pass
-		cinema = args[2].capitalize()
-	elif len(args) == 2:
-		if hasDate:
-			try:
-				now = time.strptime(args[1], "%H:%M")
-			except ValueError:
-				pass
+				now = getCityTime(cityCode)
 		else:
-			cinema = args[1].capitalize()
-	if not now:
+			now = getCityTime(cityCode)
+		cinema = args[arglen - 1].capitalize()
+	else:
 		now = getCityTime(cityCode)
-	strTime = time.strftime(u"%H:%M", now)
+		cinema = None
+	timestr = time.strftime(u"%H:%M", now)
+
 	if not cinema:
 		schedule = getSchedule(cityCode, now, None, None)
 		if schedule:
-			return u"После %s в городе %s пройдут фильмы:\n%s" % (strTime, city, "\n".join([u"%s: %s (%s)" % (i[2], i[0], i[1]) for i in schedule]))
+			filmslist = "\n".join([u"%s: %s (%s)" % (i[2], i[0], i[1]) for i in schedule])
+			sendMsg(msgType, conference, nick, 
+				u"После %s в городе %s пройдут фильмы:\n%s" % (timestr, city, filmslist))
 		else:
-			return u"После %s в городе %s фильмов не найдено" % (strTime, city)
+			sendMsg(msgType, conference, nick, 
+				u"После %s в городе %s фильмов не найдено" % (timestr, city))
 	elif cinema.lower() in [i.lower() for i in getCinemas(cityCode)]:
 		schedule = getSchedule(cityCode, now, cinema, None)
 		if schedule:
-			return u"После %s в кинотеатре %s пройдут фильмы:\n%s" % (strTime, cinema, u"\n".join([u"%s: %s" % (i[2], i[0]) for i in schedule]))
+			filmslist = "\n".join([u"%s: %s (%s)" % (i[2], i[0], i[1]) for i in schedule])
+			sendMsg(msgType, conference, nick, 
+				u"После %s в кинотеатре %s пройдут фильмы:\n%s" % (timestr, cinema, filmslist))
 		else:
-			return u"После %s в кинотеатре %s фильмов не будет" % (strTime, cinema)
+			sendMsg(msgType, conference, nick, 
+				u"После %s в кинотеатре %s фильмов не будет" % (timestr, cinema))
 	elif cinema.lower() in [i.lower() for i in getFilms(cityCode)]:
 		schedule = getSchedule(cityCode, now, None, cinema)
 		if schedule:
-			return u"После %s фильм %s пройдет в следующих кинотеатрах:\n%s" % (strTime, cinema, u"\n".join([u"%s: %s" % (i[2], i[1]) for i in schedule]))
+			cinemalist = u"\n".join([u"%s: %s" % (i[2], i[1]) for i in schedule])
+			sendMsg(msgType, conference, nick, 
+				u"После %s фильм %s пройдет в следующих кинотеатрах:\n%s" % (timestr, cinema, cinemalist))
 		else:
-			return u"После %s фильм %s не найден" % (strTime, cinema)
+			sendMsg(msgType, conference, nick, 
+				u"После %s фильм %s не найден" % (timestr, cinema))
 	else:
-		return u"Укажите кинотеатр, расписание которго Вы хотите посмотреть:\n%s\nили один из фильмов:\n%s" % (u", ".join(getCinemas(cityCode)), u", ".join(getFilms(cityCode)))
-
-def showAfisha(msgType, conference, nick, param):
-	sendMsg(msgType, conference, nick, kinoAfisha(param))
+		cinemalist = u", ".join(getCinemas(cityCode))
+		filmslist = u", ".join(getFilms(cityCode))
+		sendMsg(msgType, conference, nick, 
+			u"Укажите кинотеатр, расписание которого Вы хотите посмотреть:\n%s\nили один из фильмов:\n%s" % (cinemalist, filmslist))
 	
 registerCommand(showAfisha, u"афиша", 10, 
 				u"Показывает расписание кинотеатров",

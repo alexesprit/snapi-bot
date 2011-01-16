@@ -47,8 +47,9 @@ def showHoroscope(msgType, conference, nick, param):
 			if date in HOROSCOPE_DATES:
 				rawdate = HOROSCOPE_DATES[date]
 			else:
-				message = u"В кач-ве дат можно указывать только следующее: %s" % (", ".join(HOROSCOPE_DATES.keys()))
-				sendMsg(msgType, conference, nick, message)
+				examples = ", ".join(HOROSCOPE_DATES.keys())
+				sendMsg(msgType, conference, nick, 
+					u"В кач-ве дат можно указывать только следующее: %s" % (examples))
 				return
 		else:
 			rawdate = u"today"
@@ -66,8 +67,9 @@ def showHoroscope(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
-		message = u"Можно указывать только следующие знаки: %s" % (", ".join(sorted(HOROSCOPE_SIGNS.keys())))
-		sendMsg(msgType, conference, nick, message)
+		examples = ", ".join(sorted(HOROSCOPE_SIGNS.keys()))
+		sendMsg(msgType, conference, nick, 
+			u"Можно указывать только следующие знаки: %s" % (examples))
 
 registerCommand(showHoroscope, u"гороскоп", 10, 
 				u"Показывает гороскоп для указанного знака гороскопа. Возможен просмотр гороскопа на сегодня, вчера, завтра, послезавтра (указывайте 2-м параметром, без указания покажет для сегодняшнего дня)", 

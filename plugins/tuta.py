@@ -39,12 +39,19 @@ def showHereStatistic(msgType, conference, nick, param):
 		if truejid in base:
 			joinCount = base[truejid]["count"]
 			hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
+
 			totalTime = base[truejid]["here"] + hereTime
+			maxTime = max(base[truejid]["record"], hereTime)
 			averageTime = totalTime / joinCount
-			record = max(base[truejid]["record"], hereTime)
-			message = param and userNick or u"Ты"
-			message = u"%s всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d" % (message, getTimeStr(totalTime), getTimeStr(record), getTimeStr(averageTime), joinCount)
-			sendMsg(msgType, conference, nick, message)
+
+			if not param:
+				sendMsg(msgType, conference, nick, 
+					u"Ты всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d" % 
+						(getTimeStr(totalTime), getTimeStr(maxTime), getTimeStr(averageTime), joinCount))
+			else:
+				sendMsg(msgType, conference, nick, 
+					u"%s всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d" % 
+						(userNick, getTimeStr(totalTime), getTimeStr(maxTime), getTimeStr(averageTime), joinCount))
 		else:
 			sendMsg(msgType, conference, nick, u"Нет информации")
 	else:

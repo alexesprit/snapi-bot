@@ -62,8 +62,8 @@ def showTalkerInfo(msgType, conference, nick, param):
 			topList = topList[:10]
 			elements = [pattern % (i + 1, element[4], element[0], element[1], element[2], element[3]) 
 						for i, element in enumerate(topList)]
-			message = u"Список топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n%s" % ("\n".join(elements))
-			sendMsg(msgType, conference, nick, message)
+			sendMsg(msgType, conference, nick, 
+				u"Список топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n%s" % ("\n".join(elements)))
 		else:
 			sendMsg(msgType, conference, nick, u"База болтунов пуста")
 	elif param == u"сброс":
@@ -86,14 +86,14 @@ def showTalkerInfo(msgType, conference, nick, param):
 		base = gTalkersCache[conference]
 		if truejid in base:
 			statistic = base[truejid]
-			pattern = u"Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f"
 			nick = statistic["nick"]
 			words = statistic["words"]
 			messages = statistic["messages"]
 			meMessages = statistic["mes"]
 			wordsPerMsg = (float(words)) / (messages + meMessages)
-			message = pattern % (nick, messages, meMessages, words, wordsPerMsg)
-			sendMsg(msgType, conference, nick, message)
+			sendMsg(msgType, conference, nick, 
+				u"Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f" % 
+					(nick, messages, meMessages, words, wordsPerMsg))
 		else:
 			sendMsg(msgType, conference, nick, u"Нет информации")
 

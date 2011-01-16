@@ -69,46 +69,49 @@ def showWeather(msgType, conference, nick, param):
 			rawxml = response.read()
 			node = simplexml.XML2Node(rawxml)
 			node = node.getTag("REPORT").getTag("TOWN")
-			message = u"Погода в городе %s:\n" % (city.decode("utf-8"))
+			buf = []
+
+			buf.append(u"Погода в городе %s:\n" % (city.decode("utf-8")))
 			for forecast in node.getTags("FORECAST"):
 				attrs = forecast.getAttrs()
-				message += u"[%(day)s.%(month)s.%(year)s, %(hour)s:00]\n"% (attrs)
+				buf.append(u"[%(day)s.%(month)s.%(year)s, %(hour)s:00]\n" % (attrs))
 
 				weather = forecast.getTag("PHENOMENA").getAttrs()
-				message += CLOUDINESS[weather["cloudiness"]]
-				precipitation = weather["precipitation"]
-				if precipitation not in ["8", "9", "10"]:
+				precValue = weather["precipitation"]
+				cloudiness = CLOUDINESS[weather["cloudiness"]]
+				precipitation = PRECIPITATION[precValue]
+				if precValue not in ["8", "9", "10"]:
 					rpower = weather["rpower"]
 					if "0" == rpower:
-						message += u", возможен %s\n" % (PRECIPITATION[precipitation])
+						buf.append(u"%s, возможен %s\n" % (cloudiness, precipitation))
 					else:
-						message += u", %s\n" % (PRECIPITATION[precipitation])
-				elif "8" == precipitation:
+						buf.append(u"%s, %s\n" % (cloudiness, precipitation))
+				elif "8" == precValue:
 					spower = weather["spower"]
 					if "0" == spower:
-						message += u", возможна %s\n" % (PRECIPITATION[precipitation])
+						buf.append(u"%s, возможна %s\n" % (cloudiness, precipitation))
 					else:
-						message += u", %s\n" % (PRECIPITATION[precipitation])
+						buf.append(u"%s, %s\n" % (cloudiness, precipitation))
 				else:
-					message += u", %s\n" % (PRECIPITATION[precipitation])
+					buf.append(u"%s, %s\n" % (cloudiness, precipitation))
 
 				temp = forecast.getTag("TEMPERATURE").getAttrs()
-				message += u"Температура: %d°C\n" % (getAverageValue(temp))
+				buf.append(u"Температура: %d°C\n" % (getAverageValue(temp)))
 
 				pressure = forecast.getTag("PRESSURE").getAttrs()
-				message += u"Давление: %d мм рт. ст.\n" % (getAverageValue(pressure))
+				buf.append(u"Давление: %d мм рт. ст.\n" % (getAverageValue(pressure)))
 				
 				hudmity = forecast.getTag("RELWET").getAttrs()
-				message += u"Влажность: %s%%\n" % (getAverageValue(hudmity))
+				buf.append(u"Влажность: %s%%\n" % (getAverageValue(hudmity)))
 				
 				wind = forecast.getTag("WIND").getAttrs()
 				windValue = getAverageValue(wind)
 				if windValue:
-					message += u"Ветер: %d м/с (%s)\n" % (windValue, WINDDIRECTION[wind["direction"]])
-				message += "\n"
+					buf.append(u"Ветер: %d м/с (%s)\n" % (windValue, WINDDIRECTION[wind["direction"]]))
+				buf.append("\n")
 			if protocol.TYPE_PUBLIC == msgType:
 				sendMsg(msgType, conference, nick, u"Ушла")
-			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, "".join(buf))
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
