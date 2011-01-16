@@ -703,12 +703,15 @@ def shutdown(restart=False):
 	if gClient.isConnected():
 		callEventHandlers(EVT_SHUTDOWN, MODE_SYNC)
 		gClient.disconnected()
+
 	if restart:
 		printf("Restarting...")
 		time.sleep(RESTART_DELAY)
 		os.execl(sys.executable, sys.executable, sys.argv[0])
 	else:
 		printf("Terminating...", FLAG_SUCCESS)
+		global IS_RUNNING
+		IS_RUNNING = False
 
 def main():
 	currentDir = os.path.dirname(sys.argv[0])
@@ -775,7 +778,6 @@ def main():
 
 		while IS_RUNNING:
 			gClient.process(10)
-		shutdown()
 	except KeyboardInterrupt:
 		if gClient.isConnected():
 			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
