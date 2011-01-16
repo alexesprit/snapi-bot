@@ -33,7 +33,9 @@ def botShutdown(msgType, conference, nick, param):
 	prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
 	prs.setStatus(message)
 	gClient.send(prs)
-	shutdown()
+
+	global IS_RUNNING
+	IS_RUNNING = False
 
 registerCommand(botRestart, u"рестарт", 100, 
 				u"Перезапускает бота", 

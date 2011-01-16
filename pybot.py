@@ -39,6 +39,8 @@ from xmpp import client
 from xmpp import debug
 from xmpp import protocol
 
+IS_RUNNING = True
+
 CONFIG_DIR = "config"
 PLUGIN_DIR = "plugins"
 SYSLOG_DIR = "syslogs"
@@ -706,8 +708,7 @@ def shutdown(restart=False):
 		time.sleep(RESTART_DELAY)
 		os.execl(sys.executable, sys.executable, sys.argv[0])
 	else:
-		printf("Terminated", FLAG_SUCCESS)
-		os.abort()
+		printf("Terminating...", FLAG_SUCCESS)
 
 def main():
 	currentDir = os.path.dirname(sys.argv[0])
@@ -772,8 +773,9 @@ def main():
 
 		printf("Now I am ready to work :)")
 
-		while True:
+		while IS_RUNNING:
 			gClient.process(10)
+		shutdown()
 	except KeyboardInterrupt:
 		if gClient.isConnected():
 			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
@@ -796,4 +798,4 @@ def main():
 		shutdown(gConfig.RESTART_IF_ERROR)
 
 if __name__ == "__main__":
-	main()
+	sys.exit(main())
