@@ -18,14 +18,16 @@ KEEPALIVE_TIMEOUT = 300
 def sendKeepAlivePacket_(stanza, conference):
 	if protocol.TYPE_ERROR == stanza.getType():
 		if stanza.getErrorCode() == "503":
-			startTimer(REJOIN_DELAY, joinConference, (conference, getBotNick(conference), getChatKey(conference, "password")))
+			botNick = getBotNick(conference)
+			password = getChatKey(conference, "password")
+			startTimer(REJOIN_DELAY, joinConference, conference, botNick, password)
 
 def sendKeepAlivePacket():
 	for conference in getConferences():
 		iq = protocol.Iq(protocol.TYPE_GET)
 		iq.setID(getUniqueID("keep_id"))
 		iq.addChild("ping", {}, [], protocol.NS_PING)
-		iq.setTo(conference + "/" + getBotNick(conference))
+		iq.setTo(u"%s/%s" % (conference, getBotNick(conference)))
 		gClient.sendAndCallForResponse(iq, sendKeepAlivePacket_, (conference, ))
 	startKeepAliveTimer()
 
