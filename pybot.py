@@ -382,7 +382,7 @@ def getAccess(conference, jid):
 
 def getPresenceNode(show, status, priority):
 	prs = protocol.Presence(priority=priority)
-	prs.setAttr("ver", gVerInfo.getVersion())
+	prs.setAttr("ver", gVerInfo.getVerString())
 	if status:
 		prs.setStatus(status)
 	if show:
@@ -390,7 +390,7 @@ def getPresenceNode(show, status, priority):
 
 	caps = protocol.Node("c")
 	caps.setNamespace(protocol.NS_CAPS)
-	caps.setAttr("node", version.CAPS)
+	caps.setAttr("node", gVerInfo.getCapsString())
 	caps.setAttr("ver", gVerInfo.getFeaturesHash())
 	caps.setAttr("hash", "sha-1")
 
@@ -625,8 +625,8 @@ def parseIQ(session, stanza):
 		if stanza.getTags("query", {}, protocol.NS_VERSION):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.getTag("query")
-			query.setTagData("name", version.APP_NAME)
-			query.setTagData("version", gVerInfo.getVersion())
+			query.setTagData("name", gVerInfo.getAppName())
+			query.setTagData("version", gVerInfo.getVerString())
 			query.setTagData("os", gVerInfo.getOSName())
 		elif stanza.getTags("query", {}, protocol.NS_LAST):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
@@ -647,9 +647,9 @@ def parseIQ(session, stanza):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.addChild("query", {}, [], protocol.NS_DISCO_ITEMS)
 			attrs = {
-				"category": version.IDENTITY_CAT, 
-				"type": version.IDENTITY_TYPE, 
-				"name": version.IDENTITY_NAME
+				"category": gVerInfo.getIdentCat(), 
+				"type": gVerInfo.getIdentType(), 
+				"name": gVerInfo.getIdentName()
 			}
 			query.addChild("identity", attrs)
 			for feat in BOT_FEATURES:

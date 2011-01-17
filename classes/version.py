@@ -1,5 +1,5 @@
 # version.py
-# Initial Copyright (C) 2010 -Esprit-
+# Initial Copyright (C) 2010-2011 -Esprit-
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,38 +16,56 @@ import hashlib
 import os
 import platform
 
-MAJOR_VER = 0
-MINOR_VER = 1
-
-IDENTITY_CAT = "bot"
-IDENTITY_NAME = "snapi"
-IDENTITY_TYPE = "pc"
-
-CAPS = "http://snapi-bot.googlecode.com/caps"
-APP_NAME = "Snapi-Snup"
-
 class VersionInfo:
 	def __init__(self):
 		osinfo = platform.uname()
-
 		self.osname = u"%s %s" % (osinfo[0], osinfo[2])
 
-		pipe = os.popen("svnversion")
-		rawRev = pipe.read()
-		pipe.close()
+		self.capsstr = "http://snapi-bot.googlecode.com/caps"
+		self.appname = "Snapi-Snup"
 
-		if not rawRev:
-			rawRev = 0
-
-		self.version = u"%d.%d.%s" % (MAJOR_VER, MINOR_VER, rawRev)
+		self.major = "0"
+		self.minor = "1"
+		self.revision = os.popen("svnversion -n").read()
+		if not self.revision:
+			self.revision = "0"
+		self.version = u"%s.%s.%s" % (self.major, self.minor, self.revision)
 		self.verhash = None
+		
+		self.identcat = "bot"
+		self.identname = "snapi"
+		self.identtype = "pc"
 
 	def createFeaturesHash(self, features):
 		fString = "<".join(features)
-		string = u"%s/%s//%s<%s<" % (IDENTITY_TYPE, IDENTITY_CAT, IDENTITY_NAME, fString)
+		string = u"%s/%s//%s<%s<" % (self.identname, self.identcat, self.identtype, fString)
 		self.verhash = base64.b64encode(hashlib.sha1(string).digest())
 
-	def getVersion(self):
+	def getAppName(self):
+		return self.appname
+
+	def getCapsString(self):
+		return self.capsstr
+
+	def getIdentCat(self):
+		return self.identcat
+
+	def getIdentName(self):
+		return self.identname
+
+	def getIdentType(self):
+		return self.identtype
+
+	def getMajorVer(self):
+		return self.major
+
+	def getMinorVer(self):
+		return self.minor
+
+	def getRevision(self):
+		return self.revision
+
+	def getVerString(self):
 		return self.version
 
 	def getOSName(self):
