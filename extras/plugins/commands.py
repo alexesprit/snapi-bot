@@ -35,7 +35,7 @@ def changeCommandAccess(msgType, conference, nick, param):
 		if isCommand(command):
 			try:
 				access = int(access)
-				if -100 <= access <= 100:
+				if 0 <= access <= 100:
 					gCommandAccess[command] = access
 					gCommands[command][CMD_ACCESS] = access
 					saveCommandAccesses()
@@ -43,7 +43,7 @@ def changeCommandAccess(msgType, conference, nick, param):
 				else:
 					raise ValueError 
 			except ValueError:
-				sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
+				sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число больше 0!")
 		else:
 			sendMsg(msgType, conference, nick, u"Не вижу команду")
 	else:

@@ -35,12 +35,11 @@ def addExpression(msgType, conference, nick, param):
 		text = param[1].strip()
 		if exp and text:
 			if exp in gExpressions:
-				gExpressions[conference][exp] = text
 				sendMsg(msgType, conference, nick, u"Заменила")
 			else:
-				gExpressions[conference][exp] = text
 				sendMsg(msgType, conference, nick, u"Добавила")
-			saveExpressions(conference);
+			gExpressions[conference][exp] = text
+			saveExpressions(conference)
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибочный запрос")
 	else:
@@ -57,8 +56,7 @@ def delExpression(msgType, conference, nick, param):
 def showExpressions(msgType, conference, nick, param):
 	if gExpressions[conference]:
 		items = [exp for exp in gExpressions[conference]]
-		message = u"выражения:\n%s" % ("\n".join(items))
-		sendMsg(msgType, conference, nick, message)
+		sendMsg(msgType, conference, nick, u"Выражения:\n%s" % ("\n".join(items)))
 	else:
 		sendMsg(msgType, conference, nick, u"Выражений нет");		
 

@@ -52,7 +52,8 @@ def removeNicks(message, nickList):
 
 def processChatter(stanza, msgType, conference, nick, truejid, message):
 	if protocol.TYPE_PUBLIC == msgType and getConferenceConfigKey(conference, "chatter"):
-		if not nick: # topic
+		# topic & sys messages
+		if conference != truejid:
 			return
 		botNick = getBotNick(conference)
 		if nick == botNick:
@@ -106,7 +107,8 @@ def manageChatterValue(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Прочитай помощь по команде")
 	else:
-		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (getConferenceConfigKey(conference, "chatter")))
+		chatterValue = getConferenceConfigKey(conference, "chatter")
+		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (chatterValue))
 
 registerEventHandler(loadChatterBase, EVT_ADDCONFERENCE)
 registerEventHandler(freeChatterBase, EVT_DELCONFERENCE)
