@@ -20,11 +20,12 @@ gStatsKicked = {}
 gStatsBanned = {}
 
 def showConferenceStats(msgType, conference, nick, param):
-	text = u"За время, проведённое мной в конфе, вы запостили %(groupchat)d мессаг в чат и %(chat)d мессаг мне в личку, "
-	text += u"я же запостила %(mymsg)d сообщений. Всего сюда заходили %(join)d человек, из них %(moderator)d модеров, "
-	text += u"%(participant)d участников и %(visitor)d посетителей. Вышло же %(leave)d человек; модеры выгнали %(kick)d человек и "
-	text += u"забанили %(ban)d. Также ники сменили %(nick)d раз, статусами нафлудили %(status)d раз."
-	sendMsg(msgType, conference, nick, text % (gConferenceStats[conference]))
+	buf = []
+	buf.append(u"За время, проведённое мной в конфе, вы запостили %(groupchat)d мессаг в чат и %(chat)d мессаг мне в личку, ")
+	buf.append(u"я же запостила %(mymsg)d сообщений. Всего сюда заходили %(join)d человек, из них %(moderator)d модеров, ")
+	buf.append(u"%(participant)d участников и %(visitor)d посетителей. Вышло же %(leave)d человек; модеры выгнали %(kick)d человек и ")
+	buf.append(u"забанили %(ban)d. Также ники сменили %(nick)d раз, статусами нафлудили %(status)d раз.")
+	sendMsg(msgType, conference, nick, "".join(buf) % (gConferenceStats[conference]))
 
 def updateBotMessageStats(msgType, conference, text):
 	if protocol.TYPE_PUBLIC == msgType and text:

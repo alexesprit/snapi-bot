@@ -14,17 +14,19 @@
 # GNU General Public License for more details.
 
 def showBotUptime(msgType, conference, nick, param):
+	buf = []
+	
 	uptime = int(time.time() - gInfo["start"])
-	message = u"Время работы: %s. " % (getUptimeStr(uptime))
-	message += u"Получено %(msg)d сообщений, обработано %(prs)d презенсов и %(iq)d iq-запросов, а также выполнено %(cmd)d команд. " % (gInfo)
+	buf.append(u"Время работы: %s. " % (getUptimeStr(uptime)))
+	buf.append(u"Получено %(msg)d сообщений, обработано %(prs)d презенсов и %(iq)d iq-запросов, а также выполнено %(cmd)d команд. " % (gInfo))
 	memUsage = getUsedMemorySize()
 	if memUsage: 
-		message += u"Используется %0.2f МБ памяти. " % (memUsage)
-	message += u"Было запущено %(tmr)d таймеров, %(thr)d потоков, " % (gInfo)
+		buf.append(u"Используется %0.2f МБ памяти. " % (memUsage))
+	buf.append(u"Было запущено %(tmr)d таймеров, %(thr)d потоков, " % (gInfo))
 	if gInfo["err"]:
-		message += u"%(err)d ошибок, " % (gInfo)
-	message += u"в данный момент активно %d потоков" % (threading.activeCount())
-	sendMsg(msgType, conference, nick, message)
+		buf.append(u"%(err)d ошибок, " % (gInfo))
+	buf.append(u"в данный момент активно %d потоков" % (threading.activeCount()))
+	sendMsg(msgType, conference, nick, "".join(buf))
 
 registerCommand(showBotUptime, u"ботап", 10, 
 				u"Показывает статистику работы бота", 

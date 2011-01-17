@@ -92,7 +92,7 @@ def showServiceDiscoveryResults_(stanza, msgType, conference, nick, jid, maxCoun
 				if itemCount > maxCount:
 					discoList = discoList[:maxCount]
 					discoList.append(u"Всего %d пунктов" % (itemCount))
-				sendMsg(msgType, conference, nick, u"Надискаверила:\n" + u"\n".join(discoList))
+				sendMsg(msgType, conference, nick, u"Надискаверила:\n%s" % (u"\n".join(discoList)))
 		else:
 			if searchKey and itemCount:
 				message = u"Текст \"%s\" не найден (всего %d пунктов)" % (searchKey, itemCount)

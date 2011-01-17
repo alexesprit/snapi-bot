@@ -83,13 +83,13 @@ def loadRawVCard(node, rawVCard):
 			loadRawVCard(child, rawVCard)
 			
 def getVCard(rawVCard):
-	name = ""
+	buf = []
 	for tag in ("GIVEN", "MIDDLE", "FAMILY"):
 		tagData = rawVCard.get(tag)
 		if tagData:
-			name += tagData + " "
-	if name:
-		rawVCard["FN"] = name
+			buf.append(tagData)
+	if buf:
+		rawVCard["FN"] = "".join(buf)
 	vCardElements = []
 	for i in xrange(len(VCARD_TAGS)):
 		tagName, tagDesc = VCARD_TAGS[i]

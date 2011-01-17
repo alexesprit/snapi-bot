@@ -32,8 +32,8 @@ def freeLocalBase(conference):
 def getLocalKeyToChat(msgType, conference, nick, param):
 	key = param.lower()
 	if key in gLocalBase[conference]:
-		message = u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key])
-		sendMsg(msgType, conference, nick, message)
+		sendMsg(msgType, conference, nick, 
+			u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key]))
 	else:
 		sendMsg(msgType, conference, nick, u"Я не знаю, что такое %s :(" % (key))
 
@@ -43,17 +43,17 @@ def getLocalKeyToPM(msgType, conference, nick, param):
 	if len(args) == 2:
 		userNick = args[0].strip()
 		if isNickOnline(conference, userNick):
-			receiverjid = conference + "/" + userNick
+			receiverjid = u"%s/%s" % (conference, userNick)
 			key = args[1].lower()
 	elif len(args) == 1:
-		receiverjid = conference + "/" + nick
+		receiverjid = u"%s/%s" % (conference, nick)
 		key = args[0].lower()
 	if receiverjid:
 		if key in gLocalBase[conference]:
 			if protocol.TYPE_PUBLIC == msgType:
 				sendMsg(msgType, conference, nick, u"Ушло")
-			message = u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key])
-			sendTo(protocol.TYPE_PRIVATE, receiverjid, message)
+			sendTo(protocol.TYPE_PRIVATE, receiverjid, 
+				u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key]))
 		else:
 			sendMsg(msgType, conference, nick, u"Я не знаю, что такое %s :(" % key)
 	else:

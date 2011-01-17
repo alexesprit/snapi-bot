@@ -51,9 +51,9 @@ def saveUserClient(conference, nick, truejid, aff, role):
 	else:
 		base.updateChangeTime(truejid)
 	iq = protocol.Iq(protocol.TYPE_GET)
-	iq.addChild("query", {}, [], protocol.NS_VERSION)
-	iq.setTo(conference + "/" + nick)
+	iq.setTo(u"%s/%s" % (conference, nick))
 	iq.setID(getUniqueID("cli_id"))
+	iq.addChild("query", {}, [], protocol.NS_VERSION)
 	gClient.sendAndCallForResponse(iq, saveUserClient_, (conference, truejid))
 
 def saveUserClient_(stanza, conference, truejid):

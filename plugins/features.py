@@ -64,16 +64,17 @@ XMPP_FEATURES = {
 
 def showFeatures(msgType, conference, nick, param):
 	if param:
-		if isConferenceInList(conference) and isNickOnline(conference, param):
-			jid = conference + "/" + param
+		if isConferenceInList(conference) and \
+			isNickOnline(conference, param):
+				jid = u"%s/%s" % (conference, param)
 		else:
 			jid = param
 	else:
-		jid = conference + "/" + nick
+		jid = u"%s/%s" % (conference, nick)
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.setTo(jid)
-	iq.addChild("query", {}, [], protocol.NS_DISCO_INFO)
 	iq.setID(getUniqueID("feat_id"))
+	iq.addChild("query", {}, [], protocol.NS_DISCO_INFO)
 	gClient.sendAndCallForResponse(iq, showFeatures_, (msgType, conference, nick, param))
 
 def showFeatures_(stanza, msgType, conference, nick, param):
@@ -88,10 +89,10 @@ def showFeatures_(stanza, msgType, conference, nick, param):
 		if featureList:
 			featureList = list(featureList)
 			featureList.sort()
-			answer = u"Вот, что я узнала:\n%s" % ("\n".join(featureList))
 			if protocol.TYPE_PUBLIC == msgType:
 				sendMsg(msgType, conference, nick, u"Ушли")
-			sendMsg(protocol.TYPE_PRIVATE, conference, nick, answer)
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, 
+				u"Вот, что я узнала:\n%s" % ("\n".join(featureList)))
 		else:
 			sendMsg(msgType, conference, nick, u"Нет информации")
 	else:
