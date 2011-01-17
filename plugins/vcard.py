@@ -3,7 +3,7 @@
 # vcard.py
 # Initial Copyright (c) 2007 dimichxp <dimichxp@gmail.com>
 # Modification Copyright (c) 2007 Als <Als@exploit.in>
-# Modification Copyright (c) 2010 -Esprit-
+# Modification Copyright (c) 2010-2011 -Esprit-
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,12 +37,14 @@ VCARD_TAGS = (
 
 def showVCard(msgType, conference, nick, param):
 	if param:
-		if isConferenceInList(conference) and isNickOnline(conference, param):
-			jid = conference + "/" + param
+		usernick = param
+		if isConferenceInList(conference) and \
+			isNickOnline(conference, usernick):
+				jid = u"%s/%s" % (conference, usernick)
 		else:
 			jid = param
 	else:
-		jid = isConferenceInList(conference) and (conference + "/" + nick) or conference
+		jid = isConferenceInList(conference) and (u"%s/%s" % (conference, nick)) or conference
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.addChild("vCard", {}, [], protocol.NS_VCARD)
 	iq.setTo(jid)

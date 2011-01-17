@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # dates.py
-# Initial Copyright (с) 2010 -Esprit-
+# Initial Copyright (с) 2010-2011 -Esprit-
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,11 +19,9 @@ def showDates(msgType, conference, nick, param):
 	if response:
 		rawhtml = response.read()
 		rawhtml = unicode(rawhtml, "utf-8")
-		dates = rawhtml.split("<br/>-----<br/>")
-		dates = dates[1:-1]
-		if dates:
-			dates = [date.split("/")[0] for date in dates]
-			sendMsg(msgType, conference, nick, u"Глянь, что я нашла:" + u"\n".join(dates))
+		elements = re.findall(r"(.+?)/.+?<br/>-----<br/>", rawhtml)
+		if elements:
+			sendMsg(msgType, conference, nick, u"Вот, что я нашла:\n%s" % (u"\n".join(elements)))
 		else:
 			sendMsg(msgType, conference, nick, u"На сегодня праздников нет")
 	else:

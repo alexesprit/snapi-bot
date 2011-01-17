@@ -31,12 +31,14 @@ PONG_REPLICS_FOR_ME = (
 
 def showPing(msgType, conference, nick, param):
 	if param:
-		if isConferenceInList(conference) and isNickOnline(conference, param):
-			jid = conference + "/" + param
+		usernick = param
+		if isConferenceInList(conference) and \
+			isNickOnline(conference, usernick):
+				jid = u"%s/%s" % (conference, usernick)
 		else:
 			jid = param
 	else:
-		jid = conference + "/" + nick
+		jid = u"%s/%s" % (conference, nick)
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_VERSION)
 	iq.setTo(jid)
 	iq.setID(getUniqueID("ping_id"))

@@ -3,7 +3,7 @@
 # tv.py
 # Initial Copyright (c) 2007 dimichxp <dimichxp@gmail.com>
 # Modification Copyright (c) 2007 Als <Als@exploit.in>
-# Modification Copyright (c) 2010 -Esprit-
+# Modification Copyright (c) 2010-2011 -Esprit-
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -109,8 +109,7 @@ def showTVProgram(msgType, conference, nick, param):
 		if channelCode:
 			program = getTVForChannel(channelCode)
 			if program:
-				message = u"Вот, что я нашла:\n%s" % (program)
-				sendMsg(msgType, conference, nick, message)
+				sendMsg(msgType, conference, nick, u"Вот, что я нашла:\n%s" % (program))
 			else:
 				sendMsg(msgType, conference, nick, u"На сегодня программы нет")
 		else:
@@ -121,8 +120,8 @@ def showTVProgram(msgType, conference, nick, param):
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушло")	
 		if program:
-			message = u"Программа для категории \"%s\":\n%s" % (param, program)
-			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, 
+				u"Программа для категории \"%s\":\n%s" % (param, program))
 		else:
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"На сегодня программы для этой категории нет")
 
