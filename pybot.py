@@ -506,11 +506,13 @@ def parseMessage(session, stanza):
 		cmdAccess = gCommands[command][CMD_ACCESS]
 	else:
 		if gMacros.hasMacros(command):
+			param = (len(rawbody) == 2) and rawbody[1] or None
+			message = gMacros.getParsedMacros(command, param, (barejid, nick))
 			cmdAccess = gMacros.getAccess(command)
-			message = gMacros.expand(message, (barejid, nick))
 		else:
 			if isConference and gMacros.hasMacros(command, conference):
-				message = gMacros.expand(message, (conference, nick), conference)
+				param = (len(rawbody) == 2) and rawbody[1] or None
+				message = gMacros.getParsedMacros(command, param, (conference, nick), conference)
 				cmdAccess = gMacros.getAccess(command, conference)
 			else:
 				return

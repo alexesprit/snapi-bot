@@ -20,17 +20,89 @@ from utils import utils
 MACROS_FILE = "macros.txt"
 MACCESS_FILE = "macrosaccess.txt"
 
+class ArgParser:
+	def __init__(self):
+		self.commands = {
+			"rand": self._getRandom,
+			"context": self._getContext
+		}
+
+	def parseArgs(self, me):
+		i = 0
+		m = self._getMap(me)
+		args = [""] * max(m)
+		while i < len(m):
+			if m[i]:
+				args[m[i]-1] += me[i]
+			i += 1
+		return args
+
+	def proccess(self, cmd, source):
+		command = cmd[0]
+		args = cmd[1:]
+		return self._execCommand(command, args, source)
+
+	def _getRandom(self, args, context):
+		try:
+			f = int(args[0])
+			t = int(args[1])
+			return str(random.randrange(f, t))
+		except ValueError:
+			return ""
+
+	def _getContext(self, args, context):
+		name = args[0]
+		if name == "conf":
+			return context[0]
+		elif name == "nick":
+			return context[1]
+		return ""
+
+	def _execCommand(self, cmd, args, source):
+		if cmd in self.commands:
+			return self.commands[cmd](args, source)
+		return ""
+
+	def _charMap(self, x, i):
+		if i["esc"]:
+			i["esc"] = False
+			return i["level"]
+		elif x == "\\":
+			i["esc"] = True
+			return 0
+		elif x == "%":
+			i["state"] = "cmd_p"
+			return 0
+		elif x == "(":
+			if i["state"] == "cmd_p":
+				i["level"] += 1
+				i["state"] = "args"
+			return 0
+		elif x == ")":
+			if i["state"] == "args":
+				i["state"] = "null"
+			return 0
+		else:
+			if i["state"] == "args":
+				return i["level"]
+			else:
+				i["state"] = "null"
+				return 0
+
+	def _getMap(self, inp):
+		i = {"level": 0, "state": "null", "esc": False}
+		return [self._charMap(x, i) for x in list(inp)]
+
 class Macros:
 	def __init__(self, path):
-		self.commands = {
-			"rand": self.getRand,
-			"context": self.getContext
-		}
 		self.gMacrosList = {}
 		self.gAccessList = {}
 		self.macrosList = {}
 		self.accessList = {}
+
 		self.path = path
+		
+		self.parser = ArgParser()
 
 	def loadMacroses(self, conference=None):
 		if conference:
@@ -71,10 +143,36 @@ class Macros:
 
 	def getMacros(self, macros, conference=None):
 		if conference:
-			return self.macrosList[conference].get(macros)
+			return self.macrosList[conference][macros]
 		else:
-			return self.gMacrosList.get(macros)
-		
+			return self.gMacrosList[macros]
+
+	def getParsedMacros(self, macros, param, context, conference=None):
+		if conference:
+			rawbody = self.macrosList[conference][macros]
+		else:
+			rawbody = self.gMacrosList[macros]
+
+		if param is None:
+			param = ""
+		if rawbody.count("$*"):
+			rawbody = rawbody.replace("$*", param)
+		else:
+			args = param.split()
+			arglen = len(args)
+
+			for i, n in enumerate(re.findall("\$[0-9]+", rawbody)):
+				if arglen == i:
+					break
+				rawbody = rawbody.replace(n, args[i])
+
+		for i in self.parser.parseArgs(rawbody):
+			cmd = [x.strip() for x in i.split(",")]
+			res = self.parser.proccess(cmd, context)
+			if res:
+				rawbody = rawbody.replace("%%(%s)" % i, res)
+		return rawbody
+			
 	def hasMacros(self, macros, conference=None):
 		if conference:
 			return macros in self.macrosList[conference]
@@ -93,14 +191,14 @@ class Macros:
 		else:
 			self.gAccessList[macros] = access
 
-	def add(self, macros, param, access, conference=None):
+	def addMacros(self, macros, param, access, conference=None):
 		if conference:
 			self.macrosList[conference][macros] = param
 		else:
 			self.gMacrosList[macros] = param
 		self.setAccess(macros, access, conference)
 
-	def remove(self, macros, conference=None):
+	def delMacros(self, macros, conference=None):
 		if conference:
 			if macros in self.macrosList[conference]:
 				del self.macrosList[conference][macros]
@@ -109,106 +207,3 @@ class Macros:
 			if macros in  self.gMacrosList:
 				del self.gMacrosList[macros]
 				del self.gAccessList[macros]
-
-	def expand(self, message, context, conference=None):
-		macros = None
-		rawBody = message.split(None, 1)
-		command = rawBody[0].lower()
-		param = (len(rawBody) == 2) and rawBody[1] or ""
-		if conference in self.macrosList:
-			if command in self.macrosList[conference]:
-				macros = self.macrosList[conference][command]
-		if command in self.gMacrosList:
-			macros = self.gMacrosList[command]
-		if not macros:
-			return message
-		message = self.replace(macros, param, context)
-		expanded = self.expand(message, context, conference)
-		return expanded
-
-	def replace(self, message, param, context):
-		if message.count("$*"):
-			message = message.replace("$*", param)
-		else:
-			param = param.split()
-			paramLen = len(param)
-			for i, n in enumerate(re.findall("\$[0-9]+", message)):
-				if i < paramLen:
-					message = message.replace(n, param[i])
-				else:
-					message = message.replace(n, "")
-		for i in self.parseCommand(message):
-			cmd = [x.strip() for x in i.split(",")]
-			res = self.proccess(cmd, context)
-			if res:
-				message = message.replace("%%(%s)" % i, res)
-		while message.count("  "):
-			message = message.replace("  ", " ")
-		return message
-
-	def getRand(self, args, context):
-		try:
-			f = int(args[0])
-			t = int(args[1])
-			return str(random.randrange(f, t))
-		except ValueError:
-			return ""
-
-	def getContext(self, args, context):
-		arg = args[0]
-		if arg == "conf":
-			return context[0]
-		elif arg == "nick":
-			return context[1]
-		else:
-			return ""
-
-	def charMap(self, x, i):
-		if i["esc"]:
-			i["esc"] = False
-			return i["level"]
-		elif x == "\\":
-			i["esc"] = True
-			return 0
-		elif x == "%":
-			i["state"] = "cmd_p"
-			return 0
-		elif x == "(":
-			if i["state"] == "cmd_p":
-				i["level"] += 1
-				i["state"] = "args"
-			return 0
-		elif x == ")":
-			if i["state"] == "args":
-				i["state"] = "null"
-			return 0
-		else:
-			if i["state"] == "args":
-				return i["level"]
-			else:
-				i["state"] = "null"
-				return 0
-
-	def getMap(self, inp):
-		i = {"level": 0, "state": "null", "esc": False}
-		return [self.charMap(x, i) for x in list(inp)]
-
-	def parseCommand(self, me):
-		i = 0
-		m = self.getMap(me)
-		args = [""] * max(m)
-		while i < len(m):
-			if m[i]:
-				args[m[i]-1] += me[i]
-			i += 1
-		return args
-		
-	def execCommand(self, cmd, args, source):
-		if cmd in self.commands:
-			return self.commands[cmd](args, source)
-		return ""
-
-	def proccess(self, cmd, source):
-		command = cmd[0]
-		args = cmd[1:]
-		return self.execCommand(command, args, source)

@@ -31,10 +31,6 @@ def addLocalMacros(msgType, conference, nick, param):
 				command = body.split()[0]
 				if isCommand(command):
 					access = gCommands[command][CMD_ACCESS]
-				elif gMacros.hasMacros(command):
-					access = gMacros.getAccess(command)
-				elif gMacros.hasMacros(command, conference):
-					access = gMacros.getAccess(command, conference)
 				else:
 					sendMsg(msgType, conference, nick, u"Не вижу команду внутри макроса")
 					return
@@ -44,7 +40,7 @@ def addLocalMacros(msgType, conference, nick, param):
 						sendMsg(msgType, conference, nick, u"Заменила")
 					else:
 						sendMsg(msgType, conference, nick, u"Добавила");		
-					gMacros.add(macros, body, access, conference)
+					gMacros.addMacros(macros, body, access, conference)
 					gMacros.saveMacroses(conference)
 				else:
 					sendMsg(msgType, conference, nick, u"Недостаточно прав")
@@ -66,8 +62,6 @@ def addGlobalMacros(msgType, conference, nick, param):
 				command = body.split()[0]
 				if isCommand(command):
 					access = gCommands[command][CMD_ACCESS]
-				elif gMacros.hasMacros(command):
-					access = gMacros.getAccess(command)
 				else:
 					sendMsg(msgType, conference, nick, u"Не вижу команду внутри макроса")
 					return
@@ -76,7 +70,7 @@ def addGlobalMacros(msgType, conference, nick, param):
 					sendMsg(msgType, conference, nick, u"Заменила")
 				else:
 					sendMsg(msgType, conference, nick, u"Добавила")
-				gMacros.add(macros, body, access)
+				gMacros.addMacros(macros, body, access)
 				gMacros.saveMacroses()
 		else:
 			sendMsg(msgType, conference, nick, u"Читай справку по команде")
@@ -86,7 +80,7 @@ def delLocalMacros(msgType, conference, nick, param):
 		access = gMacros.getAccess(macros, conference)
 		truejid = getTrueJID(conference, nick)
 		if getAccess(conference, truejid) >= access:
-			gMacros.remove(param, conference)
+			gMacros.delMacros(param, conference)
 			gMacros.saveMacroses(conference)
 
 			sendMsg(msgType, conference, nick, u"Удалила")
@@ -97,7 +91,7 @@ def delLocalMacros(msgType, conference, nick, param):
 
 def delGlobalMacros(msgType, conference, nick, param):
 	if gMacros.hasMacros(param): 
-		gMacros.remove(param)
+		gMacros.delMacros(param)
 		gMacros.saveMacroses()
 
 		sendMsg(msgType, conference, nick, u"Удалила")
@@ -105,21 +99,31 @@ def delGlobalMacros(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Нет такого макроса")
 
 def expandLocalMacros(msgType, conference, nick, param):
-	macros = param.split()[0].lower()
+	args = param.split(None, 1)
+	macros = args[0]
 	if gMacros.hasMacros(macros, conference):
 		access = gMacros.getAccess(macros, conference)
 		truejid = getTrueJID(conference, nick)
 		if access <= getAccess(conference, truejid):
-			sendMsg(msgType, conference, nick, gMacros.expand(param, (conference, nick), conference))
+			if len(args) > 1:
+				sendMsg(msgType, conference, nick, 
+					gMacros.getParsedMacros(macros, args[1], (conference, nick), conference))
+			else:
+				sendMsg(msgType, conference, nick, gMacros.getMacros(macros, conference))
 		else:
 			sendMsg(msgType, conference, nick, u"Недостаточно прав")
 	else:
 		sendMsg(msgType, conference, nick, u"Нет такого макроса")
 
 def expandGlobalMacros(msgType, conference, nick, param):
-	macros = param.split()[0].lower()
+	args = param.split(None, 1)
+	macros = args[0]
 	if gMacros.hasMacros(macros):
-		sendMsg(msgType, conference, nick, gMacros.expand(param, (conference, nick)))
+		if len(args) > 1:
+			sendMsg(msgType, conference, nick, 
+				gMacros.getParsedMacros(macros, args[1], (conference, nick)))
+		else:
+			sendMsg(msgType, conference, nick, gMacros.getMacros(macros))
 	else:
 		sendMsg(msgType, conference, nick, u"Нет такого макроса")
 
@@ -243,7 +247,7 @@ registerEventHandler(gMacros.freeMacroses, EVT_DELCONFERENCE)
 
 registerCommand(addLocalMacros, u"макроадд", 20, 
 				u"Добавляет локальный макрос", 
-				u"<название>=<макрос>",
+				u"<название> = <макрос>",
 				(u"глюк = сказать /me подумала, что все глючат", ), 
 				CMD_CONFERENCE | CMD_PARAM)
 registerCommand(addGlobalMacros, u"гмакроадд", 100, 
@@ -263,12 +267,12 @@ registerCommand(delGlobalMacros, u"гмакродел", 100,
 				CMD_ANY | CMD_PARAM)
 registerCommand(showLocalMacrosInfo, u"макроинфо", 20, 
 				u"Показывает локальный макрос в сыром виде",
-				u"[название]", 
+				u"<название>", 
 				(u"глюк", ), 
 				CMD_CONFERENCE)
 registerCommand(showGlobalMacrosInfo, u"гмакроинфо", 100, 
 				u"Показывает глобальный макрос в сыром виде",
-				u"[название]", 
+				u"<название>", 
 				(u"глюк", ), 
 				CMD_ANY | CMD_PARAM)
 registerCommand(expandLocalMacros, u"макроэксп", 20, 
