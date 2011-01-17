@@ -118,16 +118,16 @@ class Node(object):
 		for key in self.attrs.keys():
 			val = ustr(self.attrs[key])
 			s = s + " %s=\"%s\"" % (key, escapeXML(val))
-		s = s + ">"
-		if self.children:
-			for child in self.children:
-				if child:
-					s += ustr(child)
-		if self.data:
-			s += escapeXML(self.getData().strip())
 		if not self.children and not self.data:
-			s = s[:-1] + " />"
+			s += " />"
 		else:
+			s = s + ">"
+			if self.children:
+				for child in self.children:
+					if child:
+						s += ustr(child)
+			if self.data:
+				s += escapeXML(self.getData().strip())
 			s += "</%s>" % (self.name)
 		return s
 
