@@ -23,9 +23,9 @@ def showHelp(msgType, conference, nick, param):
 			buf = []
 			
 			buf.append(gCommands[command][CMD_DESC])
+			buf.append("\n")
 			syntax = gCommands[command][CMD_SYNTAX]
 			if syntax:
-				buf.append("\n")				
 				buf.append(u"Синтаксис: %s %s\n" % (command, syntax))
 			examples = gCommands[command][CMD_EXAMPLE]
 			if examples:
