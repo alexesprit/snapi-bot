@@ -38,7 +38,7 @@ class VersionInfo:
 
 	def createFeaturesHash(self, features):
 		fString = "<".join(features)
-		string = u"%s/%s//%s<%s<" % (self.identname, self.identcat, self.identtype, fString)
+		string = u"%s/%s//%s<%s<" % (self.identcat, self.identtype, self.identname, fString)
 		self.verhash = base64.b64encode(hashlib.sha1(string).digest())
 
 	def getAppName(self):
