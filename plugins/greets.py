@@ -25,10 +25,10 @@ def freeGreetings(conference):
 	del gGreets[conference]
 
 def setUserGreeting(msgType, conference, nick, param):
-	rawGreet = param.split("=", 1)
-	if len(rawGreet) == 2:
-		user = rawGreet[0].strip()
-		greet = rawGreet[1].strip()
+	args = param.split("=", 1)
+	if len(args) == 2:
+		user = args[0].strip()
+		greet = args[1].strip()
 		if isJID(user):
 			truejid = user
 		elif isNickInConference(conference, user):

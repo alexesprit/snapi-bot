@@ -100,10 +100,10 @@ def startRSSQueries():
 	startTimer(RSS_UPDATE_TIME, startRSSQueries)
 
 def addRSSChannel(msgType, conference, nick, param):
-	param = param.split("=", 1)
-	if 2 == len(param):
-		name = param[0].strip()
-		url = param[1].strip()
+	args = param.split("=", 1)
+	if 2 == len(args):
+		name = args[0].strip()
+		url = args[1].strip()
 		gRSSItems[conference][name] = url
 		gRSSCache[conference][url] = []
 		if name in gRSSItems[conference]:

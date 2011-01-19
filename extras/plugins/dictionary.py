@@ -90,17 +90,17 @@ def searchInGoogleDict(msgType, conference, nick, param):
 		message = u"Доступные пары языков:\n%s" % ("\n".join(langs))
 		sendMsg(msgType, conference, nick, message)
 	else:
-		param = param.split(None, 2)
-		if len(param) == 3:
-			src, target, text = param
+		args = param.split(None, 2)
+		if len(args) == 3:
+			src, target, text = args
 			if not ("%s %s" % (src, target)) in DICTIONARY_LANGPAIRS:
 				sendMsg(msgType, conference, nick, u"Читай справку по команде")
 				return
-			param = {
+			qparam = {
 				"q": text.encode("utf-8"), 
 				"langpair": "%s|%s" % (src, target) 
 			}
-			query = urllib.urlencode(param)
+			query = urllib.urlencode(qparam)
 			url = "http://www.google.com/dictionary?%s" % (query)
 			rawHTML = urllib.urlopen(url).read()
 			rawHTML = unicode(rawHTML, "utf-8")

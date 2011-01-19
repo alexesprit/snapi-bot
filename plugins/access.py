@@ -85,8 +85,8 @@ def showUserAccess(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"%d" % (access))
 
 def setLocalAccess(msgType, conference, nick, param):
-	param = param.split(None, 2)
-	user = param[0].strip()
+	args = param.split(None, 2)
+	user = args[0].strip()
 	if isNickInConference(conference, user):
 		userjid = getTrueJID(conference, user)
 	elif isJID(user):
@@ -95,8 +95,8 @@ def setLocalAccess(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"А кто это?")
 		return
 	try:
-		if len(param) > 1:
-			newAccess = int(param[1])
+		if len(args) > 1:
+			newAccess = int(args[1])
 			if newAccess > 100 or newAccess < -100:
 				raise ValueError
 		else:
@@ -110,7 +110,7 @@ def setLocalAccess(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Недостаточно прав")
 			return
 		if newAccess != 0:
-			if len(param) == 2:
+			if len(args) == 2:
 				setTempAccess(conference, userjid, newAccess)
 				sendMsg(msgType, conference, nick, u"Доступ выдан до выхода из конференции")
 			else:
@@ -123,8 +123,8 @@ def setLocalAccess(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
 
 def setGlobalAccess(msgType, conference, nick, param):
-	param = param.split(None, 1)
-	user = param[0].strip()
+	args = param.split(None, 1)
+	user = args[0].strip()
 	if isConferenceInList(conference):
 		if isNickInConference(conference, user):
 			userjid = getTrueJID(conference, user)
@@ -140,8 +140,8 @@ def setGlobalAccess(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"А это кто?")
 			return
 	try:
-		if len(param) > 1:
-			newAccess = int(param[1])
+		if len(args) > 1:
+			newAccess = int(args[1])
 			if newAccess > 100 or newAccess < -100:
 				raise ValueError
 		else:

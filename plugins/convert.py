@@ -28,15 +28,15 @@ def convertValues(msgType, conference, nick, param):
 		elements.sort()
 		sendMsg(msgType, conference, nick, "\n".join(elements))
 	else:
-		if len(param.split()) == 3:
-			param = param.upper().split()
+		args = param.split()
+		if len(args) == 3:
 			try:
-				value = float(param[2])
+				value = float(args[2])
 			except ValueError:
 				sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 				return
-			source = param[0]
-			target = param[1]
+			source = args[0].upper()
+			target = args[1].upper()
 			if source and target in CONV_CURRENCIES:
 				if source == "RUR":
 					source = "BASE"

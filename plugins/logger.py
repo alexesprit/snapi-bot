@@ -40,11 +40,11 @@ def setDefaultLoggingValue(conference):
 
 def manageLoggingValue(msgType, conference, nick, param):
 	if param:
-		param = param.split()
-		if len(param) == 2:
-			conf, value = param
-		elif len(param) == 1:
-			conf, value = conference, param[0]
+		args = param.split()
+		if len(args) == 2:
+			conf, value = args
+		elif len(args) == 1:
+			conf, value = conference, args[0]
 		else:
 			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 			return

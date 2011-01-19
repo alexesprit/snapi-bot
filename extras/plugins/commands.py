@@ -28,10 +28,10 @@ def loadCommandAccesses():
 		gCommands[command][CMD_ACCESS] = gCommandAccess[command]
 
 def changeCommandAccess(msgType, conference, nick, param):
-	param = param.split()
-	if len(param) == 2:
-		command = param[0]
-		access = param[1]
+	args = param.split()
+	if len(args) == 2:
+		command = args[0]
+		access = args[1]
 		if isCommand(command):
 			try:
 				access = int(access)

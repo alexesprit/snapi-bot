@@ -29,10 +29,10 @@ def loadExpressions(conference):
 	gExpressions[conference] = eval(utils.readFile(path, "{}"))
 
 def addExpression(msgType, conference, nick, param):
-	param = param.split("=", 1)
-	if len(param) == 2:
-		exp = param[0].strip()
-		text = param[1].strip()
+	args = param.split("=", 1)
+	if len(args) == 2:
+		exp = args[0].strip()
+		text = args[1].strip()
 		if exp and text:
 			if exp in gExpressions:
 				sendMsg(msgType, conference, nick, u"Заменила")

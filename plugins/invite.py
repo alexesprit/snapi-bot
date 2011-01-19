@@ -14,8 +14,8 @@
 # GNU General Public License for more details.
 
 def sendInvite(msgType, conference, nick, param):
-	param = param.split(None, 1)
-	user = param[0]
+	args = param.split(None, 1)
+	user = args[0]
 	if not isJID(user):
 		if isNickInConference(conference, user):
 			truejid = getTrueJID(conference, user)
@@ -24,7 +24,7 @@ def sendInvite(msgType, conference, nick, param):
 			return
 	else:
 		truejid = user
-	reason = (len(param) == 2) and param[1] or None
+	reason = (len(args) == 2) and args[1] or None
 	msg = protocol.Message(to=conference)
 	x = protocol.Node("x")
 	x.setNamespace(protocol.NS_MUC_USER)

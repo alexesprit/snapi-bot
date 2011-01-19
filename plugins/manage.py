@@ -14,14 +14,14 @@
 # GNU General Public License for more details.
 
 def joinConf(msgType, conference, nick, param):
-	param = param.split()
-	if param and isJID(param[0]):
-		conf = param[0]
+	args = param.split()
+	if param and isJID(args[0]):
+		conf = args[0]
 		if isConferenceInList(conf):
 			sendMsg(msgType, conference, nick, u"Я уже там!")
 		else:
-			password = (len(param) == 2) and param[1] or None
 			addConference(conf)
+			password = (len(args) == 2) and args[1] or None
 			joinConference(conf, gConfig.NICK, password)
 			saveConferenceConfig(conf)
 			saveConferences()

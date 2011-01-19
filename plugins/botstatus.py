@@ -20,7 +20,8 @@ def setDefaultBotStatusValue(conference):
 
 def manageBotStatusValue(msgType, conference, nick, param):
 	args = param.split(None, 1)
-	show, status = "", ""
+	show, status = None, None
+
 	if args[0] in STATUS_STRINGS:
 		show = args[0]
 		if len(args) > 1:

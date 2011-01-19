@@ -26,10 +26,10 @@ def freeSendBase(conference):
 	del gSendCache[conference]
 
 def addToSendBase(msgType, conference, nick, param):
-	param = param.split(None, 1)
-	if len(param) == 2:
-		userNick = param[0]
-		message = param[1]
+	args = param.split(None, 1)
+	if len(args) == 2:
+		userNick = args[0]
+		message = args[1]
 		message = u"%s попросил меня передать тебе следующее:\n%s" % (nick, message)
 		if isNickOnline(conference, userNick):
 			sendMsg(protocol.TYPE_PRIVATE, conference, userNick, message)

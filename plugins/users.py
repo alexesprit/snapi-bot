@@ -20,11 +20,26 @@ def showInMucUsers(msgType, conference, nick, param):
 	sendMsg(msgType, conference, nick, message)
 
 def showWhoWas(msgType, conference, nick, param):
-	elements = [u"%d) %s" % (i + 1, user) 
-			for i, user in enumerate(sorted(getNicks(conference)))]
-	message = u"Я видела здесь %d участников:\n%s" % (len(elements), "\n".join(elements))
-	sendMsg(msgType, conference, nick, message)
-	
+	jidlist = {}
+	for usernick in getNicks(conference):
+		userjid = getTrueJID(conference, usernick)
+		if userjid not in jidlist:
+			jidlist[userjid] = []
+		jidlist[userjid].append(usernick)
+
+	userlist = []
+	for i, data in enumerate(jidlist.values()):
+		firstnick = data[0]
+		if len(data) == 1:
+			userlist.append(u"%d) %s" % (i + 1, firstnick))
+		else:
+			othernicks = data[1:]
+			userlist.append(u"%d) %s (%s)" % (i + 1, firstnick, ", ".join(othernicks)))
+	userlist.sort()
+
+	sendMsg(msgType, conference, nick, 
+		u"Я видела здесь %d участников:\n%s" % (len(userlist), "\n".join(userlist)))
+
 def showUserNicks(msgType, conference, nick, param):
 	userNick = param or nick
 	if isNickInConference(conference, userNick):

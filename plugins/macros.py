@@ -15,11 +15,11 @@
 # GNU General Public License for more details.
 
 def addLocalMacros(msgType, conference, nick, param):
-	rawdata = param.split("=", 1)
-	if len(rawdata) != 2:
+	args = param.split("=", 1)
+	if len(args) != 2:
 		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 	else:
-		macros, body = rawdata
+		macros, body = args
 		macros = macros.strip()
 		body = body.strip()
 		if macros and body:
@@ -48,11 +48,11 @@ def addLocalMacros(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
 def addGlobalMacros(msgType, conference, nick, param):
-	rawdata = param.split("=", 1)
-	if len(rawdata) != 2:
+	args = param.split("=", 1)
+	if len(args) != 2:
 		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 	else:
-		macros, body = rawdata
+		macros, body = args
 		macros = macros.strip()
 		body = body.strip()
 		if macros and body:
@@ -146,16 +146,16 @@ def showGlobalMacrosInfo(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Нет такого макроса")
 
 def showLocalMacroAccess(msgType, conference, nick, param):
-	param = param.split(None, 1)
-	macros = param[0]
+	args = param.split(None, 1)
+	macros = args[0]
 	if gMacros.hasMacros(macros, conference):
-		if len(param) == 2:
+		if len(args) == 2:
 			access = gMacros.getAccess(macros, conference)
 			truejid = getTrueJID(conference, nick)
 			if getAccess(conference, truejid) >= access:
-				access = param[1]
+				access = args[1]
 				if access.isdigit():
-					access = int(param[1])
+					access = int(args[1])
 					gMacros.setAccess(macros, access, conference)
 					gMacros.saveMacroses(conference)
 
@@ -171,13 +171,13 @@ def showLocalMacroAccess(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Нет такого макроса")
 
 def showGlobalMacroAccess(msgType, conference, nick, param):
-	param = param.split(None, 1)
-	macros = param[0]
+	args = param.split(None, 1)
+	macros = args[0]
 	if gMacros.hasMacros(macros):
-		if len(param) == 2:
-			access = param[1]
+		if len(args) == 2:
+			access = args[1]
 			if access.isdigit():
-				access = int(param[1])
+				access = int(args[1])
 				gMacros.setAccess(macros, access)
 				gMacros.saveMacroses()
 
