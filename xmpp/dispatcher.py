@@ -27,10 +27,10 @@ import plugin
 import protocol
 import simplexml
 
-DEFAULT_TIMEOUT = 25
-gID = 0
-
 DBG_DISPATCHER = "dispatcher"
+DEFAULT_TIMEOUT = 25
+
+gID = 0
 
 class Dispatcher(plugin.PlugIn):
 	""" Ancestor of PlugIn class. Handles XMPP stream, i.e. aware of stream headers.
@@ -38,9 +38,6 @@ class Dispatcher(plugin.PlugIn):
 	"""
 	def __init__(self):
 		plugin.PlugIn.__init__(self)
-		self.debugFlag = DBG_DISPATCHER
-		self.handlers = {}
-		self._expected = {}
 		self._exportedMethods = (
 			self.disconnect,
 			self.process,
@@ -52,17 +49,9 @@ class Dispatcher(plugin.PlugIn):
 			self.sendAndCallForResponse
 		)
 
-	def dumpHandlers(self):
-		""" Return set of user-registered callbacks in it's internal format.
-			Used within the library to carry user handlers set over Dispatcher replugins. 
-		"""
-		return self.handlers
-
-	def restoreHandlers(self, handlers):
-		""" Restores user-registered callbacks structure from dump previously obtained via dumpHandlers.
-			Used within the library to carry user handlers set over Dispatcher replugins. 
-		"""
-		self.handlers = handlers
+		self.debugFlag = DBG_DISPATCHER
+		self.handlers = {}
+		self._expected = {}
 
 	def plugin(self, owner):
 		""" Plug the Dispatcher instance into Client class instance and send 
@@ -78,9 +67,9 @@ class Dispatcher(plugin.PlugIn):
 		self.registerStanza("iq", protocol.Iq)
 		self.registerStanza("presence", protocol.Presence)
 		self.registerStanza("message", protocol.Message)
-		self.registerHandler("error", self.streamErrorHandler, xmlns=protocol.NS_STREAMS)
+		self.registerHandler("error", self._streamErrorHandler, xmlns=protocol.NS_STREAMS)
 
-		self.initStream()
+		self._initStream()
 
 	def plugout(self):
 		""" Prepares instance to be destructed.
@@ -89,7 +78,19 @@ class Dispatcher(plugin.PlugIn):
 		self.Stream.features = None
 		self.Stream.destroy()
 
-	def initStream(self):
+	def dumpHandlers(self):
+		""" Return set of user-registered callbacks in it's internal format.
+			Used within the library to carry user handlers set over Dispatcher replugins. 
+		"""
+		return self.handlers
+
+	def restoreHandlers(self, handlers):
+		""" Restores user-registered callbacks structure from dump previously obtained via dumpHandlers.
+			Used within the library to carry user handlers set over Dispatcher replugins. 
+		"""
+		self.handlers = handlers
+
+	def _initStream(self):
 		""" Send an initial stream header.
 		"""
 		self.Stream = simplexml.NodeBuilder()
@@ -190,7 +191,7 @@ class Dispatcher(plugin.PlugIn):
 			if not self.handlers[xmlns][name][key]:
 				del self.handlers[xmlns][name]
 
-	def streamErrorHandler(self, conn, error):
+	def _streamErrorHandler(self, conn, error):
 		name, text = "error", error.getData()
 		for tag in error.getChildren():
 			if tag.getNamespace() == protocol.NS_XMPP_STREAMS:

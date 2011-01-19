@@ -25,8 +25,7 @@ import protocol
 DBG_ROSTER = "roster"
 
 ROSTER_EMPTY = 0x0
-ROSTER_REQUESTING = 0x1
-ROSTER_LOADED = 0x2
+ROSTER_LOADED = 0x1
 
 class Roster(plugin.PlugIn):
 	""" Defines a plenty of methods that will allow you to manage roster.
@@ -40,37 +39,37 @@ class Roster(plugin.PlugIn):
 		""" Init internal variables.
 		"""
 		plugin.PlugIn.__init__(self)
-		self.debugFlag = DBG_ROSTER
-		self.rosterData = {}
-		self.state = ROSTER_EMPTY
 		self._exportedMethods = (self.getRoster, )
+
+		self.debugFlag = DBG_ROSTER
+		self.state = ROSTER_EMPTY
+		self.rosterData = {}
 
 	def plugin(self, owner):
 		""" Register presence and subscription trackers in the owner's dispatcher.
 			Also request roster from server if the "request" argument is set.
 			Used internally.
 		"""
-		self._owner.registerHandler("iq", self.rosterIqHandler, namespace=protocol.NS_ROSTER)
-		self._owner.registerHandler("presence", self.presenceHandler)
-
-	def requestRoster(self):
-		""" Request roster from server if it were not yet requested 
-			(or if the "force" argument is set).
-		"""
-		self.state = ROSTER_REQUESTING
-		self._owner.send(protocol.Iq(protocol.TYPE_GET, protocol.NS_ROSTER))
-		self.printf("Roster requested from server", "start")
+		self._owner.registerHandler("iq", self._parseIQ, namespace=protocol.NS_ROSTER)
+		self._owner.registerHandler("presence", self._parsePresence)
 
 	def getRoster(self):
 		""" Requests roster from server if neccessary and returns self.
 		"""
 		if self.state == ROSTER_EMPTY:
-			self.requestRoster()
+			self._requestRoster()
 		while self.state != ROSTER_LOADED:
-			self._owner.process(10)
+			self._owner.process(1)
 		return self
 
-	def rosterIqHandler(self, dis, stanza):
+	def _requestRoster(self):
+		""" Request roster from server if it were not yet requested 
+			(or if the "force" argument is set).
+		"""
+		self._owner.send(protocol.Iq(protocol.TYPE_GET, protocol.NS_ROSTER))
+		self.printf("Roster requested from server", "start")
+
+	def _parseIQ(self, dis, stanza):
 		""" Subscription tracker. Used internally for setting items state 
 			in internal roster representation.
 		"""
@@ -92,7 +91,7 @@ class Roster(plugin.PlugIn):
 			self.printf("Setting roster item %s" % (jid), "ok")
 		self.state = ROSTER_LOADED
 
-	def presenceHandler(self, dis, stanza):
+	def _parsePresence(self, dis, stanza):
 		""" Presence tracker. Used internally for setting items' resources state
 			in internal roster representation.
 		"""
@@ -135,7 +134,7 @@ class Roster(plugin.PlugIn):
 			for r in resources:
 				priority = resources[r]["priority"]
 				if priority > lastPriority:
-					resource, lastpri = r, priority
+					resource, lastPriority = r, priority
 			return resources[resource][field]
 
 	def getGroups(self, jid):
@@ -189,7 +188,7 @@ class Roster(plugin.PlugIn):
 		self._owner.send(iq)
 
 	def keys(self):
-		""" Same as getItems. Provided for the sake of dictionary interface.
+		""" Provided for the sake of dictionary interface.
 		"""
 		return self.rosterData.keys()
 

@@ -26,7 +26,7 @@ import select
 import socket
 import sys
 
-if sys.hexversion >= 0x20600f0:
+if sys.hexversion >= 0x20600F0:
 	import ssl
 
 import dispatcher
@@ -38,11 +38,6 @@ from utils.utils import ustr
 BUFLEN = 1024
 
 DBG_SOCKET = "socket"
-DBG_TLS = "tls"
-
-TLS_SUCCESS = 0x1
-TLS_FAILURE = 0x2
-TLS_UNSUPPORTED = 0x3
 
 class TCPSocket(plugin.PlugIn):
 	""" This class defines direct TCP connection method.
@@ -59,13 +54,13 @@ class TCPSocket(plugin.PlugIn):
 		"""
 		import dns
 		host, port = server
-		query = "_xmpp-client._tcp.%s" % (host)
+		query = "_xmpp-client._tcp.%s:%s" % (host, port)
 
 		try:
 			dns.DiscoverNameServers()
 			response = dns.DnsRequest().req(query, qtype="SRV")
 			if response.answers:
-				port, host = response.answers[0]['data'][2:4]
+				port, host = response.answers[0]["data"][2:4]
 				port = int(port)
 				server = (host, port)
 		except dns.DNSError:
@@ -171,6 +166,12 @@ class TCPSocket(plugin.PlugIn):
 		self.printf("Closing socket", "stop")
 		self._sock.close()
 
+DBG_TLS = "tls"
+
+TLS_SUCCESS = 0x1
+TLS_FAILURE = 0x2
+TLS_UNSUPPORTED = 0x3
+
 class TLS(plugin.PlugIn):
 	""" TLS connection used to encrypts already estabilished tcp connection.
 	"""
@@ -179,16 +180,25 @@ class TLS(plugin.PlugIn):
 			If "forceSSL" is false then starts encryption as soon as TLS feature is
 			declared by the server (if it were already declared - it is ok).
 		"""
-		# Already enabled
-		if hasattr(owner, "TLS"):
-			return
-		self.debugFlag = DBG_TLS
 		plugin.PlugIn.PlugIn(self, owner)
+		self.debugFlag = DBG_TLS
+
 		self.forceSSL = forceSSL
 		if forceSSL:
 			return self._startSSL()
-		self.state = None
-		self.featuresHandler(self._owner.Dispatcher, self._owner.Dispatcher.Stream.features)
+		else:
+			self.state = None
+
+			features = self._owner.Dispatcher.Stream.features
+			if not features.getTag("starttls", namespace=protocol.NS_TLS):
+				self.state = TLS_UNSUPPORTED
+				self.printf("TLS unsupported by remote server", 'warn')
+				return
+			self.printf("TLS supported by remote server. Requesting TLS start", "ok")
+			self._owner.registerHandler("proceed", self._startTLSHandler, xmlns=protocol.NS_TLS)
+			self._owner.registerHandler("failure", self._startTLSHandler, xmlns=protocol.NS_TLS)
+
+			self._owner.Connection.send("<starttls xmlns=\"%s\"/>" % (protocol.NS_TLS))
 
 	def plugout(self):
 		""" Unregisters TLS handler's from owner's dispatcher.
@@ -196,20 +206,7 @@ class TLS(plugin.PlugIn):
 		if not self.forceSSL:
 			self._owner.unregisterHandler("proceed", self.startTLSHandler, xmlns=protocol.NS_TLS)
 			self._owner.unregisterHandler("failure", self.startTLSHandler, xmlns=protocol.NS_TLS)
-
-	def featuresHandler(self, conn, feats):
-		""" Used to analyse server <features/> tag for TLS support.
-			If TLS is supported starts the encryption negotiation. Used internally
-		"""
-		if not feats.getTag("starttls", namespace=protocol.NS_TLS):
-			self.state = TLS_UNSUPPORTED
-			self.printf("TLS unsupported by remote server", 'warn')
-			return
-		self.printf("TLS supported by remote server. Requesting TLS start", 'ok')
-		self._owner.registerHandler("proceed", self.startTLSHandler, xmlns=protocol.NS_TLS)
-		self._owner.registerHandler("failure", self.startTLSHandler, xmlns=protocol.NS_TLS)
-		self._owner.Connection.send("<starttls xmlns=\"%s\"/>" % (protocol.NS_TLS))
-
+		
 	def pending_data(self, timeout=0):
 		""" Returns true if there possible is a data ready to be read.
 		"""
@@ -217,7 +214,7 @@ class TLS(plugin.PlugIn):
 
 	def _startSSL(self):
 		tcpsock = self._owner.Connection
-		if sys.hexversion >= 0x20600f0:
+		if sys.hexversion >= 0x20600F0:
 			tcpsock._sslObj = ssl.wrap_socket(tcpsock._sock, None, None)
 		else:
 			tcpsock._sslObj = socket.ssl(tcpsock._sock, None, None)
@@ -232,7 +229,7 @@ class TLS(plugin.PlugIn):
 
 		self.state = TLS_SUCCESS
 
-	def startTLSHandler(self, conn, stanza):
+	def _startTLSHandler(self, conn, stanza):
 		""" Handle server reply if TLS is allowed to process. Behaves accordingly.
 			Used internally.
 		"""
