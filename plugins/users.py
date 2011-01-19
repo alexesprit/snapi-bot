@@ -28,14 +28,15 @@ def showWhoWas(msgType, conference, nick, param):
 		jidlist[userjid].append(usernick)
 
 	userlist = []
-	for i, data in enumerate(jidlist.values()):
+	for data in jidlist.values():
 		firstnick = data[0]
 		if len(data) == 1:
-			userlist.append(u"%d) %s" % (i + 1, firstnick))
+			userlist.append(firstnick)
 		else:
 			othernicks = data[1:]
-			userlist.append(u"%d) %s (%s)" % (i + 1, firstnick, ", ".join(othernicks)))
+			userlist.append(u"%s (%s)" % (firstnick, ", ".join(othernicks)))
 	userlist.sort()
+	userlist = [u"%d) %s" % (i + 1, data) for i, data in enumerate(userlist)]
 
 	sendMsg(msgType, conference, nick, 
 		u"Я видела здесь %d участников:\n%s" % (len(userlist), "\n".join(userlist)))
