@@ -54,18 +54,16 @@ class TCPSocket(plugin.PlugIn):
 		"""
 		import dns
 		host, port = server
-		query = "_xmpp-client._tcp.%s:%s" % (host, port)
+		query = "_xmpp-client._tcp.%s" % host
 
 		try:
 			dns.DiscoverNameServers()
 			response = dns.DnsRequest().req(query, qtype="SRV")
 			if response.answers:
-				port, host = response.answers[0]["data"][2:4]
-				port = int(port)
-				server = (host, port)
+				host = response.answers[0]["data"][3]
 		except dns.DNSError:
 			pass
-		return server
+		return host, port
 
 	def plugin(self, owner):
 		""" Fire up connection. Return non-empty string on success.
