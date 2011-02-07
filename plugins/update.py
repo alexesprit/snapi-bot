@@ -20,9 +20,7 @@ def updateWorkingCopy(msgType, conference, nick, param):
 		newRev = os.popen("svnversion -n").read()
 		if currentRev != newRev:
 			sendMsg(msgType, conference, nick, u"Обновлено до редакции %s" % (newRev))
-			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-			prs.setStatus(u"Выключаюсь... (Обновление)")
-			gClient.send(prs)
+			sendOfflineStatus(u"Выключаюсь... (Обновление)")
 			shutdown(True)
 		else:
 			sendMsg(msgType, conference, nick, u"Ваша копия не требует обновления")

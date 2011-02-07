@@ -400,6 +400,11 @@ def getPresenceNode(show, status, priority):
 def setStatus(show, status, priority):
 	gClient.send(getPresenceNode(show, status, priority))
 
+def sendOfflinePresence(message):
+	prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
+	prs.setStatus(message)
+	gClient.send(prs)
+
 def sendTo(msgType, jid, text):
 	message = protocol.Message(jid)
 	message.setType(msgType)
@@ -669,7 +674,7 @@ def parseIQ(session, stanza):
 def addTextToSysLog(text, logtype, show=False):
 	path = getFilePath(SYSLOG_DIR, time.strftime(LOG_TYPES[logtype]))
 	if isinstance(text, unicode):
-		text = text.encode("utf-8") 
+		text = text.encode("utf-8")
 	utils.writeFile(path, text + "\n", "a")
 	if LOG_ERRORS == logtype:
 		gInfo["err"] += 1
@@ -782,9 +787,7 @@ def main():
 			gClient.process(10)
 	except KeyboardInterrupt:
 		if gClient.isConnected():
-			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-			prs.setStatus(u"Выключаюсь... (CTRL+C)")
-			gClient.send(prs)
+			sendOfflinePresence(u"Выключаюсь... (CTRL+C)")
 		shutdown()
 	except protocol.SystemShutdown:
 		printf("%s has been switched off" % (gConfig.SERVER), FLAG_WARNING)
@@ -796,9 +799,7 @@ def main():
 		printf("Exception in main thread", FLAG_ERROR)
 		addTextToSysLog(traceback.format_exc(), LOG_CRASHES)
 		if gClient.isConnected():
-			prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-			prs.setStatus(u"Что-то сломано...")
-			gClient.send(prs)
+			sendOfflinePresence(u"Что-то сломано...")
 		shutdown(gConfig.RESTART_IF_ERROR)
 
 if __name__ == "__main__":
