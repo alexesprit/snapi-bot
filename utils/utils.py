@@ -72,7 +72,7 @@ def ustr(text):
 	return text
 
 def readFile(path, default=None, encoding=None):
-	if isinstance(path, unicode):
+	if not os.path.supports_unicode_filenames:
 		path = path.encode("utf-8")
 	if os.path.exists(path):
 		f = file(path)
@@ -90,7 +90,7 @@ def readFile(path, default=None, encoding=None):
 
 def writeFile(path, data, mode="w"):
 	with smph:
-		if isinstance(path, unicode):
+		if not os.path.supports_unicode_filenames:
 			path = path.encode("utf-8")
 		f = file(path, mode)
 		f.write(data)
