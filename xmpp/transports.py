@@ -202,8 +202,8 @@ class TLS(plugin.PlugIn):
 		""" Unregisters TLS handler's from owner's dispatcher.
 		"""
 		if not self.forceSSL:
-			self._owner.unregisterHandler("proceed", self.startTLSHandler, xmlns=protocol.NS_TLS)
-			self._owner.unregisterHandler("failure", self.startTLSHandler, xmlns=protocol.NS_TLS)
+			self._owner.unregisterHandler("proceed", self._startTLSHandler, xmlns=protocol.NS_TLS)
+			self._owner.unregisterHandler("failure", self._startTLSHandler, xmlns=protocol.NS_TLS)
 		
 	def pending_data(self, timeout=0):
 		""" Returns true if there possible is a data ready to be read.
