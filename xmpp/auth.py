@@ -78,7 +78,7 @@ class SASL(plugin.PlugIn):
 		elif "DIGEST-MD5" in mecs:
 			node = protocol.Node("auth", attrs={"xmlns": protocol.NS_SASL, "mechanism": "DIGEST-MD5"})
 		elif "PLAIN" in mecs:
-			saslData = "%s@%s\x00%s\x00%s" % (self.username, self._owner.Server, self.username, self.password)
+			saslData = "%s@%s\x00%s\x00%s" % (self.username, self._owner.server, self.username, self.password)
 			node = protocol.Node("auth", attrs={"xmlns": protocol.NS_SASL, "mechanism": "PLAIN"}, \
 						payload=[base64.encodestring(saslData).replace("\r", "").replace("\n", "")])
 		else:
