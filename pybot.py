@@ -545,11 +545,11 @@ def parsePresence(session, stanza):
 	gInfo["prs"] += 1
 	fulljid = stanza.getFrom()
 	jid = fulljid.getBareJID()
+	prsType = stanza.getType()
 	if jid in gConferences:
 		conference = jid
 		truejid = stanza.getJID()
 		nick = fulljid.getResource()
-		prsType = stanza.getType()
 		if truejid:
 			truejid = protocol.UserJID(truejid).getBareJID()
 		if not prsType:
@@ -612,6 +612,23 @@ def parsePresence(session, stanza):
 				addTextToSysLog(u"Got error in %s (%s)" % (conference, errorCode), LOG_WARNINGS, True)
 		callEventHandlers(EVT_PRS | H_CONFERENCE, MODE_ASYNC, stanza, conference, nick, truejid)
 	else:
+		if protocol.PRS_SUBSCRIBE == prsType:
+			printf(u"%s has added me into his/her roster" % (jid))
+
+			roster = gClient.getRoster()
+			roster.authorize(jid)
+			roster.subscribe(jid)
+		elif protocol.PRS_UNSUBSCRIBE == prsType:
+			printf(u"%s has removed me into his/her roster" % (jid))
+
+			roster = gClient.getRoster()
+			roster.unauthorize(jid)
+			roster.delItem(jid)
+		elif protocol.PRS_SUBSCRIBED == prsType:
+			printf(u"I've added %s into my roster" % (jid), FLAG_SUCCESS)
+		elif protocol.PRS_UNSUBSCRIBED == prsType:
+			printf(u"I've removed %s from my roster" % (jid), FLAG_SUCCESS)
+
 		resource = fulljid.getResource()
 		callEventHandlers(EVT_PRS | H_ROSTER, MODE_ASYNC, stanza, jid, resource)
 
