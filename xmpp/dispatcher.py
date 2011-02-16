@@ -53,7 +53,7 @@ class Dispatcher(plugin.PlugIn):
 		self.handlers = {}
 		self._expected = {}
 
-	def plugin(self, owner):
+	def plugin(self):
 		""" Plug the Dispatcher instance into Client class instance and send 
 			initial stream header. Used internally.
 		"""
@@ -67,7 +67,8 @@ class Dispatcher(plugin.PlugIn):
 		self.registerStanza("iq", protocol.Iq)
 		self.registerStanza("presence", protocol.Presence)
 		self.registerStanza("message", protocol.Message)
-		self.registerHandler("error", self._streamErrorHandler, xmlns=protocol.NS_STREAMS)
+
+		self.registerHandler("error", self._parseStreamError, xmlns=protocol.NS_STREAMS)
 
 		self._initStream()
 
@@ -192,7 +193,7 @@ class Dispatcher(plugin.PlugIn):
 			if not self.handlers[xmlns][name][key]:
 				del self.handlers[xmlns][name]
 
-	def _streamErrorHandler(self, conn, error):
+	def _parseStreamError(self, error):
 		name, text = "error", error.getData()
 		for tag in error.getChildren():
 			if tag.getNamespace() == protocol.NS_XMPP_STREAMS:
@@ -264,7 +265,7 @@ class Dispatcher(plugin.PlugIn):
 				chain = chain + self.handlers[xmlns][name][key]
 		for handler in chain:
 			try:
-				handler(session, stanza)
+				handler(stanza)
 			except protocol.NodeProcessed:
 				return
 

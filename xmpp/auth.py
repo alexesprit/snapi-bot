@@ -52,10 +52,24 @@ class SASL(plugin.PlugIn):
 	"""
 	def __init__(self, username, password):
 		plugin.PlugIn.__init__(self)
+
+		self.debugFlag = DBG_AUTH
 		self.username = username
 		self.password = password
-		self.debugFlag = DBG_AUTH
 		self.state = None
+
+	def plugin(self):
+		self._owner.registerHandler("challenge", self._parseAuthStanza, xmlns=protocol.NS_SASL)
+		self._owner.registerHandler("failure", self._parseAuthStanza, xmlns=protocol.NS_SASL)
+		self._owner.registerHandler("success", self._parseAuthStanza, xmlns=protocol.NS_SASL)
+
+	def plugout(self):
+		""" Remove SASL handlers from owner's dispatcher.
+			Used internally.
+		"""
+		self._owner.unregisterHandler("challenge", self._parseAuthStanza, xmlns=protocol.NS_SASL)
+		self._owner.unregisterHandler("failure", self._parseAuthStanza, xmlns=protocol.NS_SASL)
+		self._owner.unregisterHandler("success", self._parseAuthStanza, xmlns=protocol.NS_SASL)
 
 	def auth(self):
 		""" Start authentication. Result can be obtained via "SASL.state" attribute and will be
@@ -70,9 +84,6 @@ class SASL(plugin.PlugIn):
 		mecs = []
 		for mec in features.getTag("mechanisms", namespace=protocol.NS_SASL).getTags("mechanism"):
 			mecs.append(mec.getData())
-		self._owner.registerHandler("challenge", self.SASLHandler, xmlns=protocol.NS_SASL)
-		self._owner.registerHandler("failure", self.SASLHandler, xmlns=protocol.NS_SASL)
-		self._owner.registerHandler("success", self.SASLHandler, xmlns=protocol.NS_SASL)
 		if "ANONYMOUS" in mecs and self.username is None:
 			node = protocol.Node("auth", attrs={"xmlns": protocol.NS_SASL, "mechanism": "ANONYMOUS"})
 		elif "DIGEST-MD5" in mecs:
@@ -88,39 +99,31 @@ class SASL(plugin.PlugIn):
 		self.state = AUTH_WAITING
 		self._owner.send(node.__str__())
 
-	def plugout(self):
-		""" Remove SASL handlers from owner's dispatcher.
-			Used internally.
-		"""
-		self._owner.unregisterHandler("challenge", self.SASLHandler, xmlns=protocol.NS_SASL)
-		self._owner.unregisterHandler("failure", self.SASLHandler, xmlns=protocol.NS_SASL)
-		self._owner.unregisterHandler("success", self.SASLHandler, xmlns=protocol.NS_SASL)
-
-	def SASLHandler(self, conn, challenge):
+	def _parseAuthStanza(self, stanza):
 		""" Perform next SASL auth step. Used internally.
 		"""
-		if challenge.getNamespace() != protocol.NS_SASL:
+		if stanza.getNamespace() != protocol.NS_SASL:
 			return
-		if challenge.getName() == "failure":
+		if stanza.getName() == "failure":
 			self.state = AUTH_FAILURE
-			children = challenge.getChildren()
+			children = stanza.getChildren()
 			if children:
 				reason = children[0]
 			else:
-				reason = challenge
+				reason = stanza
 			self.printf("Failed SASL authentification: %s" % (reason), "error")
 			raise protocol.NodeProcessed
-		elif challenge.getName() == "success":
+		elif stanza.getName() == "success":
 			self.state = AUTH_SUCCESS
 			self.printf("Successfully authenticated with remote server", "ok")
 			handlers = self._owner.Dispatcher.dumpHandlers()
-			self._owner.Dispatcher.PlugOut()
-			dispatcher.Dispatcher().PlugIn(self._owner)
+			self._owner.Dispatcher.plugOut()
+			dispatcher.Dispatcher().plugIn(self._owner)
 			self._owner.Dispatcher.restoreHandlers(handlers)
 			self._owner._user = self.username
 			raise protocol.NodeProcessed
 
-		incoming_data = challenge.getData()
+		incoming_data = stanza.getData()
 		chal = {}
 		data = base64.decodestring(incoming_data)
 		self.printf("Got challenge: %s" % (data), "ok")
@@ -169,18 +172,16 @@ class Bind(plugin.PlugIn):
 		plugin.PlugIn.__init__(self)
 		self.debugFlag = DBG_BIND
 		self.bound = BIND_WAITING
-
-	def plugin(self, owner):
-		""" Start resource binding, if allowed at this time. Used internally.
-		"""
-		self._owner.registerHandler("features", self.featuresHandler, xmlns=protocol.NS_STREAMS)
+	
+	def plugin(self):
+		self._owner.registerHandler("features", self._parseFeatures, xmlns=protocol.NS_STREAMS)
 
 	def plugout(self):
 		""" Remove Bind handler from owner's dispatcher. Used internally.
 		"""
-		self._owner.unregisterHandler("features", self.featuresHandler, xmlns=protocol.NS_STREAMS)
+		self._owner.unregisterHandler("features", self._parseFeatures, xmlns=protocol.NS_STREAMS)
 
-	def featuresHandler(self, session, features):
+	def _parseFeatures(self, features):
 		""" Determine if server supports resource binding and set some internal attributes accordingly.
 		"""
 		if not features.getTag("bind", namespace=protocol.NS_BIND):

@@ -65,7 +65,7 @@ class TCPSocket(plugin.PlugIn):
 			pass
 		return host, port
 
-	def plugin(self, owner):
+	def plugin(self):
 		""" Fire up connection. Return non-empty string on success.
 			Also registers self.disconnected method in the owner's dispatcher.
 			Called internally.
@@ -173,13 +173,16 @@ TLS_UNSUPPORTED = 0x3
 class TLS(plugin.PlugIn):
 	""" TLS connection used to encrypts already estabilished tcp connection.
 	"""
-	def PlugIn(self, owner, forceSSL=False):
+	def __init__(self):
+		plugin.PlugIn.__init__(self)
+		self.debugFlag = DBG_TLS
+
+	def plugIn(self, owner, forceSSL=False):
 		""" If the "forceSSL" argument is true then starts using encryption immidiatedly.
 			If "forceSSL" is false then starts encryption as soon as TLS feature is
 			declared by the server (if it were already declared - it is ok).
 		"""
-		plugin.PlugIn.PlugIn(self, owner)
-		self.debugFlag = DBG_TLS
+		plugin.PlugIn.plugIn(self, owner)
 
 		self.forceSSL = forceSSL
 		if forceSSL:
@@ -193,8 +196,8 @@ class TLS(plugin.PlugIn):
 				self.printf("TLS unsupported by remote server", 'warn')
 				return
 			self.printf("TLS supported by remote server. Requesting TLS start", "ok")
-			self._owner.registerHandler("proceed", self._startTLSHandler, xmlns=protocol.NS_TLS)
-			self._owner.registerHandler("failure", self._startTLSHandler, xmlns=protocol.NS_TLS)
+			self._owner.registerHandler("proceed", self._parseTLSStanza, xmlns=protocol.NS_TLS)
+			self._owner.registerHandler("failure", self._parseTLSStanza, xmlns=protocol.NS_TLS)
 
 			self._owner.Connection.send("<starttls xmlns=\"%s\"/>" % (protocol.NS_TLS))
 
@@ -202,8 +205,8 @@ class TLS(plugin.PlugIn):
 		""" Unregisters TLS handler's from owner's dispatcher.
 		"""
 		if not self.forceSSL:
-			self._owner.unregisterHandler("proceed", self._startTLSHandler, xmlns=protocol.NS_TLS)
-			self._owner.unregisterHandler("failure", self._startTLSHandler, xmlns=protocol.NS_TLS)
+			self._owner.unregisterHandler("proceed", self._parseTLSStanza, xmlns=protocol.NS_TLS)
+			self._owner.unregisterHandler("failure", self._parseTLSStanza, xmlns=protocol.NS_TLS)
 		
 	def pending_data(self, timeout=0):
 		""" Returns true if there possible is a data ready to be read.
@@ -227,7 +230,7 @@ class TLS(plugin.PlugIn):
 
 		self.state = TLS_SUCCESS
 
-	def _startTLSHandler(self, conn, stanza):
+	def _parseTLSStanza(self, stanza):
 		""" Handle server reply if TLS is allowed to process. Behaves accordingly.
 			Used internally.
 		"""
@@ -235,8 +238,8 @@ class TLS(plugin.PlugIn):
 			self.state = TLS_SUCCESS
 			self.printf("Got starttls proceed response. Switching to TLS...", "ok")
 			self._startSSL()
-			self._owner.Dispatcher.PlugOut()
-			dispatcher.Dispatcher().PlugIn(self._owner)
+			self._owner.Dispatcher.plugOut()
+			dispatcher.Dispatcher().plugIn(self._owner)
 		else:
 			self.state = TLS_FAILURE
 			self.printf("Got starttls response: %s" % (self.state), "error")

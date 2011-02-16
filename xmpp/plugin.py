@@ -19,7 +19,7 @@ class PlugIn:
 		self._exportedMethods = []
 		self.debugFlag = self.__class__.__name__.lower()
 
-	def PlugIn(self, owner):
+	def plugIn(self, owner):
 		""" Attach to main instance and register ourself and all our staff in it.
 		"""
 		self._owner = owner
@@ -36,11 +36,11 @@ class PlugIn:
 				setattr(owner, methodName, method)
 			setattr(owner, className, self)
 			if hasattr(self, "plugin"):
-				return self.plugin(owner)
+				return self.plugin()
 		else:
 			self.printf("Another %s is already plugged" % (self), "error")
  
-	def PlugOut(self):
+	def plugOut(self):
 		""" Unregister all our staff from main instance and detach from it.
 		"""
 		self.printf("Plugging %s out of %s" % (self, self._owner), "stop")

@@ -108,21 +108,21 @@ class Client:
 			Returns None or "TCP", "SSL" "TLS", depending on the result.
 		"""
 		sock = transports.TCPSocket(useResolver)
-		connectType = sock.PlugIn(self)
+		connectType = sock.plugIn(self)
 		if not connectType: 
-			sock.PlugOut()
+			sock.plugOut()
 			return None
 		self.connectType = C_TCP
 		isSSLPort = self.port in (5223, 443)
 		if (secureMode == SECURE_AUTO and isSSLPort) or secureMode == SECURE_FORCE:
 			# FIXME. This should be done in transports.py
 			try:
-				transports.TLS().PlugIn(self, forceSSL=True)
+				transports.TLS().plugIn(self, forceSSL=True)
 				self.connectType = C_SSL
 			except socket.sslerror:
 				self.TLS.PlugOut()
 				return None
-		dispatcher.Dispatcher().PlugIn(self)
+		dispatcher.Dispatcher().plugIn(self)
 		while self.Dispatcher.stream._document_attrs is None:
 			if not self.process(1):
 				return None
@@ -133,14 +133,14 @@ class Client:
 		if secureMode == SECURE_AUTO and not isSSLPort:
 			# If we get version 1.0 stream the features tag MUST BE presented
 			if self.Dispatcher.stream._document_attrs.get("version") == "1.0":
-				transports.TLS().PlugIn(self)
+				transports.TLS().plugIn(self)
 				if transports.TLS_UNSUPPORTED == self.TLS.state:
 					self.TLS.PlugOut()
 					return self.connectType
 				while not self.TLS.state and self.process(1):
 					pass
 				if self.TLS.state != transports.TLS_SUCCESS:
-					self.TLS.PlugOut()
+					self.TLS.plugOut()
 					return None
 				self.connectType = C_TLS
 		return self.connectType
@@ -156,18 +156,18 @@ class Client:
 		if self.Dispatcher.stream._document_attrs.get("version") == "1.0":
 			while not self.Dispatcher.stream.features and self.process(1):
 				pass
-		auth.SASL(username, password).PlugIn(self)
+		auth.SASL(username, password).plugIn(self)
 		self.SASL.auth()
 		while auth.AUTH_WAITING == self.SASL.state and self.process(1):
 			pass
 		if auth.AUTH_SUCCESS == self.SASL.state:
-			self.SASL.PlugOut()
-			auth.Bind().PlugIn(self)
+			self.SASL.plugOut()
+			auth.Bind().plugIn(self)
 			if auth.BIND_SUCCESS == self.Bind.bind(resource):
-				self.Bind.PlugOut()
+				self.Bind.plugOut()
 				return True
 			else:
-				self.Bind.PlugOut()
+				self.Bind.plugOut()
 				return False				
 		else:
 			self.SASL.PlugOut()
@@ -178,7 +178,7 @@ class Client:
 			requesting roster from server if needed.
 		"""
 		if not hasattr(self, "Roster"):
-			roster.Roster().PlugIn(self)
+			roster.Roster().plugIn(self)
 		return self.Roster.getRoster()
 
 	def setStatus(self, show, status, priority):

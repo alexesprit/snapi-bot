@@ -434,7 +434,7 @@ def sendMsg(msgType, conference, nick, text, force=False):
 		jid = u"%s/%s" % (conference, nick)
 	sendTo(msgType, jid, text)
 
-def parseMessage(session, stanza):
+def parseMessage(stanza):
 	gInfo["msg"] += 1
 	msgType = stanza.getType()
 	if stanza.getTimestamp() or msgType in FORBIDDEN_TYPES:
@@ -541,7 +541,7 @@ def parseMessage(session, stanza):
 		else:
 			sendMsg(msgType, barejid, resource, u"Недостаточно прав")
 
-def parsePresence(session, stanza):
+def parsePresence(stanza):
 	gInfo["prs"] += 1
 	fulljid = stanza.getFrom()
 	jid = fulljid.getBareJID()
@@ -632,7 +632,7 @@ def parsePresence(session, stanza):
 		resource = fulljid.getResource()
 		callEventHandlers(EVT_PRS | H_ROSTER, MODE_ASYNC, stanza, jid, resource)
 
-def parseIQ(session, stanza):
+def parseIQ(stanza):
 	gInfo["iq"] += 1
 	fulljid = stanza.getFrom()
 	# fix for prosody servers

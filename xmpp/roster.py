@@ -45,7 +45,7 @@ class Roster(plugin.PlugIn):
 		self.state = ROSTER_EMPTY
 		self.rosterData = {}
 
-	def plugin(self, owner):
+	def plugin(self):
 		""" Register presence and subscription trackers in the owner's dispatcher.
 			Also request roster from server if the "request" argument is set.
 			Used internally.
@@ -69,7 +69,7 @@ class Roster(plugin.PlugIn):
 		self._owner.send(protocol.Iq(protocol.TYPE_GET, protocol.NS_ROSTER))
 		self.printf("Roster requested from server", "start")
 
-	def _parseIQ(self, dis, stanza):
+	def _parseIQ(self, stanza):
 		""" Subscription tracker. Used internally for setting items state 
 			in internal roster representation.
 		"""
@@ -91,7 +91,7 @@ class Roster(plugin.PlugIn):
 			self.printf("Setting roster item %s" % (jid), "ok")
 		self.state = ROSTER_LOADED
 
-	def _parsePresence(self, dis, stanza):
+	def _parsePresence(self, stanza):
 		""" Presence tracker. Used internally for setting items' resources state
 			in internal roster representation.
 		"""
