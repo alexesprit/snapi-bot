@@ -184,6 +184,7 @@ def showQuizHint(msgType, conference, nick, param):
 			gQuizIdleCount[conference] = 0
 			resetQuizTimer(conference)
 		else:
+			gQuizEnabled[conference] = False
 			askQuizQuestion(conference, answer)
 
 def showQuizScores(msgType, conference, nick, param):
