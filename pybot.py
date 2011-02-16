@@ -753,8 +753,8 @@ def main():
 		loadPlugins()
 	
 		printf("Connecting...")
-		if gClient.connect(secureMode=gConfig.SECURE, useResolver=gConfig.USE_RESOLVER):
-			printf("Connection established (%s)" % gClient.connectType, FLAG_SUCCESS)
+		if gClient.connect(gConfig.SECURE, gConfig.USE_RESOLVER):
+			printf("Connection established (%s)" % gClient.getConnectType(), FLAG_SUCCESS)
 		else:
 			printf("Unable to connect", FLAG_ERROR)
 			if gConfig.RESTART_IF_ERROR:

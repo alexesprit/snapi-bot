@@ -187,7 +187,7 @@ class TLS(plugin.PlugIn):
 		else:
 			self.state = None
 
-			features = self._owner.Dispatcher.Stream.features
+			features = self._owner.Dispatcher.stream.features
 			if not features.getTag("starttls", namespace=protocol.NS_TLS):
 				self.state = TLS_UNSUPPORTED
 				self.printf("TLS unsupported by remote server", 'warn')

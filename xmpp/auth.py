@@ -62,7 +62,7 @@ class SASL(plugin.PlugIn):
 			either "success" or "failure". Note that successfull auth will take at least
 			two Dispatcher.process() calls.
 		"""
-		features = self._owner.Dispatcher.Stream.features
+		features = self._owner.Dispatcher.stream.features
 		if not features.getTag("mechanisms", namespace=protocol.NS_SASL):
 			self.state = AUTH_FAILURE
 			self.printf("SASL not supported by server", "error")

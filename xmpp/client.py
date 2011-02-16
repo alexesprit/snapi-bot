@@ -12,13 +12,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# $Id: client.py, v 1.61 2009/04/07 06:19:42 snakeru Exp $
 
 """
-	Provides PlugIn class functionality to develop extentions for xmpppy.
-	Also provides Client class implementations as the
-	examples of xmpppy structures usage.
-	These classes can be used for simple applications "AS IS" though.
+	Provides Client class implementations as the examples of xmpppy 
+	structures usage.
 """
 
 import socket
@@ -38,8 +35,7 @@ C_TCP = "TCP"
 C_TLS = "TLS"
 C_SSL = "SSL"
 
-class CommonClient:
-	""" Base for Client class."""
+class Client:
 	def __init__(self, server, port=5222, debugFlags=None):
 		""" Caches server name and (optionally) port to connect to. "debugFlags" parameter specifies
 			the debug IDs that will go into debug output. You can either specifiy an "include"
@@ -56,9 +52,9 @@ class CommonClient:
 
 		if not debugFlags:
 			debugFlags = []	
-		self.initDebugger(debugFlags)
+		self._initDebugger(debugFlags)
 	
-	def initDebugger(self, debugFlags):
+	def _initDebugger(self, debugFlags):
 		self._debug = debug.Debug(debugFlags, showFlags=False)
 		self.printf = self._debug.show
 		self.debugFlags = self._debug.debugFlags
@@ -95,20 +91,21 @@ class CommonClient:
 		self.connectType = None
 		for instance in self.disconnectHandlers:
 			instance()
-		if hasattr(self, "TLS"):
-			self.TLS.PlugOut()
 
-	def getConnectType():
-		return self.connnection
+	def getConnectType(self):
+		return self.connectType
 
 	def isConnected(self):
-		""" Returns "true" if connection state is not "None".
+		""" Returns "True" if connection state is not "None".
 		"""
 		return self.connectType != None
 
 	def connect(self, secureMode=SECURE_DISABLE, useResolver=True):
-		""" Make a TCP/IP connection, protect it with TLS/SSL if possible and start XMPP stream.
-			Returns None, "TCP", "TLS" or "SSL", depending on the result.
+		""" Connect to jabber server. If you want TLS/SSL support to be discovered and enable automatically, 
+			set third argument as SECURE_AUTO (SSL will be autodetected only if port is 5223 or 443)
+			If you want to force SSL start (i.e. if port 5223 or 443 is remapped to some non-standard port) then set it to SECURE_FORCE.
+			If you want to disable TLS/SSL support completely, set it to SECURE_DISABLE.
+			Returns None or "TCP", "SSL" "TLS", depending on the result.
 		"""
 		sock = transports.TCPSocket(useResolver)
 		connectType = sock.PlugIn(self)
@@ -116,7 +113,8 @@ class CommonClient:
 			sock.PlugOut()
 			return None
 		self.connectType = C_TCP
-		if (secureMode == SECURE_AUTO and self.port in (5223, 443)) or secureMode == SECURE_FORCE:
+		isSSLPort = self.port in (5223, 443)
+		if (secureMode == SECURE_AUTO and isSSLPort) or secureMode == SECURE_FORCE:
 			# FIXME. This should be done in transports.py
 			try:
 				transports.TLS().PlugIn(self, forceSSL=True)
@@ -125,54 +123,38 @@ class CommonClient:
 				self.TLS.PlugOut()
 				return None
 		dispatcher.Dispatcher().PlugIn(self)
-		while self.Dispatcher.Stream._document_attrs is None:
+		while self.Dispatcher.stream._document_attrs is None:
 			if not self.process(1):
 				return None
 		# If we get version 1.0 stream the features tag MUST BE presented
-		if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
-			while not self.Dispatcher.Stream.features and self.process(1):
-				pass	  
-		return self.connectType
-
-class Client(CommonClient):
-	""" Example client class, based on CommonClient. """
-	def connect(self, secureMode=SECURE_DISABLE, useResolver=True):
-		""" Connect to jabber server. If you want TLS/SSL support to be discovered and enable automatically, 
-			set third argument as SECURE_AUTO (SSL will be autodetected only if port is 5223 or 443)
-			If you want to force SSL start (i.e. if port 5223 or 443 is remapped to some non-standard port) then set it to SECURE_FORCE.
-			If you want to disable TLS/SSL support completely, set it to SECURE_DISABLE.
-			Returns None or "TCP", "SSL" "TLS", depending on the result.
-		"""
-		if CommonClient.connect(self, secureMode, useResolver):
-			if self.connectType != C_SSL and secureMode == SECURE_AUTO:
+		if self.Dispatcher.stream._document_attrs.get("version") == "1.0":
+			while not self.Dispatcher.stream.features and self.process(1):
+				pass
+		if secureMode == SECURE_AUTO and not isSSLPort:
+			# If we get version 1.0 stream the features tag MUST BE presented
+			if self.Dispatcher.stream._document_attrs.get("version") == "1.0":
 				transports.TLS().PlugIn(self)
-				if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
-					# If we get version 1.0 stream the features tag MUST BE presented
-					while not self.Dispatcher.Stream.features and self.process(1):
-						pass
-					if transports.TLS_UNSUPPORTED == self.TLS.state:
-						self.TLS.PlugOut()
-						return self.connectType
-					while not self.TLS.state and self.process(1):
-						pass
-					if self.TLS.state != transports.TLS_SUCCESS:
-						self.TLS.PlugOut()
-						return None
-					self.connectType = C_TLS
-			return self.connectType
-		else:
-			return None
+				if transports.TLS_UNSUPPORTED == self.TLS.state:
+					self.TLS.PlugOut()
+					return self.connectType
+				while not self.TLS.state and self.process(1):
+					pass
+				if self.TLS.state != transports.TLS_SUCCESS:
+					self.TLS.PlugOut()
+					return None
+				self.connectType = C_TLS
+		return self.connectType
 
 	def auth(self, username, password, resource=None):
 		""" Authenticate connnection and bind resource. If resource is not provided
 			random one or library name used.
 		"""
 		self.username, self.password, self.resource = username, password, resource
-		while not self.Dispatcher.Stream._document_attrs and self.process(1):
+		while not self.Dispatcher.stream._document_attrs and self.process(1):
 			pass
 		# If we get version 1.0 stream the features tag MUST BE presented
-		if self.Dispatcher.Stream._document_attrs.get("version") == "1.0":
-			while not self.Dispatcher.Stream.features and self.process(1):
+		if self.Dispatcher.stream._document_attrs.get("version") == "1.0":
+			while not self.Dispatcher.stream.features and self.process(1):
 				pass
 		auth.SASL(username, password).PlugIn(self)
 		self.SASL.auth()

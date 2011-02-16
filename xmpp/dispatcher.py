@@ -74,9 +74,9 @@ class Dispatcher(plugin.PlugIn):
 	def plugout(self):
 		""" Prepares instance to be destructed.
 		"""
-		self.Stream.dispatch = None
-		self.Stream.features = None
-		self.Stream.destroy()
+		self.stream.dispatch = None
+		self.stream.features = None
+		self.stream.destroy()
 
 	def dumpHandlers(self):
 		""" Return set of user-registered callbacks in it's internal format.
@@ -93,11 +93,12 @@ class Dispatcher(plugin.PlugIn):
 	def _initStream(self):
 		""" Send an initial stream header.
 		"""
-		self.Stream = simplexml.NodeBuilder()
-		self.Stream._dispatch_depth = 2
-		self.Stream.dispatch = self.dispatch
-		self.Stream.stream_header_received = self._checkStreamStart
-		self.Stream.features = None
+		self.stream = simplexml.NodeBuilder()
+		self.stream._dispatch_depth = 2
+		self.stream.dispatch = self.dispatch
+		self.stream.stream_header_received = self._checkStreamStart
+		self.stream.features = None
+
 		metastream = protocol.Node("stream:stream")
 		metastream.setNamespace(self._owner.namespace)
 		metastream.setAttr("version", "1.0")
@@ -123,7 +124,7 @@ class Dispatcher(plugin.PlugIn):
 				data = self._owner.Connection.receive()
 			except IOError:
 				return
-			self.Stream.Parse(data)
+			self.stream.parse(data)
 			if data:
 				return len(data)
 		# It means that nothing is received but link is alive.
@@ -211,10 +212,10 @@ class Dispatcher(plugin.PlugIn):
 		"""
 		if not session:
 			session = self
-		session.Stream._mini_dom = None
+		session.stream._mini_dom = None
 		name = stanza.getName()
 		if name == "features":
-			session.Stream.features = stanza
+			session.stream.features = stanza
 
 		xmlns = stanza.getNamespace()
 		if xmlns not in self.handlers:

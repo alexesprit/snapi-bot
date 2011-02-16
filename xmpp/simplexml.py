@@ -374,7 +374,7 @@ class NodeBuilder:
 		self._parser.CharacterDataHandler = self.handle_cdata
 		self._parser.StartNamespaceDeclHandler = self.handle_namespace_start
 		self._parser.buffer_text = True
-		self.Parse = self._parser.Parse
+		self.parse = self._parser.Parse
 
 		self.__depth = 0
 		self.__last_depth = 0
