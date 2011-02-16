@@ -635,6 +635,9 @@ def parsePresence(session, stanza):
 def parseIQ(session, stanza):
 	gInfo["iq"] += 1
 	fulljid = stanza.getFrom()
+	# fix for prosody servers
+	if not fulljid:
+		return
 	barejid = fulljid.getBareJID()
 	resource = fulljid.getResource()
 	isConference = barejid in gConferences
