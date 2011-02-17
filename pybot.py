@@ -736,9 +736,11 @@ def shutdown(restart=False):
 		time.sleep(RESTART_DELAY)
 		os.execl(sys.executable, sys.executable, sys.argv[0])
 	else:
-		printf("Terminating...", FLAG_SUCCESS)
 		global IS_RUNNING
 		IS_RUNNING = False
+
+		printf("Terminating...", FLAG_SUCCESS)
+		sys.exit()
 
 def main():
 	currentDir = os.path.dirname(sys.argv[0])
@@ -823,4 +825,4 @@ def main():
 		shutdown(gConfig.RESTART_IF_ERROR)
 
 if __name__ == "__main__":
-	sys.exit(main())
+	main()

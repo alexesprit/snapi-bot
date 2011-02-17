@@ -170,7 +170,7 @@ class Client:
 				self.Bind.plugOut()
 				return False				
 		else:
-			self.SASL.PlugOut()
+			self.SASL.plugOut()
 			return False
 
 	def getRoster(self):
