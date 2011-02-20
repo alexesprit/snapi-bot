@@ -30,8 +30,7 @@ def getUniqueID(text):
 	gStanzaID += 1
 	return "%s_%d" % (text, gStanzaID)
 
-def getConferences():
-	return gConferences.keys()
+getConferences = gConferences.keys
 
 def getMUCSetRoleStanza(conference, user, role, reason=None):
 	iq = protocol.Iq(protocol.TYPE_SET)
@@ -127,7 +126,7 @@ def getURL(url, param=None, data=None, headers=None):
 	try:
 		return urllib2.urlopen(request)
 	except IOError, e:
-		addTextToSysLog(u"Unable to open %s (%s)" % (url, e), LOG_WARNINGS, True)
+		printf(u"Unable to open %s (%s)" % (url, e), FLAG_WARNING)
 	return None
 
 def decode(text, encoding=None):

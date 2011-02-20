@@ -20,6 +20,7 @@
 
 from __future__ import with_statement
 
+import gc
 import os
 import random
 import re
@@ -53,7 +54,6 @@ CONFIG_FILE = "config.txt"
 CONF_FILE = "conferences.txt"
 LOG_ERRORS_FILE = "%Y.%m.%d_errors.txt"
 LOG_CRASHES_FILE = "%Y.%m.%d_crashes.txt"
-LOG_WARNINGS_FILE = "%Y.%m.%d_warnings.txt"
 
 FLAG_INFO = "info"
 FLAG_ERROR = "error"
@@ -87,12 +87,10 @@ NICK_JOINED = "joined"
 
 LOG_ERRORS = 0x1
 LOG_CRASHES = 0x2
-LOG_WARNINGS = 0x3
 
 LOG_TYPES = {
 	LOG_CRASHES: LOG_CRASHES_FILE, 
-	LOG_ERRORS: LOG_ERRORS_FILE, 
-	LOG_WARNINGS: LOG_WARNINGS_FILE
+	LOG_ERRORS: LOG_ERRORS_FILE
 }
 
 ROLES = {
@@ -135,6 +133,8 @@ BOT_FEATURES = (
 	protocol.NS_VCARD
 )
 
+COLLECT_TIMEOUT = 600
+KEEPALIVE_TIMEOUT = 300
 REJOIN_DELAY = 120
 RECONNECT_DELAY = 15
 RESTART_DELAY = 5
@@ -434,6 +434,22 @@ def sendMsg(msgType, conference, nick, text, force=False):
 		jid = u"%s/%s" % (conference, nick)
 	sendTo(msgType, jid, text)
 
+def startGarbageCollecting():
+	sys.exc_clear()
+	gc.collect()
+
+	startTimer(COLLECT_TIMEOUT, startGarbageCollecting)
+
+def startKeepAliveSending():
+	for conference in gConferences.keys():
+		iq = protocol.Iq(protocol.TYPE_GET)
+		iq.addChild("ping", {}, [], protocol.NS_PING)
+		iq.setTo(u"%s/%s" % (conference, getBotNick(conference)))
+		gClient.send(iq)
+		time.sleep(0.5)
+
+	startTimer(KEEPALIVE_TIMEOUT, startKeepAliveSending)
+
 def parseMessage(stanza):
 	gInfo["msg"] += 1
 	msgType = stanza.getType()
@@ -602,14 +618,19 @@ def parsePresence(stanza):
 			elif errorCode == "404":
 				delConference(conference)
 				saveConferences()
-				addTextToSysLog(u"%s is deleted (%s)" % (conference, errorCode), LOG_WARNINGS, True)
+				printf(u"%s is deleted (%s)" % (conference, errorCode), FLAG_WARNING)
 			elif errorCode == "503":
+				leaveConference(conference)
+
 				botNick = getBotNick(conference)
 				password = getConferenceConfigKey(conference, "password")
 				startTimer(REJOIN_DELAY, joinConference, conference, botNick, password)
+
+				printf("Got 503 error code in %s" % (conference))
 			elif errorCode in ("401", "403", "405"):
-				leaveConference(conference, u"got %s error code" % errorCode)
-				addTextToSysLog(u"Got error in %s (%s)" % (conference, errorCode), LOG_WARNINGS, True)
+				leaveConference(conference, u"Got %s error code" % errorCode)
+
+				printf(u"Got error in %s (%s)" % (conference, errorCode), FLAG_WARNING)
 		callEventHandlers(EVT_PRS | H_CONFERENCE, MODE_ASYNC, stanza, conference, nick, truejid)
 	else:
 		if protocol.PRS_SUBSCRIBE == prsType:
@@ -699,9 +720,6 @@ def addTextToSysLog(text, logtype, show=False):
 	if LOG_ERRORS == logtype:
 		gInfo["err"] += 1
 	if show:
-		if LOG_WARNINGS == logtype:
-			printf(text, FLAG_WARNING)
-		else:
 			printf(text, FLAG_ERROR)
 
 def loadPlugins():
@@ -791,9 +809,6 @@ def main():
 		gClient.setStatus = setStatus
 		gClient.setStatus(None, None, gConfig.PRIORITY)
 
-		callEventHandlers(EVT_READY, MODE_ASYNC)
-		clearEventHandlers(EVT_READY)
-
 		path = getConfigPath(CONF_FILE)
 		conferences = eval(utils.readFile(path, "[]"))
 		if conferences:
@@ -802,6 +817,11 @@ def main():
 				joinConference(conference, getBotNick(conference), getConferenceConfigKey(conference, "password"))
 				saveConferenceConfig(conference)
 			printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
+
+		startKeepAliveSending()
+		startGarbageCollecting()
+		callEventHandlers(EVT_READY, MODE_ASYNC)
+		clearEventHandlers(EVT_READY)
 
 		printf("Now I am ready to work :)")
 
