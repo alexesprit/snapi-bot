@@ -752,6 +752,7 @@ def shutdown(restart=False):
 	if restart:
 		printf("Restarting...")
 		time.sleep(RESTART_DELAY)
+
 		os.execl(sys.executable, sys.executable, sys.argv[0])
 	else:
 		global IS_RUNNING
@@ -761,12 +762,9 @@ def shutdown(restart=False):
 		sys.exit()
 
 def main():
-	currentDir = os.path.dirname(sys.argv[0])
-	if currentDir:
-		os.chdir(currentDir)
-
 	gInfo["start"] = time.time()
 	
+	os.chdir(os.getcwd())
 	try:
 		global gClient, gConfig
 		gConfig = config.Config(BOTCONFIG_FILE)
@@ -787,9 +785,9 @@ def main():
 			else:
 				shutdown()
 
-		printf("Waiting for authentication...")
+		printf("Authenticating...")
 		if gClient.auth(gConfig.USERNAME, gConfig.PASSWORD, gConfig.RESOURCE):
-			printf("Connected", FLAG_SUCCESS)
+			printf("Done", FLAG_SUCCESS)
 		else:
 			printf("Incorrect login/password", FLAG_ERROR)
 			shutdown()
@@ -824,25 +822,26 @@ def main():
 		clearEventHandlers(EVT_READY)
 
 		printf("Now I am ready to work :)")
-
-		while IS_RUNNING:
-			gClient.process(10)
+		
+		try:
+			while IS_RUNNING:
+				gClient.process(10)
+		except protocol.SystemShutdown:
+			printf("%s has been switched off" % (gConfig.SERVER), FLAG_WARNING)
+			shutdown()
+		except protocol.Conflict:
+			printf("Resource conflict", FLAG_WARNING)
+			shutdown()
+		except Exception:
+			printf("Exception in main thread", FLAG_ERROR)
+			addTextToSysLog(traceback.format_exc(), LOG_CRASHES)
+			if gClient.isConnected():
+				sendOfflinePresence(u"Что-то сломано...")
+			shutdown(gConfig.RESTART_IF_ERROR)
 	except KeyboardInterrupt:
 		if gClient.isConnected():
 			sendOfflinePresence(u"Выключаюсь... (CTRL+C)")
 		shutdown()
-	except protocol.SystemShutdown:
-		printf("%s has been switched off" % (gConfig.SERVER), FLAG_WARNING)
-		shutdown()
-	except protocol.Conflict:
-		printf("Resource conflict", FLAG_WARNING)
-		shutdown()
-	except Exception:
-		printf("Exception in main thread", FLAG_ERROR)
-		addTextToSysLog(traceback.format_exc(), LOG_CRASHES)
-		if gClient.isConnected():
-			sendOfflinePresence(u"Что-то сломано...")
-		shutdown(gConfig.RESTART_IF_ERROR)
 
 if __name__ == "__main__":
 	main()
