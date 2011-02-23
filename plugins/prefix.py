@@ -19,13 +19,16 @@ def setDefaultPrefixValue(conference):
 
 def managePrefixControl(msgType, conference, nick, param):
 	if param:
-		if param.lower() != "none":
-			setConferenceConfigKey(conference, "prefix", param)
-			sendMsg(msgType, conference, nick, u"Установлен префикс: %s" % (param))
-		else:
-			setConferenceConfigKey(conference, "prefix", "")
-			sendMsg(msgType, conference, nick, u"Префикс для команд отключен")
-		saveConferenceConfig(conference)
+		args = param.split()
+		if len(args) == 1:
+			prefix = args[0]
+			if prefix.lower() != "none":
+				setConferenceConfigKey(conference, "prefix", prefix)
+				sendMsg(msgType, conference, nick, u"Установлен префикс: %s" % (prefix))
+			else:
+				setConferenceConfigKey(conference, "prefix", "")
+				sendMsg(msgType, conference, nick, u"Префикс для команд отключен")
+			saveConferenceConfig(conference)
 	else:
 		prefixValue = getConferenceConfigKey(conference, "prefix")
 		if prefixValue:
