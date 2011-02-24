@@ -34,12 +34,16 @@ def addExpression(msgType, conference, nick, param):
 		exp = args[0].strip()
 		text = args[1].strip()
 		if exp and text:
-			if exp in gExpressions:
-				sendMsg(msgType, conference, nick, u"Заменила")
-			else:
-				sendMsg(msgType, conference, nick, u"Добавила")
-			gExpressions[conference][exp] = text
-			saveExpressions(conference)
+			try:
+				re.search(exp, "", re.DOTALL)
+				if exp in gExpressions:
+					sendMsg(msgType, conference, nick, u"Заменила")
+				else:
+					sendMsg(msgType, conference, nick, u"Добавила")
+				gExpressions[conference][exp] = text
+				saveExpressions(conference)
+			except:
+				sendMsg(msgType, conference, nick, u"Ошибка в регулярном выражении!")
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибочный запрос")
 	else:
