@@ -764,7 +764,10 @@ def shutdown(restart=False):
 def main():
 	gInfo["start"] = time.time()
 	
-	os.chdir(os.getcwd())
+	currentDir = os.path.dirname(sys.argv[0])
+	if currentDir:
+		os.chdir(currentDir)
+
 	try:
 		global gClient, gConfig
 		gConfig = config.Config(BOTCONFIG_FILE)
