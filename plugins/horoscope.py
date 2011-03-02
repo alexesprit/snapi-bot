@@ -39,7 +39,7 @@ HOROSCOPE_DATES = {
 
 def showHoroscope(msgType, conference, nick, param):
 	args = param.split()
-	sign = param[0].lower()
+	sign = args[0].lower()
 	if sign in HOROSCOPE_SIGNS:
 		rawsign = HOROSCOPE_SIGNS[sign]
 		if len(args) > 1:
