@@ -133,7 +133,6 @@ BOT_FEATURES = (
 	protocol.NS_VCARD
 )
 
-COLLECT_TIMEOUT = 600
 KEEPALIVE_TIMEOUT = 300
 REJOIN_DELAY = 120
 RECONNECT_DELAY = 15
@@ -171,7 +170,6 @@ gMacros = macros.Macros(CONFIG_DIR)
 
 gConferenceConfig = {}
 gConferences = {}
-gIsJoined = {}
 
 gJokes = []
 
@@ -257,13 +255,11 @@ def setConferenceConfigKey(conference, key, value):
 
 def addConference(conference):
 	gConferences[conference] = {}
-	gIsJoined[conference] = False
 	loadConferenceConfig(conference)
 	callEventHandlers(EVT_ADDCONFERENCE, MODE_SYNC, conference)
 
 def delConference(conference):
 	callEventHandlers(EVT_DELCONFERENCE, MODE_SYNC, conference)
-	del gIsJoined[conference]
 	del gConferenceConfig[conference]
 	del gConferences[conference]
 
@@ -434,12 +430,6 @@ def sendMsg(msgType, conference, nick, text, force=False):
 		jid = u"%s/%s" % (conference, nick)
 	sendTo(msgType, jid, text)
 
-def startGarbageCollecting():
-	sys.exc_clear()
-	gc.collect()
-
-	startTimer(COLLECT_TIMEOUT, startGarbageCollecting)
-
 def startKeepAliveSending():
 	for conference in gConferences.keys():
 		iq = protocol.Iq(protocol.TYPE_GET)
@@ -581,11 +571,8 @@ def parsePresence(stanza):
 				setNickKey(conference, nick, NICK_IDLE, time.time())
 				setNickKey(conference, nick, NICK_HERE, True)
 				setNickKey(conference, nick, NICK_JOINED, time.time())
-				if gIsJoined[conference]:
-					callEventHandlers(EVT_USERJOIN, MODE_ASYNC, conference, nick, truejid, aff, role)
-				else:
-					if nick == getBotNick(conference):
-						gIsJoined[conference] = True
+
+				callEventHandlers(EVT_USERJOIN, MODE_ASYNC, conference, nick, truejid, aff, role)
 			roleAccess = ROLES[role]
 			affAccess = AFFILIATIONS[aff]
 			setTempAccess(conference, truejid, roleAccess + affAccess)
@@ -761,14 +748,16 @@ def shutdown(restart=False):
 		printf("Terminating...", FLAG_SUCCESS)
 		sys.exit()
 
+import classes.version as VersionInstance
+
 def main():
 	gInfo["start"] = time.time()
-	
+
 	currentDir = os.path.dirname(sys.argv[0])
 	if currentDir:
 		os.chdir(currentDir)
 
-	try:
+	try:      
 		global gClient, gConfig
 		gConfig = config.Config(BOTCONFIG_FILE)
 		gClient = client.Client(server=gConfig.SERVER, port=gConfig.PORT)
@@ -820,7 +809,7 @@ def main():
 			printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
 		startKeepAliveSending()
-		startGarbageCollecting()
+
 		callEventHandlers(EVT_READY, MODE_ASYNC)
 		clearEventHandlers(EVT_READY)
 
