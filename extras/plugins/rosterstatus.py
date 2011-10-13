@@ -21,7 +21,7 @@ def updateRosterStatus():
 		show = protocol.PRS_DND
 	elif hour >= 0:
 		show = protocol.PRS_NA
-	gClient.setStatus(show, None, gConfig.PRIORITY)
+	setStatus(show, None, gConfig.PRIORITY)
 	timeout = 3600 * 8 + random.randrange(-800, 801)
 	startTimer(timeout, updateRosterStatus)
 

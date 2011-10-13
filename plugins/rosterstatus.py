@@ -25,7 +25,7 @@ def updateRosterStatus():
 	if gRosterStatus:
 		show = gRosterStatus["show"]
 		status = gRosterStatus["status"]
-		gClient.setStatus(show, status, Config.PRIORITY)
+		setStatus(show, status, Config.PRIORITY)
 
 def setRosterStatus(msgType, conference, nick, param):
 	args = param.split(None, 1)
@@ -37,7 +37,7 @@ def setRosterStatus(msgType, conference, nick, param):
 			status = args[1]
 	else:
 		status = param
-	gClient.setStatus(show, status, Config.PRIORITY)
+	setStatus(show, status, Config.PRIORITY)
 
 	gRosterStatus["show"] = show
 	gRosterStatus["status"] = status

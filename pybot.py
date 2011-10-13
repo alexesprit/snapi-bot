@@ -907,8 +907,7 @@ def main():
 		clearEventHandlers(EVT_STARTUP)
 
 		gClient.getRoster()
-		gClient.setStatus = setStatus
-		gClient.setStatus(None, None, Config.PRIORITY)
+		setStatus(None, None, Config.PRIORITY)
 
 		path = getConfigPath(CONF_FILE)
 		conferences = eval(utils.readFile(path, "[]"))
