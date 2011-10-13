@@ -31,7 +31,7 @@ def saveAllTalkersBases():
 
 def updateTalkersInfo(stanza, msgType, conference, nick, truejid, body):
 	if msgType == protocol.TYPE_PUBLIC:
-		if truejid != gConfig.JID and truejid != conference:
+		if truejid != Config.JID and truejid != conference:
 			base = gTalkersCache[conference]
 			if truejid in base:
 				base[truejid]["nick"] = nick
@@ -59,9 +59,9 @@ def showTalkerInfo(msgType, conference, nick, param):
 			topList.sort()
 			topList.reverse()
 			topList = topList[:10]
-			elements = [pattern % (i + 1, element[4], element[0], element[1], element[2], element[3]) 
+			elements = [pattern % (i + 1, element[4], element[0], element[1], element[2], element[3])
 						for i, element in enumerate(topList)]
-			sendMsg(msgType, conference, nick, 
+			sendMsg(msgType, conference, nick,
 				u"Список топ-участников\nНик, сообщ., /me, слов, слов на сообщ.\n%s" % ("\n".join(elements)))
 		else:
 			sendMsg(msgType, conference, nick, u"База болтунов пуста")
@@ -90,8 +90,8 @@ def showTalkerInfo(msgType, conference, nick, param):
 			messages = statistic["messages"]
 			meMessages = statistic["mes"]
 			wordsPerMsg = (float(words)) / (messages + meMessages)
-			sendMsg(msgType, conference, nick, 
-				u"Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f" % 
+			sendMsg(msgType, conference, nick,
+				u"Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f" %
 					(nick, messages, meMessages, words, wordsPerMsg))
 		else:
 			sendMsg(msgType, conference, nick, u"Нет информации")
@@ -103,8 +103,8 @@ registerEventHandler(saveAllTalkersBases, EVT_SHUTDOWN)
 
 registerEventHandler(updateTalkersInfo, EVT_MSG | H_CONFERENCE)
 
-registerCommand(showTalkerInfo, u"болтун", 10, 
-				u"Показывает статистику болтливости указанного пользователя. Параметр \"топ\" - список десяти самых болтливых. Параметр \"сброс\" - очистка статистики", 
-				u"[ник]", 
-				(None, u"топ", u"Nick"), 
+registerCommand(showTalkerInfo, u"болтун", 10,
+				u"Показывает статистику болтливости указанного пользователя. Параметр \"топ\" - список десяти самых болтливых. Параметр \"сброс\" - очистка статистики",
+				u"[ник]",
+				(None, u"топ", u"Nick"),
 				CMD_CONFERENCE)

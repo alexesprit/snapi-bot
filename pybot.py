@@ -29,10 +29,11 @@ import threading
 import time
 import traceback
 
-from classes import config
+import module.config as Config
+import module.version as Version
+
 from classes import database
 from classes import macros
-from classes import version
 
 from utils import utils
 
@@ -89,22 +90,22 @@ LOG_ERRORS = 0x1
 LOG_CRASHES = 0x2
 
 LOG_TYPES = {
-	LOG_CRASHES: LOG_CRASHES_FILE, 
+	LOG_CRASHES: LOG_CRASHES_FILE,
 	LOG_ERRORS: LOG_ERRORS_FILE
 }
 
 ROLES = {
-	protocol.ROLE_NONE: 0, 
-	protocol.ROLE_VISITOR: 0, 
-	protocol.ROLE_PARTICIPANT: 10, 
+	protocol.ROLE_NONE: 0,
+	protocol.ROLE_VISITOR: 0,
+	protocol.ROLE_PARTICIPANT: 10,
 	protocol.ROLE_MODERATOR: 15
 }
 
 AFFILIATIONS = {
-	protocol.AFF_OUTCAST: 0, 
-	protocol.AFF_NONE: 0, 
-	protocol.AFF_MEMBER: 1, 
-	protocol.AFF_ADMIN: 5, 
+	protocol.AFF_OUTCAST: 0,
+	protocol.AFF_NONE: 0,
+	protocol.AFF_MEMBER: 1,
+	protocol.AFF_ADMIN: 5,
 	protocol.AFF_OWNER: 15
 }
 
@@ -114,9 +115,9 @@ FORBIDDEN_TYPES = (
 )
 
 STATUS_STRINGS = (
-	protocol.PRS_AWAY, 
-	protocol.PRS_NA, 
-	protocol.PRS_DND, 
+	protocol.PRS_AWAY,
+	protocol.PRS_NA,
+	protocol.PRS_DND,
 	protocol.PRS_CHAT
 )
 
@@ -185,10 +186,10 @@ THR_SEMAPHORE = threading.BoundedSemaphore(30)
 def registerCommand(function, command, access, desc, syntax, examples, cmdType=CMD_ANY):
 	gCmdHandlers[command] = function
 	gCommands[command] = {
-		CMD_ACCESS: access, 
-		CMD_DESC: desc, 
-		CMD_SYNTAX: syntax, 
-		CMD_EXAMPLE: examples, 
+		CMD_ACCESS: access,
+		CMD_DESC: desc,
+		CMD_SYNTAX: syntax,
+		CMD_EXAMPLE: examples,
 		CMD_TYPE: cmdType
 	}
 
@@ -269,7 +270,7 @@ def joinConference(conference, nick, password):
 
 	status = getConferenceConfigKey(conference, "status")
 	show = getConferenceConfigKey(conference, "show")
-	prs = getPresenceNode(show, status, gConfig.PRIORITY)
+	prs = getPresenceNode(show, status, Config.PRIORITY)
 	prs.setTo(u"%s/%s" % (conference, nick))
 	mucTag = prs.setTag("x", namespace=protocol.NS_MUC)
 	mucTag.addChild("history", {"maxchars": "0"})
@@ -285,7 +286,7 @@ def leaveConference(conference, status=None):
 	delConference(conference)
 
 def getBotNick(conference):
-	return getConferenceConfigKey(conference, "nick") or gConfig.NICK
+	return getConferenceConfigKey(conference, "nick") or Config.NICK
 
 def isCommand(command):
 	return command in gCommands
@@ -301,7 +302,7 @@ def getNicks(conference):
 
 def getOnlineNicks(conference):
 	return [x for x in gConferences[conference] if getNickKey(conference, x, NICK_HERE)]
-	
+
 def getTrueJID(barejid, resource=None):
 	if barejid in gConferences:
 		if isNickInConference(barejid, resource):
@@ -378,7 +379,7 @@ def getAccess(conference, jid):
 
 def getPresenceNode(show, status, priority):
 	prs = protocol.Presence(priority=priority)
-	prs.setAttr("ver", gVerInfo.getVerString())
+	prs.setAttr("ver", Version.version)
 	if status:
 		prs.setStatus(status)
 	if show:
@@ -386,13 +387,13 @@ def getPresenceNode(show, status, priority):
 
 	caps = protocol.Node("c")
 	caps.setNamespace(protocol.NS_CAPS)
-	caps.setAttr("node", gVerInfo.getCapsString())
-	caps.setAttr("ver", gVerInfo.getFeaturesHash())
+	caps.setAttr("node", Version.capsstr)
+	caps.setAttr("ver", Version.verhash)
 	caps.setAttr("hash", "sha-1")
 
 	prs.addChild(node=caps)
 	return prs
-	
+
 def setStatus(show, status, priority):
 	gClient.send(getPresenceNode(show, status, priority))
 
@@ -468,7 +469,7 @@ def parseMessage(stanza):
 			time.sleep(1)
 		elif errorCode == "406":
 			addConference(conference)
-			joinConference(conference, gConfig.NICK, getConferenceConfigKey(conference, "password"))
+			joinConference(conference, Config.NICK, getConferenceConfigKey(conference, "password"))
 			time.sleep(0.5)
 		else:
 			return
@@ -660,9 +661,9 @@ def parseIQ(stanza):
 		if stanza.getTags("query", {}, protocol.NS_VERSION):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.getTag("query")
-			query.setTagData("name", gVerInfo.getAppName())
-			query.setTagData("version", gVerInfo.getVerString())
-			query.setTagData("os", gVerInfo.getOSName())
+			query.setTagData("name", Version.appname)
+			query.setTagData("version", Version.version)
+			query.setTagData("os", Version.osname)
 		elif stanza.getTags("query", {}, protocol.NS_LAST):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.getTag("query")
@@ -682,9 +683,9 @@ def parseIQ(stanza):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.addChild("query", {}, [], protocol.NS_DISCO_ITEMS)
 			attrs = {
-				"category": gVerInfo.getIdentCat(), 
-				"type": gVerInfo.getIdentType(), 
-				"name": gVerInfo.getIdentName()
+				"category": Version.identcat,
+				"type": Version.identtype,
+				"name": Version.identname
 			}
 			query.addChild("identity", attrs)
 			for feat in BOT_FEATURES:
@@ -746,9 +747,6 @@ def shutdown(restart=False):
 		IS_RUNNING = False
 
 		printf("Terminating...", FLAG_SUCCESS)
-		sys.exit()
-
-import classes.version as VersionInstance
 
 def main():
 	gInfo["start"] = time.time()
@@ -757,20 +755,22 @@ def main():
 	if currentDir:
 		os.chdir(currentDir)
 
-	try:      
-		global gClient, gConfig
-		gConfig = config.Config(BOTCONFIG_FILE)
-		gClient = client.Client(server=gConfig.SERVER, port=gConfig.PORT)
+	try:
+		Config.load(BOTCONFIG_FILE)
+		Version.updateFeaturesHash(BOT_FEATURES)
+
+		global gClient
+		gClient = client.Client(server=Config.SERVER, port=Config.PORT)
 
 		printf("Loading plugins...")
 		loadPlugins()
-	
+
 		printf("Connecting...")
-		if gClient.connect(gConfig.SECURE, gConfig.USE_RESOLVER):
+		if gClient.connect(Config.SECURE, Config.USE_RESOLVER):
 			printf("Connection established (%s)" % gClient.getConnectType(), FLAG_SUCCESS)
 		else:
 			printf("Unable to connect", FLAG_ERROR)
-			if gConfig.RESTART_IF_ERROR:
+			if Config.RESTART_IF_ERROR:
 				printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
 				time.sleep(RECONNECT_DELAY)
 				shutdown(True)
@@ -778,7 +778,7 @@ def main():
 				shutdown()
 
 		printf("Authenticating...")
-		if gClient.auth(gConfig.USERNAME, gConfig.PASSWORD, gConfig.RESOURCE):
+		if gClient.auth(Config.USERNAME, Config.PASSWORD, Config.RESOURCE):
 			printf("Done", FLAG_SUCCESS)
 		else:
 			printf("Incorrect login/password", FLAG_ERROR)
@@ -791,13 +791,9 @@ def main():
 		callEventHandlers(EVT_STARTUP, MODE_ASYNC)
 		clearEventHandlers(EVT_STARTUP)
 
-		global gVerInfo
-		gVerInfo = version.VersionInfo()
-		gVerInfo.createFeaturesHash(BOT_FEATURES)
-
 		gClient.getRoster()
 		gClient.setStatus = setStatus
-		gClient.setStatus(None, None, gConfig.PRIORITY)
+		gClient.setStatus(None, None, Config.PRIORITY)
 
 		path = getConfigPath(CONF_FILE)
 		conferences = eval(utils.readFile(path, "[]"))
@@ -814,12 +810,12 @@ def main():
 		clearEventHandlers(EVT_READY)
 
 		printf("Now I am ready to work :)")
-		
+
 		try:
 			while IS_RUNNING:
 				gClient.process(10)
 		except protocol.SystemShutdown:
-			printf("%s has been switched off" % (gConfig.SERVER), FLAG_WARNING)
+			printf("%s has been switched off" % (Config.SERVER), FLAG_WARNING)
 			shutdown()
 		except protocol.Conflict:
 			printf("Resource conflict", FLAG_WARNING)
@@ -829,11 +825,11 @@ def main():
 			addTextToSysLog(traceback.format_exc(), LOG_CRASHES)
 			if gClient.isConnected():
 				sendOfflinePresence(u"Что-то сломано...")
-			shutdown(gConfig.RESTART_IF_ERROR)
+			shutdown(Config.RESTART_IF_ERROR)
 	except KeyboardInterrupt:
 		if gClient.isConnected():
 			sendOfflinePresence(u"Выключаюсь... (CTRL+C)")
 		shutdown()
 
 if __name__ == "__main__":
-	main()
+	sys.exit(main())

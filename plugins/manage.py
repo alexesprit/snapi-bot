@@ -22,7 +22,7 @@ def joinConf(msgType, conference, nick, param):
 		else:
 			addConference(conf)
 			password = (len(args) == 2) and args[1] or None
-			joinConference(conf, gConfig.NICK, password)
+			joinConference(conf, Config.NICK, password)
 			saveConferenceConfig(conf)
 			saveConferences()
 			sendMsg(msgType, conference, nick, u"Зашла")
@@ -41,12 +41,12 @@ def leaveConf(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка! Необходимо указать конференцию")
 
-registerCommand(joinConf, u"зайти", 100, 
+registerCommand(joinConf, u"зайти", 100,
 				u"Заставляет бота войти в указанную конференцию",
-				u"<конференция> [пароль]", 
+				u"<конференция> [пароль]",
 				(u"room@conference.server.tld", u"room@conference.server.tld secret"),
 				CMD_ANY | CMD_PARAM)
-registerCommand(leaveConf, u"свали", 
+registerCommand(leaveConf, u"свали",
 				30, u"Заставляет бота выйти из указанной конференции",
-				u"[конференция]", 
+				u"[конференция]",
 				(None, u"room@conference.server.tld"))

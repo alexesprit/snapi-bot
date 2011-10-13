@@ -26,11 +26,11 @@ LOGTYPE_KICK = "kick"
 LOGTYPE_BAN = "ban"
 
 LOGTYPES = (
-	LOGTYPE_SYSTEM, 
-	LOGTYPE_JOIN, 
-	LOGTYPE_LEAVE, 
-	LOGTYPE_NICK, 
-	LOGTYPE_KICK, 
+	LOGTYPE_SYSTEM,
+	LOGTYPE_JOIN,
+	LOGTYPE_LEAVE,
+	LOGTYPE_NICK,
+	LOGTYPE_KICK,
 	LOGTYPE_BAN
 )
 
@@ -71,14 +71,14 @@ def manageLoggingValue(msgType, conference, nick, param):
 	else:
 		conferences = getConferences()
 		if conferences:
-			elements = [u"%d) %s [%d]" % (i + 1, c, getConferenceConfigKey(c, "log")) 
+			elements = [u"%d) %s [%d]" % (i + 1, c, getConferenceConfigKey(c, "log"))
 						for i, c in enumerate(sorted(conferences))]
 			sendMsg(msgType, conference, nick, u"Список конференций:\n%s" % ("\n".join(elements)))
 		else:
 			sendMsg(msgType, conference, nick, u"Сейчас меня нет ни в одной конференции")
 
 def getLogFile(conference, year, month, day):
-	path = u"%s/%s/%d/%02d/%02d.html" % (gConfig.LOGGER_DIR, conference, year, month, day)
+	path = u"%s/%s/%d/%02d/%02d.html" % (Config.LOGGER_DIR, conference, year, month, day)
 	path = path.encode("utf-8")
 	if os.path.exists(path):
 		f = file(path, "a")
@@ -158,17 +158,17 @@ def addUserLeaveToLog(conference, nick, truejid, reason, code):
 			if reason:
 				addTextToLog(LOGTYPE_LEAVE, conference, None, u"*** %s выходит из комнаты: %s" % (nick, reason))
 			else:
-				addTextToLog(LOGTYPE_LEAVE, conference, None, u"*** %s выходит из комнаты" % (nick))		
+				addTextToLog(LOGTYPE_LEAVE, conference, None, u"*** %s выходит из комнаты" % (nick))
 		elif "307" == code:
 			if reason:
 				addTextToLog(LOGTYPE_KICK, conference, None, u"*** %s выгнали из комнаты: %s" % (nick, reason))
 			else:
-				addTextToLog(LOGTYPE_KICK, conference, None, u"*** %s выгнали из комнаты" % (nick));		
+				addTextToLog(LOGTYPE_KICK, conference, None, u"*** %s выгнали из комнаты" % (nick));
 		elif "301" == code:
 			if reason:
 				addTextToLog(LOGTYPE_BAN, conference, None, u"*** %s забанили: %s" % (nick, reason))
 			else:
-				addTextToLog(LOGTYPE_BAN, conference, None, u"*** %s забанили" % (nick));	
+				addTextToLog(LOGTYPE_BAN, conference, None, u"*** %s забанили" % (nick));
 
 def addPresenceToLog(stanza, conference, nick, truejid):
 	if protocol.TYPE_ERROR != stanza.getType():
@@ -178,7 +178,7 @@ def addPresenceToLog(stanza, conference, nick, truejid):
 				newnick = stanza.getNick()
 				addTextToLog(LOGTYPE_NICK, conference, None, u"*** %s меняет ник на %s" % (nick, newnick))
 
-if gConfig.LOGGER_DIR:
+if Config.LOGGER_DIR:
 	registerEventHandler(addUserJoinToLog, EVT_USERJOIN)
 	registerEventHandler(addUserLeaveToLog, EVT_USERLEAVE)
 
@@ -186,8 +186,8 @@ if gConfig.LOGGER_DIR:
 	registerEventHandler(addPresenceToLog, EVT_PRS | H_CONFERENCE)
 
 	registerEventHandler(setDefaultLoggingValue, EVT_ADDCONFERENCE)
-	
-	registerCommand(manageLoggingValue, u"логирование", 100, 
+
+	registerCommand(manageLoggingValue, u"логирование", 100,
 				u"Отключает (0) или включает (1) ведение логов для указанной/текущей конференции. Без параметра покажет значения для всех конференций, в которых находится бот",
-				u"[<конференция> <0|1>]", 
+				u"[<конференция> <0|1>]",
 				(None, u"0", u"room@conference.server.tld 0"))

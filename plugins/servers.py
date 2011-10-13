@@ -15,7 +15,7 @@
 # GNU General Public License for more details.
 
 def showServerInfo(msgType, conference, nick, param):
-	server = param or gConfig.SERVER
+	server = param or Config.SERVER
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_STATS)
 	iq.setTo(server)
 	iq.setID(getUniqueID("info_id"))
@@ -47,7 +47,7 @@ def showServerStats_(stanza, msgType, conference, nick, server):
 		sendMsg(msgType, conference, nick, u"Не получается :(")
 
 def showServerUptime(msgType, conference, nick, param):
-	server = param or gConfig.SERVER
+	server = param or Config.SERVER
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_LAST)
 	iq.setTo(server)
 	iq.setID(getUniqueID("uptime_id"))
@@ -64,11 +64,11 @@ def showServerUptime_(stanza, msgType, conference, nick, server):
 	else:
 		sendMsg(msgType, conference, nick, u"Не получается :(")
 
-registerCommand(showServerInfo, u"инфа", 10, 
-				u"Возвращает статистику jabber-сервера", 
-				u"[сервер]", 
+registerCommand(showServerInfo, u"инфа", 10,
+				u"Возвращает статистику jabber-сервера",
+				u"[сервер]",
 				(u"server.tld", ))
-registerCommand(showServerUptime, u"аптайм", 10, 
-				u"Показывает аптайм jabber-сервера", 
-				u"[сервер]", 
+registerCommand(showServerUptime, u"аптайм", 10,
+				u"Показывает аптайм jabber-сервера",
+				u"[сервер]",
 				(u"server.tld", ))

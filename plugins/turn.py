@@ -84,9 +84,9 @@ TURN_TABLE = {
 	u",": u"б", u"б": u",",
 	u"|": u"/", u"/": u"|",
 	u".": u"ю", u"ю": u".",
-	u"/": u".", 
-	u"@": u"\"", 
-	u"$": u";", 
+	u"/": u".",
+	u"@": u"\"",
+	u"$": u";",
 	u"^": u":"
 }
 
@@ -108,7 +108,7 @@ def turnLastMessage(msgType, conference, nick, param):
 			return
 		truejid = getTrueJID(conference, nick)
 		if truejid not in gTurnMsgCache[conference]:
-			# TODO придумать реплику одинаковой для М и Ж 
+			# TODO придумать реплику одинаковой для М и Ж
 			sendMsg(msgType, conference, nick, u"А ты ещё ничего не говорил")
 		else:
 			savedMsg = gTurnMsgCache[conference][truejid]
@@ -128,7 +128,7 @@ def turnLastMessage(msgType, conference, nick, param):
 
 def saveTurnMessage(stanza, msgType, conference, nick, truejid, message):
 	if msgType == protocol.TYPE_PUBLIC:
-		if truejid != gConfig.JID and truejid != conference:
+		if truejid != Config.JID and truejid != conference:
 			if "turn" != message.lower():
 				gTurnMsgCache[conference][truejid] = message
 
@@ -149,7 +149,7 @@ registerEventHandler(clearTurnCache, EVT_USERLEAVE)
 
 registerEventHandler(saveTurnMessage, EVT_MSG | H_CONFERENCE)
 
-registerCommand(turnLastMessage, u"turn", 10, 
-				u"Переключает раскладку вашего последнего сообщения или текста в параметре команды", 
-				u"[текст]", 
+registerCommand(turnLastMessage, u"turn", 10,
+				u"Переключает раскладку вашего последнего сообщения или текста в параметре команды",
+				u"[текст]",
 				(None, u"jkjkj"))

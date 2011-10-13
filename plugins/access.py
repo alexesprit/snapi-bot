@@ -16,13 +16,13 @@
 # GNU General Public License for more details.
 
 ACCESS_DESC = {
-	0: u"никто", 
-	10: u"юзер", 
-	11: u"мембер", 
-	15: u"модер", 
-	16: u"модер", 
-	20: u"админ", 
-	30: u"овнер", 
+	0: u"никто",
+	10: u"юзер",
+	11: u"мембер",
+	15: u"модер",
+	16: u"модер",
+	20: u"админ",
+	30: u"овнер",
 	100: u"админ бота",
 	-100: u"игнор"
 }
@@ -31,7 +31,7 @@ def loadGlobalAccesses():
 	global gGlobalAccess
 	path = getConfigPath(ACCESS_FILE)
 	gGlobalAccess = eval(utils.readFile(path, "{}"))
-	for jid in gConfig.ADMINS:
+	for jid in Config.ADMINS:
 		gGlobalAccess[jid] = 100
 
 def loadLocalAccesses(conference):
@@ -45,10 +45,10 @@ def freeLocalAccesses(conference):
 
 def login(msgType, conference, nick, param):
 	if msgType == protocol.TYPE_PRIVATE:
-		if param == gConfig.ADMIN_PASSWORD:
+		if param == Config.ADMIN_PASSWORD:
 			truejid = getTrueJID(conference, nick)
-			if truejid not in gConfig.ADMINS:
-				gConfig.ADMINS.append(truejid)
+			if truejid not in Config.ADMINS:
+				Config.ADMINS.append(truejid)
 				setTempGlobalAccess(truejid, 100)
 				sendMsg(msgType, conference, nick, u"Пароль принят, глобальный доступ выдан")
 			else:
@@ -58,8 +58,8 @@ def login(msgType, conference, nick, param):
 
 def logout(msgType, conference, nick, param):
 	truejid = getTrueJID(conference, nick)
-	if truejid in gConfig.ADMINS:
-		gConfig.ADMINS.remove(truejid)
+	if truejid in Config.ADMINS:
+		Config.ADMINS.remove(truejid)
 		setTempGlobalAccess(truejid)
 		sendMsg(msgType, conference, nick, u"Глобальный доступ снят")
 	else:
@@ -101,7 +101,7 @@ def setLocalAccess(msgType, conference, nick, param):
 				raise ValueError
 		else:
 			newAccess = 0
-		
+
 		userAccess = getAccess(conference, userjid)
 		senderjid = getTrueJID(conference, nick)
 		senderAccess = getAccess(conference, senderjid)
@@ -160,7 +160,7 @@ def showGlobalAccesses(msgType, conference, nick, param):
 	else:
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли")
-		elements = [u"%d) %s [%d]" % (i + 1, item, gGlobalAccess[item]) 
+		elements = [u"%d) %s [%d]" % (i + 1, item, gGlobalAccess[item])
 				for i, item in enumerate(sorted(gGlobalAccess))]
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Глобальные уровни доступа:\n%s" % ("\n".join(elements)))
 
@@ -171,7 +171,7 @@ def showLocalAccesses(msgType, conference, nick, param):
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли")
 		accesses = gPermAccess[conference]
-		elements = [u"%d) %s [%d]" % (i + 1, item, accesses[item]) 
+		elements = [u"%d) %s [%d]" % (i + 1, item, accesses[item])
 				for i, item in enumerate(sorted(accesses))]
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Локальные уровни доступа:\n%s" % ("\n".join(elements)))
 
@@ -181,37 +181,37 @@ registerEventHandler(loadLocalAccesses, EVT_ADDCONFERENCE)
 registerEventHandler(freeLocalAccesses, EVT_DELCONFERENCE)
 
 registerCommand(login, u"логин", 0,
-				u"Авторизоваться как админиcтратор бота", 
+				u"Авторизоваться как админиcтратор бота",
 				u"<пароль>",
-				(u"secret", ), 
+				(u"secret", ),
 				CMD_ANY | CMD_FROZEN | CMD_PARAM)
 registerCommand(logout, u"логаут", 0,
-				u"Разлогиниться", 
-				None, 
-				None, 
+				u"Разлогиниться",
+				None,
+				None,
 				CMD_ANY | CMD_FROZEN | CMD_NONPARAM)
-registerCommand(showUserAccess, u"доступ", 0, 
-				u"Показывает уровень доступа определённого пользователя", 
-				u"[ник|жид]", 
-				(None, u"Nick", u"user@server.tld"), 
+registerCommand(showUserAccess, u"доступ", 0,
+				u"Показывает уровень доступа определённого пользователя",
+				u"[ник|жид]",
+				(None, u"Nick", u"user@server.tld"),
 				CMD_CONFERENCE | CMD_FROZEN)
-registerCommand(setLocalAccess, u"дать_доступ", 20, 
-				u"Устанавливает или снимает (если указать уровень доступа, равный 0, или вовсе не указывать его) уровень локального доступа для определённого пользователя на определённый уровень. Если указывается второй параметр (что угодно), то выдаётся постоянный доступ доступ", 
-				u"<ник|жид> <уровень> [навсегда]", 
-				(u"Nick 100", u"user@server.tld 100", u"Nick 100 1"), 
+registerCommand(setLocalAccess, u"дать_доступ", 20,
+				u"Устанавливает или снимает (если указать уровень доступа, равный 0, или вовсе не указывать его) уровень локального доступа для определённого пользователя на определённый уровень. Если указывается второй параметр (что угодно), то выдаётся постоянный доступ доступ",
+				u"<ник|жид> <уровень> [навсегда]",
+				(u"Nick 100", u"user@server.tld 100", u"Nick 100 1"),
 				CMD_CONFERENCE | CMD_PARAM)
-registerCommand(setGlobalAccess, u"глобдоступ", 100, 
-				u"Устанавливает или снимает (если указать уровень доступа, равный 0, или вовсе не указывать его) уровень глобального доступа для определённого пользователя", 
-				u"<ник|жид> [уровень]", 
-				(u"Nick", u"user@server.tld", u"Nick 100"), 
+registerCommand(setGlobalAccess, u"глобдоступ", 100,
+				u"Устанавливает или снимает (если указать уровень доступа, равный 0, или вовсе не указывать его) уровень глобального доступа для определённого пользователя",
+				u"<ник|жид> [уровень]",
+				(u"Nick", u"user@server.tld", u"Nick 100"),
 				CMD_ANY | CMD_FROZEN | CMD_PARAM)
-registerCommand(showGlobalAccesses, u"доступы", 100, 
-				u"Показывает все глобальные уровни доступа", 
-				None, 
-				None, 
+registerCommand(showGlobalAccesses, u"доступы", 100,
+				u"Показывает все глобальные уровни доступа",
+				None,
+				None,
 				CMD_ANY | CMD_NONPARAM)
-registerCommand(showLocalAccesses, u"локалдоступы", 20, 
-				u"Показывает все локальные уровни доступа", 
-				None, 
-				None, 
+registerCommand(showLocalAccesses, u"локалдоступы", 20,
+				u"Показывает все локальные уровни доступа",
+				None,
+				None,
 				CMD_CONFERENCE | CMD_NONPARAM)

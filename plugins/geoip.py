@@ -15,7 +15,7 @@
 # GNU General Public License for more details.
 
 def showGeoIPInfo(msgType, conference, nick, param):
-	host = param or gConfig.HOST
+	host = param or Config.HOST
 	url = "http://www.and-rey.ru/geoip/ie.php"
 	qparam = {"host": host.encode("utf-8")}
 	response = getURL(url, qparam)
@@ -29,7 +29,7 @@ def showGeoIPInfo(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Ошибка!")
 
-registerCommand(showGeoIPInfo, u"геоип", 10, 
-				u"Показывает информацию о географическом месторасположении хоста", 
-				u"[сервер]", 
+registerCommand(showGeoIPInfo, u"геоип", 10,
+				u"Показывает информацию о географическом месторасположении хоста",
+				u"[сервер]",
 				(None, u"server.tld"))

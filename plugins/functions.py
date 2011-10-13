@@ -61,7 +61,7 @@ def setMUCAffiliation(conference, user, itemType, aff, reason=None):
 	gClient.send(iq)
 
 def setConferenceStatus(conference, show, status):
-	prs = getPresenceNode(show, status, gConfig.PRIORITY)
+	prs = getPresenceNode(show, status, Config.PRIORITY)
 	prs.setTo(conference)
 	gClient.send(prs)
 

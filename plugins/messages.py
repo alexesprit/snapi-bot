@@ -14,20 +14,20 @@
 # GNU General Public License for more details.
 
 def sendToAdmins(msgType, conference, nick, param):
-	for admin in gConfig.ADMINS:
+	for admin in Config.ADMINS:
 		sendTo(protocol.TYPE_PRIVATE, admin, u"Сообщение от %s/%s:\n%s" % (conference, nick, param))
 	sendMsg(msgType, conference, nick, u"Ваше сообщение отправлено!")
-	
+
 def messageToChat(msgType, conference, nick, param):
 	sendToConference(conference, param)
 
-registerCommand(sendToAdmins, u"мессага_админу", 10, 
-				u"Отправляет сообщение всем администраторам бота", 
-				u"<текст>", 
-				(u"привет!11", ), 
+registerCommand(sendToAdmins, u"мессага_админу", 10,
+				u"Отправляет сообщение всем администраторам бота",
+				u"<текст>",
+				(u"привет!11", ),
 				CMD_ANY | CMD_PARAM)
-registerCommand(messageToChat, u"сказать", 20, 
-				u"Сказать через бота в конференции", 
-				u"<текст>", 
-				(u"Всем привет!!!", ), 
+registerCommand(messageToChat, u"сказать", 20,
+				u"Сказать через бота в конференции",
+				u"<текст>",
+				(u"Всем привет!!!", ),
 				CMD_CONFERENCE | CMD_PARAM)

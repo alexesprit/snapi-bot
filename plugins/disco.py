@@ -16,7 +16,7 @@
 # GNU General Public License for more details.
 
 def showServiceDiscoveryResults(msgType, conference, nick, param):
-	param = param or gConfig.SERVER
+	param = param or Config.SERVER
 	args = param.split(None, 2)
 	jid = args[0]
 	searchKey = None
@@ -28,7 +28,7 @@ def showServiceDiscoveryResults(msgType, conference, nick, param):
 			if protocol.TYPE_PUBLIC == msgType:
 				maxCount = min(50, count)
 			else:
-				maxCount = min(250, count);	
+				maxCount = min(250, count);
 			if len(args) > 2:
 				searchKey = args[2]
 		else:
@@ -102,7 +102,7 @@ def showServiceDiscoveryResults_(stanza, msgType, conference, nick, jid, maxCoun
 	else:
 		sendMsg(msgType, conference, nick, u"Не могу")
 
-registerCommand(showServiceDiscoveryResults, u"диско", 10, 
-				u"Показывает результаты обзора сервисов для указанного жида. Также можно выполнить запрос по узлу (\"жид#узел\") Второй или третий (если даётся ограничитель кол-ва) параметр - поиск (ищет заданное слово в жиде и описании элемента диско). Если поисковым словом задать имя конференции до названия сервера (например qwerty@), то покажет место этой конференции в общем рейтинге. В общий чат может дать до 50 результатов (10 - без указания кол-ва), в приват - 250 (50 - без указания кол-ва)", 
-				u"<жид> [кол-во результатов] [поисковая строка]", 
+registerCommand(showServiceDiscoveryResults, u"диско", 10,
+				u"Показывает результаты обзора сервисов для указанного жида. Также можно выполнить запрос по узлу (\"жид#узел\") Второй или третий (если даётся ограничитель кол-ва) параметр - поиск (ищет заданное слово в жиде и описании элемента диско). Если поисковым словом задать имя конференции до названия сервера (например qwerty@), то покажет место этой конференции в общем рейтинге. В общий чат может дать до 50 результатов (10 - без указания кол-ва), в приват - 250 (50 - без указания кол-ва)",
+				u"<жид> [кол-во результатов] [поисковая строка]",
 				(u"server.tld", u"conference.server.tld qwerty", u"conference.server.tld 5 qwerty", u"conference.server.tld qwerty@"))
