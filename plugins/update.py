@@ -16,7 +16,7 @@
 def updateWorkingCopy(msgType, conference, nick, param):
 	response = os.popen("svn up").read()
 	if response:
-		currentRev = gVerInfo.getRevision()
+		currentRev = Version.revision
 		newRev = os.popen("svnversion -n").read()
 		if currentRev != newRev:
 			sendMsg(msgType, conference, nick, u"Обновлено до редакции %s" % (newRev))
@@ -26,9 +26,9 @@ def updateWorkingCopy(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Ваша копия не требует обновления")
 	else:
 		sendMsg(msgType, conference, nick, u"Не удалось обновиться, возможно не установлена SubVersion")
-	
-registerCommand(updateWorkingCopy, u"update", 100, 
-				u"Обновление рабочей копии бота", 
-				None, 
-				None, 
+
+registerCommand(updateWorkingCopy, u"update", 100,
+				u"Обновление рабочей копии бота",
+				None,
+				None,
 				CMD_ANY | CMD_NONPARAM)

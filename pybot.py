@@ -28,6 +28,8 @@ import sys
 import threading
 import time
 import traceback
+import urllib
+import urllib2
 
 import module.config as Config
 import module.version as Version
@@ -232,10 +234,82 @@ def execute(function, args):
 def printf(text, flag=FLAG_INFO):
 	gDebug.show(text, flag, flag)
 
+gStanzaID = 0
+def getUniqueID(text):
+	global gStanzaID
+	gStanzaID += 1
+	return "%s_%d" % (text, gStanzaID)
+
 getFilePath = os.path.join
 
 def getConfigPath(*param):
 	return os.path.join(CONFIG_DIR, *param)
+
+def getURL(url, param=None, data=None, headers=None):
+	if param:
+		query = urllib.urlencode(param)
+		url = u"%s?%s" % (url, query)
+	if data:
+		data = urllib.urlencode(data)
+	if headers:
+		request = urllib2.Request(url, data, headers)
+	else:
+		request = urllib2.Request(url, data)
+	try:
+		return urllib2.urlopen(request)
+	except IOError, e:
+		printf(u"Unable to open %s (%s)" % (url, e), FLAG_WARNING)
+	return None
+
+def decode(text, encoding=None):
+	if encoding:
+		text = unicode(text, encoding)
+	text = HTML_TAG_RE.sub("", text.replace("<br />","\n").replace("<br>","\n"))
+	return utils.unescapeHTML(text)
+
+URL_RE = re.compile(r"(http|ftp|svn)(\:\/\/[^\s<]+)")
+HTML_TAG_RE = re.compile(r"<.+?>")
+def isURL(url):
+	if URL_RE.search(url):
+		return True
+	return False
+
+USERJID_RE = re.compile(r"\w+@\w+\.\w+", re.UNICODE)
+def isJID(jid):
+	if USERJID_RE.search(jid):
+		return True
+	return False
+
+SERVER_RE = re.compile(r"\w+\.\w+", re.UNICODE)
+def isServer(server):
+	if not server.count(" "):
+		if SERVER_RE.search(server):
+			return True
+	return False
+
+def getUptimeStr(time):
+	minutes, seconds = divmod(time, 60)
+	hours, minutes = divmod(minutes, 60)
+	days, hours = divmod(hours, 24)
+	timeStr = "%02d:%02d:%02d" % (hours, minutes, seconds)
+	if days:
+		timeStr = u"%d дн. %s" % (days, timeStr)
+	return timeStr
+
+def getTimeStr(time):
+	minutes, seconds = divmod(time, 60)
+	hours, minutes = divmod(minutes, 60)
+	days, hours = divmod(hours, 24)
+	timeStr = ""
+	if seconds:
+		timeStr = u"%d сек." % (seconds)
+	if minutes:
+		timeStr = u"%d мин. %s" % (minutes, timeStr)
+	if hours:
+		timeStr = u"%d ч. %s" % (hours, timeStr)
+	if days:
+		timeStr = u"%d дн. %s" % (days, timeStr)
+	return timeStr
 
 def saveConferences():
 	utils.writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
@@ -285,6 +359,39 @@ def leaveConference(conference, status=None):
 	gClient.send(prs)
 	delConference(conference)
 
+getConferences = gConferences.keys
+
+def isConferenceInList(conference):
+	return conference in gConferences
+
+def getMUCSetRoleStanza(conference, user, role, reason=None):
+	iq = protocol.Iq(protocol.TYPE_SET)
+	iq.setTo(conference)
+	query = protocol.Node("query", {"xmlns": protocol.NS_MUC_ADMIN})
+	role = query.addChild("item", {"nick": user, "role": role})
+	if reason:
+		role.setTagData("reason", reason)
+	iq.addChild(node=query)
+	return iq
+
+def setMUCRole(conference, user, role, reason=None):
+	iq = getMUCSetRoleStanza(conference, user, role, reason)
+	gClient.send(iq)
+
+def getMUCSetAffiliationStanza(conference, user, itemType, aff, reason=None):
+	iq = protocol.Iq(protocol.TYPE_SET)
+	iq.setTo(conference)
+	query = protocol.Node("query", {"xmlns": protocol.NS_MUC_ADMIN})
+	aff = query.addChild("item", {itemType: user, "affiliation": aff})
+	if reason:
+		aff.setTagData("reason", reason)
+	iq.addChild(node=query)
+	return iq
+
+def setMUCAffiliation(conference, user, itemType, aff, reason=None):
+	iq = getMUCSetAffiliationStanza(conference, user, itemType, aff, reason)
+	gClient.send(iq)
+
 def getBotNick(conference):
 	return getConferenceConfigKey(conference, "nick") or Config.NICK
 
@@ -327,6 +434,9 @@ def isNickInConference(conference, nick):
 
 def isNickOnline(conference, nick):
 	return isNickInConference(conference, nick) and getNickKey(conference, nick, NICK_HERE)
+
+def isNickModerator(conference, nick):
+	return getNickKey(conference, nick, NICK_ROLE) == protocol.ROLE_MODERATOR
 
 def setTempAccess(conference, jid, level=0):
 	gTempAccess[conference][jid] = None
@@ -396,6 +506,11 @@ def getPresenceNode(show, status, priority):
 
 def setStatus(show, status, priority):
 	gClient.send(getPresenceNode(show, status, priority))
+
+def setConferenceStatus(conference, show, status):
+	prs = getPresenceNode(show, status, Config.PRIORITY)
+	prs.setTo(conference)
+	gClient.send(prs)
 
 def sendOfflinePresence(message):
 	prs = protocol.Presence(typ=protocol.PRS_OFFLINE)

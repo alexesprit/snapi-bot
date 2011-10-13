@@ -13,14 +13,21 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+def getUsedMemorySize():
+	if os.name == "posix":
+		pipe = os.popen("ps -o rss -p %s" % os.getpid())
+		pipe.readline()
+		return float(pipe.readline().strip()) / 1024
+	return 0
+
 def showBotUptime(msgType, conference, nick, param):
 	buf = []
-	
+
 	uptime = int(time.time() - gInfo["start"])
 	buf.append(u"Время работы: %s. " % (getUptimeStr(uptime)))
 	buf.append(u"Получено %(msg)d сообщений, обработано %(prs)d презенсов и %(iq)d iq-запросов, а также выполнено %(cmd)d команд. " % (gInfo))
 	memUsage = getUsedMemorySize()
-	if memUsage: 
+	if memUsage:
 		buf.append(u"Используется %0.2f МБ памяти. " % (memUsage))
 	buf.append(u"Было запущено %(tmr)d таймеров, %(thr)d потоков, " % (gInfo))
 	if gInfo["err"]:
@@ -28,8 +35,8 @@ def showBotUptime(msgType, conference, nick, param):
 	buf.append(u"в данный момент активно %d потоков" % (threading.activeCount()))
 	sendMsg(msgType, conference, nick, "".join(buf))
 
-registerCommand(showBotUptime, u"ботап", 10, 
-				u"Показывает статистику работы бота", 
-				None, 
-				None, 
+registerCommand(showBotUptime, u"ботап", 10,
+				u"Показывает статистику работы бота",
+				None,
+				None,
 				CMD_ANY | CMD_NONPARAM)
