@@ -176,7 +176,7 @@ gConferences = {}
 
 gJokes = []
 
-gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "tmr": 0}
+gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0}
 
 gDebug = debug.Debug([debug.DBG_ALWAYS], showFlags=False)
 gDebug.colors[FLAG_ERROR] = debug.colorBrightRed
@@ -217,7 +217,7 @@ def startThread(function, *args):
 	threading.Thread(None, execute, function.__name__, (function, args)).start()
 
 def startTimer(timeout, function, *args):
-	gInfo["tmr"] += 1
+	gInfo["thr"] += 1
 	timer = threading.Timer(timeout, execute, (function, args))
 	timer.setName(function.__name__)
 	timer.start()

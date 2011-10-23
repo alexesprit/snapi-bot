@@ -29,10 +29,10 @@ def showBotUptime(msgType, conference, nick, param):
 	memUsage = getUsedMemorySize()
 	if memUsage:
 		buf.append(u"Используется %0.2f МБ памяти. " % (memUsage))
-	buf.append(u"Было запущено %(tmr)d таймеров, %(thr)d потоков, " % (gInfo))
+	buf.append(u"Было запущено %(thr)d потоков, " % (gInfo))
+	buf.append(u"в данный момент активно %d потоков. " % (threading.activeCount()))
 	if gInfo["err"]:
-		buf.append(u"%(err)d ошибок, " % (gInfo))
-	buf.append(u"в данный момент активно %d потоков" % (threading.activeCount()))
+		buf.append(u"Необработанных ошибок: %(err)d" % (gInfo))
 	sendMsg(msgType, conference, nick, "".join(buf))
 
 registerCommand(showBotUptime, u"ботап", 10,
