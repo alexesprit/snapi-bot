@@ -53,7 +53,7 @@ def disableCommand(msgType, conference, nick, param):
 			buf.append(u"Отключены: %s\n" % (", ".join(validCmd)))
 		if alreadySwitched:
 			alreadySwitched.sort()
-			buf.append(u"Уже отключены: %\n" % (", ".join(alreadySwitched)))
+			buf.append(u"Уже отключены: %s\n" % (", ".join(alreadySwitched)))
 		if nonSwitched:
 			nonSwitched.sort()
 			buf.append(u"Неотключаемы: %s\n" % (", ".join(nonSwitched)))
@@ -64,7 +64,7 @@ def disableCommand(msgType, conference, nick, param):
 	else:
 		switchedOn = [cmd for cmd in gCmdOff[conference]]
 		if switchedOn:
-			sendMsg(msgType, conference, nick, 
+			sendMsg(msgType, conference, nick,
 				u"Отключены следующие команды: %s" % (", ".join(switchedOn)))
 		else:
 			sendMsg(msgType, conference, nick, u"В этой конференции включены все команды")
@@ -101,13 +101,13 @@ def enableCommand(msgType, conference, nick, param):
 registerEventHandler(loadDisabledCommands, EVT_ADDCONFERENCE)
 registerEventHandler(freeDisableCommands, EVT_DELCONFERENCE)
 
-registerCommand(enableCommand, u"комвкл", 30, 
-				u"Включает определённые команды для текущей конференции", 
-				u"<команды>", 
-				(u"тык диско версия пинг", ), 
+registerCommand(enableCommand, u"комвкл", 30,
+				u"Включает определённые команды для текущей конференции",
+				u"<команды>",
+				(u"тык диско версия пинг", ),
 				CMD_CONFERENCE | CMD_FROZEN | CMD_PARAM)
-registerCommand(disableCommand, u"комвыкл", 30, 
-				u"Отключает определённые команды для текущей конференции. Без параметров показывает список отключенных команд", 
-				u"[команды]", 
-				(None, u"тык диско версия пинг", ), 
+registerCommand(disableCommand, u"комвыкл", 30,
+				u"Отключает определённые команды для текущей конференции. Без параметров показывает список отключенных команд",
+				u"[команды]",
+				(None, u"тык диско версия пинг", ),
 				CMD_CONFERENCE | CMD_FROZEN)
