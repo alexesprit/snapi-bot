@@ -1,37 +1,39 @@
 # coding: utf-8
 
-# moscowtime.py
-# Copyright (c) ferym <ferym@jabbim.org.ru>
+# Firat Atagun
+# http://www.firatatagun.com/python-ntp-client/
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2, or (at your option)
-# any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+import socket
+import struct
 
 WEEKDAYS = (u"понедельник", u"вторник", u"среда", u"четверг", u"пятница", u"суббота", u"воскресенье")
 
 def showMoscowTime(msgType, conference, nick, param):
-	url = "http://www.zln.ru/time/"
-	response = getURL(url)
-	if response:
-		rawhtml = response.read()
-		elements = re.search(r"<div id=\"servertime.+?>(.+?)</div>", rawhtml, re.DOTALL)
-		if elements:
-			mskTime = unicode(elements.group(1), "cp1251").strip()
-			message = u"Московское время: %s (%s, %s)" % (mskTime, time.strftime("%d.%m.%y"), WEEKDAYS[time.localtime()[6]])
-			sendMsg(msgType, conference, nick, message)
-		else:
-			sendMsg(msgType, conference, nick, u"Не получается")
-	else:
-		sendMsg(msgType, conference, nick, u"Ошибка!")
+	server = ("pool.ntp.org", 123)
+	reqdata = "\x1b" + 47 * "\0"
+	fromntp = True
 
-registerCommand(showMoscowTime, u"время", 10, 
-				u"Показывает точное московское время", 
-				None, 
-				None, 
+	client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	client.sendto(reqdata, server)
+
+	data = client.recvfrom(1024)[0]
+	if data:
+		seconds = struct.unpack('!12I', data)[10]
+		if seconds == 0:
+			seconds = int(time.time())
+		currtime = time.gmtime(seconds - 2208988800L + 4 * 3600)
+	else:
+		fromntp = False
+		currtime = time.localtime()
+	timestr = time.strftime("%H:%M:%S, %d.%m.%y", currtime)
+	if fromntp:
+		message = u"Московское время: %s, %s" % (timestr, WEEKDAYS[currtime[6]])
+	else:
+		message = u"Локальное время: %s, %s" % (timestr, WEEKDAYS[currtime[6]])
+	sendMsg(msgType, conference, nick, message)
+
+registerCommand(showMoscowTime, u"время", 10,
+				u"Показывает точное московское время",
+				None,
+				None,
 				CMD_ANY | CMD_NONPARAM)
