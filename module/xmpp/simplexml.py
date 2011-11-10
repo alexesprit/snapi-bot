@@ -19,7 +19,7 @@
 """
 
 import xml.parsers.expat
-from utils.utils import escapeXML, ustr
+from module.utils import escapeXML, ustr
 
 class Node(object):
 	""" Node class describes syntax of separate XML Node. It have a constructor that permits node creation
@@ -263,7 +263,7 @@ class Node(object):
 		else:
 			self.children = payload
 
-	def getTag(self, name, attrs=None, namespace=None): 
+	def getTag(self, name, attrs=None, namespace=None):
 		""" Filters all child nodes using specified arguments as filter.
 			Returns the first found or None if not found.
 		"""
@@ -280,7 +280,7 @@ class Node(object):
 			return self.addChild(name, attrs, namespace=namespace)
 
 	def getTagAttr(self, tag, attr):
-		""" Returns attribute value of the child with specified name 
+		""" Returns attribute value of the child with specified name
 			or None if no such attribute.
 		"""
 		try:
@@ -474,7 +474,7 @@ class NodeBuilder:
 
 	def dispatch(self, stanza):
 		""" Gets called when the NodeBuilder reaches some level of depth on it's way up with the built
-			node as argument. Can be redefined to convert incoming XML stanzas to program events. 
+			node as argument. Can be redefined to convert incoming XML stanzas to program events.
 		"""
 	def stream_header_received(self,ns,tag,attrs):
 		""" Method called when stream just opened.

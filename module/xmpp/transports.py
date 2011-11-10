@@ -33,7 +33,7 @@ import dispatcher
 import plugin
 import protocol
 
-from utils.utils import ustr
+from module.utils import ustr
 
 BUFLEN = 1024
 
@@ -52,7 +52,7 @@ class TCPSocket(plugin.PlugIn):
 		""" SRV resolver. Takes server=(host, port) as argument.
 			Returns new (host, port) pair
 		"""
-		import dns
+		from module import dns
 		host, port = server
 		query = "_xmpp-client._tcp.%s" % host
 
@@ -207,7 +207,7 @@ class TLS(plugin.PlugIn):
 		if not self.forceSSL:
 			self._owner.unregisterHandler("proceed", self._parseTLSStanza, xmlns=protocol.NS_TLS)
 			self._owner.unregisterHandler("failure", self._parseTLSStanza, xmlns=protocol.NS_TLS)
-		
+
 	def pending_data(self, timeout=0):
 		""" Returns true if there possible is a data ready to be read.
 		"""

@@ -36,12 +36,11 @@ import module.version as Version
 
 from module import database
 from module import macros
+from module import utils
 
-from utils import utils
-
-from xmpp import client
-from xmpp import debug
-from xmpp import protocol
+from module.xmpp import client
+from module.xmpp import debug
+from module.xmpp import protocol
 
 IS_RUNNING = True
 

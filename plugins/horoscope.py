@@ -13,27 +13,27 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-from xmpp import simplexml
+from module.xmpp import simplexml
 
 HOROSCOPE_SIGNS = {
-	u"овен": u"aries", 
-	u"телец": u"taurus", 
-	u"близнецы": u"gemini", 
-	u"рак": u"cancer", 
-	u"лев": u"leo", 
-	u"дева": u"virgo", 
-	u"весы": u"libra", 
-	u"скорпион": u"scorpio", 
-	u"стрелец": u"sagittarius", 
-	u"козерог": u"capricorn", 
-	u"водолей": u"aquarius", 
+	u"овен": u"aries",
+	u"телец": u"taurus",
+	u"близнецы": u"gemini",
+	u"рак": u"cancer",
+	u"лев": u"leo",
+	u"дева": u"virgo",
+	u"весы": u"libra",
+	u"скорпион": u"scorpio",
+	u"стрелец": u"sagittarius",
+	u"козерог": u"capricorn",
+	u"водолей": u"aquarius",
 	u"рыбы": u"pisces"
 }
 
 HOROSCOPE_DATES = {
-	u"вчера": u"yesterday", 
-	u"сегодня": u"today", 
-	u"завтра": u"tomorrow", 
+	u"вчера": u"yesterday",
+	u"сегодня": u"today",
+	u"завтра": u"tomorrow",
 	u"послезавтра": u"tomorrow02"
 }
 
@@ -48,7 +48,7 @@ def showHoroscope(msgType, conference, nick, param):
 				rawdate = HOROSCOPE_DATES[date]
 			else:
 				examples = ", ".join(HOROSCOPE_DATES.keys())
-				sendMsg(msgType, conference, nick, 
+				sendMsg(msgType, conference, nick,
 					u"В кач-ве дат можно указывать только следующее: %s" % (examples))
 				return
 		else:
@@ -59,7 +59,7 @@ def showHoroscope(msgType, conference, nick, param):
 		if response:
 			rawxml = response.read()
 			xmlnode = simplexml.XML2Node(rawxml)
-			
+
 			horoNode = xmlnode.getTag(rawsign)
 			text = horoNode.getTagData(rawdate)
 			date = xmlnode.getTagAttr("date", rawdate)
@@ -68,11 +68,11 @@ def showHoroscope(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
 		examples = ", ".join(sorted(HOROSCOPE_SIGNS.keys()))
-		sendMsg(msgType, conference, nick, 
+		sendMsg(msgType, conference, nick,
 			u"Можно указывать только следующие знаки: %s" % (examples))
 
-registerCommand(showHoroscope, u"гороскоп", 10, 
-				u"Показывает гороскоп для указанного знака гороскопа. Возможен просмотр гороскопа на сегодня, вчера, завтра, послезавтра (указывайте 2-м параметром, без указания покажет для сегодняшнего дня)", 
-				u"<знак> [день]", 
-				(u"рыбы", u"рыбы завтра"), 
+registerCommand(showHoroscope, u"гороскоп", 10,
+				u"Показывает гороскоп для указанного знака гороскопа. Возможен просмотр гороскопа на сегодня, вчера, завтра, послезавтра (указывайте 2-м параметром, без указания покажет для сегодняшнего дня)",
+				u"<знак> [день]",
+				(u"рыбы", u"рыбы завтра"),
 				CMD_ANY | CMD_PARAM)

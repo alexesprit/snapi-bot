@@ -15,7 +15,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import chardet
+from module import chardet
 
 def pythonEval(msgType, conference, nick, param):
 	try:
@@ -57,23 +57,23 @@ def pythonCalc(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Ты глюк")
 
-registerCommand(pythonEval, u"eval", 100, 
-				u"Расчитывает и показывает заданное выражение питона", 
-				u"<выражение>", 
-				(u"str(gConferences)", ), 
+registerCommand(pythonEval, u"eval", 100,
+				u"Расчитывает и показывает заданное выражение питона",
+				u"<выражение>",
+				(u"str(gConferences)", ),
 				CMD_ANY | CMD_FROZEN | CMD_PARAM)
-registerCommand(pythonExec, u"exec", 100, 
-				u"Выполняет выражение питона", 
-				u"<выражение>", 
-				(u"del gConferences", ), 
+registerCommand(pythonExec, u"exec", 100,
+				u"Выполняет выражение питона",
+				u"<выражение>",
+				(u"del gConferences", ),
 				CMD_ANY | CMD_FROZEN | CMD_PARAM)
-registerCommand(pythonShell, u"sh", 100, 
-				u"Выполняет шелл-команду", 
-				u"<команда>", 
-				(u"ls", ), 
+registerCommand(pythonShell, u"sh", 100,
+				u"Выполняет шелл-команду",
+				u"<команда>",
+				(u"ls", ),
 				CMD_ANY | CMD_FROZEN | CMD_PARAM)
-registerCommand(pythonCalc, u"кальк", 10, 
-				u"Калькулятор", 
-				u"<выражение>", 
-				(u"1 + 2", ), 
+registerCommand(pythonCalc, u"кальк", 10,
+				u"Калькулятор",
+				u"<выражение>",
+				(u"1 + 2", ),
 				CMD_ANY | CMD_PARAM)

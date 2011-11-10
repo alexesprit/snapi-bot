@@ -15,7 +15,7 @@ import os
 import random
 import re
 
-from utils import utils
+from module import utils
 
 MACROS_FILE = "macros.txt"
 MACCESS_FILE = "macrosaccess.txt"
@@ -101,7 +101,7 @@ class Macros:
 		self.accessList = {}
 
 		self.path = path
-		
+
 		self.parser = ArgParser()
 
 	def loadMacroses(self, conference=None):
@@ -131,7 +131,7 @@ class Macros:
 
 			path = os.path.join(self.path, MACCESS_FILE)
 			utils.writeFile(path, str(self.gAccessList))
-			
+
 	def freeMacroses(self, conference):
 		del self.macrosList[conference]
 
@@ -172,13 +172,13 @@ class Macros:
 			if res:
 				rawbody = rawbody.replace("%%(%s)" % i, res)
 		return rawbody
-			
+
 	def hasMacros(self, macros, conference=None):
 		if conference:
 			return macros in self.macrosList[conference]
 		else:
 			return macros in self.gMacrosList
-			
+
 	def getAccess(self, macros, conference=None):
 		if conference:
 			return self.accessList[conference].get(macros)

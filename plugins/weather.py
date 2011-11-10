@@ -13,13 +13,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-from xmpp import simplexml
+from module.xmpp import simplexml
 
 WCODES_FILE = "citycodes.txt"
 
 PRECIPITATION = {
-	"4": u"дождь", 
-	"5": u"ливень", 
+	"4": u"дождь",
+	"5": u"ливень",
 	"6": u"снег",
 	"7": u"снег",
 	"8": u"гроза",
@@ -28,7 +28,7 @@ PRECIPITATION = {
 }
 
 WINDDIRECTION = {
-	"0": u"С", 
+	"0": u"С",
 	"1": u"С-В",
 	"2": u"В",
 	"3": u"Ю-В",
@@ -52,7 +52,7 @@ def getWCodeByName(city):
 		if line.startswith(city):
 			return line.split("|")
 	return None
-	
+
 def getAverageValue(attr):
 	minValue = int(attr["min"])
 	maxValue = int(attr["max"])
@@ -100,10 +100,10 @@ def showWeather(msgType, conference, nick, param):
 
 				pressure = forecast.getTag("PRESSURE").getAttrs()
 				buf.append(u"Давление: %d мм рт. ст.\n" % (getAverageValue(pressure)))
-				
+
 				hudmity = forecast.getTag("RELWET").getAttrs()
 				buf.append(u"Влажность: %s%%\n" % (getAverageValue(hudmity)))
-				
+
 				wind = forecast.getTag("WIND").getAttrs()
 				windValue = getAverageValue(wind)
 				if windValue:
@@ -117,8 +117,8 @@ def showWeather(msgType, conference, nick, param):
 	else:
 		sendMsg(msgType, conference, nick, u"Город не найден!")
 
-registerCommand(showWeather, u"погода", 10, 
-				u"Показывает погоду", 
-				u"<город>", 
-				(u"Москва", ), 
+registerCommand(showWeather, u"погода", 10,
+				u"Показывает погоду",
+				u"<город>",
+				(u"Москва", ),
 				CMD_ANY | CMD_PARAM)
