@@ -8,21 +8,26 @@ import struct
 
 WEEKDAYS = (u"понедельник", u"вторник", u"среда", u"четверг", u"пятница", u"суббота", u"воскресенье")
 
+def getMoscowTime():
+	try:
+		server = ("pool.nt1p.org", 123)
+		reqdata = "\x1b" + 47 * "\0"
+
+		client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		client.sendto(reqdata, server)
+		data = client.recvfrom(1024)[0]
+		if data:
+			seconds = struct.unpack('!12I', data)[10]
+			if seconds:
+				return time.gmtime(seconds - 2208988800L + 4 * 3600)
+	except socket.error:
+		pass
+	return None
+
 def showMoscowTime(msgType, conference, nick, param):
-	server = ("pool.ntp.org", 123)
-	reqdata = "\x1b" + 47 * "\0"
 	fromntp = True
-
-	client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	client.sendto(reqdata, server)
-
-	data = client.recvfrom(1024)[0]
-	if data:
-		seconds = struct.unpack('!12I', data)[10]
-		if seconds == 0:
-			seconds = int(time.time())
-		currtime = time.gmtime(seconds - 2208988800L + 4 * 3600)
-	else:
+	currtime = getMoscowTime()
+	if not currtime:
 		fromntp = False
 		currtime = time.localtime()
 	timestr = time.strftime("%H:%M:%S, %d.%m.%y", currtime)

@@ -59,7 +59,7 @@ def giveBomb(msgType, conference, nick, param):
 			gBombColors[conference][truejid] = colors
 			timeout = random.randrange(40, 71)
 			if colors:
-				message = u"Вам вручена бомба, на ней %d цветов: %s, " % (len(colors), ", ".join(colors))
+				message = u"Вам вручена бомба, на ней %d проводов: %s, " % (len(colors), ", ".join(colors))
 				message += u"выберите цвет провода, который нужно перерезать, бомба взорвется через %s" % (getTimeStr(timeout))
 			else:
 				# это не баг, это фича :)
