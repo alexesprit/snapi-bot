@@ -28,6 +28,7 @@ del major
 del minor
 
 def updateFeaturesHash(features):
+	global verhash
 	fString = "<".join(features)
 	string = u"%s/%s//%s<%s<" % (identcat, identtype, identname, fString)
 	verhash = base64.b64encode(hashlib.sha1(string).digest())

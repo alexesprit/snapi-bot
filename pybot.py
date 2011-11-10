@@ -34,8 +34,8 @@ import urllib2
 import module.config as Config
 import module.version as Version
 
-from classes import database
-from classes import macros
+from module import database
+from module import macros
 
 from utils import utils
 
