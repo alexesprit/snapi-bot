@@ -14,7 +14,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import simplejson
+from module import simplejson
 
 TRANSL_LANGS_FILE = "transllangs.txt"
 
@@ -24,17 +24,20 @@ def loadLangsForTranslate():
 	TRANSL_LANGS = eval(utils.readFile(path, encoding="utf-8"))
 
 def getTranslatedText(text, source, target):
-	url = "http://ajax.googleapis.com/ajax/services/language/translate"
+	url = "http://translate.google.ru/translate_a/t"
 	qparam = {
-		"v": "1.0", 
-		"q": text.encode("utf-8"), 
-		"langpair": "%s|%s" % (source, target)
+		"client": "x",
+		"text": text.encode("utf-8"),
+		"sl": source,
+		"tl": target
 	}
 	response = getURL(url, qparam)
 	if response:
 		rawdata = simplejson.load(response)
-		if rawdata["responseData"]:
-			return rawdata["responseData"]["translatedText"]
+		try:
+			return rawdata["sentences"][0]["trans"]
+		except KeyError, IndexError:
+			pass
 	return None
 
 def translateText(msgType, conference, nick, param):
@@ -69,8 +72,8 @@ def translateText(msgType, conference, nick, param):
 
 registerEventHandler(loadLangsForTranslate, EVT_STARTUP)
 
-registerCommand(translateText, u"перевод", 10, 
+registerCommand(translateText, u"перевод", 10,
 				u"Переводит текст с одного языка на другой. Чтобы получить список доступных языков для перевода, укажите \"языки\" в кач-ве параметра",
-				u"[исходный_язык] <нужный_язык> <фраза>", 
-				(u"языки", u"en привет", u"en ru hello"), 
+				u"[исходный_язык] <нужный_язык> <фраза>",
+				(u"языки", u"en привет", u"en ru hello"),
 				CMD_ANY | CMD_PARAM)

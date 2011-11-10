@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import simplejson
+from module import simplejson
 
 def getGoogleSearchQuery(text, lang=None):
 	param = {
@@ -54,18 +54,18 @@ def searchInGoogle(msgType, conference, nick, url, qparam):
 	else:
 		sendMsg(msgType, conference, nick, u"Ошибка!")
 
-registerCommand(searchInGoogleAll, u"гугль", 10, 
+registerCommand(searchInGoogleAll, u"гугль", 10,
 				u"Показывает результаты поиска через Google",
-				u"<текст>", 
-				(u"yandex", ), 
+				u"<текст>",
+				(u"yandex", ),
 				CMD_ANY | CMD_PARAM)
-registerCommand(searchInGoogleEN, u"гугльен", 10, 
+registerCommand(searchInGoogleEN, u"гугльен", 10,
 				u"Показывает результаты поиска через Google (по зарубежным сайтам)",
-				u"<текст>", 
-				(u"yandex", ), 
+				u"<текст>",
+				(u"yandex", ),
 				CMD_ANY | CMD_PARAM)
-registerCommand(searchInGoogleRU, u"гугльру", 10, 
+registerCommand(searchInGoogleRU, u"гугльру", 10,
 				u"Показывает результаты поиска через Google (по русскоязычным сайтам)",
-				u"<текст>", 
-				(u"yandex", ), 
+				u"<текст>",
+				(u"yandex", ),
 				CMD_ANY | CMD_PARAM)

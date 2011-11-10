@@ -254,6 +254,7 @@ def getURL(url, param=None, data=None, headers=None):
 		request = urllib2.Request(url, data, headers)
 	else:
 		request = urllib2.Request(url, data)
+	request.add_header("User-Agent", "Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11")
 	try:
 		return urllib2.urlopen(request)
 	except IOError, e:

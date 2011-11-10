@@ -4,7 +4,7 @@
 import re
 import sys
 
-from simplejson.scanner import Scanner, pattern
+from scanner import Scanner, pattern
 try:
     from _json import scanstring as c_scanstring
 except ImportError:
