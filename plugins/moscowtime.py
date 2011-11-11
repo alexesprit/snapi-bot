@@ -10,7 +10,7 @@ WEEKDAYS = (u"понедельник", u"вторник", u"среда", u"че�
 
 def getMoscowTime():
 	try:
-		server = ("pool.nt1p.org", 123)
+		server = ("pool.ntp.org", 123)
 		reqdata = "\x1b" + 47 * "\0"
 
 		client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
