@@ -82,10 +82,12 @@ def delAutoVisitort(msgType, conference, nick, param):
 
 def showAutoVisitors(msgType, conference, nick, param):
 	if gVisitors[conference]:
-		elements = [u"%d) %s" % (i + 1, moder) 
+		elements = [u"%d) %s" % (i + 1, moder)
 				for i, moder in enumerate(sorted(gVisitors[conference]))]
 		message = u"Список автомодераторов:\n%s" % ("\n".join(elements))
-		sendMsg(msgType, conference, nick, message)
+		if protocol.TYPE_PUBLIC == msgType:
+			sendMsg(msgType, conference, nick, u"Отправила в приват")
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"список автопосетителей пуст")
 
@@ -94,18 +96,18 @@ registerEventHandler(freeAutoVisitors, EVT_DELCONFERENCE)
 
 registerEventHandler(setAutoVisitor, EVT_USERJOIN)
 
-registerCommand(addAutoVisitor, u"девойс+", 15, 
-				u"Добавляет пользователя в список автопосетителей", 
-				u"<ник|жид>", 
-				(u"Nick", u"user@server.tld"), 
+registerCommand(addAutoVisitor, u"девойс+", 15,
+				u"Добавляет пользователя в список автопосетителей",
+				u"<ник|жид>",
+				(u"Nick", u"user@server.tld"),
 				CMD_CONFERENCE | CMD_PARAM)
-registerCommand(delAutoVisitort, u"девойс-", 15, 
-				u"Удаляет пользователя из списка автопосетителей", 
-				u"<ник|жид>", 
-				(u"Nick", u"user@server.tld"), 
+registerCommand(delAutoVisitort, u"девойс-", 15,
+				u"Удаляет пользователя из списка автопосетителей",
+				u"<ник|жид>",
+				(u"Nick", u"user@server.tld"),
 				CMD_CONFERENCE | CMD_PARAM)
-registerCommand(showAutoVisitors, u"девойс*", 15, 
-				u"Показывает список автопосетителей", 
-				None, 
-				None, 
+registerCommand(showAutoVisitors, u"девойс*", 15,
+				u"Показывает список автопосетителей",
+				None,
+				None,
 				CMD_CONFERENCE | CMD_NONPARAM)

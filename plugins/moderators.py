@@ -82,10 +82,12 @@ def delAutoModerator(msgType, conference, nick, param):
 
 def showAutoModerators(msgType, conference, nick, param):
 	if gModerators[conference]:
-		elements = [u"%d) %s" % (i + 1, moder) 
+		elements = [u"%d) %s" % (i + 1, moder)
 				for i, moder in enumerate(sorted(gModerators[conference]))]
 		message = u"Список автомодераторов:\n%s" % ("\n".join(elements))
-		sendMsg(msgType, conference, nick, message)
+		if protocol.TYPE_PUBLIC == msgType:
+			sendMsg(msgType, conference, nick, u"Отправила в приват")
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"Список автомодераторов пуст")
 
@@ -94,18 +96,18 @@ registerEventHandler(freeAutoModerators, EVT_DELCONFERENCE)
 
 registerEventHandler(setAutoModerator, EVT_USERJOIN)
 
-registerCommand(addAutoModerator, u"модер+", 20, 
-				u"Добавляет пользователя в список автомодераторов", 
-				u"<ник|жид>", 
-				(u"Nick", u"nick@server.tld"), 
+registerCommand(addAutoModerator, u"модер+", 20,
+				u"Добавляет пользователя в список автомодераторов",
+				u"<ник|жид>",
+				(u"Nick", u"nick@server.tld"),
 				CMD_CONFERENCE | CMD_PARAM)
-registerCommand(delAutoModerator, u"модер-", 20, 
-				u"Удаляет пользователя из списка автомодераторов", 
-				u"<ник|жид>", 
-				(u"Nick", u"nick@server.tld"), 
+registerCommand(delAutoModerator, u"модер-", 20,
+				u"Удаляет пользователя из списка автомодераторов",
+				u"<ник|жид>",
+				(u"Nick", u"nick@server.tld"),
 				CMD_CONFERENCE | CMD_PARAM)
-registerCommand(showAutoModerators, u"модер*", 20, 
-				u"Показывает список автомодераторов", 
-				None, 
-				None, 
+registerCommand(showAutoModerators, u"модер*", 20,
+				u"Показывает список автомодераторов",
+				None,
+				None,
 				CMD_CONFERENCE | CMD_NONPARAM)

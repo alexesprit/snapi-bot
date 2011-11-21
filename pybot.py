@@ -927,7 +927,7 @@ def main():
 
 		try:
 			while IS_RUNNING:
-				gClient.process(100)
+				gClient.process(10)
 		except protocol.SystemShutdown:
 			printf("%s has been switched off" % (Config.SERVER), FLAG_WARNING)
 			shutdown()
