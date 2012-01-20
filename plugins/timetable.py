@@ -24,36 +24,31 @@ def getTrainTable(cityFrom, cityTo, dateForward):
 	if response:
 		rawhtml = response.read()
 		rawhtml = unicode(rawhtml, "utf-8")
-		elements = re.findall(u"<tr class=\"{(.+?)</tr>", rawhtml, re.DOTALL)
-		tableList = []
-		for element in elements:
-			trainName = re.search("<a href=\".+?>(.+?)</a>", element, re.DOTALL)
-			trainName = decode(trainName.group(1)).strip()
+		table = []
+		
+		rawhtml = re.search("</thead>(.+?)<div class=\"b-yadirect\">", rawhtml, re.DOTALL).group(1)
 
-			dispatch, arrive = re.findall(r"<span class=\"point\">(.+?)</span>", element, re.DOTALL)
-			
-			timePtrn = re.compile(r"<strong(.+?)</strong>")
-			namePtrn = re.compile(r"<a href=\".+?>(.+?)</a>", re.DOTALL)
+		transports = re.findall(u"<div class=\"b-timetable__tripname\">(.+?)</div>", rawhtml, re.DOTALL)
+		descs = re.findall(u"<div class=\"b-timetable__description\">(.+?)</div>", rawhtml, re.DOTALL)
+		platforms = re.findall(u"<div class=\"b-timetable__platform\">(.+?)</div>", rawhtml, re.DOTALL)
+		times = re.findall(u"<div class=\"b-timetable__time\">(.+?)</div>", rawhtml, re.DOTALL)
+		places = re.findall(u"<td class=.+?column_type_price\">(.+?)</td>", rawhtml, re.DOTALL)
+		
+		count = len(transports)
 
-			disTime = timePtrn.search(dispatch)
-			disTime = decode(disTime.group(0)).strip()
-			disName = namePtrn.search(dispatch)
-			disName = decode(disName.group(1)).strip()
+		for i in xrange(count):
+			if "gone" in places[i]:
+				continue
+				
+			transport = decode(transports[i]).strip()
+			desc = decode(descs[i]).strip()
+			source = decode(platforms[2 * i + 0]).strip()
+			target = decode(platforms[2 * i + 1]).strip()
+			departure = decode(times[2 * i]).strip()
+			arrival = decode(times[2 * i + 1]).strip()
 			
-			arrTime = timePtrn.search(arrive)
-			arrTime = decode(arrTime.group(0)).strip()
-			arrName = namePtrn.search(arrive)
-			arrName = decode(arrName.group(1)).strip()
-			
-			travelTime = re.search(r"td class=\"{raw:.+?>.+?</i>(.+?)</td>", element, re.DOTALL)
-			travelTime = decode(travelTime.group(1)).strip()
-
-			if element.find("tickets\": \"yes") != -1:
-				places = u"есть"
-			else:
-				places = u"нет"
-			tableList.append([trainName, disTime, disName, arrTime, arrName, travelTime, places])
-		return tableList
+			table.append([transport, desc, source, departure, target, arrival])
+		return table
 	else:
 		return None
 
@@ -66,10 +61,10 @@ def showTrainTable(msgType, conference, nick, param):
 			date = param[0]
 			tableList = getTrainTable(cityFrom, cityTo, date)
 			message = []
-			msgText = u"%d) %s\nВремя отправления: %s (%s)\nВремя прибытия: %s (%s)\nВремя в пути: %s\nМеста: %s"
+			msgText = u"%d) %s\n%s\nОтправление: %s; %s\nПрибытие: %s; %s\n"
 			if tableList:
 				for i, table in enumerate(tableList):
-					message.append(msgText % (i + 1, table[0], table[1], table[2], table[3], table[4], table[5], table[6]))
+					message.append(msgText % (i + 1, table[0], table[1], table[2], table[3], table[4], table[5]))
 				if protocol.TYPE_PUBLIC == msgType:
 					sendMsg(msgType, conference, nick, u"ушло")
 				sendMsg(protocol.TYPE_PRIVATE, conference, nick, "\n".join(message))
