@@ -22,9 +22,9 @@ def showBashQuote(msgType, conference, nick, param):
 	response = getURL(url)
 	if response:
 		rawhtml = response.read()
-		elements = re.search("quote/(\d+).+?<div>(.+?)</div>", rawhtml, re.DOTALL)
+		elements = re.search(r"link: '(.+?)'.+?<div class=\"text\">(.+?)</div>", rawhtml, re.DOTALL)
 		if elements:
-			url = "http://bash.org.ru/quote/%s" % (elements.group(1))
+			url = elements.group(1)
 			quote = decode(elements.group(2), "cp1251")
 			sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
 		else:
@@ -37,7 +37,7 @@ def showAbyssQuote(msgType, conference, nick, param):
 	response = getURL(url)
 	if response:
 		rawhtml = response.read()
-		elements = re.findall("<div class=\"vote\">.+?<div>(.+?)</div>", rawhtml, re.DOTALL)
+		elements = re.findall("<span class=\"abysstop\">.+?<div class=\"text\">(.+?)</div>", rawhtml, re.DOTALL)
 		if elements:
 			rawquote = random.choice(elements)
 			message = decode(rawquote, "cp1251")
