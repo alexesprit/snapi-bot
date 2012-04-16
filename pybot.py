@@ -487,13 +487,15 @@ def getAccess(conference, jid):
 		return 10
 	return 0
 
-def getPresenceNode(show, status, priority):
-	prs = protocol.Presence(priority=priority)
+def getPresenceNode(to=None, show=None, status=None):
+	prs = protocol.Presence(priority=Config.PRIORITY)
 	prs.setAttr("ver", Version.version)
 	if status:
 		prs.setStatus(status)
 	if show:
 		prs.setShow(show)
+	if to:
+		prs.setTo(to)
 
 	caps = protocol.Node("c")
 	caps.setNamespace(protocol.NS_CAPS)
@@ -504,13 +506,8 @@ def getPresenceNode(show, status, priority):
 	prs.addChild(node=caps)
 	return prs
 
-def setStatus(show, status, priority):
-	gClient.send(getPresenceNode(show, status, priority))
-
-def setConferenceStatus(conference, show, status):
-	prs = getPresenceNode(show, status, Config.PRIORITY)
-	prs.setTo(conference)
-	gClient.send(prs)
+def setStatus(to=None, show=None, status=None):
+	gClient.send(getPresenceNode(to, show, status))
 
 def sendOfflinePresence(message):
 	prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
@@ -907,7 +904,7 @@ def main():
 		clearEventHandlers(EVT_STARTUP)
 
 		gClient.getRoster()
-		setStatus(None, None, Config.PRIORITY)
+		setStatus()
 
 		path = getConfigPath(CONF_FILE)
 		conferences = eval(utils.readFile(path, "[]"))

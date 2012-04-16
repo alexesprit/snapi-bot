@@ -39,7 +39,8 @@ def showPing(msgType, conference, nick, param):
 			jid = param
 	else:
 		jid = u"%s/%s" % (conference, nick)
-	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_VERSION)
+	iq = protocol.Iq(protocol.TYPE_GET)
+	iq.addChild("ping", {}, [], protocol.NS_PING)
 	iq.setTo(jid)
 	iq.setID(getUniqueID("ping_id"))
 	t0 = time.time()

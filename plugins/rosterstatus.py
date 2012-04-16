@@ -25,7 +25,7 @@ def updateRosterStatus():
 	if gRosterStatus:
 		show = gRosterStatus["show"]
 		status = gRosterStatus["status"]
-		setStatus(show, status, Config.PRIORITY)
+		setStatus(None, show, status)
 
 def setRosterStatus(msgType, conference, nick, param):
 	args = param.split(None, 1)

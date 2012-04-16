@@ -28,7 +28,7 @@ def manageBotStatusValue(msgType, conference, nick, param):
 			status = args[1]
 	else:
 		status = param
-	setConferenceStatus(conference, show, status)
+	setStatus(conference, show, status)
 	
 	setConferenceConfigKey(conference, "status", status)
 	setConferenceConfigKey(conference, "show", show)

@@ -35,7 +35,7 @@ def getTranslatedText(text, source, target):
 	if response:
 		rawdata = simplejson.load(response)
 		try:
-			return rawdata["sentences"][0]["trans"]
+			return "".join(s["trans"] for s in rawdata["sentences"])
 		except KeyError, IndexError:
 			pass
 	return None
