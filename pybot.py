@@ -344,8 +344,9 @@ def joinConference(conference, nick, password):
 
 	status = getConferenceConfigKey(conference, "status")
 	show = getConferenceConfigKey(conference, "show")
-	prs = getPresenceNode(show, status, Config.PRIORITY)
-	prs.setTo(u"%s/%s" % (conference, nick))
+	jid = u"%s/%s" % (conference, nick)
+
+	prs = getPresenceNode(jid, show, status)
 	mucTag = prs.setTag("x", namespace=protocol.NS_MUC)
 	mucTag.addChild("history", {"maxchars": "0"})
 	if password:
