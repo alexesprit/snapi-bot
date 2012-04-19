@@ -32,6 +32,7 @@ AFISHA_CITIES = {
 	u"мурманск": "murmansk",
 	u"новгород": "nnovgorod",
 	u"новосибирск": "novosibirsk",
+	u"омск": "omsk",
 	u"пермь": "perm",
 	u"петрозаводск": "petrozavidsk",
 	u"ростов-на-дону": "rostov-na-donu",
@@ -41,7 +42,10 @@ AFISHA_CITIES = {
 	u"тула": "tula",
 	u"уфа": "ufa",
 	u"челябинск": "chelyabinsk",
-	u"ярославль": "yaroslavl"
+	u"ярославль": "yaroslavl",
+	u"киев": "kiev",
+	u"харьков": "harkov",
+	u"донецк": "donetsk"
 }
 
 TIME_OFFSET = {

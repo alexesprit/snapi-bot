@@ -31,13 +31,15 @@ def loadTVChannels():
 	path = getFilePath(RESOURCE_DIR, TVCODES_FILE)
 	TV_CHANNELS = eval(utils.readFile(path, encoding="utf-8"))
 
-def getTVQueryParam(channel, flag=None):
+def getTVQueryParam(channel, flag=None, short=False):
 	param = {
 		"mode": "print",
 		"channel": channel
 	}
 	if flag:
 		param["flag"] = flag
+	if not short:
+		param["period"] = "24"
 	return param
 
 def getTVChannelCode(channelName):
@@ -48,9 +50,9 @@ def getTVChannelCode(channelName):
 			if channelName == x.lower():
 				return TV_CHANNELS[x]
 
-def getTVForChannel(channelCode):
+def getTVForChannel(channelCode, short):
 	url = "http://tv.yandex.ru/"
-	qparam = getTVQueryParam(channelCode)
+	qparam = getTVQueryParam(channelCode, short)
 	response = getURL(url, qparam)
 	if response:
 		rawHTML = response.read()
@@ -60,7 +62,7 @@ def getTVForChannel(channelCode):
 			return decode(rawtext, "utf-8")
 	return None
 
-def getTVForCategory(category):
+def getTVForCategory(category, short):
 	channels = ",".join(TV_CHANNELS.values())
 	url = "http://tv.yandex.ru/"
 	qparam = getTVQueryParam(channels, category)
@@ -90,7 +92,13 @@ def getTVForCategory(category):
 			return "\n".join(message)
 	return None
 
+def showTVProgramMore(msgType, conference, nick, param):
+	processCommand(msgType, conference, nick, param, True)
+	
 def showTVProgram(msgType, conference, nick, param):
+	processCommand(msgType, conference, nick, param, False)
+
+def processCommand(msgType, conference, nick, param, short=False):
 	param = param.lower()
 	if u"каналы" == param:
 		if protocol.TYPE_PUBLIC == msgType:
@@ -107,7 +115,7 @@ def showTVProgram(msgType, conference, nick, param):
 	elif param not in TV_CATEGORIES:
 		channelCode = getTVChannelCode(param)
 		if channelCode:
-			program = getTVForChannel(channelCode)
+			program = getTVForChannel(channelCode, short)
 			if program:
 				sendMsg(msgType, conference, nick, u"Вот, что я нашла:\n%s" % (program))
 			else:
@@ -129,6 +137,11 @@ registerEventHandler(loadTVChannels, EVT_STARTUP)
 
 registerCommand(showTVProgram, u"тв", 10, 
 				u"Показывает телепрограму для определённого канала/категории. Параметр \"каналы\" - список каналов, параметр \"категории\" - список категорий",
+				u"<канал|номер|категория>", 
+				(u"101", u"первый", u"каналы", u"категории"), 
+				CMD_ANY | CMD_PARAM)
+registerCommand(showTVProgramMore, u"тв+", 10, 
+				u"Показывает телепрограму для определённого канала/категории на 24 часа. Параметр \"каналы\" - список каналов, параметр \"категории\" - список категорий",
 				u"<канал|номер|категория>", 
 				(u"101", u"первый", u"каналы", u"категории"), 
 				CMD_ANY | CMD_PARAM)

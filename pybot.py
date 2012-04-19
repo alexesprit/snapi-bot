@@ -574,8 +574,7 @@ def parseMessage(stanza):
 		userAccess = getAccess(None, barejid)
 	if -100 == userAccess:
 		return
-	message = stanza.getBody() or ""
-	message = message.strip()
+	message = (stanza.getBody() or "").strip()
 	if protocol.TYPE_ERROR == msgType:
 		errorCode = stanza.getErrorCode()
 		if errorCode == "500":
