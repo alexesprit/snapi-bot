@@ -14,6 +14,15 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+"""
+<iq from='loc-id@conference.jabber.ru/modi' to='espr1t@jabber.ru/home' id='31:933738' xml:lang='ru' type='result'>
+    <time xmlns='urn:xmpp:time'>
+        <tzo>+04:00</tzo>
+        <utc>2005-01-01T03:04:19ZZ</utc>
+    </time>
+</iq>
+"""
+
 def showUserTime(msgType, conference, nick, param):
 	if param:
 		usernick = param
@@ -49,7 +58,7 @@ def showUserTime_(stanza, msgType, conference, nick, param):
 				else:
 					sendMsg(msgType, conference, nick, u"У тебя сейчас %s" % (userTime))
 			except ValueError:
-				sendMsg(msgType, conference, nick, u"Твой клиент - глюк!")
+				sendMsg(msgType, conference, nick, u"Глючит клиент!")
 		else:
 			sendMsg(msgType, conference, nick, u"Клиент глюк, инфы не хватает")
 	else:
