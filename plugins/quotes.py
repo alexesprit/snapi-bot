@@ -55,7 +55,7 @@ def showItHappensQuote(msgType, conference, nick, param):
 	response = getURL(url)
 	if response:
 		rawhtml = response.read()
-		elements = re.search(r"<p class=\"text\" id=\"story_(.+?)\">(.+?)</p>.+?", rawhtml, re.DOTALL)
+		elements = re.search(r"<p class=\"text\" id=\"story_(.+?)\">(.+?)</p>", rawhtml, re.DOTALL)
 		if elements:
 			url = "http://ithappens.ru/story/%s" % (elements.group(1))
 			quote = decode(elements.group(2), "cp1251")
