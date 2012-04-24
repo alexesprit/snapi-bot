@@ -90,6 +90,11 @@ def showTVProgram(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Ушли")
 		tvList = ["%d) %s" % (i + 1, item[0]) for i, item in enumerate(TV_CHANNELS)]
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Список каналов:\n%s" % ("\n".join(tvList)))
+	elif u"категории" == param:
+		if protocol.TYPE_PUBLIC == msgType:
+			sendMsg(msgType, conference, nick, u"Ушли")
+		tvCats = [cat for cat in TV_CATEGORIES]
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Список категорий:\n%s" % (", ".join(tvCats)))
 	elif param not in TV_CATEGORIES:
 		chInfo = getTVChannelInfo(param)
 		if chInfo:
