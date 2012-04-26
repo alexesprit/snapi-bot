@@ -46,7 +46,7 @@ def getTVChannelByURL(channelURL):
 	return channelURL
 
 def getTVProgramFromContent(rawdata):
-	elements = re.findall(r"<span class=\"prg_item_time\">(.+?)</span>.+?<a href.+?>(.+?)</a>", rawdata, re.DOTALL)
+	elements = re.findall(r"item_time\">(.+?)</span>.+?<(?:a href|span).+?>(.+?)</(?:a|span)>", rawdata, re.DOTALL)
 	if elements:
 		buf = []			
 		for element in elements:
