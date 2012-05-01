@@ -16,9 +16,9 @@
 
 def showBashQuote(msgType, conference, nick, param):
 	if param and param.isdigit():
-		url = "http://bash.org.ru/quote/%s" % (param)
+		url = "http://bash.im/quote/%s" % (param)
 	else:
-		url = "http://bash.org.ru/random"
+		url = "http://bash.im/random"
 	response = getURL(url)
 	if response:
 		rawhtml = response.read()
@@ -33,11 +33,11 @@ def showBashQuote(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 def showAbyssQuote(msgType, conference, nick, param):
-	url = "http://bash.org.ru/abysstop"
+	url = "http://bash.im/abysstop"
 	response = getURL(url)
 	if response:
 		rawhtml = response.read()
-		elements = re.findall("<span class=\"abysstop\">.+?<div class=\"text\">(.+?)</div>", rawhtml, re.DOTALL)
+		elements = re.findall("<div class=\"text\">(.+?)</div>", rawhtml, re.DOTALL)
 		if elements:
 			rawquote = random.choice(elements)
 			message = decode(rawquote, "cp1251")

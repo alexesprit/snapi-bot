@@ -100,7 +100,9 @@ def showTVProgram(msgType, conference, nick, param):
 		if chInfo:
 			program = getTVForChannel(chInfo[1])
 			if program:
-				sendMsg(msgType, conference, nick, u"Телепрограмма для канала \"%s\":\n%s" % (chInfo[0], program))
+				if protocol.TYPE_PUBLIC == msgType:
+					sendMsg(msgType, conference, nick, u"Ушло")
+				sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Телепрограмма для канала \"%s\":\n%s" % (chInfo[0], program))
 			else:
 				sendMsg(msgType, conference, nick, u"На сегодня программы нет")
 		else:
@@ -108,12 +110,12 @@ def showTVProgram(msgType, conference, nick, param):
 	else:
 		category = TV_CATEGORIES[param]
 		program = getTVForCategory(category)
-		if protocol.TYPE_PUBLIC == msgType:
-			sendMsg(msgType, conference, nick, u"Ушло")     
 		if program:
+			if protocol.TYPE_PUBLIC == msgType:
+				sendMsg(msgType, conference, nick, u"Ушло") 
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Программа для категории \"%s\":\n%s" % (param, program))
 		else:
-			sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"На сегодня программы для этой категории нет")
+			sendMsg(msgType, conference, nick, u"На сегодня программы для этой категории нет")
 
 registerEventHandler(loadTVChannels, EVT_STARTUP)
 
