@@ -85,17 +85,18 @@ def showIBashQuote(msgType, conference, nick, param):
 
 def showJabberQuote(msgType, conference, nick, param):
 	if param and param.isdigit():
-		url = "http://jabber-quotes.ru/id%s" % (param)
+		url = "http://jabber-quotes.ru/id/%s" % (param)
 	else:
 		url = "http://jabber-quotes.ru/random"
 	response = getURL(url)
 	if response:
 		rawhtml = response.read()
-		elements = re.search(r"#(\d+).+?<blockquote>(.+?)</blockquote>", rawhtml)
+		elements = re.search(r"<a href=.+?>#(\d+)</a>.+?<div id=\"quote\">(.+?)</div>", rawhtml, re.DOTALL)
 		if elements:
 			quote = elements.group(2)
-			quote = decode(quote.replace("<br><br>", "\n"), "cp1251")
-			url = "http://jabber-quotes.ru/id%s" % (elements.group(1))
+			quote = quote.replace("<br />\r<br />", "\n")
+			quote = decode(quote, "utf-8")
+			url = "http://jabber-quotes.ru/id/%s" % (elements.group(1))
 			sendMsg(msgType, conference, nick, u"%s\n\n%s" % (quote, url))
 		else:
 			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
