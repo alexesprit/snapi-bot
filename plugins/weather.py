@@ -46,10 +46,10 @@ CLOUDINESS = {
 }
 
 def getWCodeByName(city):
-	city = city.encode("utf-8")
+	city = city.encode("utf-8").lower()
 	path = getFilePath(RESOURCE_DIR, WCODES_FILE)
 	for line in open(path):
-		if line.startswith(city):
+		if line.lower().startswith(city):
 			return line.split("|")
 	return None
 
@@ -59,8 +59,7 @@ def getAverageValue(attr):
 	return (minValue + maxValue) / 2
 
 def showWeather(msgType, conference, nick, param):
-	city = param.capitalize()
-	rawdata = getWCodeByName(city)
+	rawdata = getWCodeByName(param)
 	if rawdata:
 		city, code = rawdata
 		url = "http://informer.gismeteo.ru/xml/%s.xml" % (code.strip())
