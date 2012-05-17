@@ -19,8 +19,8 @@ def showDreamInfo(msgType, conference, nick, param):
 	response = getURL(url, qparam)
 	if response:
 		rawhtml = response.read()
-		elements = re.search(r"<div id=\"mntxt\">(.+?)</p>", rawhtml, re.DOTALL)
-		message = decode(elements.group(1), "cp1251")
+		elements = re.search(r"<div id=\"hypercontext\">(.+?)</div>", rawhtml, re.DOTALL)
+		message = decode(elements.group(1), "utf-8")
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушёл")
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
