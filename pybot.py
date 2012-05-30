@@ -41,6 +41,7 @@ from module import utils
 from module.xmpp import client
 from module.xmpp import debug
 from module.xmpp import protocol
+from module.xmpp import simplexml
 
 IS_RUNNING = True
 
@@ -264,7 +265,9 @@ def getURL(url, param=None, data=None, headers=None):
 def decode(text, encoding=None):
 	if encoding:
 		text = unicode(text, encoding)
-	text = HTML_TAG_RE.sub("", text.replace("<br />","\n").replace("<br>","\n"))
+	for br in ("<br/>", "<br />", "<br>"):
+		text = text.replace(br, "\n")
+	text = HTML_TAG_RE.sub("", text)
 	return utils.unescapeHTML(text)
 
 URL_RE = re.compile(r"(http|ftp|svn)(\:\/\/[^\s<]+)")

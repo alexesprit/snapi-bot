@@ -47,8 +47,15 @@ def searchInGoogle(msgType, conference, nick, url, qparam):
 		if rawdata:
 			if msgType == protocol.TYPE_PUBLIC:
 				rawdata = rawdata[:1]
-			elements = ["%(title)s\n%(content)s\n%(unescapedUrl)s" % (element) for element in rawdata]
-			sendMsg(msgType, conference, nick, decode("\n\n".join(elements)))
+			found = []
+			for element in rawdata:
+				title = element["title"]
+				text = element["content"]
+				url = urllib.unquote(element["unescapedUrl"].encode('utf8')).decode("utf-8")
+				result = "%s\n%s\n%s" % (title, text, url)
+				result = result.replace(u"<b>", u"«").replace(u"</b>", u"»")
+				found.append(result)
+			sendMsg(msgType, conference, nick, decode("\n\n".join(found)))
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:

@@ -14,21 +14,27 @@
 # GNU General Public License for more details.
 
 def searchInYandex(msgType, conference, nick, param):
-	url = "http://yandex.ru/msearch"
-	qparam = {"query": param.encode("utf-8")}
+	url = "http://yandex.ru/yandsearch"
+	qparam = {"text": param.encode("utf-8")}
 	response = getURL(url, qparam)
 	if response:
 		rawhtml = response.read()
 		rawhtml = unicode(rawhtml, "utf-8")
-		elements = re.findall("<li >\n(.+?)\n.+?<div class=\"www\">(.+?)</div>", rawhtml, re.DOTALL)
+		elements = re.findall(r'<a class="b-serp-item__title.+?href="(.+?)".+?>(.+?)</a>.+?<div class="b-serp-item__text">(.+?)</div>', rawhtml, re.DOTALL)
 		if elements:
 			if protocol.TYPE_PUBLIC == msgType:
 				elements = elements[:1]
 			else:
 				elements = elements[:5]			
-			foundElements = [u"%s\nhttp://%s" % (element[0], element[1]) for element in elements]
-			message = "\n\n".join(foundElements)
-			sendMsg(msgType, conference, nick, decode(message))
+			found = []
+			for element in elements:
+				title = element[1]
+				text = element[2].replace("<br/>", "").strip()
+				url = element[0]
+				result = "%s\n%s\n%s" % (title, text, url)
+				result = result.replace(u"<b>", u"«").replace(u"</b>", u"»")
+				found.append(result)
+			sendMsg(msgType, conference, nick, decode("\n\n".join(found)))
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:

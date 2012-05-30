@@ -13,8 +13,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-from module.xmpp import simplexml
-
 HOROSCOPE_SIGNS = {
 	u"овен": u"aries",
 	u"телец": u"taurus",
