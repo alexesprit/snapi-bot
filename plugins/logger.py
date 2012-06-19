@@ -13,9 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-LOGCSS_FILE = "logger.css"
-
-LOGS_URL_NOINDEX = True
+LOGHEADER_FILE = "logheader.txt"
 
 LOGTYPE_MSG = "msg"
 LOGTYPE_SYSTEM = "system"
@@ -33,6 +31,8 @@ LOGTYPES = (
 	LOGTYPE_KICK,
 	LOGTYPE_BAN
 )
+
+gLastLogDir = {}
 
 def setDefaultLoggingValue(conference):
 	if getConferenceConfigKey(conference, "log") is None:
@@ -83,38 +83,32 @@ def getLogFile(conference, year, month, day):
 	if os.path.exists(path):
 		f = file(path, "a")
 	else:
+		lastLogDir = gLastLogDir.get(conference)
+		if lastLogDir:
+			writeLogFooter(lastLogDir)		
 		dirName = os.path.dirname(path)
 		if not os.path.exists(dirName):
 			os.makedirs(dirName)
 		f = file(path, "w")
 		writeLogHeader(f, conference, year, month, day)
+	gLastLogDir[conference] = path
 	return f
 
 def regexUrl(matchobj):
 	url = matchobj.group(0)
-	if LOGS_URL_NOINDEX:
-		return "<noindex><a href=\"%s\">%s</a></noindex>" % (url, url)
-	else:
-		return "<a href=\"%s\">%s</a>" % (url, url)
+	return "<noindex><a href=\"%s\">%s</a></noindex>" % (url, url)
+
+def writeLogFooter(logDir):
+	if os.path.isfile(logDir):
+		f = open(logDir, "a")
+		f.write(u"</body>\n</html>")
+		f.close()
 
 def writeLogHeader(f, conference, year, month, day):
-	date = "%.2i.%.2i.%.2i" % (day, month, year)
-	cssdata = utils.readFile(getFilePath(RESOURCE_DIR, LOGCSS_FILE))
-	header = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>%s</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<style type="text/css">
-<!--%s-->
-</style>
-</head>
-<body>
-<h1>%s<br/>%s</h1>
-<div>
-<tt>
-""" % (" - ".join([conference, date]), cssdata, conference, date)
+	date = "%02d.%02d.%2d" % (day, month, year)
+	header = utils.readFile(getFilePath(RESOURCE_DIR, LOGHEADER_FILE))
+	header = header.replace("%ROOM%", conference)
+	header = header.replace("%DATE%", date)
 	f.write(header.encode("utf-8"))
 
 def addTextToLog(conference, nick, text, logtype=LOGTYPE_MSG):
