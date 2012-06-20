@@ -670,7 +670,6 @@ def parseMessage(stanza):
 			gInfo["cmd"] += 1
 			startThread(gCmdHandlers[command], msgType, barejid, resource, param)
 		else:
-			printf(stanza)
 			sendMsg(msgType, barejid, resource, u"Недостаточно прав")
 
 def parsePresence(stanza):
