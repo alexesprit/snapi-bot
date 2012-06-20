@@ -578,6 +578,12 @@ def parseMessage(stanza):
 	if -100 == userAccess:
 		return
 	message = (stanza.getBody() or "").strip()
+	isTopic = False
+	if isConference and not message:
+		subject = stanza.getTagData("subject")
+		if subject:
+			message = subject
+			isTopic = True
 	if protocol.TYPE_ERROR == msgType:
 		errorCode = stanza.getErrorCode()
 		if errorCode == "500":
@@ -607,6 +613,9 @@ def parseMessage(stanza):
 		callEventHandlers(EVT_MSG | H_CONFERENCE, MODE_ASYNC, stanza, msgType, conference, nick, truejid, message)
 	else:
 		callEventHandlers(EVT_MSG | H_ROSTER, MODE_ASYNC, stanza, msgType, barejid, resource, message)
+	# topic can starts with some command word
+	if isTopic:
+		return
 	if isConference:
 		botNick = getBotNick(conference)
 		if botNick == nick:
@@ -661,6 +670,7 @@ def parseMessage(stanza):
 			gInfo["cmd"] += 1
 			startThread(gCmdHandlers[command], msgType, barejid, resource, param)
 		else:
+			printf(stanza)
 			sendMsg(msgType, barejid, resource, u"Недостаточно прав")
 
 def parsePresence(stanza):
