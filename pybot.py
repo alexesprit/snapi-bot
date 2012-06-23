@@ -270,16 +270,17 @@ def decode(text, encoding=None):
 	text = HTML_TAG_RE.sub("", text)
 	return utils.unescapeHTML(text)
 
-URL_RE = re.compile(r"(http|ftp|svn)(\:\/\/[^\s<]+)")
+URL_RE = re.compile(r"(http|ftp|https)(\:\/\/[^\s<]+)")
 HTML_TAG_RE = re.compile(r"<.+?>")
 def isURL(url):
 	if URL_RE.search(url):
 		return True
 	return False
 
-USERJID_RE = re.compile(r"\w+@\w+\.\w+", re.UNICODE)
+#USERJID_RE = re.compile(r"\w+@\w+\.\w+", re.UNICODE)
 def isJID(jid):
-	if USERJID_RE.search(jid):
+	#if USERJID_RE.search(jid):
+	if "@" in jid:
 		return True
 	return False
 
