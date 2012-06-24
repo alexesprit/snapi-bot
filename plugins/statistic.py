@@ -53,12 +53,13 @@ def updateLeaveStats(conference, nick, truejid, reason, code):
 		gStatsBanned[conference].append(truejid)
 
 def updatePresenceStats(stanza, conference, nick, truejid):
-	if protocol.TYPE_ERROR != stanza.getType():
-		if "303" == stanza.getStatusCode():
+	stype = stanza.getType()
+	if protocol.TYPE_ERROR != stype:
+		code = stanza.getStatusCode()
+		if "303" == code:
 			gConferenceStats[conference]["nick"] += 1
-		else:
-			msgType = stanza.getType()
-			if msgType and msgType != protocol.PRS_OFFLINE:
+		elif not code:
+			if stype != protocol.PRS_OFFLINE:
 				gConferenceStats[conference]["status"] += 1
 	
 def initConferenceStats(conference):
