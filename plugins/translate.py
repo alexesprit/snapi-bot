@@ -18,10 +18,9 @@ from module import simplejson
 
 TRANSL_LANGS_FILE = "transllangs.txt"
 
-def loadLangsForTranslate():
-	global TRANSL_LANGS
+def getTranslateLangs():
 	path = getFilePath(RESOURCE_DIR, TRANSL_LANGS_FILE)
-	TRANSL_LANGS = eval(utils.readFile(path, encoding="utf-8"))
+	return eval(io.read(path))
 
 def getTranslatedText(text, source, target):
 	url = "http://translate.google.ru/translate_a/t"
@@ -31,7 +30,7 @@ def getTranslatedText(text, source, target):
 		"sl": source,
 		"tl": target
 	}
-	response = getURL(url, qparam)
+	response = netutil.getURL(url, qparam)
 	if response:
 		rawdata = simplejson.load(response)
 		try:
@@ -43,7 +42,7 @@ def getTranslatedText(text, source, target):
 def translateText(msgType, conference, nick, param):
 	if param.lower() == u"языки":
 		elements = [u"%s - %s" % (name, lang)
-				for lang, name in TRANSL_LANGS.items()]
+				for lang, name in getTranslateLangs().items()]
 		elements.sort()
 		message = u"Доступные языки:\n%s" % ("\n".join(elements))
 		sendMsg(msgType, conference, nick, message)
@@ -52,9 +51,10 @@ def translateText(msgType, conference, nick, param):
 		if len(args) >= 2:
 			source = args[0]
 			target = args[1]
-			if source in TRANSL_LANGS:
+			langs = getTranslateLangs()
+			if source in langs:
 				# maybe target is a text
-				if target not in TRANSL_LANGS:
+				if target not in langs:
 					args = param.split(None, 1)
 					target, text = args
 					source = ""
@@ -66,11 +66,9 @@ def translateText(msgType, conference, nick, param):
 						return
 				text = getTranslatedText(text, source, target)
 				if text:
-					sendMsg(msgType, conference, nick, utils.unescapeHTML(text))
+					sendMsg(msgType, conference, nick, netutil.unescapeHTML(text))
 				else:
 					sendMsg(msgType, conference, nick, u"Не могу перевести")
-
-registerEventHandler(loadLangsForTranslate, EVT_STARTUP)
 
 registerCommand(translateText, u"перевод", 10,
 				u"Переводит текст с одного языка на другой. Чтобы получить список доступных языков для перевода, укажите \"языки\" в кач-ве параметра",

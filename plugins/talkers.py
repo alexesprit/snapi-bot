@@ -14,7 +14,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-TALKERS_FILE = "talkers.txt"
+TALKERS_FILE = "talkers.dat"
 
 gTalkersCache = {}
 

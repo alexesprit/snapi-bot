@@ -24,7 +24,7 @@ def setUserAffiliation(msgType, conference, nick, user, aff):
 	if isNickInConference(conference, user):
 		iq = getMUCSetAffiliationStanza(conference, user, protocol.ITEM_NICK, aff)
 		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
-	elif isJID(user) or isServer(user):
+	elif netutil.isJID(user) or netutil.isServer(user):
 		iq = getMUCSetAffiliationStanza(conference, user, protocol.ITEM_JID, aff)
 		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))	
 	else:

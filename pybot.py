@@ -28,15 +28,14 @@ import sys
 import threading
 import time
 import traceback
-import urllib
-import urllib2
 
 import module.config as Config
 import module.version as Version
 
 from module import database
+from module import io
 from module import macros
-from module import utils
+from module import netutil
 
 from module.xmpp import client
 from module.xmpp import debug
@@ -52,11 +51,13 @@ RESOURCE_DIR = "resource"
 
 BOTCONFIG_FILE = "config.py"
 
-ACCESS_FILE = "access.txt"
-CONFIG_FILE = "config.txt"
+ACCESS_FILE = "access.dat"
+CONFIG_FILE = "config.dat"
 CONF_FILE = "conferences.txt"
 LOG_ERRORS_FILE = "%Y.%m.%d_errors.txt"
 LOG_CRASHES_FILE = "%Y.%m.%d_crashes.txt"
+
+JOKES_FILE = "jokes.txt"
 
 FLAG_INFO = "info"
 FLAG_ERROR = "error"
@@ -123,19 +124,6 @@ STATUS_STRINGS = (
 	protocol.PRS_CHAT
 )
 
-BOT_FEATURES = (
-	protocol.NS_ACTIVITY,
-	protocol.NS_DISCO_INFO,
-	protocol.NS_DISCO_ITEMS,
-	protocol.NS_MOOD,
-	protocol.NS_MUC,
-	protocol.NS_VERSION,
-	protocol.NS_PING,
-	protocol.NS_RECEIPTS,
-	protocol.NS_ENTITY_TIME,
-	protocol.NS_VCARD
-)
-
 KEEPALIVE_TIMEOUT = 300
 REJOIN_DELAY = 120
 RECONNECT_DELAY = 15
@@ -156,7 +144,7 @@ EVT_USERLEAVE = 0x0080
 EVT_ADDCONFERENCE = 0x0100
 EVT_DELCONFERENCE = 0x0200
 
-EVT_STARTUP = 0x0400
+EVT_CONNECTED = 0x0400
 EVT_READY = 0x0800
 EVT_SHUTDOWN = 0x1000
 
@@ -174,16 +162,12 @@ gMacros = macros.Macros(CONFIG_DIR)
 gConferenceConfig = {}
 gConferences = {}
 
-gJokes = []
-
 gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0}
 
 gDebug = debug.Debug([debug.DBG_ALWAYS], showFlags=False)
 gDebug.colors[FLAG_ERROR] = debug.colorBrightRed
 gDebug.colors[FLAG_WARNING] = debug.colorYellow
 gDebug.colors[FLAG_SUCCESS] = debug.colorBrightCyan
-
-THR_SEMAPHORE = threading.BoundedSemaphore(30)
 
 def registerCommand(function, command, access, desc, syntax, examples, cmdType=CMD_ANY):
 	gCmdHandlers[command] = function
@@ -225,8 +209,7 @@ def startTimer(timeout, function, *args):
 
 def execute(function, args):
 	try:
-		with THR_SEMAPHORE:
-			function(*args)
+		function(*args)
 	except Exception:
 		printf("Exception in %s function" % (function.__name__), FLAG_ERROR)
 		addTextToSysLog(traceback.format_exc(), LOG_ERRORS)
@@ -244,52 +227,6 @@ getFilePath = os.path.join
 
 def getConfigPath(*param):
 	return os.path.join(CONFIG_DIR, *param)
-
-def getURL(url, param=None, data=None, headers=None):
-	if param:
-		query = urllib.urlencode(param)
-		url = u"%s?%s" % (url, query)
-	if data:
-		data = urllib.urlencode(data)
-	if headers:
-		request = urllib2.Request(url, data, headers)
-	else:
-		request = urllib2.Request(url, data)
-	request.add_header("User-Agent", "Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11")
-	try:
-		return urllib2.urlopen(request)
-	except IOError, e:
-		printf(u"Unable to open %s (%s)" % (url, e), FLAG_WARNING)
-	return None
-
-def decode(text, encoding=None):
-	if encoding:
-		text = unicode(text, encoding)
-	for br in ("<br/>", "<br />", "<br>"):
-		text = text.replace(br, "\n")
-	text = HTML_TAG_RE.sub("", text)
-	return utils.unescapeHTML(text)
-
-URL_RE = re.compile(r"(http|ftp|https)(\:\/\/[^\s<]+)")
-HTML_TAG_RE = re.compile(r"<.+?>")
-def isURL(url):
-	if URL_RE.search(url):
-		return True
-	return False
-
-#USERJID_RE = re.compile(r"\w+@\w+\.\w+", re.UNICODE)
-def isJID(jid):
-	#if USERJID_RE.search(jid):
-	if "@" in jid:
-		return True
-	return False
-
-SERVER_RE = re.compile(r"\w+\.\w+", re.UNICODE)
-def isServer(server):
-	if not server.count(" "):
-		if SERVER_RE.search(server):
-			return True
-	return False
 
 def getUptimeStr(time):
 	minutes, seconds = divmod(time, 60)
@@ -316,15 +253,15 @@ def getTimeStr(time):
 	return timeStr
 
 def saveConferences():
-	utils.writeFile(getConfigPath(CONF_FILE), str(gConferences.keys()))
+	io.write(getConfigPath(CONF_FILE), gConferences.keys())
 
 def loadConferenceConfig(conference):
 	path = getConfigPath(conference, CONFIG_FILE)
-	gConferenceConfig[conference] = eval(utils.readFile(path, "{}"))
+	gConferenceConfig[conference] = io.load(path, {})
 
 def saveConferenceConfig(conference):
 	path = getConfigPath(conference, CONFIG_FILE)
-	utils.writeFile(path, str(gConferenceConfig[conference]))
+	io.dump(path, gConferenceConfig[conference])
 
 def getConferenceConfigKey(conference, key):
 	return gConferenceConfig[conference].get(key)
@@ -358,10 +295,7 @@ def joinConference(conference, nick, password):
 	gClient.send(prs)
 
 def leaveConference(conference, status=None):
-	prs = protocol.Presence(conference, protocol.PRS_OFFLINE)
-	if status:
-		prs.setStatus(status)
-	gClient.send(prs)
+	setOfflineStatus(conference, status)
 	delConference(conference)
 
 getConferences = gConferences.keys
@@ -457,11 +391,11 @@ def setPermAccess(conference, jid, level=0):
 	else:
 		del gPermAccess[conference][jid]
 	path = getConfigPath(conference, ACCESS_FILE)
-	utils.writeFile(path, str(gPermAccess[conference]))
+	io.dump(path, gPermAccess[conference])
 
 def setPermGlobalAccess(jid, level=0):
 	path = getConfigPath(ACCESS_FILE)
-	tempAccess = eval(utils.readFile(path))
+	tempAccess = io.load(path)
 	tempAccess[jid] = None
 	gGlobalAccess[jid] = None
 	if level:
@@ -471,7 +405,7 @@ def setPermGlobalAccess(jid, level=0):
 		del tempAccess[jid]
 		del gGlobalAccess[jid]
 	path = getConfigPath(ACCESS_FILE)
-	utils.writeFile(path, str(tempAccess))
+	io.dump(path, tempAccess)
 
 def setTempGlobalAccess(jid, level=0):
 	gGlobalAccess[jid] = None
@@ -495,16 +429,15 @@ def getAccess(conference, jid):
 def getPresenceNode(to=None, show=None, status=None):
 	prs = protocol.Presence(priority=Config.PRIORITY)
 	prs.setAttr("ver", Version.version)
-	if status:
-		prs.setStatus(status)
-	if show:
-		prs.setShow(show)
+
+	prs.setStatus(status)
+	prs.setShow(show)
 	if to:
 		prs.setTo(to)
 
 	caps = protocol.Node("c")
 	caps.setNamespace(protocol.NS_CAPS)
-	caps.setAttr("node", Version.capsstr)
+	caps.setAttr("node", Version.caps)
 	caps.setAttr("ver", Version.verhash)
 	caps.setAttr("hash", "sha-1")
 
@@ -514,9 +447,11 @@ def getPresenceNode(to=None, show=None, status=None):
 def setStatus(to=None, show=None, status=None):
 	gClient.send(getPresenceNode(to, show, status))
 
-def sendOfflinePresence(message):
+def setOfflineStatus(to=None, status=None):
 	prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-	prs.setStatus(message)
+	prs.setStatus(status)
+	if to:
+		prs.setTo(to)
 	gClient.send(prs)
 
 def sendTo(msgType, jid, text):
@@ -535,7 +470,9 @@ def sendMsg(msgType, conference, nick, text, force=False):
 	if protocol.TYPE_PUBLIC == msgType and not force:
 		fools = getConferenceConfigKey(conference, "jokes")
 		if fools and not random.randrange(0, 30):
-			text = random.choice(gJokes)
+			jokesPath = getFilePath(RESOURCE_DIR, JOKES_FILE)
+			jokes = eval(io.read(jokesPath))
+			text = random.choice(jokes)
 		else:
 			msgLimit = getConferenceConfigKey(conference, "msg")
 			if msgLimit and len(text) > msgLimit:
@@ -813,7 +750,7 @@ def parseIQ(stanza):
 				"name": Version.identname
 			}
 			query.addChild("identity", attrs)
-			for feat in BOT_FEATURES:
+			for feat in Version.BOT_FEATURES:
 				query.addChild("feature", {"var": feat})
 		else:
 			iq = stanza.buildReply(protocol.TYPE_ERROR)
@@ -829,7 +766,7 @@ def addTextToSysLog(text, logtype, show=False):
 	path = getFilePath(SYSLOG_DIR, time.strftime(LOG_TYPES[logtype]))
 	if isinstance(text, unicode):
 		text = text.encode("utf-8")
-	utils.writeFile(path, text + "\n", "a")
+	io.write(path, text + "\n", "a")
 	if LOG_ERRORS == logtype:
 		gInfo["err"] += 1
 	if show:
@@ -882,7 +819,6 @@ def main():
 
 	try:
 		Config.load(BOTCONFIG_FILE)
-		Version.updateFeaturesHash(BOT_FEATURES)
 
 		global gClient
 		gClient = client.Client(server=Config.SERVER, port=Config.PORT)
@@ -913,14 +849,14 @@ def main():
 		gClient.registerHandler("presence", parsePresence)
 		gClient.registerHandler("iq", parseIQ)
 
-		callEventHandlers(EVT_STARTUP, MODE_ASYNC)
-		clearEventHandlers(EVT_STARTUP)
+		callEventHandlers(EVT_CONNECTED, MODE_ASYNC)
+		clearEventHandlers(EVT_CONNECTED)
 
 		gClient.getRoster()
 		setStatus()
 
 		path = getConfigPath(CONF_FILE)
-		conferences = eval(utils.readFile(path, "[]"))
+		conferences = eval(io.read(path, "[]"))
 		if conferences:
 			for conference in conferences:
 				addConference(conference)
@@ -948,11 +884,11 @@ def main():
 			printf("Exception in main thread", FLAG_ERROR)
 			addTextToSysLog(traceback.format_exc(), LOG_CRASHES)
 			if gClient.isConnected():
-				sendOfflinePresence(u"Что-то сломано...")
+				setOfflineStatus(None, u"Что-то сломано...")
 			shutdown(Config.RESTART_IF_ERROR)
 	except KeyboardInterrupt:
 		if gClient.isConnected():
-			sendOfflinePresence(u"Выключаюсь... (CTRL+C)")
+			setOfflineStatus(u"Выключаюсь... (CTRL+C)")
 		shutdown()
 
 if __name__ == "__main__":

@@ -19,7 +19,7 @@
 """
 
 import xml.parsers.expat
-from module.utils import escapeXML, ustr
+from module.netutil import escapeXML, ustr
 
 class Node(object):
 	""" Node class describes syntax of separate XML Node. It have a constructor that permits node creation

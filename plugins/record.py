@@ -13,36 +13,34 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-REC_FILE = "record.txt"
-gRecords = {}
+REC_FILE = "record.dat"
 
-def loadRecordsBase(conference):
+def openRecords(conference):
 	path = getConfigPath(conference, REC_FILE)
-	gRecords[conference] = eval(utils.readFile(path, "{}"))
+	return io.load(path, {})
 
-def freeRecordsBase(conference):
-	del gRecords[conference]
-
+def saveRecords(conference, records):
+	path = getConfigPath(conference, REC_FILE)
+	io.dump(path, records)
+	
 def showRecord(msgType, conference, nick, param):
-	if gRecords[conference]:
+	records = openRecords(conference)
+	if records:
 		sendMsg(msgType, conference, nick, 
-				u"Рекорд посещаемости - %(count)d человек (%(time)s)" % (gRecords[conference]))
+				u"Рекорд посещаемости - %(count)d человек (%(time)s)" % (records))
 	else:
 		sendMsg(msgType, conference, nick, u"Нет информации")
-		
-def calculateRecord(conference, nick, truejid, aff, role):
-	userCount = len(getOnlineNicks(conference))
-	lastCount = gRecords[conference] and gRecords[conference]["count"] or 0
-	if userCount >= lastCount:
-		gRecords[conference]["time"] = time.strftime("%d.%m.%y, %H:%M")
-		gRecords[conference]["count"] = userCount
-		path = getConfigPath(conference, REC_FILE)
-		utils.writeFile(path, str(gRecords[conference]))
-	
-registerEventHandler(calculateRecord, EVT_USERJOIN)
 
-registerEventHandler(loadRecordsBase, EVT_ADDCONFERENCE)
-registerEventHandler(freeRecordsBase, EVT_DELCONFERENCE)
+def calculateRecord(conference, nick, truejid, aff, role):
+	records = openRecords(conference)
+	userCount = len(getOnlineNicks(conference))
+	lastCount = records and records["count"] or 0
+	if userCount >= lastCount:
+		records["time"] = time.strftime("%d.%m.%y, %H:%M")
+		records["count"] = userCount
+		saveRecords(conference, records)
+
+registerEventHandler(calculateRecord, EVT_USERJOIN)
 
 registerCommand(showRecord, u"рекорд", 10, 
 				u"Показывает рекорд посещаемости конференции", 

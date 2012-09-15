@@ -13,18 +13,18 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-CMDOFF_FILE = "cmdoff.txt"
+CMDOFF_FILE = "cmdoff.dat"
 
 def loadDisabledCommands(conference):
 	path = getConfigPath(conference, CMDOFF_FILE)
-	gCmdOff[conference] = eval(utils.readFile(path, "[]"))
+	gCmdOff[conference] = io.load(path, [])
 
 def freeDisableCommands(conference):
 	del gCmdOff[conference]
 
 def saveDisabledCommands(conference):
 	path = getConfigPath(conference, CMDOFF_FILE)
-	utils.writeFile(path, str(gCmdOff[conference]))
+	io.dump(path, gCmdOff[conference])
 
 def disableCommand(msgType, conference, nick, param):
 	if param:

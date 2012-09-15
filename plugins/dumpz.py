@@ -14,26 +14,25 @@
 
 DUMPZ_LANGS_FILE = "dumpzlangs.txt"
 
-def loadLangsForDumpz():
-	global DUMPZ_LANGS
+def getDumpzLangs():
 	path = getFilePath(RESOURCE_DIR, DUMPZ_LANGS_FILE)
-	DUMPZ_LANGS = eval(utils.readFile(path))
+	return eval(io.read(path))
 
 def uploadToDumpz(msgType, conference, nick, param):
 	if u"языки" == param.lower():
 		elements = [u"%s - %s" % (name, lang)
-				for lang, name in DUMPZ_LANGS.items()]
+				for lang, name in getDumpzLangs().iteritems()]
 		elements.sort()
 		message = u"Доступные языки:\n%s" % ("\n".join(elements))
 		sendMsg(msgType, conference, nick, message)
 	else:
 		args = param.split(None, 1)
 		lang = args[0]
-		if lang in DUMPZ_LANGS:
+		if lang in getDumpzLangs():
 			if len(args) == 2:
 				text = args[1]
 			else:
-				sendMsg(msgType, conference, nick, u"А где тескт?")
+				sendMsg(msgType, conference, nick, u"А где текст?")
 				return
 		else:
 			text = param
@@ -43,14 +42,11 @@ def uploadToDumpz(msgType, conference, nick, param):
 			"lexer": lang,
 			"code": text.encode("utf-8")
 		}
-		headers = {"Content-type": "application/x-www-form-urlencoded"}
-		response = getURL(url, None, data, headers)
+		response = netutil.getURL(url, None, data)
 		if response:
 			sendMsg(msgType, conference, nick, u"Залито на %s" % (response.url))
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
-
-registerEventHandler(loadLangsForDumpz, EVT_STARTUP)
 
 registerCommand(uploadToDumpz, u"пастебин", 10, 
 				u"Заливает текст на пастебин-сервис dumpz.org. Чтобы получить список поддерживаемых языков, укажите \"языки\" в кач-ве параметра", 

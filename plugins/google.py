@@ -40,7 +40,7 @@ def searchInGoogleRU(msgType, conference, nick, text):
 	searchInGoogle(msgType, conference, nick, url, qparam)
 
 def searchInGoogle(msgType, conference, nick, url, qparam):
-	response = getURL(url, qparam)
+	response = netutil.getURL(url, qparam)
 	if response:
 		response = simplejson.load(response)
 		rawdata = response["responseData"]["results"]

@@ -16,7 +16,7 @@
 def showDreamInfo(msgType, conference, nick, param):
 	url = "http://www.sonnik.ru/search.php"
 	qparam = {"key": param.encode("cp1251")}
-	response = getURL(url, qparam)
+	response = netutil.getURL(url, qparam)
 	if response:
 		rawhtml = response.read()
 		elements = re.search(r"<div id=\"hypercontext\">(.+?)</div>", rawhtml, re.DOTALL)

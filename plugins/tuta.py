@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-HERE_FILE = "tuta.txt"
+HERE_FILE = "tuta.dat"
 
 gHereTime = {}
 

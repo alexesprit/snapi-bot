@@ -15,32 +15,28 @@
 
 POKES_FILE = "pokes.txt"
 
-def loadPokes():
-	global gPokes
-	path = getFilePath(RESOURCE_DIR, POKES_FILE)
-	gPokes = eval(utils.readFile(path, encoding="utf-8"))
-
 def pokeUser(msgType, conference, nick, param):
 	if msgType == protocol.TYPE_PUBLIC:
 		if param:
+			pokesPath = getFilePath(RESOURCE_DIR, POKES_FILE)
+			pokes = eval(io.read(pokesPath))
+
 			botNick = getBotNick(conference)
 			if param == u"всех":
 				for userNick in getOnlineNicks(conference):
 					if userNick != botNick and userNick != nick:
-						sendToConference(conference, random.choice(gPokes) % (userNick))
+						sendToConference(conference, random.choice(pokes) % (userNick))
 						time.sleep(0.5)
 			elif isNickOnline(conference, param):
 				if param == botNick:
 					param = nick
-				sendToConference(conference, random.choice(gPokes) % (param))
+				sendToConference(conference, random.choice(pokes) % (param))
 			else:
 				sendMsg(msgType, conference, nick, u"А это кто?")
 		else:
 			sendMsg(msgType, conference, nick, u"Мазохист? :D")
 	else:
 		sendMsg(msgType, conference, nick, u":-P")
-
-registerEventHandler(loadPokes, EVT_STARTUP)
 
 registerCommand(pokeUser, u"тык", 10, 
 				u"Тыкает пользователя. Заставляет его обратить внимание на вас", 

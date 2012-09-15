@@ -13,13 +13,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-GREET_FILE = "greets.txt"
+GREET_FILE = "greets.dat"
 
 gGreets = {}
 
 def loadGreetings(conference):
 	path = getConfigPath(conference, GREET_FILE)
-	gGreets[conference] = eval(utils.readFile(path, "{}"))
+	gGreets[conference] = io.load(path, {})
 
 def freeGreetings(conference):
 	del gGreets[conference]
@@ -29,7 +29,7 @@ def setUserGreeting(msgType, conference, nick, param):
 	if len(args) == 2:
 		user = args[0].strip()
 		greet = args[1].strip()
-		if isJID(user):
+		if netutil.isJID(user):
 			truejid = user
 		elif isNickInConference(conference, user):
 			truejid = getTrueJID(conference, user)
@@ -42,7 +42,7 @@ def setUserGreeting(msgType, conference, nick, param):
 		else:
 			gGreets[conference][truejid] = greet
 		path = getConfigPath(conference, GREET_FILE)
-		utils.writeFile(path, str(gGreets[conference]))
+		io.dump(path, gGreets[conference])
 		sendMsg(msgType, conference, nick, u"Запомнила")
 
 def sendGreetingToUser(conference, nick, truejid, aff, role):

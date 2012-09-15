@@ -15,7 +15,7 @@
 
 def showDates(msgType, conference, nick, param):
 	url = "http://wap.n-urengoy.ru/cgi-bin/wappr.pl"
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = response.read()
 		rawhtml = unicode(rawhtml, "utf-8")

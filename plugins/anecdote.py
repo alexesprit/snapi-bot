@@ -15,7 +15,7 @@
 
 def showAnecdote(msgType, conference, nick, param):
 	url = "http://anekdot.odessa.ua/rand-anekdot.php"
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = response.read()
 		elements = re.search("color:#FFFFFF'>(.+?)<a href", rawhtml, re.DOTALL)

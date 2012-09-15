@@ -32,6 +32,8 @@ LOGTYPES = (
 	LOGTYPE_BAN
 )
 
+URL_RE = re.compile(r"(http|ftp|https)(\:\/\/[^\s<]+)")
+
 gLastLogDir = {}
 
 def setDefaultLoggingValue(conference):
@@ -79,17 +81,13 @@ def manageLoggingValue(msgType, conference, nick, param):
 
 def getLogFile(conference, year, month, day):
 	path = u"%s/%s/%d/%02d/%02d.html" % (Config.LOGGER_DIR, conference, year, month, day)
-	path = path.encode("utf-8")
 	if os.path.exists(path):
-		f = file(path, "a")
+		f = io.get(path, "a")
 	else:
 		lastLogDir = gLastLogDir.get(conference)
 		if lastLogDir:
 			writeLogFooter(lastLogDir)		
-		dirName = os.path.dirname(path)
-		if not os.path.exists(dirName):
-			os.makedirs(dirName)
-		f = file(path, "w")
+		f = io.get(path, "w")
 		writeLogHeader(f, conference, year, month, day)
 	gLastLogDir[conference] = path
 	return f
@@ -98,15 +96,13 @@ def regexUrl(matchobj):
 	url = matchobj.group(0)
 	return "<noindex><a href=\"%s\">%s</a></noindex>" % (url, url)
 
-def writeLogFooter(logDir):
-	if os.path.isfile(logDir):
-		f = open(logDir, "a")
-		f.write(u"</body>\n</html>")
-		f.close()
+def writeLogFooter(path):
+	footer = u"</body>\n</html>"
+	io.write(path, footer, "a")
 
 def writeLogHeader(f, conference, year, month, day):
 	date = "%02d.%02d.%2d" % (day, month, year)
-	header = utils.readFile(getFilePath(RESOURCE_DIR, LOGHEADER_FILE))
+	header = io.read(getFilePath(RESOURCE_DIR, LOGHEADER_FILE))
 	header = header.replace("%ROOM%", conference)
 	header = header.replace("%DATE%", date)
 	f.write(header.encode("utf-8"))
@@ -114,7 +110,7 @@ def writeLogHeader(f, conference, year, month, day):
 def addTextToLog(conference, nick, text, logtype=LOGTYPE_MSG):
 	year, month, day, hour, minute, second = time.localtime()[:6]
 
-	text = utils.escapeXML(text)
+	text = netutil.escapeXML(text)
 	text = URL_RE.sub(regexUrl, text)
 	text = text.replace("\n", "<br/>")
 
@@ -129,11 +125,11 @@ def addTextToLog(conference, nick, text, logtype=LOGTYPE_MSG):
 
 	timestamp = "%02d:%02d:%02d" % (hour, minute, second)
 
-	fp = getLogFile(conference, year, month, day)
-	fp.write("<span class=\"time\">[%s]</span>" % (timestamp))
-	fp.write(rawtext.encode("utf-8"))
-	fp.write("\n")
-	fp.close()
+	f = getLogFile(conference, year, month, day)
+	f.write("<span class=\"time\">[%s]</span>" % (timestamp))
+	f.write(rawtext.encode("utf-8"))
+	f.write("\n")
+	f.close()
 
 def addMessageToLog(stanza, msgType, conference, nick, truejid, text):
 	if protocol.TYPE_PUBLIC == msgType and getConferenceConfigKey(conference, "log"):

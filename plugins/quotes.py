@@ -19,7 +19,7 @@ def showBashQuote(msgType, conference, nick, param):
 		url = "http://bash.im/quote/%s" % (param)
 	else:
 		url = "http://bash.im/random"
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = response.read()
 		elements = re.search(r"link: '(.+?)'.+?<div class=\"text\">(.+?)</div>", rawhtml, re.DOTALL)
@@ -34,7 +34,7 @@ def showBashQuote(msgType, conference, nick, param):
 
 def showAbyssQuote(msgType, conference, nick, param):
 	url = "http://bash.im/abysstop"
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = response.read()
 		elements = re.findall("<div class=\"text\">(.+?)</div>", rawhtml, re.DOTALL)
@@ -52,7 +52,7 @@ def showItHappensQuote(msgType, conference, nick, param):
 		url = "http://ithappens.ru/story/%s" % (param)
 	else:
 		url = "http://ithappens.ru/random"
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = response.read()
 		elements = re.search(r"<p class=\"text\" id=\"story_(.+?)\">(.+?)</p>", rawhtml, re.DOTALL)
@@ -70,7 +70,7 @@ def showIBashQuote(msgType, conference, nick, param):
 		url = "http://ibash.org.ru/quote.php?id=%s" % (param)
 	else:
 		url = "http://ibash.org.ru/random.php"
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = response.read()
 		elements = re.search(r"<b>#(\d+).+?<div class=\"quotbody\">(.+?)</div>", rawhtml, re.DOTALL)
@@ -88,7 +88,7 @@ def showJabberQuote(msgType, conference, nick, param):
 		url = "http://jabber-quotes.ru/api/read/?id=%s" % (param)
 	else:
 		url = "http://jabber-quotes.ru/api/read/?id=random"
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawxml = response.read()
 		xmlnode = simplexml.XML2Node(rawxml)
@@ -106,7 +106,7 @@ def showJabberQuote(msgType, conference, nick, param):
 def showCinemaQuote(msgType, conference, nick, param):
 	pageNum = random.randrange(1, 39)
 	url = "http://skio.ru/afofilms/kino%d.php" % (pageNum)
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = response.read()
 		elements = re.search("<ul type=\"circle\"(.+?)</ul>", rawhtml, re.DOTALL)

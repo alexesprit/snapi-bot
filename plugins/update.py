@@ -20,7 +20,7 @@ def updateWorkingCopy(msgType, conference, nick, param):
 		newRev = os.popen("svnversion -n").read()
 		if currentRev != newRev:
 			sendMsg(msgType, conference, nick, u"Обновлено до редакции %s" % (newRev))
-			sendOfflinePresence(u"Выключаюсь... (Обновление)")
+			setOfflineStatus(u"Выключаюсь... (Обновление)")
 			shutdown(True)
 		else:
 			sendMsg(msgType, conference, nick, u"Ваша копия не требует обновления")

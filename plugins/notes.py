@@ -13,31 +13,33 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-NOTE_FILE = "notepad.txt"
+NOTE_FILE = "notepad.dat"
 
-def loadUserNotes():
-	global gUserNotes
-	gUserNotes = database.DataBase(getConfigPath(NOTE_FILE))
+def openUserNotes():
+	path = getConfigPath(NOTE_FILE)
+	return database.DataBase(path)
 
 def addUserNote(msgType, conference, nick, param):
+	notes = openUserNotes()
 	truejid = getTrueJID(conference, nick)
-	if truejid not in gUserNotes:
-		gUserNotes[truejid] = []
+	if truejid not in notes:
+		notes[truejid] = []
 	text = u"%s\n%s" % (time.strftime("[%d.%m.%y, %H:%M]"), param)
-	gUserNotes[truejid].append(text)
-	gUserNotes.save()
+	notes[truejid].append(text)
+	notes.save()
 	sendMsg(msgType, conference, nick, u"Записала")
 
 def delUserNote(msgType, conference, nick, param):
+	notes = openUserNotes()
 	truejid = getTrueJID(conference, nick)
-	if truejid in gUserNotes:
+	if truejid in notes:
 		try:
 			param = int(param) - 1
 			if param >= 0:
-				del gUserNotes[truejid][param]
-				if not gUserNotes[truejid]:
-					del gUserNotes[truejid]
-				gUserNotes.save()
+				del notes[truejid][param]
+				if not notes[truejid]:
+					del notes[truejid]
+				notes.save()
 				sendMsg(msgType, conference, nick, u"Удалила")
 			else:
 				raise IndexError
@@ -49,25 +51,24 @@ def delUserNote(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"В твоём блокноте пусто")
 
 def showUserNotes(msgType, conference, nick, param):
+	notes = openUserNotes()
 	truejid = getTrueJID(conference, nick)
 	if param == u"сброс":
-		if truejid in gUserNotes:
-			del gUserNotes[truejid]
-			gUserNotes.save()
+		if truejid in notes:
+			del notes[truejid]
+			notes.save()
 			sendMsg(msgType, conference, nick, u"Удалила")
 		else:
 			sendMsg(msgType, conference, nick, u"А у тебя и так ничего нет :P")
 	elif not param:
-		if truejid in gUserNotes:
-			elements = [u"%d) %s" % (i + 1, note) for i, note in enumerate(gUserNotes[truejid])]
+		if truejid in notes:
+			elements = [u"%d) %s" % (i + 1, note) for i, note in enumerate(notes[truejid])]
 			if protocol.TYPE_PUBLIC == msgType:
 				sendMsg(msgType, conference, nick, u"Ушли")
 			message = u"Твои заметки:\n%s" % ("\n".join(elements))
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 		else:
 			sendMsg(msgType, conference, nick, u"В твоём блокноте пусто")
-
-registerEventHandler(loadUserNotes, EVT_STARTUP)
 
 registerCommand(addUserNote, u"заметка+", 10, 
 				u"Добавляет запись в ваш блокнот", 

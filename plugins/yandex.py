@@ -16,7 +16,7 @@
 def searchInYandex(msgType, conference, nick, param):
 	url = "http://yandex.ru/yandsearch"
 	qparam = {"text": param.encode("utf-8")}
-	response = getURL(url, qparam)
+	response = netutil.getURL(url, qparam)
 	if response:
 		rawhtml = response.read()
 		rawhtml = unicode(rawhtml, "utf-8")

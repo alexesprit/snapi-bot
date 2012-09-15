@@ -33,7 +33,7 @@ import dispatcher
 import plugin
 import protocol
 
-from module.utils import ustr
+from module.netutil import ustr
 
 BUFLEN = 1024
 

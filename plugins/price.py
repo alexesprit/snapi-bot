@@ -16,7 +16,7 @@
 def showPrice(msgType, conference, nick, param):
 	domen = urllib.quote(param.encode("utf-8"))
 	url = "http://www.webvaluer.org/ru/www.%s" % (domen)
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = response.read()
 		elements = re.search(r"<td class=\"value\">(.+?)</td>", rawhtml, re.DOTALL)

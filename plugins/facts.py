@@ -16,7 +16,7 @@
 def showFact(msgType, conference, nick, param):
 	pageNum = random.randrange(1, 29)
 	url = "http://skio.ru/facts/fact%d.php" % (pageNum)
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = response.read()
 		elements = re.findall("<li>(.+?)<br><br></li>", rawhtml)

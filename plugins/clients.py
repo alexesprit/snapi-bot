@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-CLIENTS_FILE = "clients.txt"
+CLIENTS_FILE = "clients.dat"
 
 gUserClients = {}
 
@@ -65,15 +65,10 @@ def saveUserClient_(stanza, conference, truejid):
 			if name:
 				if not name in base[truejid]:
 					base[truejid].append(name)
-
-def saveAllClientsBases():
-	for conference in getConferences():
-		gUserClients[conference].save()
+					base.save()
 
 registerEventHandler(loadClientsCache, EVT_ADDCONFERENCE)
 registerEventHandler(freeClientsCache, EVT_DELCONFERENCE)
-
-registerEventHandler(saveAllClientsBases, EVT_SHUTDOWN)
 
 registerEventHandler(saveUserClient, EVT_USERJOIN)
 

@@ -24,7 +24,7 @@ def decipherExpression(msgType, conference, nick, param):
 			"a": "analiz_nick",
 			"word": param.encode("cp1251")
 		}
-		response = getURL(url, qparam)
+		response = netutil.getURL(url, qparam)
 		if response:
 			rawhtml = response.read()
 			elements = re.search(r"<div style='text-align:center;'><b>(.*?)</b></div>", rawhtml, re.DOTALL)

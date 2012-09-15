@@ -16,7 +16,7 @@
 def showAdvert(msgType, conference, nick, param):
 	pageNum = random.randrange(1, 13)
 	url = "http://skio.ru/funnyad/%d.php" % (pageNum)
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = response.read()
 		elements = re.findall(r"<tr><td>(.+?)</td></tr>", rawhtml, re.DOTALL)

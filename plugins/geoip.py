@@ -18,7 +18,7 @@ def showGeoIPInfo(msgType, conference, nick, param):
 	host = param or Config.HOST
 	url = "http://www.and-rey.ru/geoip/ie.php"
 	qparam = {"host": host.encode("utf-8")}
-	response = getURL(url, qparam)
+	response = netutil.getURL(url, qparam)
 	if response:
 		rawhtml = response.read()
 		rawhtml = unicode(rawhtml, "cp1251")

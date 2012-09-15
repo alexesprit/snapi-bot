@@ -14,26 +14,22 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-LOCALDB_FILE = "localdb.txt"
+LOCALDB_FILE = "localdb.dat"
 
-gLocalBase = {}
-
-def loadLocalBase(conference):
+def openLocalBase(conference):
 	path = getConfigPath(conference, LOCALDB_FILE)
-	gLocalBase[conference] = eval(utils.readFile(path, "{}"))
+	return io.load(path, {})
 
-def saveLocalBase(conference):
+def saveLocalBase(conference, db):
 	path = getConfigPath(conference, LOCALDB_FILE)
-	utils.writeFile(path, str(gLocalBase[conference]))
-
-def freeLocalBase(conference):
-	del gLocalBase[conference]
+	io.dump(path, db)
 
 def getLocalKeyToChat(msgType, conference, nick, param):
 	key = param.lower()
-	if key in gLocalBase[conference]:
+	db = openLocalBase(conference)
+	if key in db:
 		sendMsg(msgType, conference, nick, 
-			u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key]))
+			u"Про %s я знаю следующее:\n%s" % (key, db[key]))
 	else:
 		sendMsg(msgType, conference, nick, u"Я не знаю, что такое %s :(" % (key))
 
@@ -49,11 +45,12 @@ def getLocalKeyToPM(msgType, conference, nick, param):
 		receiverjid = u"%s/%s" % (conference, nick)
 		key = args[0].lower()
 	if receiverjid:
-		if key in gLocalBase[conference]:
+		db = openLocalBase(conference)
+		if key in db:
 			if protocol.TYPE_PUBLIC == msgType:
 				sendMsg(msgType, conference, nick, u"Ушло")
 			sendTo(protocol.TYPE_PRIVATE, receiverjid, 
-				u"Про %s я знаю следующее:\n%s" % (key, gLocalBase[conference][key]))
+				u"Про %s я знаю следующее:\n%s" % (key, db[key]))
 		else:
 			sendMsg(msgType, conference, nick, u"Я не знаю, что такое %s :(" % key)
 	else:
@@ -62,16 +59,17 @@ def getLocalKeyToPM(msgType, conference, nick, param):
 def setLocalKey(msgType, conference, nick, param):
 	args = param.split("=", 1)
 	if len(args) == 2:
+		db = openLocalBase(conference)
 		key = args[0].lower().strip()
 		value = args[1].strip()
-		if value:
-			gLocalBase[conference][key] = u"%s (от %s)" % (value, nick)
-			saveLocalBase(conference)
+		if key and value:
+			db[key] = u"%s (от %s)" % (value, nick)
+			saveLocalBase(conference, db)
 			sendMsg(msgType, conference, nick, u"Буду знать, что такое %s" % (key))
 		else:
-			if key in gLocalBase[conference]:
-				del gLocalBase[conference][key]
-				saveLocalBase(conference)
+			if key in db:
+				del db[key]
+				saveLocalBase(conference, db)
 				sendMsg(msgType, conference, nick, u"Прибила %s" % (key))
 			else:
 				sendMsg(msgType, conference, nick, u"В базе %s и так нету :-P" % (key))
@@ -79,33 +77,30 @@ def setLocalKey(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
 def searchLocalKey(msgType, conference, nick, param):
-	foundElements = []
-	for key in gLocalBase[conference].keys():
-		if key.count(param):
-			foundElements.append(key)
-	if foundElements:
-		sendMsg(msgType, conference, nick, u"Найдено: %s" % (", ".join(foundElements)))
+	db = openLocalBase(conference)
+	found = [key for key in db if key.count(param)]
+	if found:
+		sendMsg(msgType, conference, nick, u"Найдено: %s" % (", ".join(found)))
 	else:
 		sendMsg(msgType, conference, nick, u"Не найдено!")
 
 def showAllLocalKeysInChat(msgType, conference, nick, param):
-	if gLocalBase[conference]:
-		message = ", ".join(sorted(gLocalBase[conference].keys()))
+	db = openLocalBase(conference)
+	if db:
+		message = ", ".join(sorted(db.iterkeys()))
 		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, "База пуста!")
 
 def showAllLocalKeysInPM(msgType, conference, nick, param):
-	if gLocalBase[conference]:
+	db = openLocalBase(conference)
+	if db:
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли")
-		message = ", ".join(sorted(gLocalBase[conference].keys()))
+		message = ", ".join(sorted(db.iterkeys()))
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, "База пуста!")
-
-registerEventHandler(loadLocalBase, EVT_ADDCONFERENCE)
-registerEventHandler(freeLocalBase, EVT_DELCONFERENCE)
 
 registerCommand(getLocalKeyToChat, u"???", 10, 
 				u"Ищет значение по ключу в локальной базе", 

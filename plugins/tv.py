@@ -26,21 +26,20 @@ TV_CATEGORIES = {
 	u"досуг": "old/tv/-/%Y-%m-%d/Досуг/",
 }
 
-def loadTVChannels():
-	global TV_CHANNELS
+def getTVChannels():
 	path = getFilePath(RESOURCE_DIR, TVCODES_FILE)
-	TV_CHANNELS = eval(utils.readFile(path, encoding="utf-8"))
+	return eval(io.read(path))
 
 def getTVChannelInfo(channelName):
 	reqname = channelName.lower()
-	for ch in TV_CHANNELS:
+	for ch in getTVChannels():
 		name = ch[0].lower()
 		if name.startswith(reqname):
 			return ch
 	return None
 
 def getTVChannelByURL(channelURL):
-	for ch in TV_CHANNELS:
+	for ch in getTVChannels():
 		if ch[1] == channelURL:
 			return ch[0]
 	return channelURL
@@ -59,7 +58,7 @@ def getTVProgramFromContent(rawdata):
 def getTVForCategory(categoryURL):
 	expurl = time.strftime(categoryURL)
 	url = "http://s-tv.ru/%s" % (expurl)
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawdata = response.read()
 		rawchannels = re.findall("<table class=\"item_table\">(.+?)</table>", rawdata, re.DOTALL)
@@ -77,7 +76,7 @@ def getTVForCategory(categoryURL):
 	
 def getTVForChannel(channelURL):
 	url = "http://s-tv.ru/%s" % (channelURL)
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawdata = response.read()
 		return getTVProgramFromContent(rawdata)
@@ -88,7 +87,7 @@ def showTVProgram(msgType, conference, nick, param):
 	if u"каналы" == param:
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли")
-		tvList = ["%d) %s" % (i + 1, item[0]) for i, item in enumerate(TV_CHANNELS)]
+		tvList = ["%d) %s" % (i + 1, item[0]) for i, item in enumerate(getTVChannels())]
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Список каналов:\n%s" % ("\n".join(tvList)))
 	elif u"категории" == param:
 		if protocol.TYPE_PUBLIC == msgType:
@@ -116,8 +115,6 @@ def showTVProgram(msgType, conference, nick, param):
 			sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Программа для категории \"%s\":\n%s" % (param, program))
 		else:
 			sendMsg(msgType, conference, nick, u"На сегодня программы для этой категории нет")
-
-registerEventHandler(loadTVChannels, EVT_STARTUP)
 
 registerCommand(showTVProgram, u"тв", 10, 
 				u"Показывает телепрограму для определённого канала/категории. Параметр \"каналы\" - список каналов, параметр \"категории\" - список категорий",

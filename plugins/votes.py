@@ -14,7 +14,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-VOTES_FILE = "votes.txt"
+VOTES_FILE = "votes.dat"
 
 VOTE_CREATED = 0x1
 VOTE_STARTED = 0x2
@@ -24,7 +24,7 @@ gVote = {}
 
 def loadVotes(conference):
 	path = getConfigPath(conference, VOTES_FILE)
-	gVote[conference] = eval(utils.readFile(path, "{}"))
+	gVote[conference] = io.load(path, {})
 
 def freeVotes(conference):
 	del gVote[conference]
@@ -46,7 +46,7 @@ def getVoteResults(conference):
 
 def saveVotes(conference):
 	path = getConfigPath(conference, VOTES_FILE)
-	utils.writeFile(path, str(gVote[conference]))
+	io.dump(path, gVote[conference])
 
 def vote(msgType, conference, nick, param):
 	if gVote[conference]:

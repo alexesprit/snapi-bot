@@ -15,10 +15,10 @@ import os
 import random
 import re
 
-from module import utils
+from module import io
 
-MACROS_FILE = "macros.txt"
-MACCESS_FILE = "macrosaccess.txt"
+MACROS_FILE = "macros.dat"
+MACCESS_FILE = "macrosaccess.dat"
 
 class ArgParser:
 	def __init__(self):
@@ -107,30 +107,30 @@ class Macros:
 	def loadMacroses(self, conference=None):
 		if conference:
 			path = os.path.join(self.path, conference, MACROS_FILE)
-			self.macrosList[conference] = eval(utils.readFile(path, "{}"))
+			self.macrosList[conference] = io.load(path, {})
 
 			path = os.path.join(self.path, conference, MACCESS_FILE)
-			self.accessList[conference] = eval(utils.readFile(path, "{}"))
+			self.accessList[conference] = io.load(path, {})
 		else:
 			path = os.path.join(self.path, MACROS_FILE)
-			self.gMacrosList = eval(utils.readFile(path, "{}"))
+			self.gMacrosList = io.load(path, {})
 
 			path = os.path.join(self.path, MACCESS_FILE)
-			self.gAccessList = eval(utils.readFile(path, "{}"))
+			self.gAccessList = io.load(path, {})
 
 	def saveMacroses(self, conference=None):
 		if conference:
 			path = os.path.join(self.path, conference, MACROS_FILE)
-			utils.writeFile(path, str(self.macrosList[conference]))
+			io.dump(path, self.macrosList[conference])
 
 			path = os.path.join(self.path, conference, MACCESS_FILE)
-			utils.writeFile(path, str(self.accessList[conference]))
+			io.dump(path, self.accessList[conference])
 		else:
 			path = os.path.join(self.path, MACROS_FILE)
-			utils.writeFile(path, str(self.gMacrosList))
+			io.dump(path, self.gMacrosList)
 
 			path = os.path.join(self.path, MACCESS_FILE)
-			utils.writeFile(path, str(self.gAccessList))
+			io.dump(path, self.gAccessList)
 
 	def freeMacroses(self, conference):
 		del self.macrosList[conference]

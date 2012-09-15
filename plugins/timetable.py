@@ -20,7 +20,7 @@ def getTrainTable(cityFrom, cityTo, dateForward):
 		"cityTo": cityTo.encode("utf-8"),
 		"dateForward": dateForward.encode("utf-8")
 	}
-	response = getURL(url, qparam)
+	response = netutil.getURL(url, qparam)
 	if response:
 		rawhtml = response.read()
 		rawhtml = unicode(rawhtml, "utf-8")

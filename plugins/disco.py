@@ -56,7 +56,7 @@ def showServiceDiscoveryResults_(stanza, msgType, conference, nick, jid, maxCoun
 			elements = []
 			if "name" in attrs:
 				elements.append(attrs["name"])
-				if not isJID(jid) and "jid" in attrs:
+				if not netutil.isJID(jid) and "jid" in attrs:
 					elements.append(attrs["jid"])
 				if "node" in attrs:
 					elements.append(attrs["node"])

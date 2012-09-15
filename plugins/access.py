@@ -30,13 +30,13 @@ ACCESS_DESC = {
 def loadGlobalAccesses():
 	global gGlobalAccess
 	path = getConfigPath(ACCESS_FILE)
-	gGlobalAccess = eval(utils.readFile(path, "{}"))
+	gGlobalAccess = io.load(path, {})
 	for jid in Config.ADMINS:
 		gGlobalAccess[jid] = 100
 
 def loadLocalAccesses(conference):
 	path = getConfigPath(conference, ACCESS_FILE)
-	gPermAccess[conference] = eval(utils.readFile(path, "{}"))
+	gPermAccess[conference] = io.load(path, {})
 	gTempAccess[conference] = {}
 
 def freeLocalAccesses(conference):
@@ -72,7 +72,7 @@ def showUserAccess(msgType, conference, nick, param):
 	else:
 		if isConferenceInList(conference) and isNickInConference(conference, user):
 			userjid = getTrueJID(conference, user)
-		elif isJID(user):
+		elif netutil.isJID(user):
 			userjid = user
 		else:
 			sendMsg(msgType, conference, nick, u"А кто это?")
@@ -89,7 +89,7 @@ def setLocalAccess(msgType, conference, nick, param):
 	user = args[0].strip()
 	if isNickInConference(conference, user):
 		userjid = getTrueJID(conference, user)
-	elif isJID(user):
+	elif netutil.isJID(user):
 		userjid = getTrueJID(conference, user)
 	else:
 		sendMsg(msgType, conference, nick, u"А кто это?")
@@ -128,13 +128,13 @@ def setGlobalAccess(msgType, conference, nick, param):
 	if isConferenceInList(conference):
 		if isNickInConference(conference, user):
 			userjid = getTrueJID(conference, user)
-		elif isJID(user):
+		elif netutil.isJID(user):
 			userjid = user
 		else:
 			sendMsg(msgType, conference, nick, u"А это кто?")
 			return
 	else:
-		if isJID(user):
+		if netutil.isJID(user):
 			userjid = user
 		else:
 			sendMsg(msgType, conference, nick, u"А это кто?")
@@ -175,7 +175,7 @@ def showLocalAccesses(msgType, conference, nick, param):
 				for i, item in enumerate(sorted(accesses))]
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Локальные уровни доступа:\n%s" % ("\n".join(elements)))
 
-registerEventHandler(loadGlobalAccesses, EVT_STARTUP)
+registerEventHandler(loadGlobalAccesses, EVT_CONNECTED)
 
 registerEventHandler(loadLocalAccesses, EVT_ADDCONFERENCE)
 registerEventHandler(freeLocalAccesses, EVT_DELCONFERENCE)

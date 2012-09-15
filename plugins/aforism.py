@@ -41,7 +41,7 @@ AFOR_PAGES = (
 def showAforism(msgType, conference, nick, param):
 	randPage = random.choice(AFOR_PAGES)
 	url = "http://skio.ru/quotes/%s" % (randPage)
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = response.read()
 		elements = re.search("<p><div align=\"center\">(.+?)</div>", rawhtml, re.DOTALL)

@@ -15,7 +15,7 @@
 # GNU General Public License for more details.
 
 QUIZ_FILE = "questions.txt"
-QUIZ_SCORES_FILE = "quiz.txt"
+QUIZ_SCORES_FILE = "quiz.dat"
 
 QUIZ_TOTAL_LINES = sum(1 for i in open(getFilePath(RESOURCE_DIR, QUIZ_FILE), "r"))
 QUIZ_TIME_LIMIT = 180

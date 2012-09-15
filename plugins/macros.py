@@ -241,7 +241,7 @@ def showMacrosList(msgType, conference, nick, parameters):
 	else:
 		sendMsg(msgType, conference, nick, u"Макросов нет :(")
 
-registerEventHandler(gMacros.loadMacroses, EVT_STARTUP)
+registerEventHandler(gMacros.loadMacroses, EVT_CONNECTED)
 registerEventHandler(gMacros.loadMacroses, EVT_ADDCONFERENCE)
 registerEventHandler(gMacros.freeMacroses, EVT_DELCONFERENCE)
 

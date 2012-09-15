@@ -13,18 +13,14 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-ROSTERSTATUS_FILE = "rosterstatus.txt"
-
-def loadRosterStatusValue():
-	global gRosterStatus
-	path = getConfigPath(ROSTERSTATUS_FILE)
-	gRosterStatus = eval(utils.readFile(path, "{}"))
+ROSTERSTATUS_FILE = "rosterstatus.dat"
 
 def updateRosterStatus():
-	global gRosterStatus
-	if gRosterStatus:
-		show = gRosterStatus["show"]
-		status = gRosterStatus["status"]
+	path = getConfigPath(ROSTERSTATUS_FILE)
+	rstatus = io.load(path)
+	if rstatus:
+		show = rstatus["show"]
+		status = rstatus["status"]
 		setStatus(None, show, status)
 
 def setRosterStatus(msgType, conference, nick, param):
@@ -39,15 +35,15 @@ def setRosterStatus(msgType, conference, nick, param):
 		status = param
 	setStatus(show, status, Config.PRIORITY)
 
-	gRosterStatus["show"] = show
-	gRosterStatus["status"] = status
+	rstatus = {}
+	rstatus["show"] = show
+	rstatus["status"] = status
 
 	path = getConfigPath(ROSTERSTATUS_FILE)
-	utils.writeFile(path, str(gRosterStatus))
+	io.dump(path, rstatus)
 
 	sendMsg(msgType, conference, nick, u"Запомнила")
 
-registerEventHandler(loadRosterStatusValue, EVT_STARTUP)
 registerEventHandler(updateRosterStatus, EVT_READY)
 
 registerCommand(setRosterStatus, u"ростерстатус", 100,

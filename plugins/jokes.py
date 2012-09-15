@@ -13,13 +13,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-JOKES_FILE = "jokes.txt"
-
-def loadJokes():
-	global gJokes
-	path = getFilePath(RESOURCE_DIR, JOKES_FILE)
-	gJokes = eval(utils.readFile(path, encoding="utf-8"))
-
 def setDefaultJokesValue(conference):
 	if getConferenceConfigKey(conference, "jokes") is None:
 		setConferenceConfigKey(conference, "jokes", 1)
@@ -40,8 +33,6 @@ def manageJokesValue(msgType, conference, nick, param):
 	else:
 		jokesValue = getConferenceConfigKey(conference, "jokes")
 		sendMsg(msgType, conference, nick, u"Текущее значение: %d" % (jokesValue))
-
-registerEventHandler(loadJokes, EVT_STARTUP)
 
 registerEventHandler(setDefaultJokesValue, EVT_ADDCONFERENCE)
 

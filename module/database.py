@@ -13,30 +13,25 @@
 
 import time
 
-from module import utils
+from module import io
 
 class DataBase:
 	def __init__(self, path):
 		self.path = path
-		self.base = eval(utils.readFile(self.path, "{}"))
-
 		self.ctpath = "%s.db" % (path)
-		self.changes = eval(utils.readFile(self.ctpath, "{}"))
+
+		self.base = io.load(self.path, {})		
+		self.changes = io.load(self.ctpath, {})
 
 		self.__contains__ = self.base.__contains__
 		self.__iter__ = self.base.__iter__
+		
+		self.__len__ = self.base.__len__
+		self.__getitem__ = self.base.__getitem__
 
 		self.items = self.base.items
 		self.keys = self.base.keys
 		self.values = self.base.values
-
-	def __nonzero__(self):
-		if self.base:
-			return 1
-		return 0
-
-	def __getitem__(self, item):
-		return self.base[item]
 
 	def __setitem__(self, item, value):
 		self.base[item] = value
@@ -51,8 +46,8 @@ class DataBase:
 		self.changes = {}
 
 	def save(self):
-		utils.writeFile(self.path, str(self.base))
-		utils.writeFile(self.ctpath, str(self.changes))
+		io.dump(self.path, self.base)
+		io.dump(self.ctpath, self.changes)
 
 	def getChangeTime(self, item):
 		return self.changes[item]
