@@ -430,10 +430,12 @@ def getPresenceNode(to=None, show=None, status=None):
 	prs = protocol.Presence(priority=Config.PRIORITY)
 	prs.setAttr("ver", Version.version)
 
-	prs.setStatus(status)
-	prs.setShow(show)
 	if to:
 		prs.setTo(to)
+	if show:
+		prs.setShow(show)
+	if status:
+		prs.setStatus(status)
 
 	caps = protocol.Node("c")
 	caps.setNamespace(protocol.NS_CAPS)
@@ -449,9 +451,10 @@ def setStatus(to=None, show=None, status=None):
 
 def setOfflineStatus(to=None, status=None):
 	prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-	prs.setStatus(status)
 	if to:
 		prs.setTo(to)
+	if status:
+		prs.setStatus(status)
 	gClient.send(prs)
 
 def sendTo(msgType, jid, text):
