@@ -34,7 +34,7 @@ def searchInYandex(msgType, conference, nick, param):
 				result = "%s\n%s\n%s" % (title, text, url)
 				result = result.replace(u"<b>", u"«").replace(u"</b>", u"»")
 				found.append(result)
-			sendMsg(msgType, conference, nick, decode("\n\n".join(found)))
+			sendMsg(msgType, conference, nick, netutil.decode("\n\n".join(found)))
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:

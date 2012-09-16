@@ -51,11 +51,11 @@ def searchInGoogle(msgType, conference, nick, url, qparam):
 			for element in rawdata:
 				title = element["title"]
 				text = element["content"]
-				url = urllib.unquote(element["unescapedUrl"].encode('utf8')).decode("utf-8")
+				url = netutil.unquote(element["unescapedUrl"]).decode("utf-8")
 				result = "%s\n%s\n%s" % (title, text, url)
 				result = result.replace(u"<b>", u"«").replace(u"</b>", u"»")
 				found.append(result)
-			sendMsg(msgType, conference, nick, decode("\n\n".join(found)))
+			sendMsg(msgType, conference, nick, netutil.decode("\n\n".join(found)))
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:

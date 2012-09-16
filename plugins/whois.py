@@ -23,7 +23,7 @@ def showWhoIs(msgType, conference, nick, param):
 		if elements:
 			text = elements.group(1)
 			text = text.replace("<br />", "")
-			text = decode(text, "cp1251")
+			text = netutil.decode(text, "cp1251")
 			sendMsg(msgType, conference, nick, text)
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")

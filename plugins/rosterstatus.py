@@ -17,11 +17,9 @@ ROSTERSTATUS_FILE = "rosterstatus.dat"
 
 def updateRosterStatus():
 	path = getConfigPath(ROSTERSTATUS_FILE)
-	rstatus = io.load(path)
-	if rstatus:
-		show = rstatus["show"]
-		status = rstatus["status"]
-		setStatus(None, show, status)
+	status = io.load(path)
+	if status:
+		setStatus(None, status["show"], status["status"])
 
 def setRosterStatus(msgType, conference, nick, param):
 	args = param.split(None, 1)
@@ -35,12 +33,8 @@ def setRosterStatus(msgType, conference, nick, param):
 		status = param
 	setStatus(show, status, Config.PRIORITY)
 
-	rstatus = {}
-	rstatus["show"] = show
-	rstatus["status"] = status
-
 	path = getConfigPath(ROSTERSTATUS_FILE)
-	io.dump(path, rstatus)
+	io.dump(path, {"show": show, "status": status})
 
 	sendMsg(msgType, conference, nick, u"Запомнила")
 

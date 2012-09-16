@@ -25,7 +25,7 @@ def showBashQuote(msgType, conference, nick, param):
 		elements = re.search(r"link: '(.+?)'.+?<div class=\"text\">(.+?)</div>", rawhtml, re.DOTALL)
 		if elements:
 			url = elements.group(1)
-			quote = decode(elements.group(2), "cp1251")
+			quote = netutil.decode(elements.group(2), "cp1251")
 			sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
 		else:
 			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
@@ -40,7 +40,7 @@ def showAbyssQuote(msgType, conference, nick, param):
 		elements = re.findall("<div class=\"text\">(.+?)</div>", rawhtml, re.DOTALL)
 		if elements:
 			rawquote = random.choice(elements)
-			message = decode(rawquote, "cp1251")
+			message = netutil.decode(rawquote, "cp1251")
 			sendMsg(msgType, conference, nick, message)
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
@@ -58,7 +58,7 @@ def showItHappensQuote(msgType, conference, nick, param):
 		elements = re.search(r"<p class=\"text\" id=\"story_(.+?)\">(.+?)</p>", rawhtml, re.DOTALL)
 		if elements:
 			url = "http://ithappens.ru/story/%s" % (elements.group(1))
-			quote = decode(elements.group(2), "cp1251")
+			quote = netutil.decode(elements.group(2), "cp1251")
 			sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
 		else:
 			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
@@ -76,7 +76,7 @@ def showIBashQuote(msgType, conference, nick, param):
 		elements = re.search(r"<b>#(\d+).+?<div class=\"quotbody\">(.+?)</div>", rawhtml, re.DOTALL)
 		if elements:
 			url = "http://ibash.org.ru/quote.php?id=%s" % (elements.group(1))
-			quote = decode(elements.group(2), "cp1251")
+			quote = netutil.decode(elements.group(2), "cp1251")
 			sendMsg(msgType, conference, nick, "%s\n\n%s" % (quote, url))
 		else:
 			sendMsg(msgType, conference, nick, u"Цитата не найдена!")
@@ -114,7 +114,7 @@ def showCinemaQuote(msgType, conference, nick, param):
 			rawhtml = elements.group(1)
 			elements = re.findall("<li>(.+?)<li>", rawhtml, re.DOTALL)
 			quote = random.choice(elements)
-			quote = decode(quote, "cp1251")
+			quote = netutil.decode(quote, "cp1251")
 			sendMsg(msgType, conference, nick, quote)
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")

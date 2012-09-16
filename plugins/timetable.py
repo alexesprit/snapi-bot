@@ -40,12 +40,12 @@ def getTrainTable(cityFrom, cityTo, dateForward):
 			if "gone" in places[i]:
 				continue
 				
-			transport = decode(transports[i]).strip()
-			desc = decode(descs[i]).strip()
-			source = decode(platforms[2 * i + 0]).strip()
-			target = decode(platforms[2 * i + 1]).strip()
-			departure = decode(times[2 * i]).strip()
-			arrival = decode(times[2 * i + 1]).strip()
+			transport = netutil.decode(transports[i]).strip()
+			desc = netutil.decode(descs[i]).strip()
+			source = netutil.decode(platforms[2 * i + 0]).strip()
+			target = netutil.decode(platforms[2 * i + 1]).strip()
+			departure = netutil.decode(times[2 * i]).strip()
+			arrival = netutil.decode(times[2 * i + 1]).strip()
 			
 			table.append([transport, desc, source, departure, target, arrival])
 		return table

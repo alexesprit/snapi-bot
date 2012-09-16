@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 def showPrice(msgType, conference, nick, param):
-	domen = urllib.quote(param.encode("utf-8"))
+	domen = netutil.quote(param)
 	url = "http://www.webvaluer.org/ru/www.%s" % (domen)
 	response = netutil.getURL(url)
 	if response:

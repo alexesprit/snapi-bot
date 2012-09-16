@@ -22,7 +22,7 @@ def getTranslateLangs():
 	path = getFilePath(RESOURCE_DIR, TRANSL_LANGS_FILE)
 	return eval(io.read(path))
 
-def getTranslatedText(text, source, target):
+def getTranslatedText(text, source, target, detailed):
 	url = "http://translate.google.ru/translate_a/t"
 	qparam = {
 		"client": "x",
@@ -34,9 +34,23 @@ def getTranslatedText(text, source, target):
 	if response:
 		rawdata = simplejson.load(response)
 		try:
-			return "".join(s["trans"] for s in rawdata["sentences"])
+			detailed &= ("dict" in rawdata)
+			if detailed:
+				elements = []
+				for d in rawdata["dict"]:
+					for e in d["entry"]:
+						word = e["word"]
+						transl = ", ".join(r for r in e["reverse_translation"])
+						elements.append("* %s (%s)" % (word, transl))
+				result = "\n".join(elements)
+			else:
+				result = "".join(s["trans"] for s in rawdata["sentences"])
+				if not source:
+					src = rawdata["src"]
+					result = "%s [%s]" % (result, src)
+			return result
 		except KeyError, IndexError:
-			pass
+			print "cant translate: %s [%s -> %s]" % (text, source, target)
 	return None
 
 def translateText(msgType, conference, nick, param):
@@ -64,7 +78,8 @@ def translateText(msgType, conference, nick, param):
 					else:
 						sendMsg(msgType, conference, nick, u"Вы не указали текст для перевода!")
 						return
-				text = getTranslatedText(text, source, target)
+				detailed = (msgType == protocol.TYPE_PRIVATE)
+				text = getTranslatedText(text, source, target, detailed)
 				if text:
 					sendMsg(msgType, conference, nick, netutil.unescapeHTML(text))
 				else:

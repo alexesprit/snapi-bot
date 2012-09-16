@@ -22,7 +22,7 @@ def showFact(msgType, conference, nick, param):
 		elements = re.findall("<li>(.+?)<br><br></li>", rawhtml)
 		if elements:
 			fact = random.choice(elements)
-			sendMsg(msgType, conference, nick, decode(fact, "cp1251"))
+			sendMsg(msgType, conference, nick, netutil.decode(fact, "cp1251"))
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:
