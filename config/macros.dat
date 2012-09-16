@@ -1,2 +1,30 @@
 (dp1
-.
+V\u0430\u043d\u0433\u043b
+p2
+V\u043f\u0435\u0440\u0435\u0432\u043e\u0434 en $*
+p3
+sV\u0432\u0435\u0440\u043e\u044f\u0442\u043d\u043e\u0441\u0442\u044c
+p4
+Veval u'\u0432\u0430\u0448\u0435 \u0443\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u0435 \u0432\u0435\u0440\u043d\u043e \u0441 \u0432\u0435\u0440\u043e\u044f\u0442\u043d\u043e\u0441\u0442\u044c\u044e %s%%' % (divmod(sum((ord(c) for c in "$*")), 101)[1])
+p5
+sV:-|
+p6
+Veval u'\u0412\u0430\u0448 IQ \u0440\u0430\u0432\u0435\u043d %d' % (divmod(sum([ord(c) for c in "%(context, nick)"]), 201)[1])
+p7
+sVrus
+p8
+V\u043f\u0435\u0440\u0435\u0432\u043e\u0434 ru $*
+p9
+sV\u043b\u0443\u0440\u043a
+p10
+V\u0433\u0443\u0433\u043b\u044c $* site:lurkmore.to
+p11
+sVloadpl
+p12
+Vexec f = file(os.path.join(PLUGIN_DIR, '$*.py')); exec f in globals(); f.close()
+p13
+sV\u0430\u0431\u0441\u0443\u0440\u0434
+p14
+V\u0433\u0443\u0433\u043b\u044c $* site:absurdopedia.wikia.com
+p15
+s.
