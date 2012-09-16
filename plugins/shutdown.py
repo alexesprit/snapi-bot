@@ -19,8 +19,7 @@ def botRestart(msgType, conference, nick, param):
 		message = u"Меня перезагружает %s (%s)" % (nick, param)
 	else:
 		message = u"Меня перезагружает %s" % (nick)
-	setOfflineStatus(message)
-	shutdown(True)
+	disconnect(ACTION_RESTART, message)
 
 def botShutdown(msgType, conference, nick, param):
 	nick = (isConferenceInList(conference)) and nick or conference.split("@")[0]
@@ -28,8 +27,7 @@ def botShutdown(msgType, conference, nick, param):
 		message = u"Меня выключает %s (%s)" % (nick, param)
 	else:
 		message = u"Меня выключает %s" % (nick)
-	setOfflineStatus(message)
-	shutdown()
+	disconnect(ACTION_SHUTDOWN, message)
 
 registerCommand(botRestart, u"рестарт", 100, 
 				u"Перезапускает бота", 

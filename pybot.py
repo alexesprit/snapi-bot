@@ -148,6 +148,9 @@ EVT_CONNECTED = 0x0400
 EVT_READY = 0x0800
 EVT_SHUTDOWN = 0x1000
 
+ACTION_RESTART = 0x1
+ACTION_SHUTDOWN = 0x2
+
 gEventHandlers = {}
 gCmdHandlers = {}
 
@@ -794,24 +797,23 @@ def loadPlugins():
 	else:
 		printf("Loaded %d plugins (%d with errors)" % (validPlugins, invalidPlugins), FLAG_WARNING)
 
-def shutdown(restart=False):
+def disconnect(action, message=None):
 	for thr in threading.enumerate():
 		if isinstance(thr, threading._Timer):
 			thr.cancel()
 	if gClient.isConnected():
 		callEventHandlers(EVT_SHUTDOWN, MODE_SYNC)
+		setOfflineStatus(None, message)
 		gClient.disconnected()
 
-	if restart:
+	if ACTION_RESTART == action:
 		printf("Restarting...")
 		time.sleep(RESTART_DELAY)
-
 		os.execl(sys.executable, sys.executable, sys.argv[0])
-	else:
+	elif ACTION_SHUTDOWN == action:
+		printf("Terminating...", FLAG_SUCCESS)
 		global IS_RUNNING
 		IS_RUNNING = False
-
-		printf("Terminating...", FLAG_SUCCESS)
 
 def main():
 	gInfo["start"] = time.time()
@@ -837,16 +839,16 @@ def main():
 			if Config.RESTART_IF_ERROR:
 				printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
 				time.sleep(RECONNECT_DELAY)
-				shutdown(True)
+				disconnect(ACTION_RESTART)
 			else:
-				shutdown()
+				disconnect(ACTION_SHUTDOWN)
 
 		printf("Authenticating...")
 		if gClient.auth(Config.USERNAME, Config.PASSWORD, Config.RESOURCE):
 			printf("Done", FLAG_SUCCESS)
 		else:
 			printf("Incorrect login/password", FLAG_ERROR)
-			shutdown()
+			disconnect(ACTION_SHUTDOWN)
 
 		gClient.registerHandler("message", parseMessage)
 		gClient.registerHandler("presence", parsePresence)
@@ -879,20 +881,16 @@ def main():
 				gClient.process(10)
 		except protocol.SystemShutdown:
 			printf("%s has been switched off" % (Config.SERVER), FLAG_WARNING)
-			shutdown()
+			disconnect(ACTION_SHUTDOWN)
 		except protocol.Conflict:
 			printf("Resource conflict", FLAG_WARNING)
-			shutdown()
+			disconnect(ACTION_SHUTDOWN)
 		except Exception:
 			printf("Exception in main thread", FLAG_ERROR)
 			addTextToSysLog(traceback.format_exc(), LOG_CRASHES)
-			if gClient.isConnected():
-				setOfflineStatus(None, u"Что-то сломано...")
-			shutdown(Config.RESTART_IF_ERROR)
+			disconnect(Config.RESTART_IF_ERROR, u"Что-то сломано...")
 	except KeyboardInterrupt:
-		if gClient.isConnected():
-			setOfflineStatus(u"Выключаюсь... (CTRL+C)")
-		shutdown()
+		disconnect(ACTION_SHUTDOWN, u"Выключаюсь... (CTRL+C)")
 
 if __name__ == "__main__":
 	sys.exit(main())
