@@ -14,20 +14,20 @@
 # GNU General Public License for more details.
 
 def botRestart(msgType, conference, nick, param):
-	nick = (isConferenceInList(conference)) and nick or conference.split("@")[0]
+	myNick = getNickFromJID(conference, nick)
 	if param:
-		message = u"Меня перезагружает %s (%s)" % (nick, param)
+		message = u"Меня перезагружает %s (%s)" % (myNick, param)
 	else:
-		message = u"Меня перезагружает %s" % (nick)
-	disconnect(ACTION_RESTART, message)
+		message = u"Меня перезагружает %s" % (myNick)
+	stop(ACTION_RESTART, message)
 
 def botShutdown(msgType, conference, nick, param):
-	nick = (isConferenceInList(conference)) and nick or conference.split("@")[0]
+	myNick = getNickFromJID(conference, nick)
 	if param:
-		message = u"Меня выключает %s (%s)" % (nick, param)
+		message = u"Меня выключает %s (%s)" % (myNick, param)
 	else:
-		message = u"Меня выключает %s" % (nick)
-	disconnect(ACTION_SHUTDOWN, message)
+		message = u"Меня выключает %s" % (myNick)
+	stop(ACTION_SHUTDOWN, message)
 
 registerCommand(botRestart, u"рестарт", 100, 
 				u"Перезапускает бота", 

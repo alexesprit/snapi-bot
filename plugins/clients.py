@@ -46,9 +46,7 @@ def showClients(msgType, conference, nick, param):
 
 def saveUserClient(conference, nick, truejid, aff, role):
 	base = gUserClients[conference]
-	if truejid not in base:
-		base[truejid] = []
-	else:
+	if truejid in base:
 		base.updateChangeTime(truejid)
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.setTo(u"%s/%s" % (conference, nick))
@@ -63,6 +61,8 @@ def saveUserClient_(stanza, conference, truejid):
 		if query:
 			name = query.getTagData("name")
 			if name:
+				if truejid not in base:
+					base[truejid] = []
 				if not name in base[truejid]:
 					base[truejid].append(name)
 					base.save()

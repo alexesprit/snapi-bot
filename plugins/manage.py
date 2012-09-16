@@ -32,7 +32,7 @@ def leaveConf(msgType, conference, nick, param):
 	if isConferenceInList(conf):
 		if conf != conference:
 			sendMsg(msgType, conference, nick, u"Ушла")
-		myNick = (isConferenceInList(conference)) and nick or conference.split("@")[0]
+		myNick = getNickFromJID(conference, nick)
 		leaveConference(conf, u"Меня уводит %s" % (myNick))
 		saveConferences()
 	else:

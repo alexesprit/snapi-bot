@@ -42,8 +42,6 @@ from module.xmpp import debug
 from module.xmpp import protocol
 from module.xmpp import simplexml
 
-IS_RUNNING = True
-
 CONFIG_DIR = "config"
 PLUGIN_DIR = "plugins"
 SYSLOG_DIR = "syslogs"
@@ -364,6 +362,9 @@ def getNickByJID(conference, truejid, offline=False):
 		if getNickKey(conference, nick, NICK_JID) == truejid:
 			return nick
 	return None
+
+def getNickFromJID(jid, resource):
+	return (isConferenceInList(jid)) and resource or jid.split("@")[0]
 
 def getNickKey(conference, nick, key):
 	return gConferences[conference][nick].get(key)
@@ -797,13 +798,14 @@ def loadPlugins():
 	else:
 		printf("Loaded %d plugins (%d with errors)" % (validPlugins, invalidPlugins), FLAG_WARNING)
 
-def disconnect(action, message=None):
+def stop(action, message=None):
 	for thr in threading.enumerate():
 		if isinstance(thr, threading._Timer):
 			thr.cancel()
 	if gClient.isConnected():
 		callEventHandlers(EVT_SHUTDOWN, MODE_SYNC)
 		setOfflineStatus(None, message)
+		gClient.disconnect()
 		gClient.disconnected()
 
 	if ACTION_RESTART == action:
@@ -812,16 +814,8 @@ def disconnect(action, message=None):
 		os.execl(sys.executable, sys.executable, sys.argv[0])
 	elif ACTION_SHUTDOWN == action:
 		printf("Terminating...", FLAG_SUCCESS)
-		global IS_RUNNING
-		IS_RUNNING = False
 
-def main():
-	gInfo["start"] = time.time()
-
-	currentDir = os.path.dirname(sys.argv[0])
-	if currentDir:
-		os.chdir(currentDir)
-
+def start():
 	try:
 		Config.load(BOTCONFIG_FILE)
 
@@ -839,16 +833,16 @@ def main():
 			if Config.RESTART_IF_ERROR:
 				printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
 				time.sleep(RECONNECT_DELAY)
-				disconnect(ACTION_RESTART)
+				stop(ACTION_RESTART)
 			else:
-				disconnect(ACTION_SHUTDOWN)
+				stop(ACTION_SHUTDOWN)
 
 		printf("Authenticating...")
 		if gClient.auth(Config.USERNAME, Config.PASSWORD, Config.RESOURCE):
 			printf("Done", FLAG_SUCCESS)
 		else:
 			printf("Incorrect login/password", FLAG_ERROR)
-			disconnect(ACTION_SHUTDOWN)
+			stop(ACTION_SHUTDOWN)
 
 		gClient.registerHandler("message", parseMessage)
 		gClient.registerHandler("presence", parsePresence)
@@ -877,20 +871,27 @@ def main():
 		printf("Now I am ready to work :)")
 
 		try:
-			while IS_RUNNING:
-				gClient.process(10)
+			while gClient.process(10):
+				pass
 		except protocol.SystemShutdown:
 			printf("%s has been switched off" % (Config.SERVER), FLAG_WARNING)
-			disconnect(ACTION_SHUTDOWN)
+			stop(ACTION_SHUTDOWN)
 		except protocol.Conflict:
 			printf("Resource conflict", FLAG_WARNING)
-			disconnect(ACTION_SHUTDOWN)
+			stop(ACTION_SHUTDOWN)
 		except Exception:
 			printf("Exception in main thread", FLAG_ERROR)
 			addTextToSysLog(traceback.format_exc(), LOG_CRASHES)
-			disconnect(Config.RESTART_IF_ERROR, u"Что-то сломано...")
+			stop(Config.RESTART_IF_ERROR, u"Что-то сломано...")
 	except KeyboardInterrupt:
-		disconnect(ACTION_SHUTDOWN, u"Выключаюсь... (CTRL+C)")
+		stop(ACTION_SHUTDOWN, u"Выключаюсь... (CTRL+C)")
+		
+def main():
+	gInfo["start"] = time.time()
+	currentDir = os.path.dirname(sys.argv[0])
+	if currentDir:
+		os.chdir(currentDir)
+	start()
 
 if __name__ == "__main__":
 	sys.exit(main())
