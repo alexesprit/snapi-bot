@@ -45,12 +45,14 @@ def getTVChannelByURL(channelURL):
 	return channelURL
 
 def getTVProgramFromContent(rawdata):
-	elements = re.findall(r"item_time\">(.+?)</span>.+?<(?:a href|span).+?>(.+?)</(?:a|span)>", rawdata, re.DOTALL)
+	elements = re.findall(r"item_time\">(.+?)</span>.+?<(?:a|span).+?>(.+?)<(?:/a|/span)>", rawdata, re.DOTALL)
 	if elements:
 		buf = []			
 		for element in elements:
 			time = element[0].strip()
 			name = element[1].strip()
+			if "<b style" in name:
+				name = re.sub("<b style.+?</b>", "", name)
 			buf.append("%s: %s" % (time, name))
 		return unicode("\n".join(buf), "utf-8")
 	return None
