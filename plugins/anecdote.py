@@ -21,7 +21,7 @@ def showAnecdote(msgType, conference, nick, param):
 		elements = re.search("color:#FFFFFF'>(.+?)<a href", rawhtml, re.DOTALL)
 		if elements:
 			rawtext = elements.group(1).replace("<br />", "")
-			anecdote = decode(rawtext, "cp1251")
+			anecdote = netutil.decode(rawtext, "cp1251")
 			sendMsg(msgType, conference, nick, anecdote)
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
