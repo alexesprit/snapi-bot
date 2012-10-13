@@ -44,10 +44,11 @@ CLOUDINESS = {
 }
 
 def getWCodeByName(city):
-	city = city.encode("utf-8").lower()
+	city = city.lower()
 	path = getFilePath(RESOURCE_DIR, WCODES_FILE)
 	for line in open(path):
-		if line.lower().startswith(city):
+		line = line.decode('utf-8').lower()
+		if line.startswith(city):
 			return line.split("|")
 	return None
 
@@ -68,7 +69,7 @@ def showWeather(msgType, conference, nick, param):
 			node = node.getTag("REPORT").getTag("TOWN")
 			buf = []
 
-			buf.append(u"Погода в городе %s:\n" % (city.decode("utf-8")))
+			buf.append(u"Погода в городе %s:\n" % (city))
 			for forecast in node.getTags("FORECAST"):
 				attrs = forecast.getAttrs()
 				buf.append(u"[%(day)s.%(month)s.%(year)s, %(hour)s:00]\n" % (attrs))

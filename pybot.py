@@ -493,13 +493,15 @@ def sendMsg(msgType, conference, nick, text, force=False):
 	sendTo(msgType, jid, text)
 
 def startKeepAliveSending():
-	for conference in gConferences.keys():
-		iq = protocol.Iq(protocol.TYPE_GET)
-		iq.addChild("ping", {}, [], protocol.NS_PING)
-		iq.setTo(u"%s/%s" % (conference, getBotNick(conference)))
-		gClient.send(iq)
-		time.sleep(0.5)
-
+	#for conference in gConferences.keys():
+	#	iq = protocol.Iq(protocol.TYPE_GET)
+	#	iq.addChild("ping", {}, [], protocol.NS_PING)
+	#	iq.setTo(u"%s/%s" % (conference, getBotNick(conference)))
+	#	gClient.send(iq)
+	#	time.sleep(0.5)
+	iq = protocol.Iq(protocol.TYPE_GET)
+	iq.addChild("ping", {}, [], protocol.NS_PING)
+	gClient.send(iq)
 	startTimer(KEEPALIVE_TIMEOUT, startKeepAliveSending)
 
 def parseMessage(stanza):
@@ -805,8 +807,8 @@ def stop(action, message=None):
 	if gClient.isConnected():
 		callEventHandlers(EVT_SHUTDOWN, MODE_SYNC)
 		setOfflineStatus(None, message)
-		gClient.disconnect()
-		gClient.disconnected()
+	gClient.disconnect()
+	gClient.disconnected()
 
 	if ACTION_RESTART == action:
 		printf("Restarting...")
@@ -843,6 +845,7 @@ def start():
 		else:
 			printf("Incorrect login/password", FLAG_ERROR)
 			stop(ACTION_SHUTDOWN)
+			return
 
 		gClient.registerHandler("message", parseMessage)
 		gClient.registerHandler("presence", parsePresence)
