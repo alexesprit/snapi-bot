@@ -49,29 +49,32 @@ AFISHA_CITIES = {
 }
 
 TIME_OFFSET = {
-	"msk": 3,
-	"spb": 3,
-	"volgograd": 3,
-	"voronezh": 3,
-	"ekaterinburg": 5,
-	"irkutsk": 3,
-	"kazan": 3,
-	"kaliningrad": 2,
-	"krasnodar": 3,
-	"lipetsk": 3,
-	"murmansk": 3,
-	"nnovgorod": 3,
-	"novosibirsk": 6,
-	"perm": 5,
-	"petrozavodsk": 3,
-	"rostov-na-donu": 3,
-	"samara": 3, 
-	"sochi": 3,
-	"stavropol": 3,
-	"tula": 3,
-	"ufa": 5,
-	"chelyabinsk": 5,
-	"yaroslavl": 3
+	"msk": 4,
+	"spb": 4,
+	"volgograd": 4,
+	"voronezh": 4,
+	"ekaterinburg": 6,
+	"irkutsk": 4,
+	"kazan": 4,
+	"kaliningrad": 3,
+	"krasnodar": 4,
+	"lipetsk": 4,
+	"murmansk": 4,
+	"nnovgorod": 4,
+	"novosibirsk": 7,
+	"perm": 6,
+	"petrozavodsk": 4,
+	"rostov-na-donu": 4,
+	"samara": 4, 
+	"sochi": 4,
+	"stavropol": 4,
+	"tula": 4,
+	"ufa": 6,
+	"chelyabinsk": 6,
+	"yaroslavl": 4,
+	"kiev": 2,
+	"harkov": 2,
+	"donetsk": 2
 }
 
 gAfishaCache = {}
@@ -112,7 +115,7 @@ def getFullSchedule(city):
 				return gAfishaCache[city]["schedule"]
 	schedule = []
 	url = "http://www.afisha.ru/%s/schedule_cinema/" % (city)
-	response = getURL(url)
+	response = netutil.getURL(url)
 	if response:
 		rawhtml = unicode(response.read(), "utf-8")
 		getcinema = re.compile(u"class=\"b-td-item\">(?:[^>]+)>([^<]+)</a")
@@ -140,8 +143,7 @@ def getFullSchedule(city):
 	return schedule
 
 def getCityTime(city):
-	offset = time.localtime()[8] and 1 or 0
-	now = time.gmtime(time.time() + (TIME_OFFSET[city] + offset) * 3600)
+	now = time.gmtime(time.time() + (TIME_OFFSET[city]) * 3600)
 	return now
 
 def getCinemas(city):
@@ -206,7 +208,9 @@ def showAfisha(msgType, conference, nick, param):
 		schedule = getSchedule(cityCode, now, None, None)
 		if schedule:
 			filmslist = "\n".join([u"%s: %s (%s)" % (i[2], i[0], i[1]) for i in schedule])
-			sendMsg(msgType, conference, nick, 
+			if protocol.TYPE_PUBLIC == msgType:
+				sendMsg(msgType, conference, nick, u"В привате")
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, 
 				u"После %s в городе %s пройдут фильмы:\n%s" % (timestr, city, filmslist))
 		else:
 			sendMsg(msgType, conference, nick, 
@@ -215,7 +219,9 @@ def showAfisha(msgType, conference, nick, param):
 		schedule = getSchedule(cityCode, now, cinema, None)
 		if schedule:
 			filmslist = "\n".join([u"%s: %s (%s)" % (i[2], i[0], i[1]) for i in schedule])
-			sendMsg(msgType, conference, nick, 
+			if protocol.TYPE_PUBLIC == msgType:
+				sendMsg(msgType, conference, nick, u"В привате")
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, 
 				u"После %s в кинотеатре %s пройдут фильмы:\n%s" % (timestr, cinema, filmslist))
 		else:
 			sendMsg(msgType, conference, nick, 
@@ -224,7 +230,9 @@ def showAfisha(msgType, conference, nick, param):
 		schedule = getSchedule(cityCode, now, None, cinema)
 		if schedule:
 			cinemalist = u"\n".join([u"%s: %s" % (i[2], i[1]) for i in schedule])
-			sendMsg(msgType, conference, nick, 
+			if protocol.TYPE_PUBLIC == msgType:
+				sendMsg(msgType, conference, nick, u"В привате")
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, 
 				u"После %s фильм %s пройдет в следующих кинотеатрах:\n%s" % (timestr, cinema, cinemalist))
 		else:
 			sendMsg(msgType, conference, nick, 

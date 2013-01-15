@@ -344,6 +344,9 @@ def isCommandType(command, cmdType):
 def isAvailableCommand(conference, command):
 	return command not in gCmdOff[conference]
 
+def isMacros(macros, conference):
+	return gMacros.hasMacros(macros, conference) or gMacros.hasMacros(macros)
+
 def getNicks(conference):
 	return gConferences[conference].keys()
 
@@ -651,6 +654,9 @@ def parsePresence(stanza):
 			setNickKey(conference, nick, NICK_AFF, aff)
 			setNickKey(conference, nick, NICK_ROLE, role)
 		elif protocol.PRS_OFFLINE == prsType:
+			if nick == getBotNick(conference):
+				printf(u"dc: %s" % (conference))
+				printf(stanza)
 			if isNickOnline(conference, nick):
 				code = stanza.getStatusCode()
 				if "303" == code:
@@ -838,6 +844,7 @@ def start():
 				stop(ACTION_RESTART)
 			else:
 				stop(ACTION_SHUTDOWN)
+				return
 
 		printf("Authenticating...")
 		if gClient.auth(Config.USERNAME, Config.PASSWORD, Config.RESOURCE):

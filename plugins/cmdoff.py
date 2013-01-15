@@ -34,7 +34,7 @@ def disableCommand(msgType, conference, nick, param):
 		args = param.split()
 		for cmd in args:
 			_isCommand = isCommand(cmd) and isCommandType(cmd, CMD_CONFERENCE)
-			_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd)
+			_isMacros = isMacros(cmd, conference)
 			if _isCommand or _isMacros:
 				if _isMacros or not isCommandType(cmd, CMD_FROZEN):
 					if isAvailableCommand(conference, cmd):
@@ -59,15 +59,22 @@ def disableCommand(msgType, conference, nick, param):
 			buf.append(u"Неотключаемы: %s\n" % (", ".join(nonSwitched)))
 		if invalidCmd:
 			invalidCmd.sort()
-			buf.append(u"Не являются командами: %s\n" % (", ".join(invalidCmd)))
+			buf.append(u"Не являются командами/макросами: %s\n" % (", ".join(invalidCmd)))
 		sendMsg(msgType, conference, nick, "".join(buf))
 	else:
-		switchedOn = [cmd for cmd in gCmdOff[conference]]
-		if switchedOn:
-			sendMsg(msgType, conference, nick,
-				u"Отключены следующие команды: %s" % (", ".join(switchedOn)))
+		buf = []
+		commandsOff = [cmd for cmd in gCmdOff[conference] if isCommand(cmd)]
+		macrosesOff = [cmd for cmd in gCmdOff[conference] if isMacros(cmd, conference)]
+		if commandsOff:
+			commandsOff.sort()
+			buf.append(u"Отключены следующие команды: %s\n" % (", ".join(commandsOff)))
+		if macrosesOff:
+			macrosesOff.sort()
+			buf.append(u"Отключены следующие макросы: %s\n" % (", ".join(macrosesOff)))
+		if buf:
+			sendMsg(msgType, conference, nick, "".join(buf))
 		else:
-			sendMsg(msgType, conference, nick, u"В этой конференции включены все команды")
+			sendMsg(msgType, conference, nick, u"В этой конференции включены все команды/макросы")
 
 def enableCommand(msgType, conference, nick, param):
 	validCmd, invalidCmd, alreadySwitched = [], [], []
@@ -76,7 +83,7 @@ def enableCommand(msgType, conference, nick, param):
 	args = param.split()
 	for cmd in args:
 		_isCommand = isCommand(cmd) and isCommandType(cmd, CMD_CONFERENCE)
-		_isMacros = gMacros.hasMacros(cmd, conference) or gMacros.hasMacros(cmd)
+		_isMacros = isMacros(cmd, conference)
 		if _isCommand or _isMacros:
 			if not isAvailableCommand(conference, cmd):
 				gCmdOff[conference].remove(cmd)
@@ -95,19 +102,19 @@ def enableCommand(msgType, conference, nick, param):
 		buf.append(u"Уже включены: %s\n" % (", ".join(alreadySwitched)))
 	if invalidCmd:
 		invalidCmd.sort()
-		buf.append(u"Не являются командами: %s\n" % (", ".join(invalidCmd)))
+		buf.append(u"Не являются командами/макросами: %s\n" % (", ".join(invalidCmd)))
 	sendMsg(msgType, conference, nick, "".join(buf))
 
 registerEventHandler(loadDisabledCommands, EVT_ADDCONFERENCE)
 registerEventHandler(freeDisableCommands, EVT_DELCONFERENCE)
 
 registerCommand(enableCommand, u"комвкл", 30,
-				u"Включает определённые команды для текущей конференции",
+				u"Включает определённые команды/макросы для текущей конференции",
 				u"<команды>",
 				(u"тык диско версия пинг", ),
 				CMD_CONFERENCE | CMD_FROZEN | CMD_PARAM)
 registerCommand(disableCommand, u"комвыкл", 30,
-				u"Отключает определённые команды для текущей конференции. Без параметров показывает список отключенных команд",
+				u"Отключает определённые команды/макросы для текущей конференции. Без параметров показывает список отключенных команд/макросов",
 				u"[команды]",
 				(None, u"тык диско версия пинг", ),
 				CMD_CONFERENCE | CMD_FROZEN)

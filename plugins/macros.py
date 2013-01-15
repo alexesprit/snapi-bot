@@ -302,4 +302,4 @@ registerCommand(showMacrosList, u"макролист", 10,
 				u"Показывает список доступных вам макросов",
 				None, 
 				None, 
-				CMD_ANY | CMD_NONPARAM)
+				CMD_ANY | CMD_NONPARAM | CMD_FROZEN)
