@@ -15,11 +15,9 @@
 
 def showDates(msgType, conference, nick, param):
 	url = "http://wap.n-urengoy.ru/cgi-bin/wappr.pl"
-	response = netutil.getURL(url)
-	if response:
-		rawhtml = response.read()
-		rawhtml = unicode(rawhtml, "utf-8")
-		elements = re.findall(r"(.+?)/.+?<br/>-----<br/>", rawhtml)
+	data = netutil.getURLResponseData(url)
+	if data:
+		elements = re.findall(r"(.+?)/.+?<br/>-----<br/>", data)
 		if elements:
 			sendMsg(msgType, conference, nick, u"Вот, что я нашла:\n%s" % (u"\n".join(elements)))
 		else:

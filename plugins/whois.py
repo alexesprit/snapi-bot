@@ -16,14 +16,13 @@
 def showWhoIs(msgType, conference, nick, param):
 	url = "http://1whois.ru/index.php"
 	qparam = {"url": param.encode("utf-8")}
-	response = netutil.getURL(url, qparam)
-	if response:
-		rawhtml = response.read()
-		elements = re.search("<blockquote>(.+?)</font></blockquote>", rawhtml, re.DOTALL)
+	data = netutil.getURLResponseData(url, qparam, encoding='windows-1251')
+	if data:
+		elements = re.search("<blockquote>(.+?)</font></blockquote>", data, re.DOTALL)
 		if elements:
 			text = elements.group(1)
 			text = text.replace("<br />", "")
-			text = netutil.decode(text, "cp1251")
+			text = netutil.removeTags(text)
 			sendMsg(msgType, conference, nick, text)
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")

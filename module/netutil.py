@@ -15,6 +15,9 @@
 import re
 import urllib
 import urllib2
+import zlib
+
+from module import chardet
 
 HTML_ESC_MAP = (
 	("&gt;", u">"), 
@@ -34,6 +37,7 @@ XML_ESC_MAP = (
 )
 
 HTML_TAG_RE = re.compile(r"<.+?>")
+encPattern = re.compile(r'charset=(.+?)"')
 
 def ustr(text):
 	if isinstance(text, unicode):
@@ -66,9 +70,7 @@ def unescapeHTML(html):
 	html = html.replace("&amp;", "&")
 	return re.sub("&#(\d+);", lambda c: unichr(int(c.group(1))), html)
 
-def decode(text, encoding=None):
-	if encoding:
-		text = unicode(text, encoding)
+def removeTags(text):
 	for br in ("<br/>", "<br />", "<br>"):
 		text = text.replace(br, "\n")
 	text = HTML_TAG_RE.sub("", text)
@@ -79,16 +81,51 @@ def quote(url):
 	
 def unquote(url):
 	return urllib.unquote(url.encode("utf-8"))
+
+def getResponseData(response, encoding=None):
+	if response:
+		data = response.read()
+		info = response.info()
+		contentenc = info.getheader('Content-Encoding')
+		if contentenc == 'gzip':
+			obj = zlib.decompressobj(16 + zlib.MAX_WBITS)
+			data = obj.decompress(data)
+		
+		if encoding != 'raw':
+			if encoding:
+				try:
+					data = unicode(data, encoding)
+					return data
+				except UnicodeDecodeError:
+					print '%s: failed to decode response data; encoding: %s (defined by user)' % (response.geturl(), encoding)
+			else:
+				'%s: encoding is not defined' % (response.geturl())
+
+			encoding = chardet.detect(data)['encoding']
+			if encoding:
+				try:
+					data = unicode(data, encoding)
+					print "%s: enconding is %s" % (response.geturl(), encoding)
+					return data
+				except UnicodeDecodeError:
+					print '%s: failed to decode response data; encoding: %s (detected with chardet)' % (response.geturl(), encoding)
+			else:
+				print '%s: unknown encoding' % (response.geturl())
+		return data
+	return None
+
+def getURLResponseData(url, param=None, data=None, encoding=None):
+	return getResponseData(getURLResponse(url, param, data), encoding)
 	
-def getURL(url, param=None, data=None):
+def getURLResponse(url, param=None, data=None):
 	if param:
 		query = urllib.urlencode(param)
 		url = u"%s?%s" % (url, query)
 	if data:
 		data = urllib.urlencode(data)
-	#url = urllib.quote(url)
 	request = urllib2.Request(url, data)
 	request.add_header("User-Agent", "Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11")
+	request.add_header("Accept", "text/*")
 	try:
 		return urllib2.urlopen(request)
 	except IOError, e:

@@ -15,13 +15,12 @@
 
 def showAnecdote(msgType, conference, nick, param):
 	url = "http://anekdot.odessa.ua/rand-anekdot.php"
-	response = netutil.getURL(url)
-	if response:
-		rawhtml = response.read()
-		elements = re.search("color:#FFFFFF'>(.+?)<a href", rawhtml, re.DOTALL)
+	data = netutil.getURLResponseData(url, encoding='windows-1251')
+	if data:
+		elements = re.search("color:#FFFFFF'>(.+?)<a href", data, re.DOTALL)
 		if elements:
 			rawtext = elements.group(1).replace("<br />", "")
-			anecdote = netutil.decode(rawtext, "cp1251")
+			anecdote = netutil.removeTags(rawtext)
 			sendMsg(msgType, conference, nick, anecdote)
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")

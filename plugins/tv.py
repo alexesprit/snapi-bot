@@ -54,16 +54,15 @@ def getTVProgramFromContent(rawdata):
 			if "<b style" in name:
 				name = re.sub("<b style.+?</b>", "", name)
 			buf.append("%s: %s" % (time, name))
-		return unicode("\n".join(buf), "utf-8")
+		return "\n".join(buf)
 	return None
 	
 def getTVForCategory(categoryURL):
 	expurl = time.strftime(categoryURL)
 	url = "http://s-tv.ru/%s" % (expurl)
-	response = netutil.getURL(url)
-	if response:
-		rawdata = response.read()
-		rawchannels = re.findall("<table class=\"item_table\">(.+?)</table>", rawdata, re.DOTALL)
+	data = netutil.getURLResponseData(url, encoding='utf-8')
+	if data:
+		rawchannels = re.findall("<table class=\"item_table\">(.+?)</table>", data, re.DOTALL)
 		if rawchannels:
 			buf = []
 			for ch in rawchannels:
@@ -78,10 +77,9 @@ def getTVForCategory(categoryURL):
 	
 def getTVForChannel(channelURL):
 	url = "http://s-tv.ru/%s" % (channelURL)
-	response = netutil.getURL(url)
-	if response:
-		rawdata = response.read()
-		return getTVProgramFromContent(rawdata)
+	data = netutil.getURLResponseData(url, encoding='utf-8')
+	if data:
+		return getTVProgramFromContent(data)
 	return None
 	
 def showTVProgram(msgType, conference, nick, param):

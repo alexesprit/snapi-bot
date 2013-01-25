@@ -280,9 +280,9 @@ def delConference(conference):
 	del gConferenceConfig[conference]
 	del gConferences[conference]
 
-def joinConference(conference, nick, password):
-	setConferenceConfigKey(conference, "nick", nick)
-	setConferenceConfigKey(conference, "password", password)
+def joinConference(conference):
+	nick = getBotNick(conference)
+	pswd = getConferenceConfigKey(conference, "password")	
 
 	status = getConferenceConfigKey(conference, "status")
 	show = getConferenceConfigKey(conference, "show")
@@ -291,8 +291,8 @@ def joinConference(conference, nick, password):
 	prs = getPresenceNode(jid, show, status)
 	mucTag = prs.setTag("x", namespace=protocol.NS_MUC)
 	mucTag.addChild("history", {"maxchars": "0"})
-	if password:
-		mucTag.setTagData("password", password)
+	if pswd:
+		mucTag.setTagData("password", pswd)
 	gClient.send(prs)
 
 def leaveConference(conference, status=None):
@@ -314,11 +314,7 @@ def getMUCSetRoleStanza(conference, user, role, reason=None):
 	iq.addChild(node=query)
 	return iq
 
-def setMUCRole(conference, user, role, reason=None):
-	iq = getMUCSetRoleStanza(conference, user, role, reason)
-	gClient.send(iq)
-
-def getMUCSetAffiliationStanza(conference, user, itemType, aff, reason=None):
+def getMUCSetAfflStanza(conference, user, itemType, aff, reason=None):
 	iq = protocol.Iq(protocol.TYPE_SET)
 	iq.setTo(conference)
 	query = protocol.Node("query", {"xmlns": protocol.NS_MUC_ADMIN})
@@ -327,8 +323,12 @@ def getMUCSetAffiliationStanza(conference, user, itemType, aff, reason=None):
 		aff.setTagData("reason", reason)
 	iq.addChild(node=query)
 	return iq
+	
+def setMUCRole(conference, user, role, reason=None):
+	iq = getMUCSetRoleStanza(conference, user, role, reason)
+	gClient.send(iq)
 
-def setMUCAffiliation(conference, user, itemType, aff, reason=None):
+def setMUCAffl(conference, user, itemType, aff, reason=None):
 	iq = getMUCSetAffiliationStanza(conference, user, itemType, aff, reason)
 	gClient.send(iq)
 
@@ -540,7 +540,8 @@ def parseMessage(stanza):
 			time.sleep(1)
 		elif errorCode == "406":
 			addConference(conference)
-			joinConference(conference, Config.NICK, getConferenceConfigKey(conference, "password"))
+			setConferenceConfigKey(conference, "nick", Config.NICK)
+			joinConference(conference)
 			time.sleep(0.5)
 		else:
 			return
@@ -678,8 +679,9 @@ def parsePresence(stanza):
 			errorCode = stanza.getErrorCode()
 			if errorCode == "409":
 				newNick = getBotNick(conference) + "."
-				password = getConferenceConfigKey(conference, "password")
-				joinConference(conference, newNick, password)
+				setConferenceConfigKey(conference, "nick", newNick)
+				saveConferenceConfig(conference)
+				joinConference(conference)
 			elif errorCode == "404":
 				delConference(conference)
 				saveConferences()
@@ -687,9 +689,7 @@ def parsePresence(stanza):
 			elif errorCode == "503":
 				leaveConference(conference)
 
-				botNick = getBotNick(conference)
-				password = getConferenceConfigKey(conference, "password")
-				startTimer(REJOIN_DELAY, joinConference, conference, botNick, password)
+				startTimer(REJOIN_DELAY, joinConference, conference)
 
 				printf("Got 503 error code in %s" % (conference))
 			elif errorCode in ("401", "403", "405"):
@@ -869,7 +869,7 @@ def start():
 		if conferences:
 			for conference in conferences:
 				addConference(conference)
-				joinConference(conference, getBotNick(conference), getConferenceConfigKey(conference, "password"))
+				joinConference(conference)
 				saveConferenceConfig(conference)
 			printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 

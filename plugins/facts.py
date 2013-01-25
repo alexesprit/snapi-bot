@@ -16,13 +16,12 @@
 def showFact(msgType, conference, nick, param):
 	pageNum = random.randrange(1, 29)
 	url = "http://skio.ru/facts/fact%d.php" % (pageNum)
-	response = netutil.getURL(url)
-	if response:
-		rawhtml = response.read()
-		elements = re.findall("<li>(.+?)<br><br></li>", rawhtml)
+	data = netutil.getURLResponseData(url)
+	if data:
+		elements = re.findall("<li>(.+?)<br><br></li>", data)
 		if elements:
 			fact = random.choice(elements)
-			sendMsg(msgType, conference, nick, netutil.decode(fact, "cp1251"))
+			sendMsg(msgType, conference, nick, netutil.removeTags(fact))
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:

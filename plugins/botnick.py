@@ -14,8 +14,9 @@
 # GNU General Public License for more details.
 
 def setBotNick(msgType, conference, nick, param):
-	joinConference(conference, param, getConferenceConfigKey(conference, "password"))
+	setConferenceConfigKey(conference, "nick", param)
 	saveConferenceConfig(conference)
+	joinConference(conference)
 	sendMsg(msgType, conference, nick, u"Запомнила")
 
 registerCommand(setBotNick, u"ботник", 30,

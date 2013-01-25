@@ -13,19 +13,27 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def setUserRole(msgType, conference, nick, user, role):
+def getUserAndReason(param):
+	args = param.split('\n', 1)
+	if len(args) == 1:
+		return args[0], None
+	return args
+
+def setUserRole(msgType, conference, nick, param, role):
+	user, reason = getUserAndReason(param)
 	if isNickInConference(conference, user):
-		iq = getMUCSetRoleStanza(conference, user, role)
+		iq = getMUCSetRoleStanza(conference, user, role, reason)
 		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
 	else:
 		sendMsg(msgType, conference, nick, u"Чего?")
 
-def setUserAffiliation(msgType, conference, nick, user, aff):
+def setUserAffl(msgType, conference, nick, param, affl):
+	user, reason = getUserAndReason(param)
 	if isNickInConference(conference, user):
-		iq = getMUCSetAffiliationStanza(conference, user, protocol.ITEM_NICK, aff)
+		iq = getMUCSetAfflStanza(conference, user, protocol.ITEM_NICK, affl, reason)
 		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))
 	elif netutil.isJID(user) or netutil.isServer(user):
-		iq = getMUCSetAffiliationStanza(conference, user, protocol.ITEM_JID, aff)
+		iq = getMUCSetAfflStanza(conference, user, protocol.ITEM_JID, affl, reason)
 		gClient.sendAndCallForResponse(iq, setMUCItem_, (msgType, conference, nick))	
 	else:
 		sendMsg(msgType, conference, nick, u"Чего?")
@@ -37,19 +45,19 @@ def setMUCItem_(stanza, msgType, conference, nick):
 		sendMsg(msgType, conference, nick, u"Не могу :(")
 
 def setOutcast(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, protocol.AFF_OUTCAST)
+	setUserAffl(msgType, conference, nick, param, protocol.AFF_OUTCAST)
 
 def setNone(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, protocol.AFF_NONE)
+	setUserAffl(msgType, conference, nick, param, protocol.AFF_NONE)
 
 def setMember(msgType, conference, nick, param): 
-	setUserAffiliation(msgType, conference, nick, param, protocol.AFF_MEMBER)
+	setUserAffl(msgType, conference, nick, param, protocol.AFF_MEMBER)
 
 def setAdmin(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, protocol.AFF_ADMIN)
+	setUserAffl(msgType, conference, nick, param, protocol.AFF_ADMIN)
 
 def setOwner(msgType, conference, nick, param):
-	setUserAffiliation(msgType, conference, nick, param, protocol.AFF_OWNER)
+	setUserAffl(msgType, conference, nick, param, protocol.AFF_OWNER)
 	
 def setKick(msgType, conference, nick, param):
 	setUserRole(msgType, conference, nick, param, protocol.ROLE_NONE)

@@ -24,13 +24,12 @@ def decipherExpression(msgType, conference, nick, param):
 			"a": "analiz_nick",
 			"word": param.encode("cp1251")
 		}
-		response = netutil.getURL(url, qparam)
-		if response:
-			rawhtml = response.read()
-			elements = re.search(r"<div style='text-align:center;'><b>(.*?)</b></div>", rawhtml, re.DOTALL)
+		data = netutil.getURLResponseData(url, qparam, encoding='windows-1251')
+		if data:
+			elements = re.search(r"<div style='text-align:center;'><b>(.*?)</b></div>", data, re.DOTALL)
 			if elements:
 				text = elements.group(1)
-				sendMsg(msgType, conference, nick, unicode(text, "cp1251"))
+				sendMsg(msgType, conference, nick, text)
 			else:
 				sendMsg(msgType, conference, nick, u"Ошибка!")
 		else:

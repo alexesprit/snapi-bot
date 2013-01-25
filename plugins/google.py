@@ -40,7 +40,7 @@ def searchInGoogleRU(msgType, conference, nick, text):
 	searchInGoogle(msgType, conference, nick, url, qparam)
 
 def searchInGoogle(msgType, conference, nick, url, qparam):
-	response = netutil.getURL(url, qparam)
+	response = netutil.getURLResponse(url, qparam)
 	if response:
 		response = simplejson.load(response)
 		rawdata = response["responseData"]["results"]
@@ -55,7 +55,7 @@ def searchInGoogle(msgType, conference, nick, url, qparam):
 				result = "%s\n%s\n%s" % (title, text, url)
 				result = result.replace(u"<b>", u"«").replace(u"</b>", u"»")
 				found.append(result)
-			sendMsg(msgType, conference, nick, netutil.decode("\n\n".join(found)))
+			sendMsg(msgType, conference, nick, netutil.removeTags("\n\n".join(found)))
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:

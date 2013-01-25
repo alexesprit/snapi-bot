@@ -16,11 +16,10 @@
 def showDreamInfo(msgType, conference, nick, param):
 	url = "http://www.sonnik.ru/search.php"
 	qparam = {"key": param.encode("cp1251")}
-	response = netutil.getURL(url, qparam)
-	if response:
-		rawhtml = response.read()
-		elements = re.search(r"<div id=\"hypercontext\">(.+?)</div>", rawhtml, re.DOTALL)
-		message = netutil.decode(elements.group(1), "utf-8")
+	data = netutil.getURLResponseData(url, qparam, encoding='utf-8')
+	if data:
+		elements = re.search(r"<div id=\"hypercontext\">(.+?)</div>", data, re.DOTALL)
+		message = netutil.removeTags(elements.group(1))
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушёл")
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, message)

@@ -20,13 +20,11 @@ def getTrainTable(cityFrom, cityTo, dateForward):
 		"cityTo": cityTo.encode("utf-8"),
 		"dateForward": dateForward.encode("utf-8")
 	}
-	response = netutil.getURL(url, qparam)
-	if response:
-		rawhtml = response.read()
-		rawhtml = unicode(rawhtml, "utf-8")
+	data = netutil.getURLResponseData(url, qparam, encoding='utf-8')
+	if data:
 		table = []
 		
-		rawhtml = re.search("</thead>(.+?)<div class=\"b-yadirect\">", rawhtml, re.DOTALL).group(1)
+		rawhtml = re.search("</thead>(.+?)<div class=\"b-yadirect\">", data, re.DOTALL).group(1)
 
 		transports = re.findall(u"<div class=\"b-timetable__tripname\">(.+?)</div>", rawhtml, re.DOTALL)
 		descs = re.findall(u"<div class=\"b-timetable__description\">(.+?)</div>", rawhtml, re.DOTALL)
@@ -40,12 +38,12 @@ def getTrainTable(cityFrom, cityTo, dateForward):
 			if "gone" in places[i]:
 				continue
 				
-			transport = netutil.decode(transports[i]).strip()
-			desc = netutil.decode(descs[i]).strip()
-			source = netutil.decode(platforms[2 * i + 0]).strip()
-			target = netutil.decode(platforms[2 * i + 1]).strip()
-			departure = netutil.decode(times[2 * i]).strip()
-			arrival = netutil.decode(times[2 * i + 1]).strip()
+			transport = netutil.removeTags(transports[i]).strip()
+			desc = netutil.removeTags(descs[i]).strip()
+			source = netutil.removeTags(platforms[2 * i + 0]).strip()
+			target = netutil.removeTags(platforms[2 * i + 1]).strip()
+			departure = netutil.removeTags(times[2 * i]).strip()
+			arrival = netutil.removeTags(times[2 * i + 1]).strip()
 			
 			table.append([transport, desc, source, departure, target, arrival])
 		return table

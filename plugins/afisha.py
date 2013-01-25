@@ -115,13 +115,12 @@ def getFullSchedule(city):
 				return gAfishaCache[city]["schedule"]
 	schedule = []
 	url = "http://www.afisha.ru/%s/schedule_cinema/" % (city)
-	response = netutil.getURL(url)
-	if response:
-		rawhtml = unicode(response.read(), "utf-8")
+	data = netutil.getURLResponseData(url, encoding='utf-8')
+	if data:
 		getcinema = re.compile(u"class=\"b-td-item\">(?:[^>]+)>([^<]+)</a")
 		gettime = re.compile(u"<span (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")
 		gettime2 = re.compile(u"<a (?:[^>]+)>(?:\s*)([^\r]+)(?:\s*)<")
-		list1 = re.split(u"<h3 class=\"usetags\">([^>]+)>(?:\s*)([^<]+)(?:\s*)<", rawhtml, re.DOTALL)
+		list1 = re.split(u"<h3 class=\"usetags\">([^>]+)>(?:\s*)([^<]+)(?:\s*)<", data, re.DOTALL)
 		timetable = re.compile(u"table>")
 		films = zip(list1[2::3],list1[3::3])
 		for film in films:

@@ -16,14 +16,12 @@
 def showAdvert(msgType, conference, nick, param):
 	pageNum = random.randrange(1, 13)
 	url = "http://skio.ru/funnyad/%d.php" % (pageNum)
-	response = netutil.getURL(url)
-	if response:
-		rawhtml = response.read()
-		elements = re.findall(r"<tr><td>(.+?)</td></tr>", rawhtml, re.DOTALL)
+	data = netutil.getURLResponseData(url, encoding='windows-1251')
+	if data:
+		elements = re.findall(r"<tr><td>(.+?)</td></tr>", data, re.DOTALL)
 		if elements:
 			adv = random.choice(elements)
-			adv = netutil.decode(adv, "cp1251")
-			sendMsg(msgType, conference, nick, adv)
+			sendMsg(msgType, conference, nick, netutil.removeTags(adv))
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
 	else:

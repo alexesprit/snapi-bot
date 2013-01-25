@@ -30,7 +30,7 @@ def getTranslatedText(text, source, target, detailed):
 		"sl": source,
 		"tl": target
 	}
-	response = netutil.getURL(url, qparam)
+	response = netutil.getURLResponse(url, qparam)
 	if response:
 		rawdata = simplejson.load(response)
 		try:

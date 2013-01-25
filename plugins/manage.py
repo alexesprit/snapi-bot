@@ -16,24 +16,26 @@
 def joinConf(msgType, conference, nick, param):
 	args = param.split()
 	if param and netutil.isJID(args[0]):
-		conf = args[0]
-		if isConferenceInList(conf):
+		joinRoom = args[0]
+		if isConferenceInList(joinRoom):
 			sendMsg(msgType, conference, nick, u"Я уже там!")
 		else:
-			addConference(conf)
+			addConference(joinRoom)
 			password = (len(args) == 2) and args[1] or None
-			joinConference(conf, getBotNick(conf), password)
-			saveConferenceConfig(conf)
+			setConferenceConfigKey(joinRoom, "nick", getBotNick(joinRoom))
+			setConferenceConfigKey(joinRoom, "password", password)
+			joinConference(joinRoom)
+			saveConferenceConfig(joinRoom)
 			saveConferences()
 			sendMsg(msgType, conference, nick, u"Зашла")
 
 def leaveConf(msgType, conference, nick, param):
-	conf = param or conference
-	if isConferenceInList(conf):
-		if conf != conference:
+	joinRoom = param or conference
+	if isConferenceInList(joinRoom):
+		if joinRoom != conference:
 			sendMsg(msgType, conference, nick, u"Ушла")
 		myNick = getNickFromJID(conference, nick)
-		leaveConference(conf, u"Меня уводит %s" % (myNick))
+		leaveConference(joinRoom, u"Меня уводит %s" % (myNick))
 		saveConferences()
 	else:
 		if param:

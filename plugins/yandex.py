@@ -16,11 +16,9 @@
 def searchInYandex(msgType, conference, nick, param):
 	url = "http://yandex.ru/yandsearch"
 	qparam = {"text": param.encode("utf-8")}
-	response = netutil.getURL(url, qparam)
-	if response:
-		rawhtml = response.read()
-		rawhtml = unicode(rawhtml, "utf-8")
-		elements = re.findall(r'<a class="b-serp-item__title.+?href="(.+?)".+?>(.+?)</a>.+?<div class="b-serp-item__text">(.+?)</div>', rawhtml, re.DOTALL)
+	data = netutil.getURLResponseData(url, qparam, encoding='utf-8')
+	if data:
+		elements = re.findall(r'<a class="b-serp-item__title.+?href="(.+?)".+?>(.+?)</a>.+?<div class="b-serp-item__text">(.+?)</div>', data, re.DOTALL)
 		if elements:
 			if protocol.TYPE_PUBLIC == msgType:
 				elements = elements[:1]
@@ -34,7 +32,7 @@ def searchInYandex(msgType, conference, nick, param):
 				result = "%s\n%s\n%s" % (title, text, url)
 				result = result.replace(u"<b>", u"«").replace(u"</b>", u"»")
 				found.append(result)
-			sendMsg(msgType, conference, nick, netutil.decode("\n\n".join(found)))
+			sendMsg(msgType, conference, nick, netutil.removeTags("\n\n".join(found)))
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:

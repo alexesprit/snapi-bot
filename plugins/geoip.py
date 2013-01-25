@@ -15,16 +15,14 @@
 # GNU General Public License for more details.
 
 def showGeoIPInfo(msgType, conference, nick, param):
-	host = param or Config.HOST
+	host = param or Config.HOST or Config.SERVER
 	url = "http://www.and-rey.ru/geoip/ie.php"
 	qparam = {"host": host.encode("utf-8")}
-	response = netutil.getURL(url, qparam)
-	if response:
-		rawhtml = response.read()
-		rawhtml = unicode(rawhtml, "cp1251")
-		elements = re.findall("<td class=red>(.+?)</td><td class=blue>(.+?)</td>", rawhtml)
+	data = netutil.getURLResponseData(url, qparam, encoding='windows-1251')
+	if data:
+		elements = re.findall("<td class=red>(.+?)</td><td class=blue>(.+?)</td>", data)
 		elements = [u"%s %s" % (element[0], element[1]) for element in elements]
-		message = u"Инфо о %s:\n%s" % (host, netutil.decode("\n".join(elements)))
+		message = u"Инфо о %s:\n%s" % (host, netutil.removeTags("\n".join(elements)))
 		sendMsg(msgType, conference, nick, message)
 	else:
 		sendMsg(msgType, conference, nick, u"Ошибка!")

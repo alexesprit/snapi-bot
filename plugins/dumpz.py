@@ -42,9 +42,9 @@ def uploadToDumpz(msgType, conference, nick, param):
 			"lexer": lang,
 			"code": text.encode("utf-8")
 		}
-		response = netutil.getURL(url, None, data)
+		response = netutil.getURLResponse(url, None, data)
 		if response:
-			sendMsg(msgType, conference, nick, u"Залито на %s" % (response.url))
+			sendMsg(msgType, conference, nick, u"Залито на %s" % (response.geturl()))
 		else:
 			sendMsg(msgType, conference, nick, u"Ошибка!")
 

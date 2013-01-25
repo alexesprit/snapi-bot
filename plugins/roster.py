@@ -13,12 +13,24 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+def cleanRosterOnLoggedIn():
+	roster = gClient.getRoster()
+	counter = 0
+	for jid in roster.keys():
+		subsc = roster.getSubscription(jid)
+		if subsc != "both":
+			roster.delItem(jid)
+			counter += 1
+	if counter:
+		printf("%d users were dropped from my roster" % counter)
+
 def showRoster(msgType, conference, nick, param):
 	roster = gClient.getRoster()
 	elements = [u"%d) %s [%s]" % (i + 1, jid, roster.getSubscription(jid)) 
 			for i, jid in enumerate(sorted(roster.keys()))]
 	sendMsg(msgType, conference, nick,  u"Смотри, кто у меня есть:\n%s" % ("\n".join(elements)))
 
+registerEventHandler(cleanRosterOnLoggedIn, EVT_READY)	
 registerCommand(showRoster, u"ростер", 100, 
 				u"Показывает содержимое ростера", 
 				None, 
