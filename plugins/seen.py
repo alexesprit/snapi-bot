@@ -22,6 +22,7 @@ def loadSeenBase(conference):
 	gSeenCache[conference] = database.DataBase(path)
 
 def freeSeenBase(conference):
+	gSeenCache[conference].save()
 	del gSeenCache[conference]
 
 def saveAllSeenBases():

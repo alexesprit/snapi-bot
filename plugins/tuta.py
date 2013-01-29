@@ -22,6 +22,10 @@ def loadHereBase(conference):
 	gHereTime[conference] = database.DataBase(path)
 
 def freeHereBase(conference):
+	for nick in getOnlineNicks(conference):
+		truejid = getTrueJID(conference, nick)
+		updateHereTimeInfo(conference, nick, truejid)
+	gHereTime[conference].save()
 	del gHereTime[conference]
 
 def saveAllHereBases():

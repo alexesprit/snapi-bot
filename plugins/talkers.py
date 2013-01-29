@@ -23,6 +23,7 @@ def loadTalkersBase(conference):
 	gTalkersCache[conference] = database.DataBase(path)
 
 def freeTalkersBase(conference):
+	gTalkersCache[conference].save()
 	del gTalkersCache[conference]
 
 def saveAllTalkersBases():
