@@ -36,7 +36,7 @@ def calculateRecord(conference, nick, truejid, aff, role):
 	userCount = len(getOnlineNicks(conference))
 	lastCount = records and records["count"] or 0
 	if userCount >= lastCount:
-		records["time"] = time.strftime("%d.%m.%y, %H:%M")
+		records["time"] = time.strftime("%d.%m.%Y, %H:%M")
 		records["count"] = userCount
 		saveRecords(conference, records)
 

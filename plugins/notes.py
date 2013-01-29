@@ -24,7 +24,7 @@ def addUserNote(msgType, conference, nick, param):
 	truejid = getTrueJID(conference, nick)
 	if truejid not in notes:
 		notes[truejid] = []
-	text = u"%s\n%s" % (time.strftime("[%d.%m.%y, %H:%M]"), param)
+	text = u"%s\n%s" % (time.strftime("[%d.%m.%Y, %H:%M]"), param)
 	notes[truejid].append(text)
 	notes.save()
 	sendMsg(msgType, conference, nick, u"Записала")

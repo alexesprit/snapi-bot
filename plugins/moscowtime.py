@@ -30,7 +30,7 @@ def showMoscowTime(msgType, conference, nick, param):
 	if not currtime:
 		fromntp = False
 		currtime = time.localtime()
-	timestr = time.strftime("%H:%M:%S, %d.%m.%y", currtime)
+	timestr = time.strftime("%H:%M:%S, %d.%m.%Y", currtime)
 	if fromntp:
 		message = u"Московское время: %s, %s" % (timestr, WEEKDAYS[currtime[6]])
 	else:

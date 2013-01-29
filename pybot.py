@@ -72,11 +72,11 @@ CMD_NONPARAM = 0x08
 CMD_PARAM = 0x10
 CMD_ANY = CMD_CONFERENCE | CMD_ROSTER
 
-CMD_DESC = 0x1
-CMD_TYPE = 0x2
-CMD_ACCESS = 0x3
-CMD_SYNTAX = 0x4
-CMD_EXAMPLE = 0x5
+CMD_ACCESS = 0
+CMD_DESC = 1
+CMD_SYNTAX = 2
+CMD_EXAMPLE = 3
+CMD_TYPE = 4
 
 NICK_JID = "jid"
 NICK_IDLE = "idle"
@@ -172,13 +172,7 @@ gDebug.colors[FLAG_SUCCESS] = debug.colorBrightCyan
 
 def registerCommand(function, command, access, desc, syntax, examples, cmdType=CMD_ANY):
 	gCmdHandlers[command] = function
-	gCommands[command] = {
-		CMD_ACCESS: access,
-		CMD_DESC: desc,
-		CMD_SYNTAX: syntax,
-		CMD_EXAMPLE: examples,
-		CMD_TYPE: cmdType
-	}
+	gCommands[command] = (access, desc, syntax, examples, cmdType)
 
 def registerEventHandler(function, evtType):
 	if evtType not in gEventHandlers:
@@ -785,7 +779,7 @@ def addTextToSysLog(text, logtype, show=False):
 	if LOG_ERRORS == logtype:
 		gInfo["err"] += 1
 	if show:
-			printf(text, FLAG_ERROR)
+		printf(text, FLAG_ERROR)
 
 def loadPlugins():
 	validPlugins = 0
@@ -892,7 +886,8 @@ def start():
 		except Exception:
 			printf("Exception in main thread", FLAG_ERROR)
 			addTextToSysLog(traceback.format_exc(), LOG_CRASHES)
-			stop(Config.RESTART_IF_ERROR, u"Что-то сломано...")
+			action = ACTION_RESTART if Config.RESTART_IF_ERROR else ACTION_SHUTDOWN
+			stop(action, u"Что-то сломано...")
 	except KeyboardInterrupt:
 		stop(ACTION_SHUTDOWN, u"Выключаюсь... (CTRL+C)")
 		

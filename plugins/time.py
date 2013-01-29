@@ -52,7 +52,7 @@ def showUserTime_(stanza, msgType, conference, nick, param):
 					offset = -offset
 				rawTime = time.strptime(utc, "%Y-%m-%dT%H:%M:%SZ")
 				rawTime = time.mktime(rawTime) + offset
-				userTime = time.strftime("%H:%M:%S (%d.%m.%y)", time.localtime(rawTime))
+				userTime = time.strftime("%H:%M:%S (%d.%m.%Y)", time.localtime(rawTime))
 				if param:
 					sendMsg(msgType, conference, nick, u"У %s сейчас %s" % (param, userTime))
 				else:
