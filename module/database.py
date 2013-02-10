@@ -1,5 +1,7 @@
+# coding: utf-8
+
 # database.py
-# Initial Copyright (c) 2010 -Esprit-
+# Initial Copyright (c) esprit
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

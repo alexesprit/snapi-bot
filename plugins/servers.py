@@ -3,6 +3,7 @@
 # servers.py
 # Initial Copyright (c) 2002-2005 Mike Mintz <mikemintz@gmail.com>
 # Initial Copyright (c) 2007 Als <Als@exploit.in>
+# Modification Copyright (c) esprit
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,6 +14,39 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+
+import socket
+
+def getDNSResponse(query):
+	try:
+		if not re.sub(r"\d+\.\d+\.\d+\.\d+", "", query):
+			hostname = socket.gethostbyaddr(query)[0]
+			return hostname
+		else:
+			ipaddrlist = socket.gethostbyaddr(query)[2]
+			return u", ".join(ipaddrlist)
+	except (socket.error):
+		return None
+
+def showDNSResponse(msgType, conference, nick, param):
+	response = getDNSResponse(param.encode("utf-8"))
+	if response:
+		sendMsg(msgType, conference, nick, response)
+	else:
+		sendMsg(msgType, conference, nick, u"Не могу")
+
+def showGeoIPInfo(msgType, conference, nick, param):
+	host = param or Config.HOST or Config.SERVER
+	url = "http://www.and-rey.ru/geoip/ie.php"
+	qparam = {"host": host.encode("utf-8")}
+	data = netutil.getURLResponseData(url, qparam, encoding='windows-1251')
+	if data:
+		elements = re.findall("<td class=red>(.+?)</td><td class=blue>(.+?)</td>", data)
+		elements = [u"%s %s" % (element[0], element[1]) for element in elements]
+		message = u"Инфо о %s:\n%s" % (host, netutil.removeTags("\n".join(elements)))
+		sendMsg(msgType, conference, nick, message)
+	else:
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 def showServerInfo(msgType, conference, nick, param):
 	server = param or Config.SERVER
@@ -64,11 +98,20 @@ def showServerUptime_(stanza, msgType, conference, nick, server):
 	else:
 		sendMsg(msgType, conference, nick, u"Не получается :(")
 
+registerCommand(showDNSResponse, u"днс", 10, 
+				u"Показывает ответ от DNS для определённого хоста или IP адреса", 
+				u"<хост|IP>", 
+				(u"server.tld", u"127.0.0.1"), 
+				CMD_ANY | CMD_PARAM)
+registerCommand(showGeoIPInfo, u"геоип", 10,
+				u"Показывает информацию о географическом месторасположении хоста",
+				u"[сервер]",
+				(None, u"server.tld"))
 registerCommand(showServerInfo, u"инфа", 10,
 				u"Возвращает статистику jabber-сервера",
 				u"[сервер]",
-				(u"server.tld", ))
+				(None, u"server.tld"))
 registerCommand(showServerUptime, u"аптайм", 10,
 				u"Показывает аптайм jabber-сервера",
 				u"[сервер]",
-				(u"server.tld", ))
+				(None, u"server.tld"))

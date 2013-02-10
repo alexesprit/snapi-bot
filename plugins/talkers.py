@@ -2,7 +2,7 @@
 
 # talkers.py
 # Initial Copyright (c) Gigabyte
-# Modification Copyright (c) -Esprit-
+# Modification Copyright (c) esprit
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -67,7 +67,6 @@ def showTalkerInfo(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"База болтунов пуста")
 	elif param == u"сброс":
-		conference = source[1]
 		truejid = getTrueJID(conference, nick)
 		if getAccess(conference, truejid) >= 20:
 			base = gTalkersCache[conference]

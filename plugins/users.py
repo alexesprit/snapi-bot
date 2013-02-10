@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # users.py
-# Initial Copyright (с) 2010 -Esprit-
+# Initial Copyright (с) esprit
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,10 +43,9 @@ def showWhoWas(msgType, conference, nick, param):
 
 def showUserNicks(msgType, conference, nick, param):
 	userNick = param or nick
-	if isNickInConference(conference, userNick):
-		truejid = getTrueJID(conference, userNick)
-		nicks = [user for user in getNicks(conference) 
-				if truejid == getTrueJID(conference, user)]
+	truejid = getTrueJID(conference, userNick)
+	if truejid:
+		nicks = [x for x in getNicks(conference) if truejid == getTrueJID(conference, x)]
 		if len(nicks) < 2:
 			if param:
 				sendMsg(msgType, conference, nick, u"Я знаю %s только как %s" % (userNick, userNick))

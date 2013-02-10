@@ -4,6 +4,7 @@
 # Initial Copyright (с) 2002-2005 Mike Mintz <mikemintz@gmail.com>
 # Modification Copyright (с) 2007 Als <Als@exploit.in>
 # Parts of code Copyright (с) Bohdan Turkynewych aka Gh0st <tb0hdan[at]gmail.com>
+# Modification Copyright (c) esprit
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

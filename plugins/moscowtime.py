@@ -1,6 +1,8 @@
 # coding: utf-8
 
-# Firat Atagun
+# Initial Copyright (c) esprit
+
+# NTP code is written by Firat Atagun
 # http://www.firatatagun.com/python-ntp-client/
 
 import socket

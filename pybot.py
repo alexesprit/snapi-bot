@@ -5,7 +5,7 @@
 # Initial Copyright (c) 2002-2005 Mike Mintz <mikemintz@gmail.com>
 # Modification Copyright (c) 2007 Als <Als@exploit.in>
 # Modification Copyright (c) 2007 dimichxp <dimichxp@gmail.com>
-# Modification Copyright (c) 2010 -Esprit-
+# Modification Copyright (c) esprit
 # Part of code Copyright (c) Boris Kotov <admin@avoozl.ru>
 
 # This program is free software; you can redistribute it and/or modify

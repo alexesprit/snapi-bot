@@ -3,6 +3,7 @@
 # quotes.py
 # Initial Copyright (c) ???
 # Modification Copyright (c) 2007 Als <Als@exploit.in>
+# Modification Copyright (c) esprit
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -111,9 +112,87 @@ def showCinemaQuote(msgType, conference, nick, param):
 			quote = netutil.removeTags(quote)
 			sendMsg(msgType, conference, nick, quote)
 		else:
-			sendMsg(msgType, conference, nick, u"Ошибка!")
+			sendMsg(msgType, conference, nick, u"Нет цитат!")
 	else:
 		sendMsg(msgType, conference, nick, u"Ошибка!")
+
+def showFact(msgType, conference, nick, param):
+	pageNum = random.randrange(1, 29)
+	url = "http://skio.ru/facts/fact%d.php" % (pageNum)
+	data = netutil.getURLResponseData(url)
+	if data:
+		elements = re.findall("<li>(.+?)<br><br></li>", data)
+		if elements:
+			fact = random.choice(elements)
+			sendMsg(msgType, conference, nick, netutil.removeTags(fact))
+		else:
+			sendMsg(msgType, conference, nick, u"Нет фактов!")
+	else:
+		sendMsg(msgType, conference, nick, u"Ошибка!")
+
+def showAnecdote(msgType, conference, nick, param):
+	url = "http://anekdot.odessa.ua/rand-anekdot.php"
+	data = netutil.getURLResponseData(url, encoding='windows-1251')
+	if data:
+		elements = re.search("color:#FFFFFF'>(.+?)<a href", data, re.DOTALL)
+		if elements:
+			rawtext = elements.group(1).replace("<br />", "")
+			anecdote = netutil.removeTags(rawtext)
+			sendMsg(msgType, conference, nick, anecdote)
+		else:
+			sendMsg(msgType, conference, nick, u"Нет анекдота!")
+	else:
+		sendMsg(msgType, conference, nick, u"Ошибка!")		
+
+def showAforism(msgType, conference, nick, param):
+	randPage = random.choice((
+		"biz_quotes.php",
+		"rich_quotes.php",
+		"family_quotes.php",
+		"kids_quotes.php",
+		"friend_quotes.php",
+		"human_quotes.php",
+		"health_quotes.php",
+		"beauty_quotes.php",
+		"love_quotes.php",
+		"world_quotes.php",
+		"wisdom_quotes.php",
+		"menwomen_quotes.php",
+		"science_quotes.php",
+		"edu_quotes.php",
+		"pessimism_quotes.php",
+		"politics_quotes.php",
+		"truth_quotes.php",
+		"religion_quotes.php",
+		"death_quotes.php",
+		"happy_quotes.php",
+		"work_quotes.php",
+		"humour_quotes.php"))
+	url = "http://skio.ru/quotes/%s" % (randPage)
+	data = netutil.getURLResponseData(url, encoding='windows-1251')
+	if data:
+		elements = re.search("<p><div align=\"center\">(.+?)</div>", data, re.DOTALL)
+		if elements:
+			aforism = elements.group(1)
+			sendMsg(msgType, conference, nick, aforism)
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка!")
+	else:
+		sendMsg(msgType, conference, nick, u"Ошибка!")		
+
+def showAdvert(msgType, conference, nick, param):
+	pageNum = random.randrange(1, 13)
+	url = "http://skio.ru/funnyad/%d.php" % (pageNum)
+	data = netutil.getURLResponseData(url, encoding='windows-1251')
+	if data:
+		elements = re.findall(r"<tr><td>(.+?)</td></tr>", data, re.DOTALL)
+		if elements:
+			adv = random.choice(elements)
+			sendMsg(msgType, conference, nick, netutil.removeTags(adv))
+		else:
+			sendMsg(msgType, conference, nick, u"Ошибка!")
+	else:
+		sendMsg(msgType, conference, nick, u"Ошибка!")		
 
 registerCommand(showAbyssQuote, u"борб", 10, 
 				u"Показывает случайную цитату из бездны bash.org.ru", 
@@ -138,6 +217,26 @@ registerCommand(showJabberQuote, u"жк", 10,
 				(None, u"204"))
 registerCommand(showCinemaQuote, u"киноцитата", 10, 
 				u"Показывает случайную цитату из кино", 
+				None, 
+				None, 
+				CMD_ANY | CMD_NONPARAM)
+registerCommand(showFact, u"факт", 10, 
+				u"Показывает случайный интересный факт", 
+				None, 
+				None, 
+				CMD_ANY | CMD_NONPARAM)
+registerCommand(showAforism, u"афор", 10, 
+				u"Показывает случайный афоризм", 
+				None, 
+				None, 
+				CMD_ANY | CMD_NONPARAM)
+registerCommand(showAnecdote, u"анекдот", 10, 
+				u"Показывает случайный анекдот", 
+				None, 
+				None, 
+				CMD_ANY | CMD_NONPARAM)
+registerCommand(showAdvert, u"объявление", 10, 
+				u"Показывает случайное интересное объявление", 
 				None, 
 				None, 
 				CMD_ANY | CMD_NONPARAM)

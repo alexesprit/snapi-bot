@@ -2,6 +2,7 @@
 
 # clear.py
 # Initial Copyright (c) Gigabyte <gigabyte@ngs.ru>
+# Modification Copyright (c) esprit
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +16,7 @@
 
 CLEAR_ITERATIONS = 20
 
-def cleanConference(msgType, conference, nick, param):
+def cleanConference(msgType, conference, nick, param):	
 	sendMsg(msgType, conference, nick, u"Сейчас уберу...")
 	for i in xrange(CLEAR_ITERATIONS):
 		sendToConference(conference, "")

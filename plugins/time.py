@@ -3,6 +3,7 @@
 # time.py
 # Initial Copyright (с) 2007 Als <Als@exploit.in>
 # Modification Copyright (с) 2007 dimichxp <dimichxp@gmail.com>
+# Modification Copyright (c) esprit
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,15 +14,6 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
-"""
-<iq from='loc-id@conference.jabber.ru/modi' to='espr1t@jabber.ru/home' id='31:933738' xml:lang='ru' type='result'>
-    <time xmlns='urn:xmpp:time'>
-        <tzo>+04:00</tzo>
-        <utc>2005-01-01T03:04:19ZZ</utc>
-    </time>
-</iq>
-"""
 
 def showUserTime(msgType, conference, nick, param):
 	if param:

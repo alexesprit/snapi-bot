@@ -3,7 +3,7 @@
 # vcard.py
 # Initial Copyright (c) 2007 dimichxp <dimichxp@gmail.com>
 # Modification Copyright (c) 2007 Als <Als@exploit.in>
-# Modification Copyright (c) 2010-2011 -Esprit-
+# Modification Copyright (c) esprit
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,26 +14,6 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
-VCARD_TAGS = (
-	("NICKNAME", u"Ник"),
-	("FN", u"Имя"),
-	("GENDER", u"Пол"),
-	("BDAY", u"Д/р"),
-	("CTRY", u"Страна"),
-	("REGION", u"Район/Штат"),
-	("LOCALITY", u"Город"),
-	("PCODE", u"Индекс"),
-	("STREET", u"Улица"),
-	("ORGNAME", u"Огранизация"),
-	("ORGUNIT", u"Отдел"),
-	("ROLE", u"Профессия"),
-	("TITLE", u"Должность"),
-	("NUMBER", u"Телефон"),
-	("URL", u"Сайт"),
-	("EMAIL", u"E-mail"),
-	("DESC", u"Заметки"),
-)
 
 def showVCard(msgType, conference, nick, param):
 	if param:
@@ -91,8 +71,27 @@ def getVCard(rawVCard):
 	if buf:
 		rawVCard["FN"] = "".join(buf)
 	vCardElements = []
-	for i in xrange(len(VCARD_TAGS)):
-		tagName, tagDesc = VCARD_TAGS[i]
+	tags = (
+		("NICKNAME", u"Ник"),
+		("FN", u"Имя"),
+		("GENDER", u"Пол"),
+		("BDAY", u"Д/р"),
+		("CTRY", u"Страна"),
+		("REGION", u"Район/Штат"),
+		("LOCALITY", u"Город"),
+		("PCODE", u"Индекс"),
+		("STREET", u"Улица"),
+		("ORGNAME", u"Огранизация"),
+		("ORGUNIT", u"Отдел"),
+		("ROLE", u"Профессия"),
+		("TITLE", u"Должность"),
+		("NUMBER", u"Телефон"),
+		("URL", u"Сайт"),
+		("EMAIL", u"E-mail"),
+		("DESC", u"Заметки"),
+	)
+	for i in xrange(len(tags)):
+		tagName, tagDesc = tags[i]
 		tagData = rawVCard.get(tagName)
 		if tagData:
 			vCardElements.append(u"%s: %s" % (tagDesc, tagData))
