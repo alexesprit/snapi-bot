@@ -37,29 +37,32 @@ def saveAllHereBases():
 
 def showHereStatistic(msgType, conference, nick, param):
 	userNick = param or nick
-	if isNickOnline(conference, userNick):
-		base = gHereTime[conference]
-		truejid = getTrueJID(conference, userNick)
-		if truejid in base:
-			joinCount = base[truejid]["count"]
-			hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
-
-			totalTime = base[truejid]["here"] + hereTime
-			maxTime = max(base[truejid]["record"], hereTime)
-			averageTime = totalTime / joinCount
-
-			if not param:
-				sendMsg(msgType, conference, nick, 
-					u"Ты всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d" % 
-						(getTimeStr(totalTime), getTimeStr(maxTime), getTimeStr(averageTime), joinCount))
-			else:
-				sendMsg(msgType, conference, nick, 
-					u"%s всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d" % 
-						(userNick, getTimeStr(totalTime), getTimeStr(maxTime), getTimeStr(averageTime), joinCount))
+	truejid = getTrueJID(conference, userNick)
+	if not truejid:
+		if netutil.isJID(userNick):
+			truejid = userNick
 		else:
-			sendMsg(msgType, conference, nick, u"Нет информации")
+			sendMsg(msgType, conference, nick, u"А это кто?")
+			return
+	base = gHereTime[conference]		
+	if truejid in base:
+		joinCount = base[truejid]["count"]
+		hereTime = time.time() - getNickKey(conference, nick, NICK_JOINED)
+
+		totalTime = base[truejid]["here"] + hereTime
+		maxTime = max(base[truejid]["record"], hereTime)
+		averageTime = totalTime / joinCount
+
+		if not param:
+			sendMsg(msgType, conference, nick, 
+				u"Ты всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d" % 
+					(getTimeStr(totalTime), getTimeStr(maxTime), getTimeStr(averageTime), joinCount))
+		else:
+			sendMsg(msgType, conference, nick, 
+				u"%s всего здесь %s, рекорд - %s, среднее время - %s, заходов в чат - %d" % 
+					(userNick, getTimeStr(totalTime), getTimeStr(maxTime), getTimeStr(averageTime), joinCount))
 	else:
-		sendMsg(msgType, conference, nick, u"А это кто?")
+		sendMsg(msgType, conference, nick, u"Нет информации")
 
 def updateHereTimeInfo(conference, nick, truejid):
 	base = gHereTime[conference]

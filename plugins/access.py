@@ -66,34 +66,30 @@ def logout(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Ошибка! Вы не авторизованы!")
 
 def showUserAccess(msgType, conference, nick, param):
-	user = param
-	if not param:
-		userjid = getTrueJID(conference, nick)
-	else:
-		if isConferenceInList(conference) and isNickInConference(conference, user):
-			userjid = getTrueJID(conference, user)
-		elif netutil.isJID(user):
-			userjid = user
+	user = param or nick
+	truejid = getTrueJID(conference, user)
+	if truejid:
+		access = getAccess(conference, truejid)
+		if access in ACCESS_DESC:
+			accDesc = ACCESS_DESC[access]
+			sendMsg(msgType, conference, nick, u"%d (%s)" % (access, accDesc))
 		else:
-			sendMsg(msgType, conference, nick, u"А кто это?")
-			return
-	access = getAccess(conference, userjid)
-	if access in ACCESS_DESC:
-		accDesc = ACCESS_DESC[access]
-		sendMsg(msgType, conference, nick, u"%d (%s)" % (access, accDesc))
+			sendMsg(msgType, conference, nick, u"%d" % (access))
 	else:
-		sendMsg(msgType, conference, nick, u"%d" % (access))
+		sendMsg(msgType, conference, nick, u"А кто это?")
 
 def setLocalAccess(msgType, conference, nick, param):
 	args = param.split(None, 2)
-	user = args[0].strip()
-	if isNickInConference(conference, user):
-		userjid = getTrueJID(conference, user)
-	elif netutil.isJID(user):
-		userjid = getTrueJID(conference, user)
-	else:
-		sendMsg(msgType, conference, nick, u"А кто это?")
-		return
+	userNick = args[0].strip()
+	truejid = getTrueJID(conference, userNick)
+	if not truejid:
+		print userNick
+		print netutil.isJID(userNick)
+		if netutil.isJID(userNick):
+			truejid = userNick
+		else:
+			sendMsg(msgType, conference, nick, u"А это кто?")
+			return
 	try:
 		if len(args) > 1:
 			newAccess = int(args[1])
@@ -102,7 +98,7 @@ def setLocalAccess(msgType, conference, nick, param):
 		else:
 			newAccess = 0
 
-		userAccess = getAccess(conference, userjid)
+		userAccess = getAccess(conference, truejid)
 		senderjid = getTrueJID(conference, nick)
 		senderAccess = getAccess(conference, senderjid)
 
@@ -111,13 +107,13 @@ def setLocalAccess(msgType, conference, nick, param):
 			return
 		if newAccess != 0:
 			if len(args) == 2:
-				setTempAccess(conference, userjid, newAccess)
+				setTempAccess(conference, truejid, newAccess)
 				sendMsg(msgType, conference, nick, u"Доступ выдан до выхода из конференции")
 			else:
-				setPermAccess(conference, userjid, newAccess)
+				setPermAccess(conference, truejid, newAccess)
 				sendMsg(msgType, conference, nick, u"Выдан постоянный доступ")
 		else:
-			setPermAccess(conference, userjid, newAccess)
+			setPermAccess(conference, truejid, newAccess)
 			sendMsg(msgType, conference, nick, u"Постоянный доступ снят")
 	except ValueError:
 		sendMsg(msgType, conference, nick, u"Уровнем доступа должно являться число от -100 до 100!")
@@ -125,17 +121,12 @@ def setLocalAccess(msgType, conference, nick, param):
 def setGlobalAccess(msgType, conference, nick, param):
 	args = param.split(None, 1)
 	user = args[0].strip()
+	truejid = None
 	if isConferenceInList(conference):
-		if isNickInConference(conference, user):
-			userjid = getTrueJID(conference, user)
-		elif netutil.isJID(user):
-			userjid = user
-		else:
-			sendMsg(msgType, conference, nick, u"А это кто?")
-			return
-	else:
+		truejid = getTrueJID(conference, user)
+	if not truejid:
 		if netutil.isJID(user):
-			userjid = user
+			truejid = user
 		else:
 			sendMsg(msgType, conference, nick, u"А это кто?")
 			return
@@ -146,7 +137,7 @@ def setGlobalAccess(msgType, conference, nick, param):
 				raise ValueError
 		else:
 			newAccess = 0
-		setPermGlobalAccess(userjid, newAccess)
+		setPermGlobalAccess(truejid, newAccess)
 		if newAccess != 0:
 			sendMsg(msgType, conference, nick, u"Выдан глобальный доступ")
 		else:

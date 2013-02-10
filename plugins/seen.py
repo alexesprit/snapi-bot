@@ -35,22 +35,25 @@ def updateSeenTime(conference, nick, truejid, reason, code):
 
 def showSeenTime(msgType, conference, nick, param):
 	userNick = param or nick
-	if isNickInConference(conference, userNick):
-		truejid = getTrueJID(conference, userNick)
-		if truejid in gSeenCache[conference]:
-			rawtime = gSeenCache[conference][truejid]
-			seenDate = time.strftime("%H:%M, %d.%m.%Y", time.localtime(rawtime))
-			seenTime = getTimeStr(time.time() - rawtime)
-			if not param:
-				sendMsg(msgType, conference, nick, 
-					u"Последний раз я видела тебя %s назад (в %s)" % (seenTime, seenDate))
-			else:
-				sendMsg(msgType, conference, nick, 
-					u"Последний раз я видела %s %s назад (в %s)" % (userNick, seenTime, seenDate))
+	truejid = getTrueJID(conference, userNick)
+	if not truejid:
+		if netutil.isJID(userNick):
+			truejid = userNick
 		else:
-			sendMsg(msgType, conference, nick, u"Нет информации")
+			sendMsg(msgType, conference, nick, u"А это кто?")
+			return
+	if truejid in gSeenCache[conference]:
+		rawtime = gSeenCache[conference][truejid]
+		seenDate = time.strftime("%H:%M, %d.%m.%Y", time.localtime(rawtime))
+		seenTime = getTimeStr(time.time() - rawtime)
+		if not param:
+			sendMsg(msgType, conference, nick, 
+				u"Последний раз я видела тебя %s назад (в %s)" % (seenTime, seenDate))
+		else:
+			sendMsg(msgType, conference, nick, 
+				u"Последний раз я видела %s %s назад (в %s)" % (userNick, seenTime, seenDate))
 	else:
-		sendMsg(msgType, conference, nick, u"А это кто?")
+		sendMsg(msgType, conference, nick, u"Нет информации")
 
 registerEventHandler(updateSeenTime, EVT_USERLEAVE)
 

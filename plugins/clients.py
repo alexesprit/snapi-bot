@@ -26,23 +26,26 @@ def freeClientsCache(conference):
 
 def showClients(msgType, conference, nick, param):
 	userNick = param or nick
-	if isNickInConference(conference, userNick):
-		truejid = getTrueJID(conference, userNick)
-		if truejid in gUserClients[conference]:
-			clients = gUserClients[conference][truejid]
-			if clients:
-				clients.sort()
-				if not param:
-					message = u"Ты пользуешься следующим: %s" % (u", ".join(clients))
-				else:
-					message = u"%s пользуется следующим: %s" % (userNick, u", ".join(clients))
-				sendMsg(msgType, conference, nick, message)
+	truejid = getTrueJID(conference, userNick)
+	if not truejid:
+		if netutil.isJID(userNick):
+			truejid = userNick
+		else:
+			sendMsg(msgType, conference, nick, u"А это кто?")
+			return
+	if truejid in gUserClients[conference]:
+		clients = gUserClients[conference][truejid]
+		if clients:
+			clients.sort()
+			if not param:
+				message = u"Ты пользуешься следующим: %s" % (u", ".join(clients))
 			else:
-				sendMsg(msgType, conference, nick, u"Нет информации")
+				message = u"%s пользуется следующим: %s" % (userNick, u", ".join(clients))
+			sendMsg(msgType, conference, nick, message)
 		else:
 			sendMsg(msgType, conference, nick, u"Нет информации")
 	else:
-		sendMsg(msgType, conference, nick, u"А это кто?")
+		sendMsg(msgType, conference, nick, u"Нет информации")
 
 def saveUserClient(conference, nick, truejid, aff, role):
 	base = gUserClients[conference]

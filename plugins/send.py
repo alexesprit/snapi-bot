@@ -29,21 +29,21 @@ def addToSendBase(msgType, conference, nick, param):
 	args = param.split(None, 1)
 	if len(args) == 2:
 		userNick = args[0]
-		message = args[1]
-		message = u"%s попросил меня передать тебе следующее:\n%s" % (nick, message)
+		message = u"%s попросил меня передать тебе следующее:\n%s" % (nick, args[1])
 		if isNickOnline(conference, userNick):
 			sendMsg(protocol.TYPE_PRIVATE, conference, userNick, message)
 			sendMsg(msgType, conference, nick, u"Передала")
-		elif isNickInConference(conference, userNick):
-			truejid = getTrueJID(conference, userNick)
-			base = gSendCache[conference]
-			if truejid not in base:
-				base[truejid] = []
-			base[truejid].append(message)
-			base.save()
-			sendMsg(msgType, conference, nick, u"Передам")
 		else:
-			sendMsg(msgType, conference, nick, u"А это кто?")
+			truejid = getTrueJID(conference, userNick)
+			if truejid:
+				base = gSendCache[conference]
+				if truejid not in base:
+					base[truejid] = []
+				base[truejid].append(message)
+				base.save()
+				sendMsg(msgType, conference, nick, u"Передам")
+			else:
+				sendMsg(msgType, conference, nick, u"А это кто?")
 
 def sendMessagesToUser(conference, nick, truejid, aff, role):
 	base = gSendCache[conference]

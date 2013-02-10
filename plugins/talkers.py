@@ -77,23 +77,24 @@ def showTalkerInfo(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, u"Недостаточно прав")
 	else:
-		if not param:
-			truejid = getTrueJID(conference, nick)
-		elif isNickInConference(conference, param):
-			truejid = getTrueJID(conference, param)
-		else:
-			return
-		base = gTalkersCache[conference]
-		if truejid in base:
-			statistic = base[truejid]
-			nick = statistic["nick"]
+		userNick = param or nick
+		truejid = getTrueJID(conference, userNick)
+		if not truejid:
+			if netutil.isJID(userNick):
+				truejid = userNick
+			else:
+				sendMsg(msgType, conference, nick, u"А это кто?")
+				return
+		if truejid in gTalkersCache[conference]:
+			statistic = gTalkersCache[conference][truejid]
+			userNick = statistic["nick"]
 			words = statistic["words"]
 			messages = statistic["messages"]
 			meMessages = statistic["mes"]
 			wordsPerMsg = (float(words)) / (messages + meMessages)
 			sendMsg(msgType, conference, nick,
 				u"Статистика для %s\nСообщ.: %d\n/me: %d\nСлов: %d\nСлов на сообщ.: %0.1f" %
-					(nick, messages, meMessages, words, wordsPerMsg))
+					(userNick, messages, meMessages, words, wordsPerMsg))
 		else:
 			sendMsg(msgType, conference, nick, u"Нет информации")
 

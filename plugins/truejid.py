@@ -14,10 +14,10 @@
 # GNU General Public License for more details.
 
 def showTrueJID(msgType, conference, nick, param):
-	if isNickInConference(conference, param):
+	truejid = getTrueJID(conference, param)
+	if truejid:
 		if protocol.TYPE_PUBLIC == msgType:
-			sendMsg(msgType, conference, nick, u"Смотри в привате")
-		truejid = getTrueJID(conference, param)
+			sendMsg(msgType, conference, nick, u"Смотри в привате")		
 		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"Жид %s: %s" % (param, truejid))
 	else:
 		sendMsg(msgType, conference, nick, u"А это кто?")

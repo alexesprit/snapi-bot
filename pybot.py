@@ -351,6 +351,7 @@ def getTrueJID(barejid, resource=None):
 	if barejid in gConferences:
 		if isNickInConference(barejid, resource):
 			return getNickKey(barejid, resource, NICK_JID)
+		return None
 	return barejid
 
 def getNickByJID(conference, truejid, offline=False):
@@ -428,15 +429,8 @@ def getAccess(conference, jid):
 	return 0
 
 def getPresenceNode(to=None, show=None, status=None):
-	prs = protocol.Presence(priority=Config.PRIORITY)
+	prs = protocol.Presence(to, show=show, status=status)
 	prs.setAttr("ver", Version.version)
-
-	if to:
-		prs.setTo(to)
-	if show:
-		prs.setShow(show)
-	if status:
-		prs.setStatus(status)
 
 	caps = protocol.Node("c")
 	caps.setNamespace(protocol.NS_CAPS)
@@ -451,20 +445,16 @@ def setStatus(to=None, show=None, status=None):
 	gClient.send(getPresenceNode(to, show, status))
 
 def setOfflineStatus(to=None, status=None):
-	prs = protocol.Presence(typ=protocol.PRS_OFFLINE)
-	if to:
-		prs.setTo(to)
-	if status:
-		prs.setStatus(status)
+	prs = protocol.Presence(to, protocol.PRS_OFFLINE, status=status)
 	gClient.send(prs)
 
 def sendTo(msgType, jid, text):
-	message = protocol.Message(jid)
-	message.setType(msgType)
+	message = protocol.Message(jid, typ=msgType)
 	text = text.strip()
 	if text:
 		message.setBody(text)
 	gClient.send(message)
+	printf(message)
 	callEventHandlers(EVT_SELFMSG, MODE_ASYNC, msgType, jid, text)
 
 def sendToConference(conference, text):
@@ -522,12 +512,10 @@ def parseMessage(stanza):
 	if -100 == userAccess:
 		return
 	message = (stanza.getBody() or "").strip()
-	isTopic = False
-	if isConference and not message:
-		subject = stanza.getTagData("subject")
-		if subject:
-			message = subject
-			isTopic = True
+	isSystem = False
+	if isConference:
+		if not nick:
+			isSystem = True
 	if protocol.TYPE_ERROR == msgType:
 		errorCode = stanza.getErrorCode()
 		if errorCode == "500":
@@ -546,7 +534,7 @@ def parseMessage(stanza):
 	if not message:
 		return
 	if protocol.TYPE_PUBLIC == msgType:
-		if conference != truejid:
+		if not isSystem:
 			setNickKey(conference, nick, NICK_IDLE, time.time())
 	else:
 		if stanza.getTag("request"):
@@ -559,7 +547,7 @@ def parseMessage(stanza):
 	else:
 		callEventHandlers(EVT_MSG | H_ROSTER, MODE_ASYNC, stanza, msgType, barejid, resource, message)
 	# topic can starts with some command word
-	if isTopic:
+	if isSystem:
 		return
 	if isConference:
 		botNick = getBotNick(conference)
@@ -891,12 +879,12 @@ def start():
 	except KeyboardInterrupt:
 		stop(ACTION_SHUTDOWN, u"Выключаюсь... (CTRL+C)")
 		
-def main():
+def main(args):
 	gInfo["start"] = time.time()
-	currentDir = os.path.dirname(sys.argv[0])
-	if currentDir:
-		os.chdir(currentDir)
+	workdir = os.path.dirname(args[0])
+	if workdir:
+		os.chdir(workdir)
 	start()
 
 if __name__ == "__main__":
-	sys.exit(main())
+	sys.exit(main(sys.argv))

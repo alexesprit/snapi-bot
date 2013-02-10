@@ -27,15 +27,15 @@ def freeGreetings(conference):
 def setUserGreeting(msgType, conference, nick, param):
 	args = param.split("=", 1)
 	if len(args) == 2:
-		user = args[0].strip()
+		userNick = args[0].strip()
 		greet = args[1].strip()
-		if netutil.isJID(user):
-			truejid = user
-		elif isNickInConference(conference, user):
-			truejid = getTrueJID(conference, user)
-		else:
-			sendMsg(msgType, conference, nick, u"А это кто?")
-			return
+		truejid = getTrueJID(conference, userNick)
+		if not truejid:
+			if netutil.isJID(userNick):
+				truejid = userNick
+			else:
+				sendMsg(msgType, conference, nick, u"А это кто?")
+				return
 		if not greet:
 			if truejid in gGreets[conference]:
 				del gGreets[conference][truejid]
