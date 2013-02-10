@@ -74,7 +74,6 @@ def showFeatures(msgType, conference, nick, param):
 		jid = u"%s/%s" % (conference, nick)
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.setTo(jid)
-	iq.setID(getUniqueID("feat_id"))
 	iq.addChild("query", {}, [], protocol.NS_DISCO_INFO)
 	gClient.sendAndCallForResponse(iq, showFeatures_, (msgType, conference, nick, param))
 

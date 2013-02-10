@@ -212,12 +212,6 @@ def execute(function, args):
 def printf(text, flag=FLAG_INFO):
 	gDebug.show(text, flag, flag)
 
-gStanzaID = 0
-def getUniqueID(text):
-	global gStanzaID
-	gStanzaID += 1
-	return "%s_%d" % (text, gStanzaID)
-
 getFilePath = os.path.join
 
 def getConfigPath(*param):
@@ -454,7 +448,6 @@ def sendTo(msgType, jid, text):
 	if text:
 		message.setBody(text)
 	gClient.send(message)
-	printf(message)
 	callEventHandlers(EVT_SELFMSG, MODE_ASYNC, msgType, jid, text)
 
 def sendToConference(conference, text):

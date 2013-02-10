@@ -28,7 +28,6 @@ def showVCard(msgType, conference, nick, param):
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.addChild("vCard", {}, [], protocol.NS_VCARD)
 	iq.setTo(jid)
-	iq.setID(getUniqueID("vcard_id"))
 	gClient.sendAndCallForResponse(iq, showVCard_, (msgType, conference, nick, param))
 
 def showVCard_(stanza, msgType, conference, nick, param):

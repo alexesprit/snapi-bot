@@ -128,7 +128,7 @@ class Client:
 				return None
 		# If we get version 1.0 stream the features tag MUST BE presented
 		if self.Dispatcher.stream._document_attrs.get("version") == "1.0":
-			while not self.Dispatcher.stream.features and self.process(1):
+			while not self.Dispatcher.features and self.process(1):
 				pass
 		if secureMode == SECURE_AUTO and not isSSLPort:
 			# If we get version 1.0 stream the features tag MUST BE presented
@@ -154,7 +154,7 @@ class Client:
 			pass
 		# If we get version 1.0 stream the features tag MUST BE presented
 		if self.Dispatcher.stream._document_attrs.get("version") == "1.0":
-			while not self.Dispatcher.stream.features and self.process(1):
+			while not self.Dispatcher.features and self.process(1):
 				pass
 		auth.SASL(username, password).plugIn(self)
 		self.SASL.auth()

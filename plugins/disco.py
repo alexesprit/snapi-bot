@@ -43,7 +43,6 @@ def showServiceDiscoveryResults(msgType, conference, nick, param):
 		query.setAttr("node", node)
 	else:
 		iq.setTo(jid)
-	iq.setID(getUniqueID("disco_id"))
 	gClient.sendAndCallForResponse(iq, showServiceDiscoveryResults_, (msgType, conference, nick, jid, maxCount, searchKey))
 
 def showServiceDiscoveryResults_(stanza, msgType, conference, nick, jid, maxCount, searchKey):

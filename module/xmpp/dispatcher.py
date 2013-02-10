@@ -30,7 +30,9 @@ import simplexml
 DBG_DISPATCHER = "dispatcher"
 DEFAULT_TIMEOUT = 25
 
-gID = 0
+class StreamError(Exception):
+	""" Exception class for stream errors.
+	"""
 
 class Dispatcher(plugin.PlugIn):
 	""" Ancestor of PlugIn class. Handles XMPP stream, i.e. aware of stream headers.
@@ -52,6 +54,7 @@ class Dispatcher(plugin.PlugIn):
 		self.debugFlag = DBG_DISPATCHER
 		self.handlers = {}
 		self._expected = {}
+		self.features = None
 
 	def plugin(self):
 		""" Plug the Dispatcher instance into Client class instance and send 
@@ -76,7 +79,7 @@ class Dispatcher(plugin.PlugIn):
 		""" Prepares instance to be destructed.
 		"""
 		self.stream.dispatch = None
-		self.stream.features = None
+		self.features = None
 		self.stream.destroy()
 
 	def dumpHandlers(self):
@@ -98,7 +101,6 @@ class Dispatcher(plugin.PlugIn):
 		self.stream._dispatch_depth = 2
 		self.stream.dispatch = self.dispatch
 		self.stream.stream_header_received = self._checkStreamStart
-		self.stream.features = None
 
 		metastream = protocol.Node("stream:stream")
 		metastream.setNamespace(self._owner.namespace)
@@ -207,16 +209,14 @@ class Dispatcher(plugin.PlugIn):
 			exc = StreamError
 		raise exc(name, text)
 
-	def dispatch(self, stanza, session=None):
+	def dispatch(self, stanza):
 		""" Main procedure that performs XMPP stanza recognition and calling 
 			apppropriate handlers for it. Called internally.
 		"""
-		if not session:
-			session = self
-		session.stream._mini_dom = None
+		self.stream._mini_dom = None
 		name = stanza.getName()
 		if name == "features":
-			session.stream.features = stanza
+			self.features = stanza
 
 		xmlns = stanza.getNamespace()
 		if xmlns not in self.handlers:
@@ -236,20 +236,20 @@ class Dispatcher(plugin.PlugIn):
 		if not stanzaType: 
 			stanzaType = ""
 		stanzaProps = stanza.getProperties()
-		session.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID))
+		self.printf("Dispatching %s stanza with type: %s, props: %s, id: %s" % (name, stanzaType, stanzaProps, stanzaID))
 
-		if stanzaID in session._expected:
-			if isinstance(session._expected[stanzaID], tuple):
-				function, args = session._expected[stanzaID]
-				del self._expected[stanzaID]
-				session.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), "ok")
+		if stanzaID in self._expected:
+			if isinstance(self._expected[stanzaID], tuple):
+				function, args = self._expected[stanzaID][:2]
+				self.markStanzaDelivered(stanzaID)
+				self.printf("Expected stanza arrived. Callback %s (%s) found!" % (function, args), "ok")
 				try:
 					function(stanza, *args)
 				except protocol.NodeProcessed:
 					pass
 			else:
-				session.printf("Expected stanza arrived!", "ok")
-				session._expected[stanzaID] = stanza
+				self.printf("Expected stanza arrived!", "ok")
+				self._expected[stanzaID] = stanza
 		handlerList = ["default"]
 		if stanzaType in self.handlers[xmlns][name]:
 			handlerList.append(stanzaType)
@@ -283,7 +283,7 @@ class Dispatcher(plugin.PlugIn):
 				return None 
 		response = self._expected[id]
 		del self._expected[id]
-		return response 
+		return response
 
 	def sendAndWaitForResponse(self, stanza, timeout=DEFAULT_TIMEOUT):
 		""" Put stanza on the wire and wait for recipient's response to it.
@@ -296,8 +296,20 @@ class Dispatcher(plugin.PlugIn):
 		"""
 		if not args:
 			args = {}
-		self._expected[self.send(stanza)] = (func, args)
+		self._expected[self.send(stanza)] = (func, args, time.time())
 
+	def markStanzaDelivered(self, id):
+		del self._expected[id]
+		for item in self._expected:
+			if isinstance(self._expected[item], tuple):
+				t1 = self._expected[item][2]
+				t2 = time.time()
+				if t2 - t1 > 600:
+					del self._expected[item]
+
+	def getUniqueID(self):
+		return "id_%0.3f" % (time.time())
+		
 	def send(self, stanza):
 		""" Serialise stanza and put it on the wire. Assign an unique ID to it before send.
 			Returns assigned ID.
@@ -305,9 +317,7 @@ class Dispatcher(plugin.PlugIn):
 		if isinstance(stanza, protocol.Stanza):
 			stanzaID = stanza.getID()
 			if not stanzaID:
-				global gID
-				gID += 1
-				stanzaID = str(gID)
+				stanzaID = self.getUniqueID()
 				stanza.setID(stanzaID)
 			stanza.setNamespace(self._owner.namespace)
 		else:

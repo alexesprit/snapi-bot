@@ -43,7 +43,6 @@ def showPing(msgType, conference, nick, param):
 	iq = protocol.Iq(protocol.TYPE_GET)
 	iq.addChild("ping", {}, [], protocol.NS_PING)
 	iq.setTo(jid)
-	iq.setID(getUniqueID("ping_id"))
 	t0 = time.time()
 	gClient.sendAndCallForResponse(iq, showPing_, (t0, msgType, conference, nick, param))
 

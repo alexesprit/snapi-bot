@@ -14,17 +14,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-
-AUTH_QUESTIONS = (
-	(u"сорок + три", "43"),
-	(u"60 + четыре", "64"),
-	(u"десять + 22", "32"),
-	(u"17 + девять", "26"),
-	(u"12 + восемь", "20"),
-	(u"сто - шесть", "94"),
-	(u"сорок * два", "80")
-)
-
 gAuthAnswer = {}
 
 def initAuthCache(conference):
@@ -57,7 +46,15 @@ def manageAuthValue(msgType, conference, nick, param):
 def askAuthQuestion(conference, nick, truejid, aff, role):
 	if getConferenceConfigKey(conference, "auth"):
 		if aff == protocol.AFF_NONE:
-			question, answer = random.choice(AUTH_QUESTIONS)
+			question, answer = random.choice(AUTH_QUESTIONS = (
+				(u"сорок + три", "43"),
+				(u"60 + четыре", "64"),
+				(u"десять + 22", "32"),
+				(u"17 + девять", "26"),
+				(u"12 + восемь", "20"),
+				(u"сто - шесть", "94"),
+				(u"сорок * два", "80")
+			))
 			gAuthAnswer[conference][truejid] = answer
 
 			setMUCRole(conference, nick, protocol.ROLE_VISITOR, u"Неавторизованый участник")
