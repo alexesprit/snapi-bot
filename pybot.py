@@ -780,7 +780,7 @@ def stop(action, message=None):
 	if gClient.isConnected():
 		callEventHandlers(EVT_SHUTDOWN, MODE_SYNC)
 		setOfflineStatus(None, message)
-		gClient.disconnect()
+		#gClient.disconnect()
 		gClient.disconnected()
 
 	if ACTION_RESTART == action:

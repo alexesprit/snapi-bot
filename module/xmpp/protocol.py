@@ -374,6 +374,11 @@ class Presence(Stanza):
 		"""Returns the presence affiliation.
 		"""
 		return self._getMUCItemAttr("item", "affiliation")
+		
+	def getNick(self):
+		"""Returns the presence nick.
+		"""
+		return self._getMUCItemAttr("item", "nick")
 	
 	def getJID(self):
 		"""Returns the presence jid.

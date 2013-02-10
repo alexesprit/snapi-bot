@@ -292,12 +292,15 @@ class Dispatcher(plugin.PlugIn):
 
 	def markStanzaDelivered(self, id):
 		del self._expected[id]
+		idToRemove = []
 		for item in self._expected:
 			if isinstance(self._expected[item], tuple):
 				t1 = self._expected[item][2]
 				t2 = time.time()
 				if t2 - t1 > 600:
-					del self._expected[item]
+					idToRemove.append(item)
+		for item in idToRemove:
+			del self._expected[item]
 
 	def getUniqueID(self):
 		return "id_%0.3f" % (time.time())
