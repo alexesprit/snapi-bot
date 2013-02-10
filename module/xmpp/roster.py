@@ -50,8 +50,7 @@ class Roster(plugin.PlugIn):
 			Also request roster from server if the "request" argument is set.
 			Used internally.
 		"""
-		self._owner.registerHandler("iq", self._parseIQ, namespace=protocol.NS_ROSTER)
-		self._owner.registerHandler("presence", self._parsePresence)
+		self._owner.registerHandler("iq", self._parseIQ, protocol.NS_ROSTER)
 
 	def getRoster(self):
 		""" Requests roster from server if neccessary and returns self.
@@ -73,119 +72,22 @@ class Roster(plugin.PlugIn):
 		""" Subscription tracker. Used internally for setting items state 
 			in internal roster representation.
 		"""
-		for item in stanza.getTag("query").getTags("item"):
+		for item in stanza.getQueryNode().getTags("item"):
 			jid = item.getAttr("jid")
-			if item.getAttr("subscription") == "remove":
-				if jid in self.rosterData:
-					del self.rosterData[jid]
-					return
-			if not jid in self.rosterData:
-				self.rosterData[jid] = {}
-			self.rosterData[jid]["name"] = item.getAttr("name")
-			self.rosterData[jid]["subscription"] = item.getAttr("subscription")
-			self.rosterData[jid]["groups"] = []
-			if "resources" not in self.rosterData[jid]:
-				self.rosterData[jid]["resources"] = {}
-			for group in item.getTags("group"):
-				self.rosterData[jid]["groups"].append(group.getData())
+			name = item.getAttr("name")
+			subsc = item.getAttr("subscription")
+			self.rosterData[jid] = (name, subsc)
 			self.printf("Setting roster item %s" % (jid), "ok")
 		self.state = ROSTER_LOADED
-
-	def _parsePresence(self, stanza):
-		""" Presence tracker. Used internally for setting items' resources state
-			in internal roster representation.
-		"""
-		fulljid = stanza.getFrom()
-		barejid = fulljid.getBareJID()
-		if barejid in self.rosterData:
-			prsType = stanza.getType()
-			resource = fulljid.getResource()
-			item = self.rosterData[barejid]
-			if not prsType:
-				self.printf("Setting roster item %s for resource %s" % (barejid, resource), "ok")
-				show = stanza.getShow()
-				status = stanza.getStatus()
-				priority = stanza.getPriority() or "0"
-				item["resources"][resource] = {"show": show, "status": status, "priority": int(priority)}
-			elif prsType == "unavailable":
-				if resource in item["resources"]:
-					del item["resources"][resource]
-
-	def _getItemData(self, jid, field):
-		""" Return specific jid's representation in internal format. 
-			Used internally.
-		"""
-		jid = protocol.UserJID(jid).getBareJID()
-		return self.rosterData[jid][field]
-
-	def _getResourceData(self, jid, field):
-		""" Return specific jid's resource representation in internal format. 
-			Used internally.
-		"""
-		fulljid = protocol.UserJID(jid)
-		barejid = fulljid.getBareJID()
-		resource = fulljid.getResource()
-		if resource:
-			if resource in self.rosterData[barejid]["resources"]:
-				return self.rosterData[barejid]["resources"][resource][field]
-		elif self.rosterData[barejid]["resources"]:
-			lastPriority = -129
-			resources = self.rosterData[barejid]["resources"]
-			for r in resources:
-				priority = resources[r]["priority"]
-				if priority > lastPriority:
-					resource, lastPriority = r, priority
-			return resources[resource][field]
-
-	def getGroups(self, jid):
-		""" Returns groups list that jid belongs to.
-		"""
-		return self._getItemData(jid, "groups")
 
 	def getName(self, jid):
 		""" Returns name of jid.
 		"""
-		return self._getItemData(jid, "name")
-
-	def getPriority(self, jid):
-		""" Returns priority of jid. JID should be a full (not bare).
-		"""
-		return self._getResourceData(jid, "priority")
-
-	def getShow(self, jid):
-		""" Returns "show" value of jid. JID should be a full (not bare).
-		"""
-		return self._getResourceData(jid, "show")
-
-	def getStatus(self, jid):
-		""" Returns "status" value of jid. JID should be a full (not bare).
-		"""
-		return self._getResourceData(jid, "status")
+		return self.rosterData[jid][0]
 
 	def getSubscription(self, jid):
 		""" Returns "subscription" value of jid. """
-		return self._getItemData(jid, "subscription")
-
-	def getResources(self, jid):
-		""" Returns list of connected resources of jid.
-		"""
-		fulljid = protocol.UserJID(jid)
-		barejid = fulljid.getBareJID()
-		return self.rosterData[barejid]["resources"].keys()
-
-	def setItem(self, jid, name=None, groups=None):
-		""" Creates/renames jid and sets the groups list that it now belongs to.
-		"""
-		iq = Iq("set", NS_ROSTER)
-		query = iq.getTag("query")
-		if name:
-			attrs["name"] = name
-		item = query.setTag("item", attrs={"jid": jid})
-		if not groups:
-			groups = []
-		for group in groups: 
-			item.addChild(node=Node("group", payload=[group]))
-		self._owner.send(iq)
+		return self.rosterData[jid][1]
 
 	def keys(self):
 		""" Provided for the sake of dictionary interface.
@@ -203,9 +105,7 @@ class Roster(plugin.PlugIn):
 		""" Delete jid from roster.
 		"""
 		iq = protocol.Iq(protocol.TYPE_SET, protocol.NS_ROSTER)
-		query = iq.getTag("query")
-		itemNode = protocol.Node("item", {"jid": jid, "subscription": "remove"})
-		query.addChild(node=itemNode)
+		iq.setQueryPayload([protocol.Node("item", {"jid": jid, "subscription": "remove"})])
 		self._owner.send(iq)
 		
 	def subscribe(self, jid):

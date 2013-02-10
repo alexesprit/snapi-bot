@@ -77,21 +77,21 @@ class SASL(plugin.PlugIn):
 			two Dispatcher.process() calls.
 		"""
 		features = self._owner.Dispatcher.features
-		if not features.getTag("mechanisms", namespace=protocol.NS_SASL):
+		if not features.getTag("mechanisms", xmlns=protocol.NS_SASL):
 			self.state = AUTH_FAILURE
 			self.printf("SASL not supported by server", "error")
 			return
 		mecs = []
-		for mec in features.getTag("mechanisms", namespace=protocol.NS_SASL).getTags("mechanism"):
+		for mec in features.getTag("mechanisms", xmlns=protocol.NS_SASL).getTags("mechanism"):
 			mecs.append(mec.getData())
 		if "ANONYMOUS" in mecs and self.username is None:
 			node = protocol.Node("auth", attrs={"xmlns": protocol.NS_SASL, "mechanism": "ANONYMOUS"})
 		elif "DIGEST-MD5" in mecs:
 			node = protocol.Node("auth", attrs={"xmlns": protocol.NS_SASL, "mechanism": "DIGEST-MD5"})
 		elif "PLAIN" in mecs:
-			saslData = "%s@%s\x00%s\x00%s" % (self.username, self._owner.server, self.username, self.password)
-			node = protocol.Node("auth", attrs={"xmlns": protocol.NS_SASL, "mechanism": "PLAIN"}, \
-						payload=[base64.encodestring(saslData).replace("\r", "").replace("\n", "")])
+			data = "%s@%s\x00%s\x00%s" % (self.username, self._owner.server, self.username, self.password)
+			iq = protocol.Node("auth", attrs={"xmlns": protocol.NS_SASL, "mechanism": "PLAIN"})
+			iq.setData(base64.encodestring(data).replace("\r", "").replace("\n", ""))
 		else:
 			self.state = AUTH_FAILURE
 			self.printf("I can only use DIGEST-MD5 and PLAIN mecanisms.", "error")
@@ -102,15 +102,12 @@ class SASL(plugin.PlugIn):
 	def _parseAuthStanza(self, stanza):
 		""" Perform next SASL auth step. Used internally.
 		"""
-		if stanza.getNamespace() != protocol.NS_SASL:
+		print stanza.getXMLNS()
+		if stanza.getXMLNS() != protocol.NS_SASL:
 			return
 		if stanza.getName() == "failure":
 			self.state = AUTH_FAILURE
-			children = stanza.getChildren()
-			if children:
-				reason = children[0]
-			else:
-				reason = stanza
+			reason = stanza.getFirstChild() or stanza
 			self.printf("Failed SASL authentification: %s" % (reason), "error")
 			raise protocol.NodeProcessed
 		elif stanza.getName() == "success":
@@ -149,14 +146,15 @@ class SASL(plugin.PlugIn):
 			response = HH(C([HH(A1), resp["nonce"], resp["nc"], resp["cnonce"], resp["qop"], HH(A2)]))
 			resp["response"] = response
 			resp["charset"] = "utf-8"
-			saslData = ""
+			data = ""
 			for key in ("charset", "username", "realm", "nonce", "nc", "cnonce", "digest-uri", "response", "qop"):
 				if key in ("nc", "qop", "response", "charset"):
-					saslData += "%s=%s, " % (key, resp[key])
+					data += "%s=%s, " % (key, resp[key])
 				else:
-					saslData += "%s=\"%s\", " % (key, resp[key])
-			saslData = base64.encodestring(saslData[:-1]).replace("\r", "").replace("\n", "")
-			node = protocol.Node("response", attrs={"xmlns": protocol.NS_SASL}, payload=[saslData])
+					data += "%s=\"%s\", " % (key, resp[key])
+			data = base64.encodestring(data[:-1]).replace("\r", "").replace("\n", "")
+			node = protocol.Node("response", attrs={"xmlns": protocol.NS_SASL})
+			node.setData(data)
 			self._owner.send(node.__str__())
 		elif "rspauth" in chal:
 			self._owner.send(protocol.Node("response", attrs={"xmlns": protocol.NS_SASL}).__str__())
@@ -184,7 +182,7 @@ class Bind(plugin.PlugIn):
 	def _parseFeatures(self, features):
 		""" Determine if server supports resource binding and set some internal attributes accordingly.
 		"""
-		if not features.getTag("bind", namespace=protocol.NS_BIND):
+		if not features.getTag("bind", xmlns=protocol.NS_BIND):
 			self.bound = BIND_FAILURE
 			self.printf("Server does not requested binding.", "error")
 			return
@@ -195,12 +193,8 @@ class Bind(plugin.PlugIn):
 		"""
 		while self.bound == BIND_WAITING and self._owner.process(1):
 			pass
-		if resource:
-			resource = [protocol.Node("resource", payload=[resource])]
-		else:
-			resource = []
-		bNode = protocol.Node("bind", attrs={"xmlns": protocol.NS_BIND}, payload=resource)
-		iq = protocol.Iq(typ=protocol.TYPE_SET, payload=[bNode])
+		iq = protocol.Iq(typ=protocol.TYPE_SET)
+		iq.addChild("bind", xmlns=protocol.NS_BIND).addChild("resource").setData(resource)
 		stanza = self._owner.sendAndWaitForResponse(iq)
 		if protocol.TYPE_RESULT == stanza.getType():
 			resource = stanza.getTag("bind").getTagData("jid")
@@ -210,8 +204,8 @@ class Bind(plugin.PlugIn):
 			self._owner.username = jid.getNode()
 			self._owner.resource = jid.getResource()
 
-			sNode = protocol.Node("session", attrs={"xmlns": protocol.NS_SESSION})
-			iq = protocol.Iq(typ=protocol.TYPE_SET, payload=[sNode])
+			iq = protocol.Iq(typ=protocol.TYPE_SET)
+			iq.addChild(node=protocol.Node("session", attrs={"xmlns": protocol.NS_SESSION}))
 			stanza = self._owner.sendAndWaitForResponse(iq)
 			if protocol.TYPE_RESULT == stanza.getType():
 				self.printf("Successfully opened session", "ok")

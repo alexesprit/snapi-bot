@@ -25,8 +25,7 @@ def showVersion(msgType, conference, nick, param):
 			jid = param
 	else:
 		jid = u"%s/%s" % (conference, nick)
-	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_VERSION)
-	iq.setTo(jid)
+	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_VERSION, to=jid)
 	gClient.sendAndCallForResponse(iq, showVersion_, (msgType, conference, nick, param))
 
 def showVersion_(stanza, msgType, conference, nick, param):

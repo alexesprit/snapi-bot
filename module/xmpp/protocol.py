@@ -92,22 +92,6 @@ NS_IQ							= "iq"											#Jabberd2
 NS_MESSAGE						= "message"										#Jabberd2
 NS_PRESENCE						= "presence"									#Jabberd2
 
-_errorCodes = {
-	"400": "bad-request",
-	"401": "not-authorized",
-	"402": "payment-required",
-	"403": "forbidden",
-	"404": "item-not-found",
-	"405": "not-allowed",
-	"406": "not-acceptable",
-	"407": "registration-required",
-	"409": "conflict",
-	"500": "resource-constraint",
-	"501": "feature-not-implemented",
-	"503": "service-unavailable",
-	"504": "remote-server-timeout",
-}
-
 TYPE_PRIVATE = "chat"
 TYPE_PUBLIC = "groupchat"
 TYPE_ERROR = "error"
@@ -147,173 +131,52 @@ class NodeProcessed(Exception):
 	""" Exception that should be raised by handler 
 		when the handling should be stopped. 
 	"""
-	pass
 
 class StreamError(Exception):
-	""" Base exception class for stream errors.
+	""" Exception class for stream errors.
 	"""
-
-class BadFormat(StreamError):
-	pass
-
-class BadNamespacePrefix(StreamError):
-	pass
-
-class Conflict(StreamError):
-	pass
-
-class ConnectionTimeout(StreamError):
-	pass
-
-class HostGone(StreamError):
-	pass
-
-class HostUnknown(StreamError):
-	pass
-
-class ImproperAddressing(StreamError):
-	pass
-
-class InternalServerError(StreamError):
-	pass
-
-class InvalidFrom(StreamError):
-	pass
-
-class InvalidID(StreamError):
-	pass
-
-class InvalidNamespace(StreamError):
-	pass
-
-class InvalidXML(StreamError):
-	pass
-
-class NotAuthorized(StreamError):
-	pass
-
-class PolicyViolation(StreamError):
-	pass
-
-class RemoteConnectionFailed(StreamError):
-	pass
-
-class ResourceConstraint(StreamError):
-	pass
-
-class RestrictedXML(StreamError):
-	pass
-
-class SeeOtherHost(StreamError):
-	pass
-
-class SystemShutdown(StreamError):
-	pass
-
-class UndefinedCondition(StreamError):
-	pass
-
-class UnsupportedEncoding(StreamError):
-	pass
-
-class UnsupportedStanzaType(StreamError):
-	pass
-
-class UnsupportedVersion(StreamError):
-	pass
-
-class XMLNotWellFormed(StreamError):
-	pass
-
-streamExceptions = {
-	"bad-format": BadFormat,
-	"bad-namespace-prefix": BadNamespacePrefix,
-	"conflict": Conflict,
-	"connection-timeout": ConnectionTimeout,
-	"host-gone": HostGone,
-	"host-unknown": HostUnknown,
-	"improper-addressing": ImproperAddressing,
-	"internal-server-error": InternalServerError,
-	"invalid-from": InvalidFrom,
-	"invalid-id": InvalidID,
-	"invalid-namespace": InvalidNamespace,
-	"invalid-xml": InvalidXML,
-	"not-authorized": NotAuthorized,
-	"policy-violation": PolicyViolation,
-	"remote-connection-failed": RemoteConnectionFailed,
-	"resource-constraint": ResourceConstraint,
-	"restricted-xml": RestrictedXML,
-	"see-other-host": SeeOtherHost,
-	"system-shutdown": SystemShutdown,
-	"undefined-condition": UndefinedCondition,
-	"unsupported-encoding": UnsupportedEncoding,
-	"unsupported-stanza-type": UnsupportedStanzaType,
-	"unsupported-version": UnsupportedVersion,
-	"xml-not-well-formed": XMLNotWellFormed
-}
 
 class UserJID:
-	""" UserJID object. UserJID can be built from string, modified, 
-		compared, serialised into string.
+	""" UserJID object.
 	"""
-	def __init__(self, jid=None, node="", domain="", resource=""):
-		""" Constructor. JID can be specified as string (jid argument) or as separate parts.
-			Examples:
-				foo = UserJID("node@domain/resource")
-				foo = UserJID(node="node", domain="domain.org")
+	def __init__(self, jid):
+		""" Constructor. JID must be specified as string.
 		"""
-		if not jid and not domain:
-			raise ValueError("UserJID must contain at least domain name")
-		elif isinstance(jid, UserJID):
-			self.node = jid.node
-			self.domain = jid.domain
-			self.resource= jid.resource
-		elif domain:
-			self.node,self.domain,self.resource=node,domain,resource
+		if isinstance(jid, UserJID):
+			self.node = jid.getNode()
+			self.domain = jid.getDomain()
+			self.resource= jid.getResource()
 		else:
-			if jid.count("@"):
-				self.node, jid = jid.split("@", 1)
-			else:
-				self.node = ""
 			if jid.count("/"):
-				self.domain, self.resource = jid.split("/", 1)
+				barejid, self.resource = jid.split("/", 1)
 			else:
-				self.domain, self.resource = jid, ""
+				barejid = jid
+				self.resource = None
+			if barejid.count("@"):
+				self.node, self.domain = barejid.split("@", 1)
+			else:
+				self.node = None
+				self.domain = barejid
 
 	def getNode(self):
 		""" Return the node part of jid.
 		"""
 		return self.node
 
-	def setNode(self, node):
-		""" Set the node part of jid to new value. Specify None to remove the node part.
-		"""
-		self.node = node.lower()
-
 	def getDomain(self):
 		""" Return the domain part of jid.
 		"""
 		return self.domain
-
-	def setDomain(self, domain):
-		""" Set the domain part of jid to new value.
-		"""
-		self.domain = domain.lower()
 
 	def getResource(self):
 		""" Return the resource part of jid.
 		"""
 		return self.resource
 
-	def setResource(self, resource):
-		""" Set the resource part of jid to new value. Specify None to remove the resource part.
-		"""
-		self.resource = resource
-
 	def getBareJID(self):
 		""" Return the bare representation of jid. I.e. string value w/o resource.
 		"""
-		return self.__str__(0)
+		return self.__str__(False)
 
 	def __str__(self, showResource=True):
 		""" Serialise UserJID into string.
@@ -326,23 +189,17 @@ class UserJID:
 			return "%s/%s" % (jid, self.resource)
 		return jid
 
-	def __hash__(self):
-		""" Produce hash of UserJID, Allows to use UserJID objects as keys of the dictionary.
-		"""
-		return hash(self.__str__())
-
 class Stanza(Node):
 	""" A "stanza" object class. Contains methods that are common for presences, iqs and messages.
 	"""
-	def __init__(self, name=None, to=None, typ=None, frm=None, attrs=None, payload=None, timestamp=None, xmlns=None, node=None):
+	def __init__(self, name=None, to=None, typ=None, frm=None, attrs=None, xmlns=NS_CLIENT, node=None):
 		""" Constructor, name is the name of the stanza i.e. "message" or "presence" or "iq".
 			to is the value of "to" attribure, "typ" - "type" attribute
 			frn - from attribure, attrs - other attributes mapping, payload - same meaning as for simplexml payload definition
-			timestamp - the time value that needs to be stamped over stanza
 			xmlns - namespace of top stanza node
 			node - parsed or unparsed stana to be taken as prototype.
 		"""
-		if attrs is None:
+		if not attrs:
 			attrs = {}
 		if to:
 			attrs["to"] = to
@@ -350,17 +207,15 @@ class Stanza(Node):
 			attrs["from"] = frm
 		if typ:
 			attrs["type"] = typ
-		Node.__init__(self, tag=name, attrs=attrs, payload=payload, node=node)
-		if not node and xmlns:
-			self.setNamespace(xmlns)
+		Node.__init__(self, name=name, attrs=attrs, node=node)
+		if xmlns and not node:
+			self.setXMLNS(xmlns)
 		to = self.getAttr("to")
 		if to:
 			self.setTo(to)
 		frm = self.getAttr("from")
 		if frm:
 			self.setFrom(frm)
-		if timestamp is not None:
-			self.setTimestamp(timestamp)
 
 	def setFrom(self, value):
 		""" Set the value of the "from" attribute.
@@ -392,21 +247,6 @@ class Stanza(Node):
 		"""
 		self.setAttr("id", value)
 
-	def getTimestamp(self):
-		""" Return the timestamp in the "yyyymmddThhmmss" format.
-		"""
-		delayNode = self.getTag("x", namespace=NS_DELAY)
-		if delayNode:
-			return delayNode.getAttr("stamp")
-		return None
-
-	def setTimestamp(self, value=None):
-		"""Set the timestamp. timestamp should be the yyyymmddThhmmss string.
-		"""
-		if not value:
-			value = time.strftime("%Y%m%dT%H:%M:%S", time.gmtime())
-		self.setTag("x", {"stamp": value}, namespace=NS_DELAY)
-
 	def getType(self):
 		""" Return the value of the "type" attribute.
 		"""
@@ -427,7 +267,7 @@ class Stanza(Node):
 		"""
 		props = []
 		for child in self.getChildren():
-			prop = child.getNamespace()
+			prop = child.getXMLNS()
 			if prop not in props:
 				props.append(prop)
 		return props
@@ -435,12 +275,12 @@ class Stanza(Node):
 class Message(Stanza):
 	""" XMPP Message stanza - "push" mechanism.
 	"""
-	def __init__(self, to=None, body=None, typ=None, subject=None, attrs=None, frm=None, payload=None, timestamp=None, xmlns=None, node=None):
+	def __init__(self, to=None, typ=None, body=None, subject=None, attrs=None, frm=None, xmlns=NS_CLIENT, node=None):
 		""" Create message object. You can specify recipient, text of message, type of message
 			any additional attributes, sender of the message, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
 			Alternatively you can pass in the other XML object as the "node" parameted to replicate it as message.
 		"""
-		Stanza.__init__(self, "message", to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
+		Stanza.__init__(self, NS_MESSAGE, to=to, typ=typ, attrs=attrs, frm=frm, xmlns=xmlns, node=node)
 		if body:
 			self.setBody(body)
 		if subject:
@@ -466,35 +306,23 @@ class Message(Stanza):
 		"""
 		self.setTagData("subject", subject)
 
-	def getThread(self):
-		""" Returns thread of the message.
+	def isOffline(self):
+		""" Return the True if message is offline.
 		"""
-		return self.getTagData("thread")
-
-	def setThread(self, thr):
-		""" Sets the thread of the message.
-		"""
-		self.setTagData("thread", thr)
-	
-	def buildReply(self, body=None):
-		""" Builds and returns another message object with specified text.
-			The to, from and thread properties of new message are pre-set as reply to this message.
-		"""
-		msg = Message(to=self.getFrom(), frm=self.getTo(), body=body)
-		thr = self.getThread()
-		if thr:
-			msg.setThread(thr)
-		return msg
+		delay = self.getTag("x", xmlns=NS_DELAY)
+		if delay:
+			return delayNode.hasAttr("stamp")
+		return False
 
 class Presence(Stanza):
 	""" XMPP Presence object.
 	"""
-	def __init__(self, to=None, typ=None, priority=None, show=None, status=None, attrs=None, frm=None, timestamp=None, payload=None, xmlns=None, node=None):
+	def __init__(self, to=None, typ=None, priority=None, show=None, status=None, attrs=None, frm=None, xmlns=NS_CLIENT, node=None):
 		""" Create presence object. You can specify recipient, type of message, priority, show and status values
-			any additional attributes, sender of the presence, timestamp, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
+			any additional attributes, sender of the presence, any additional payload (f.e. jabber:x:delay element) and namespace in one go.
 			Alternatively you can pass in the other XML object as the "node" parameted to replicate it as presence.
 		"""
-		Stanza.__init__(self, "presence", to=to, typ=typ, attrs=attrs, frm=frm, payload=payload, timestamp=timestamp, xmlns=xmlns, node=node)
+		Stanza.__init__(self, NS_PRESENCE, to=to, typ=typ, attrs=attrs, frm=frm, xmlns=xmlns, node=node)
 		if priority:
 			self.setPriority(priority)
 		if show:
@@ -532,73 +360,54 @@ class Presence(Stanza):
 		"""
 		self.setTagData("status", status)
 
-	def _muc_getItemAttr(self, tag, attr):
+	def _getMUCItemAttr(self, tag, attr):
 		for xtag in self.getTags("x", {}, NS_MUC_USER):
 			for child in xtag.getTags(tag):
 				return child.getAttr(attr)
-
-	def _muc_getSubTagDataAttr(self, tag, attr):
-		for xtag in self.getTags("x", {}, NS_MUC_USER):
-			for child in xtag.getTags("item"):
-				for cchild in child.getTags(tag):
-					return cchild.getData(), cchild.getAttr(attr)
-		return None, None
 	
 	def getRole(self):
 		"""Returns the presence role.
 		"""
-		return self._muc_getItemAttr("item", "role")
+		return self._getMUCItemAttr("item", "role")
 	
 	def getAffiliation(self):
 		"""Returns the presence affiliation.
 		"""
-		return self._muc_getItemAttr("item", "affiliation")
-	
-	def getNick(self):
-		"""Returns the nick value.
-		"""
-		return self._muc_getItemAttr("item", "nick")
+		return self._getMUCItemAttr("item", "affiliation")
 	
 	def getJID(self):
 		"""Returns the presence jid.
 		"""
-		return self._muc_getItemAttr("item", "jid")
-	
-	def getReason(self):
-		"""Returns the reason of the presence.
-		"""
-		return self._muc_getSubTagDataAttr("reason", "")[0]
+		return self._getMUCItemAttr("item", "jid")
 	
 	def getStatusCode(self):
 		"""Returns the status code of the presence.
 		"""
-		return self._muc_getItemAttr("status", "code")
+		return self._getMUCItemAttr("status", "code")
 
 class Iq(Stanza): 
 	""" XMPP Iq object - get/set dialog mechanism.
 	"""
-	def __init__(self, typ=None, namespace=None, attrs=None, to=None, frm=None, payload=None, xmlns=None, node=None):
+	def __init__(self, typ=None, qxmlns=None, attrs=None, to=None, frm=None, xmlns=NS_CLIENT, node=None):
 		""" Create Iq object. You can specify type, query namespace
 			any additional attributes, recipient of the iq, sender of the iq, any additional payload (f.e. jabber:x:data node) and namespace in one go.
 			Alternatively you can pass in the other XML object as the "node" parameted to replicate it as an iq
 		"""
-		Stanza.__init__(self, "iq", to=to, typ=typ, attrs=attrs, frm=frm, xmlns=xmlns, node=node)
-		if payload:
-			self.setPayload(payload)
-		if namespace:
-			self.setQueryNamespace(namespace)
+		Stanza.__init__(self, NS_IQ, to=to, typ=typ, attrs=attrs, frm=frm, xmlns=xmlns, node=node)
+		if qxmlns:
+			self.setQueryXMLNS(qxmlns)
 
-	def getQueryNamespace(self):
+	def getQueryXMLNS(self):
 		""" Return the namespace of the "query" child element.
 		"""
 		tag = self.getTag("query")
 		if tag:
-			return tag.getNamespace()
+			return tag.getXMLNS()
 
-	def setQueryNamespace(self, namespace):
+	def setQueryXMLNS(self, xmlns):
 		""" Set the namespace of the "query" child element.
 		"""
-		self.setTag("query").setNamespace(namespace)
+		self.setTag("query").setXMLNS(xmlns)
 
 	def getQueryChildren(self):
 		""" Return the "query" child element child nodes.
@@ -621,5 +430,5 @@ class Iq(Stanza):
 		"""
 		iq = Iq(typ, to=self.getFrom(), frm=self.getTo(), attrs={"id": self.getID()})
 		if self.getTag("query"):
-			iq.setQueryNamespace(self.getQueryNamespace())
+			iq.setQueryXMLNS(self.getQueryXMLNS())
 		return iq

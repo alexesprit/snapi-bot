@@ -14,9 +14,8 @@
 # GNU General Public License for more details.
 
 def showMUCList(msgType, conference, nick, aff):
-	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_MUC_ADMIN)
+	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_MUC_ADMIN, to=conference)
 	iq.setQueryPayload([protocol.Node("item", {"affiliation": aff})])
-	iq.setTo(conference)
 	gClient.sendAndCallForResponse(iq, showMUCList_, (msgType, conference, nick))
 
 def showMUCList_(stanza, msgType, conference, nick):

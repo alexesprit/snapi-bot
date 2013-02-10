@@ -35,7 +35,7 @@ def showServiceDiscoveryResults(msgType, conference, nick, param):
 			args = param.split(None, 1)
 			searchKey = args[1]
 	iq = protocol.Iq(protocol.TYPE_GET)
-	query = iq.addChild("query", None, None, protocol.NS_DISCO_ITEMS)
+	query = iq.addChild("query", xmlns=protocol.NS_DISCO_ITEMS)
 	args = jid.split("#")
 	if len(args) == 2:
 		jid, node = args

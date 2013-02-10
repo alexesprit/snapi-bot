@@ -26,13 +26,11 @@ def sendInvite(msgType, conference, nick, param):
 			return
 	reason = (len(args) == 2) and args[1] or None
 	msg = protocol.Message(to=conference)
-	x = protocol.Node("x")
-	x.setNamespace(protocol.NS_MUC_USER)
+	x = msg.addChild("x", xmlns=protocol.NS_MUC_USER)
 	inv = x.addChild("invite", {"to": truejid})
 	if not reason:
 		reason = u"Вас приглашает %s" % (nick)
 	inv.setTagData("reason", reason)
-	msg.addChild(node=x)
 	gClient.send(msg)
 	sendMsg(msgType, conference, nick, u"Кинула инвайт")
 			

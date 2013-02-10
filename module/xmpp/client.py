@@ -41,7 +41,6 @@ class Client:
 			the debug IDs that will go into debug output. You can either specifiy an "include"
 			or "exclude" list. The latter is done via adding "always" pseudo-ID to the list.
 		"""
-		self.namespace = protocol.NS_CLIENT
 		self.disconnectHandlers = []
 
 		self.server = server
@@ -51,7 +50,7 @@ class Client:
 		self.connectType = None
 
 		if not debugFlags:
-			debugFlags = []	
+			debugFlags = ["socket"]	
 		self._initDebugger(debugFlags)
 	
 	def _initDebugger(self, debugFlags):

@@ -26,7 +26,7 @@ def showUserTime(msgType, conference, nick, param):
 	else:
 		jid = u"%s/%s" % (conference, nick)
 	iq = protocol.Iq(protocol.TYPE_GET)
-	iq.addChild("time", {}, [], protocol.NS_ENTITY_TIME)
+	iq.addChild("time", xmlns=protocol.NS_ENTITY_TIME)
 	iq.setTo(jid)
 	gClient.sendAndCallForResponse(iq, showUserTime_, (msgType, conference, nick, param))
 

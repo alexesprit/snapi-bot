@@ -277,7 +277,7 @@ def joinConference(conference):
 	jid = u"%s/%s" % (conference, nick)
 
 	prs = getPresenceNode(jid, show, status)
-	mucTag = prs.setTag("x", namespace=protocol.NS_MUC)
+	mucTag = prs.addChild("x", xmlns=protocol.NS_MUC)
 	mucTag.addChild("history", {"maxchars": "0"})
 	if pswd:
 		mucTag.setTagData("password", pswd)
@@ -293,23 +293,19 @@ def isConferenceInList(conference):
 	return conference in gConferences
 
 def getMUCSetRoleStanza(conference, user, role, reason=None):
-	iq = protocol.Iq(protocol.TYPE_SET)
-	iq.setTo(conference)
-	query = protocol.Node("query", {"xmlns": protocol.NS_MUC_ADMIN})
+	iq = protocol.Iq(protocol.TYPE_SET, to=conference)
+	query = iq.addChild("query", xmlns=protocol.NS_MUC_ADMIN)
 	role = query.addChild("item", {"nick": user, "role": role})
 	if reason:
 		role.setTagData("reason", reason)
-	iq.addChild(node=query)
 	return iq
 
 def getMUCSetAfflStanza(conference, user, itemType, aff, reason=None):
-	iq = protocol.Iq(protocol.TYPE_SET)
-	iq.setTo(conference)
-	query = protocol.Node("query", {"xmlns": protocol.NS_MUC_ADMIN})
+	iq = protocol.Iq(protocol.TYPE_SET, to=conference)
+	query = iq.addChild("query", xmlns=protocol.NS_MUC_ADMIN)
 	aff = query.addChild("item", {itemType: user, "affiliation": aff})
 	if reason:
 		aff.setTagData("reason", reason)
-	iq.addChild(node=query)
 	return iq
 	
 def setMUCRole(conference, user, role, reason=None):
@@ -425,14 +421,10 @@ def getAccess(conference, jid):
 def getPresenceNode(to=None, show=None, status=None):
 	prs = protocol.Presence(to, show=show, status=status)
 	prs.setAttr("ver", Version.version)
-
-	caps = protocol.Node("c")
-	caps.setNamespace(protocol.NS_CAPS)
+	caps = prs.addChild("c", xmlns=protocol.NS_CAPS)
 	caps.setAttr("node", Version.caps)
 	caps.setAttr("ver", Version.verhash)
 	caps.setAttr("hash", "sha-1")
-
-	prs.addChild(node=caps)
 	return prs
 
 def setStatus(to=None, show=None, status=None):
@@ -475,19 +467,19 @@ def sendMsg(msgType, conference, nick, text, force=False):
 def startKeepAliveSending():
 	#for conference in gConferences.keys():
 	#	iq = protocol.Iq(protocol.TYPE_GET)
-	#	iq.addChild("ping", {}, [], protocol.NS_PING)
+	#	iq.addChild("ping", xmlns=protocol.NS_PING)
 	#	iq.setTo(u"%s/%s" % (conference, getBotNick(conference)))
 	#	gClient.send(iq)
 	#	time.sleep(0.5)
 	iq = protocol.Iq(protocol.TYPE_GET)
-	iq.addChild("ping", {}, [], protocol.NS_PING)
+	iq.addChild("ping", xmlns=protocol.NS_PING)
 	gClient.send(iq)
 	startTimer(KEEPALIVE_TIMEOUT, startKeepAliveSending)
 
 def parseMessage(stanza):
 	gInfo["msg"] += 1
 	msgType = stanza.getType()
-	if stanza.getTimestamp() or msgType in FORBIDDEN_TYPES:
+	if stanza.isOffline() or msgType in FORBIDDEN_TYPES:
 		return
 	fulljid = stanza.getFrom()
 	barejid = fulljid.getBareJID()
@@ -533,7 +525,7 @@ def parseMessage(stanza):
 		if stanza.getTag("request"):
 			reportMsg = protocol.Message(fulljid)
 			reportMsg.setID(stanza.getID())
-			reportMsg.addChild("received", None, None, protocol.NS_RECEIPTS)
+			reportMsg.addChild("received", xmlns=protocol.NS_RECEIPTS)
 			gClient.send(reportMsg)
 	if isConference:
 		callEventHandlers(EVT_MSG | H_CONFERENCE, MODE_ASYNC, stanza, msgType, conference, nick, truejid, message)
@@ -642,7 +634,7 @@ def parsePresence(stanza):
 					for key in gConferences[conference][nick]:
 						oldval = getNickKey(conference, nick, key)
 						setNickKey(conference, newNick, key, oldval)
-				reason = stanza.getReason() or stanza.getStatus()
+				reason = stanza.getStatus()
 				setNickKey(conference, nick, NICK_HERE, False)
 				if not getNickByJID(conference, truejid):
 					setTempAccess(conference, truejid)
@@ -710,30 +702,30 @@ def parseIQ(stanza):
 		if getAccess(None, barejid) == -100:
 			return
 	if protocol.TYPE_GET == stanza.getType():
-		if stanza.getTags("query", {}, protocol.NS_VERSION):
+		if stanza.getTags("query", xmlns=protocol.NS_VERSION):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.getTag("query")
 			query.setTagData("name", Version.appname)
 			query.setTagData("version", Version.version)
 			query.setTagData("os", Version.osname)
-		elif stanza.getTags("query", {}, protocol.NS_LAST):
+		elif stanza.getTags("query", xmlns=protocol.NS_LAST):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.getTag("query")
 			query.setAttr("seconds", int(time.time() - gInfo["start"]))
-		elif stanza.getTags("time", {}, protocol.NS_ENTITY_TIME):
+		elif stanza.getTags("time", xmlns=protocol.NS_ENTITY_TIME):
 			tZone = time.altzone if time.localtime()[8] else time.timezone
 			sign = (tZone < 0) and "+" or "-"
 			tzo = "%s%02d:%02d" % (sign, abs(tZone) / 3600, abs(tZone) / 60 % 60)
 			utc = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
-			tNode = iq.addChild("time", {}, [], protocol.NS_ENTITY_TIME)
+			tNode = iq.addChild("time", xmlns=protocol.NS_ENTITY_TIME)
 			tNode.setTagData("tzo", tzo)
 			tNode.setTagData("utc", utc)
-		elif stanza.getTags("ping", {}, protocol.NS_PING):
+		elif stanza.getTags("ping", xmlns=protocol.NS_PING):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
-		elif stanza.getTags("query", {}, protocol.NS_DISCO_INFO):
+		elif stanza.getTags("query", xmlns=protocol.NS_DISCO_INFO):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
-			query = iq.addChild("query", {}, [], protocol.NS_DISCO_ITEMS)
+			query = iq.addChild("query", xmlns=protocol.NS_DISCO_ITEMS)
 			attrs = {
 				"category": Version.identcat,
 				"type": Version.identtype,
@@ -745,7 +737,7 @@ def parseIQ(stanza):
 		else:
 			iq = stanza.buildReply(protocol.TYPE_ERROR)
 			error = iq.addChild("error", {"type": "cancel"})
-			error.addChild("feature-not-implemented", {}, [], protocol.NS_STANZAS)
+			error.addChild("feature-not-implemented", xmlns=protocol.NS_STANZAS)
 		gClient.send(iq)
 	if isConference:
 		callEventHandlers(EVT_IQ | H_CONFERENCE, MODE_ASYNC, stanza, barejid, resource, truejid)
@@ -858,11 +850,8 @@ def start():
 		try:
 			while gClient.process(10):
 				pass
-		except protocol.SystemShutdown:
-			printf("%s has been switched off" % (Config.SERVER), FLAG_WARNING)
-			stop(ACTION_SHUTDOWN)
-		except protocol.Conflict:
-			printf("Resource conflict", FLAG_WARNING)
+		except protocol.StreamError as se:
+			printf(se.message, FLAG_WARNING)
 			stop(ACTION_SHUTDOWN)
 		except Exception:
 			printf("Exception in main thread", FLAG_ERROR)
@@ -870,7 +859,7 @@ def start():
 			action = ACTION_RESTART if Config.RESTART_IF_ERROR else ACTION_SHUTDOWN
 			stop(action, u"Что-то сломано...")
 	except KeyboardInterrupt:
-		stop(ACTION_SHUTDOWN, u"Выключаюсь... (CTRL+C)")
+		stop(ACTION_SHUTDOWN, u"Выключаюсь: CTRL+C")
 		
 def main(args):
 	gInfo["start"] = time.time()

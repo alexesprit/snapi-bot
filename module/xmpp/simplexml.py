@@ -31,10 +31,9 @@ class Node(object):
 		result more readable by human.
 	"""
 
-	def __init__(self, tag=None, attrs=None, payload=None, parent=None, nsp=None, node_built=False, node=None):
+	def __init__(self, name=None, attrs=None, nsp=None, parent=None, node_built=False, node=None):
 		""" Takes "tag" argument as the name of node (prepended by namespace, if needed and separated from it
-			by a space), attrs dictionary as the set of arguments, payload list as the set of textual strings
-			and child nodes that this node carries within itself and "parent" argument that is another node
+			by a space), attrs dictionary as the set of arguments and "parent" argument that is another node
 			that this one will be the child of. Also the __init__ can be provided with "node" argument that is
 			either a text string containing exactly one node or another Node instance to begin with. If both
 			"node" and other arguments is provided then the node initially created as replica of "node"
@@ -45,20 +44,20 @@ class Node(object):
 				node = NodeBuilder(node, self)
 				node_built = True
 			else:
-				self.name = node.name
-				self.namespace = node.namespace
+				self.name = node.getName()
+				self.xmlns = node.getXMLNS()
 				self.attrs = node.getAttrs()
 				self.data = node.getData()
 				self.children = node.getChildren()
-				self.parent = node.parent
+				self.parent = node.getParent()
 				self.nsd = {}
 				for k, v in node.nsd.items():
 					self.nsd[k] = v
 		else:
 			self.name = "tag"
-			self.namespace = ""
+			self.xmlns = ""
 			self.attrs = {}
-			self.data = []
+			self.data = None
 			self.children = []
 			self.parent = None
 			self.nsd = {}
@@ -75,25 +74,16 @@ class Node(object):
 				self.nsd[u""] = val
 			elif attr.startswith("xmlns:"):
 				self.nsd[attr[6:]] = val
-			self.attrs[attr]=attrs[attr]
-		if tag:
+			self.attrs[attr] = attrs[attr]
+		if name:
 			if node_built:
-				pfx, self.name = ([""] + tag.split(":"))[-2:]
-				self.namespace = self.lookup_nsp(pfx)
+				pfx, self.name = ([""] + name.split(":"))[-2:]
+				self.xmlns = self.lookup_nsp(pfx)
 			else:
-				if " " in tag:
-					self.namespace,self.name = tag.split()
+				if " " in name:
+					self.xmlns, self.name = name.split()
 				else:
-					self.name = tag
-		if not payload:
-			payload = []
-		if isinstance(payload, basestring):
-			payload = [payload]
-		for i in payload:
-			if isinstance(i, Node):
-				self.addChild(node=i)
-			else:
-				self.data.append(ustr(i))
+					self.name = name
 
 	def lookup_nsp(self, pfx=""):
 		ns = self.nsd.get(pfx)
@@ -111,10 +101,10 @@ class Node(object):
 		""" Method used to dump node into textual representation.
 		"""
 		s = "<" + self.name
-		if self.namespace:
-			if not self.parent or self.parent.namespace != self.namespace:
+		if self.xmlns:
+			if not self.parent or self.parent.xmlns != self.xmlns:
 				if "xmlns" not in self.attrs:
-					s = s + " xmlns=\"%s\"" % (self.namespace)
+					s = s + " xmlns=\"%s\"" % (self.xmlns)
 		for key in self.attrs.keys():
 			val = ustr(self.attrs[key])
 			s = s + " %s=\"%s\"" % (key, escapeXML(val))
@@ -131,7 +121,7 @@ class Node(object):
 			s += "</%s>" % (self.name)
 		return s
 
-	def addChild(self, name=None, attrs=None, payload=None, namespace=None, node=None):
+	def addChild(self, name=None, attrs=None, xmlns=None, node=None):
 		""" If "node" argument is provided, adds it as child node. Else creates new node from
 			the other arguments" values and adds it as well.
 		"""
@@ -139,20 +129,11 @@ class Node(object):
 			newnode = node
 			node.parent = self
 		else:
-			newnode = Node(tag=name, parent=self, attrs=attrs, payload=payload)
-		if namespace:
-			newnode.setNamespace(namespace)
+			newnode = Node(name=name, parent=self, attrs=attrs)
+		if xmlns:
+			newnode.setXMLNS(xmlns)
 		self.children.append(newnode)
 		return newnode
-
-	def delChild(self, node, attrs=None):
-		""" Deletes the "node" from the node's childs list, if "node" is an instance.
-			Else deletes the first node that have specified name and (optionally) attributes.
-		"""
-		if not isinstance(node, Node):
-			node = self.getTag(node,attrs)
-		del self.children[self.children.index(node)]
-		return node
 
 	def getChildren(self):
 		""" Returns all node's child nodes as list.
@@ -168,65 +149,50 @@ class Node(object):
 		"""
 		return self.attrs
 
-	def delAttr(self, key):
-		""" Deletes an attribute
-		"""
-		del self.attrs[key]
-
-	def getAttr(self, key):
+	def getAttr(self, attr):
 		""" Returns value of specified attribute.
 		"""
-		return self.attrs.get(key)
-
-	def hasAttr(self, key):
+		return self.attrs.get(attr)
+		
+	def hasAttr(self, attr):
 		""" Checks if node have attribute.
 		"""
-		return key in self.attrs
+		return attr in self.attrs
 
-	def setAttr(self, key, val):
+	def setAttr(self, attr, val):
 		""" Sets attribute "key" with the value.
 		"""
-		self.attrs[key] = val
-
-	def addData(self, data):
-		""" Adds some CDATA to node.
-		"""
-		self.data.append(ustr(data))
-
-	def delData(self):
-		""" Removes all CDATA from the node.
-		"""
-		self.data = []
+		self.attrs[attr] = val
 
 	def getData(self):
 		""" Returns all node CDATA as string (concatenated).
 		"""
-		return "".join(self.data)
+		return self.data
 
 	def setData(self, data):
 		""" Sets node's CDATA to provided string. Resets all previous CDATA!
 		"""
-		self.data = [ustr(data)]
+		self.data = ustr(data)
 
 	def getName(self):
 		""" Returns the name of node.
 		"""
 		return self.name
 
-	def setName(self,val):
+	def setName(self, name):
 		""" Changes the node name.
 		"""
-		self.name = val
+		self.name = name
 
-	def getNamespace(self):
+	def getXMLNS(self):
 		""" Returns the namespace of node.
 		"""
-		return self.namespace
+		return self.xmlns
 
-	def setNamespace(self, namespace):
+	def setXMLNS(self, xmlns):
 		""" Changes the node namespace.
 		"""
-		self.namespace=namespace
+		self.xmlns = xmlns
 
 	def getParent(self):
 		""" Returns the parent of node (if present).
@@ -239,82 +205,70 @@ class Node(object):
 		"""
 		self.parent = node
 
-	def getPayload(self):
-		""" Return the payload of node i.e. list of child nodes and CDATA entries.
-			F.e. for "<node>text1<nodea/><nodeb/> text2</node>" will be returned list:
-			["text1", <nodea instance>, <nodeb instance>, " text2"].
-		"""
-		ret = []
-		for i in range(max(len(self.data), len(self.children))):
-			if i < len(self.data) and self.data[i]:
-				ret.append(self.data[i])
-			if i < len(self.children) and self.children[i]:
-				ret.append(self.children[i])
-		return ret
-
-	def setPayload(self, payload, add=False):
+	def setPayload(self, payload):
 		""" Sets node payload according to the list specified. WARNING: completely replaces all node's
 			previous content. If you wish just to add child or CDATA - use addData or addChild methods.
 		"""
 		if isinstance(payload, basestring):
 			payload = [payload]
-		if add:
-			self.children += payload
-		else:
-			self.children = payload
+		for i in payload:
+			if isinstance(i, Node):
+				self.addChild(node=i)
+			else:
+				self.setData(i)
 
-	def getTag(self, name, attrs=None, namespace=None):
+	def getTag(self, name, attrs=None, xmlns=None):
 		""" Filters all child nodes using specified arguments as filter.
 			Returns the first found or None if not found.
 		"""
-		return self.getTags(name, attrs, namespace, one=True)
+		return self.getTags(name, attrs, xmlns, one=True)
 
-	def setTag(self, name, attrs=None, namespace=None):
+	def setTag(self, name, attrs=None, xmlns=None):
 		""" Same as getTag but if the node with specified namespace/attributes not found, creates such
 			node and returns it.
 		"""
-		node = self.getTags(name, attrs, namespace=namespace, one=True)
+		node = self.getTag(name, attrs, xmlns=xmlns)
 		if node:
 			return node
 		else:
-			return self.addChild(name, attrs, namespace=namespace)
+			return self.addChild(name, attrs, xmlns=xmlns)
 
-	def getTagAttr(self, tag, attr):
+	def getTagAttr(self, name, attr):
 		""" Returns attribute value of the child with specified name
 			or None if no such attribute.
 		"""
 		try:
-			return self.getTag(tag).attrs[attr]
+			return self.getTag(name).attrs[attr]
 		except (AttributeError, KeyError):
 			return None
 
-	def setTagAttr(self, tag, attr, val):
-		""" Creates new node (if not already present) with name "tag"
+	def setTagAttr(self, name, attr, val):
+		""" Creates new node (if not already present) with name "name"
 			and sets it's attribute "attr" to value "val".
 		"""
 		try:
-			self.getTag(tag).attrs[attr] = val
+			self.getTag(name).attrs[attr] = val
 		except AttributeError:
-			self.addChild(tag, attrs={attr: val})
+			self.addChild(name, attrs={attr: val})
 
-	def getTagData(self, tag):
+	def getTagData(self, name):
 		""" Returns cocatenated CDATA of the child with specified name.
 		"""
 		try:
-			return self.getTag(tag).getData()
+			return self.getTag(name).getData()
 		except AttributeError:
 			return None
 
-	def setTagData(self, tag, val, attrs=None):
-		""" Creates new node (if not already present) with name "tag" and (optionally) attributes "attrs"
+	def setTagData(self, name, val, attrs=None):
+		""" Creates new node (if not already present) with name "name" and (optionally) attributes "attrs"
 			and sets it's CDATA to string "val".
 		"""
 		try:
-			self.getTag(tag, attrs).setData(ustr(val))
+			self.getTag(name, attrs).setData(val)
 		except AttributeError:
-			self.addChild(tag, attrs, payload=[ustr(val)])
+			self.addChild(name, attrs).setData(val)
 
-	def getTags(self, name, attrs=None, namespace=None, one=False):
+	def getTags(self, name, attrs=None, xmlns=None, one=False):
 		""" Filters all child nodes using specified arguments as filter.
 			Returns the list of nodes found.
 		"""
@@ -324,7 +278,7 @@ class Node(object):
 		for node in self.children:
 			if not node:
 				continue
-			if namespace and namespace!=node.getNamespace():
+			if xmlns and xmlns != node.getXMLNS():
 				continue
 			if node.getName() == name:
 				for key in attrs:
@@ -337,23 +291,6 @@ class Node(object):
 		if not one:
 			return nodes
 
-	def iterTags(self, name, attrs=None, namespace=None):
-		""" Iterate over all children using specified arguments as filter.
-		"""
-		if not attrs:
-			attrs = {}
-		for node in self.children:
-			if not node:
-				continue
-			if namespace is not None and namespace != node.getNamespace():
-				continue
-			if node.getName() == name:
-				for key in attrs:
-					if key not in node.attrs or node.attrs[key]!=attrs[key]:
-						break
-				else:
-					yield node
-
 class NodeBuilder:
 	""" Builds a Node class minidom from data parsed to it. This class used for two purposes:
 		1. Creation an XML Node from a textual representation. F.e. reading a config file. See an XML2Node method.
@@ -361,7 +298,7 @@ class NodeBuilder:
 		   the __dispatch_depth parameter and redefining the dispatch method.
 		You do not need to use this class directly if you do not designing your own XML handler.
 	"""
-	def __init__(self, data=None, initial_node=None):
+	def __init__(self, data=None):
 		""" Takes two optional parameters: "data" and "initial_node".
 			By default class initialised with empty Node class instance.
 			Though, if "initial_node" is provided it used as "starting point".
@@ -372,56 +309,42 @@ class NodeBuilder:
 		self._parser.StartElementHandler = self.starttag
 		self._parser.EndElementHandler = self.endtag
 		self._parser.CharacterDataHandler = self.handle_cdata
-		self._parser.StartNamespaceDeclHandler = self.handle_namespace_start
-		self._parser.buffer_text = True
 		self.parse = self._parser.Parse
 
 		self.__depth = 0
 		self.__last_depth = 0
-		self.__max_depth = 0
 		self._dispatch_depth = 1
 		self._document_attrs = None
 		self._document_nsp = None
-		self._mini_dom = initial_node
-		self.last_is_data = 1
+		self._mini_dom = None
 		self._ptr = None
-		self.data_buffer = None
 		if data:
 			self._parser.Parse(data,1)
-
-	def check_data_buffer(self):
-		if self.data_buffer:
-			self._ptr.data.append("".join(self.data_buffer))
-			del self.data_buffer[:]
-			self.data_buffer = None
 
 	def destroy(self):
 		""" Method used to allow class instance to be garbage-collected.
 		"""
-		self.check_data_buffer()
 		self._parser.StartElementHandler = None
 		self._parser.EndElementHandler = None
 		self._parser.CharacterDataHandler = None
-		self._parser.StartNamespaceDeclHandler = None
 
-	def starttag(self, tag, attrs):
+	def starttag(self, name, attrs):
 		""" XML Parser callback. Used internally.
 		"""
-		self.check_data_buffer()
-		self._inc_depth()
+		self.__depth += 1
 		if self.__depth == self._dispatch_depth:
 			if not self._mini_dom :
-				self._mini_dom = Node(tag=tag, attrs=attrs, nsp=self._document_nsp, node_built=True)
+				self._mini_dom = Node(name=name, attrs=attrs, nsp=self._document_nsp, node_built=True)
 			else:
-				Node(self._mini_dom, tag=tag, attrs=attrs, nsp=self._document_nsp, node_built=True)
+				Node(self._mini_dom, name=name, attrs=attrs, nsp=self._document_nsp, node_built=True)
 			self._ptr = self._mini_dom
 		elif self.__depth > self._dispatch_depth:
-			self._ptr.children.append(Node(tag=tag, parent=self._ptr, attrs=attrs, node_built=True))
+			self._ptr.children.append(Node(name=name, parent=self._ptr, attrs=attrs, node_built=True))
 			self._ptr = self._ptr.children[-1]
 		if self.__depth == 1:
 			self._document_attrs = {}
 			self._document_nsp = {}
-			nsp, name = ([""]+tag.split(":"))[-2:]
+			nsp, name = ([""]+name.split(":"))[-2:]
 			for attr, val in attrs.items():
 				if attr == "xmlns":
 					self._document_nsp[u""] = val
@@ -429,76 +352,41 @@ class NodeBuilder:
 					self._document_nsp[attr[6:]] = val
 				else:
 					self._document_attrs[attr] = val
-			ns = self._document_nsp.get(nsp, "http://www.gajim.org/xmlns/undeclared-root")
+			xmlns = self._document_nsp.get(nsp, "http://www.gajim.org/xmlns/undeclared-root")
 			try:
-				self.stream_header_received(ns, name, attrs)
+				self.stream_header_received(name, attrs, xmlns)
 			except ValueError, e:
 				self._document_attrs = None
 				raise ValueError(str(e))
-		if not self.last_is_data and self._ptr.parent:
-			self._ptr.parent.data.append("")
-		self.last_is_data = 0
 
-	def endtag(self, tag ):
+	def endtag(self, tag):
 		""" XML Parser callback. Used internally.
 		"""
-		self.check_data_buffer()
 		if self.__depth == self._dispatch_depth:
 			self.dispatch(self._mini_dom)
 		elif self.__depth > self._dispatch_depth:
 			self._ptr = self._ptr.parent
-		self._dec_depth()
-		self.last_is_data = 0
-		if self.__depth == 0: self.stream_footer_received()
+		self.__depth -= 1
 
 	def handle_cdata(self, data):
 		""" XML Parser callback. Used internally.
 		"""
-		if self.last_is_data:
-			if self.data_buffer:
-				self.data_buffer.append(data)
-		elif self._ptr:
-			self.data_buffer = [data]
-			self.last_is_data = 1
-
-	def handle_namespace_start(self, prefix, uri):
-		""" XML Parser callback. Used internally.
-		"""
-		self.check_data_buffer()
+		if self._ptr:
+			self._ptr.setData(data)
 
 	def getDom(self):
 		""" Returns just built Node.
 		"""
-		self.check_data_buffer()
 		return self._mini_dom
 
 	def dispatch(self, stanza):
 		""" Gets called when the NodeBuilder reaches some level of depth on it's way up with the built
 			node as argument. Can be redefined to convert incoming XML stanzas to program events.
 		"""
-	def stream_header_received(self,ns,tag,attrs):
+
+	def stream_header_received(self, name, attrs, xmlns):
 		""" Method called when stream just opened.
 		"""
-		self.check_data_buffer()
-
-	def stream_footer_received(self):
-		""" Method called when stream just closed.
-		"""
-		self.check_data_buffer()
-
-	def has_received_endtag(self, level=0):
-		""" Return True if at least one end tag was seen (at level).
-		"""
-		return self.__depth <= level and self.__max_depth > level
-
-	def _inc_depth(self):
-		self.__last_depth = self.__depth
-		self.__depth += 1
-		self.__max_depth = max(self.__depth, self.__max_depth)
-
-	def _dec_depth(self):
-		self.__last_depth = self.__depth
-		self.__depth -= 1
 
 def XML2Node(xml):
 	""" Converts supplied textual string into XML node. Handy f.e. for reading configuration file.

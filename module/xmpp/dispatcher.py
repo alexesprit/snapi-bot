@@ -30,10 +30,6 @@ import simplexml
 DBG_DISPATCHER = "dispatcher"
 DEFAULT_TIMEOUT = 25
 
-class StreamError(Exception):
-	""" Exception class for stream errors.
-	"""
-
 class Dispatcher(plugin.PlugIn):
 	""" Ancestor of PlugIn class. Handles XMPP stream, i.e. aware of stream headers.
 		Can be plugged out/in to restart these headers (used for SASL f.e.).
@@ -66,7 +62,7 @@ class Dispatcher(plugin.PlugIn):
 				break
 
 		self.registerNamespace(protocol.NS_STREAMS)
-		self.registerNamespace(self._owner.namespace)
+		self.registerNamespace(protocol.NS_CLIENT)
 		self.registerStanza("iq", protocol.Iq)
 		self.registerStanza("presence", protocol.Presence)
 		self.registerStanza("message", protocol.Message)
@@ -103,15 +99,15 @@ class Dispatcher(plugin.PlugIn):
 		self.stream.stream_header_received = self._checkStreamStart
 
 		metastream = protocol.Node("stream:stream")
-		metastream.setNamespace(self._owner.namespace)
+		metastream.setXMLNS(protocol.NS_CLIENT)
 		metastream.setAttr("version", "1.0")
 		metastream.setAttr("xmlns:stream", protocol.NS_STREAMS)
 		metastream.setAttr("to", self._owner.server)
 		self._owner.send("<?xml version=\"1.0\"?>%s>" % str(metastream)[:-2])
 
-	def _checkStreamStart(self, ns, tag, attrs):
-		if ns != protocol.NS_STREAMS or tag != "stream":
-			raise ValueError("Incorrect stream start: (%s, %s). Terminating." % (tag, ns))
+	def _checkStreamStart(self, name, attrs, xmlns):
+		if xmlns != protocol.NS_STREAMS or name != "stream":
+			raise ValueError("Incorrect stream start: (%s, %s). Terminating." % (name, xmlns))
 
 	def process(self, timeout=0):
 		""" Check incoming stream for data waiting. If "timeout" is positive - block for as max. this time.
@@ -148,7 +144,7 @@ class Dispatcher(plugin.PlugIn):
 		   Iq, Message and Presence stanzas are registered by default. 
 		"""
 		if not xmlns:
-			xmlns = self._owner.namespace
+			xmlns = protocol.NS_CLIENT
 		self.printf("Registering %s as %s (%s)" % (tagName, stanza, xmlns), order)
 		self.handlers[xmlns][tagName] = {"type": stanza, "default": []}
 
@@ -165,7 +161,7 @@ class Dispatcher(plugin.PlugIn):
 				"namespace" - namespace of child that stanza must contain.
 		"""
 		if not xmlns:
-			xmlns = self._owner.namespace
+			xmlns = protocol.NS_CLIENT
 		self.printf("Registering %s for %s type: %s, namespace: %s (%s)" % (handler, name, htype, namespace, xmlns))
 		if not htype and not namespace:
 			htype = "default"
@@ -183,7 +179,7 @@ class Dispatcher(plugin.PlugIn):
 			exactly the same as with registering.
 		"""
 		if not xmlns:
-			xmlns = self._owner.namespace
+			xmlns = protocol.NS_CLIENT
 		self.printf("Unregistering handler %s for %s type: %s, namespace: %s (%s)" % (handler, name, htype, namespace, xmlns), "stop")
 		if xmlns not in self.handlers:
 			return
@@ -198,16 +194,12 @@ class Dispatcher(plugin.PlugIn):
 	def _parseStreamError(self, error):
 		name, text = "error", error.getData()
 		for tag in error.getChildren():
-			if tag.getNamespace() == protocol.NS_XMPP_STREAMS:
+			if tag.getXMLNS() == protocol.NS_XMPP_STREAMS:
 				if tag.getName() == "text":
 					text = tag.getData()
 				else:
 					name = tag.getName()
-		if name in protocol.streamExceptions:
-			exc = protocol.streamExceptions[name]
-		else:
-			exc = StreamError
-		raise exc(name, text)
+		raise StreamError(u"%s: %s" % (name, text))
 
 	def dispatch(self, stanza):
 		""" Main procedure that performs XMPP stanza recognition and calling 
@@ -218,7 +210,7 @@ class Dispatcher(plugin.PlugIn):
 		if name == "features":
 			self.features = stanza
 
-		xmlns = stanza.getNamespace()
+		xmlns = stanza.getXMLNS()
 		if xmlns not in self.handlers:
 			self.printf("Unknown namespace: %s" % (xmlns), "warn")
 			xmlns = "default"
@@ -319,7 +311,7 @@ class Dispatcher(plugin.PlugIn):
 			if not stanzaID:
 				stanzaID = self.getUniqueID()
 				stanza.setID(stanzaID)
-			stanza.setNamespace(self._owner.namespace)
+			stanza.setXMLNS(protocol.NS_CLIENT)
 		else:
 			stanzaID = None
 		self._owner_send(stanza)

@@ -25,7 +25,7 @@ def setRosterStatus(msgType, conference, nick, param):
 			status = args[1]
 	else:
 		status = param
-	setStatus(show, status, Config.PRIORITY)
+	setStatus(None, show, status)
 
 	path = getConfigPath(ROSTERSTATUS_FILE)
 	io.dump(path, {"show": show, "status": status})

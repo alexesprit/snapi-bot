@@ -13,18 +13,16 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-def getMoodStanza(name=None, text=None):
-	stanza = protocol.Iq(protocol.TYPE_SET)
-	pubsub = stanza.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
-	pubNode = protocol.Node("publish", {"node": protocol.NS_MOOD})
-	moodNode = protocol.Node("mood", {"xmlns": protocol.NS_MOOD})
+def getMoodNode(name=None, text=None):
+	iq = protocol.Iq(protocol.TYPE_SET)
+	pubsub = iq.addChild("pubsub", xmlns=protocol.NS_PUBSUB)
+	pubNode = pubsub.addChild("publish", {"node": protocol.NS_MOOD})
+	moodNode = pubNode.addChild("item", {"id": "mood"}).addChild("mood", xmlns=protocol.NS_MOOD)
 	if name:
-		moodNode.addChild(node=protocol.Node(name))
-		if text: 
+		moodNode.addChild(name)
+		if text:
 			moodNode.setTagData("text", text)
-	pubNode.addChild("item", {}, [moodNode], "")
-	pubsub.addChild(node=pubNode)
-	return stanza
+	return iq
 
 def setBotMood(msgType, jid, resource, param):
 	if param != u"reset":
@@ -34,26 +32,24 @@ def setBotMood(msgType, jid, resource, param):
 			text = args[1]
 		else:
 			text = None
-		gClient.send(getMoodStanza(name, text))
+		gClient.send(getMoodNode(name, text))
 		sendMsg(msgType, jid, resource, u"Запомнила")
 	else:
-		gClient.send(getMoodStanza())
+		gClient.send(getMoodNode())
 		sendMsg(msgType, jid, resource, u"Сбросила")
 
-def getActivityStanza(name=None, exname=None, text=None):
-	stanza = protocol.Iq(protocol.TYPE_SET)
-	pubsub = stanza.addChild("pubsub", {}, [], protocol.NS_PUBSUB)
-	pubNode = protocol.Node("publish", {"node": protocol.NS_ACTIVITY})
-	actNode = protocol.Node("activity", {"xmlns": protocol.NS_ACTIVITY})
+def getActivityNode(name=None, exname=None, text=None):
+	iq = protocol.Iq(protocol.TYPE_SET)
+	pubsub = iq.addChild("pubsub", xmlns=protocol.NS_PUBSUB)
+	pubNode = pubsub.addChild("publish", {"node": protocol.NS_ACTIVITY})
+	actNode = pubNode.addChild("item").addChild("activity", xmlns=protocol.NS_ACTIVITY)
 	if name:
-		act = actNode.addChild(node=protocol.Node(name))
+		act = actNode.addChild(name)
 		if exname:
-			act.addChild(node=protocol.Node(exname))
+			act.addChild(exname)
 		if text:
 			actNode.setTagData("text", text)
-	pubNode.addChild("item", {}, [actNode], "")
-	pubsub.addChild(node = pubNode)
-	return stanza
+	return iq
 
 def setBoAtctivity(msgType, jid, resource, param):
 	if param != u"reset":
@@ -66,12 +62,12 @@ def setBoAtctivity(msgType, jid, resource, param):
 				text = args[2]
 			else:
 				text = None
-			gClient.send(getActivityStanza(name, exname, text))
+			gClient.send(getActivityNode(name, exname, text))
 			sendMsg(msgType, jid, resource, u"Запомнила")
 		else:
 			sendMsg(msgType, jid, resource, u"Читай помощь по команде")
 	else:
-		gClient.send(getActivityStanza())
+		gClient.send(getActivityNode())
 		sendMsg(msgType, jid, resource, u"Сбросила")		
 
 registerCommand(setBoAtctivity, u"activity", 100, 
