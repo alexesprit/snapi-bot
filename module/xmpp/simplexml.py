@@ -309,6 +309,7 @@ class NodeBuilder:
 		self._parser.StartElementHandler = self.starttag
 		self._parser.EndElementHandler = self.endtag
 		self._parser.CharacterDataHandler = self.handle_cdata
+		self._parser.buffer_text = True
 		self.parse = self._parser.Parse
 
 		self.__depth = 0
