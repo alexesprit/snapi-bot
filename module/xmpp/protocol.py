@@ -313,6 +313,12 @@ class Message(Stanza):
 		if delay:
 			return delayNode.hasAttr("stamp")
 		return False
+		
+	def buildReply(self, text=None):
+		""" Builds and returns another message object with specified text.
+			The to, from and thread properties of new message are pre-set as reply to this message. """
+		m = Message(to=self.getFrom(), frm=self.getTo(), typ=self.getType(), body=text)
+		return m
 
 class Presence(Stanza):
 	""" XMPP Presence object.

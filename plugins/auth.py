@@ -46,7 +46,7 @@ def manageAuthValue(msgType, conference, nick, param):
 def askAuthQuestion(conference, nick, truejid, aff, role):
 	if getConferenceConfigKey(conference, "auth"):
 		if aff == protocol.AFF_NONE:
-			question, answer = random.choice(AUTH_QUESTIONS = (
+			question, answer = random.choice((
 				(u"сорок + три", "43"),
 				(u"60 + четыре", "64"),
 				(u"десять + 22", "32"),
