@@ -512,7 +512,7 @@ def parseMessage(stanza):
 			time.sleep(0.5)
 		else:
 			return
-		gClient.send(stanza.buildReply(message))
+		gClient.send(stanza.buildReply(protocol.TYPE_PUBLIC, message))
 		return
 	if not message:
 		return

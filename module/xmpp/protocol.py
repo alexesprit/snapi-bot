@@ -314,10 +314,10 @@ class Message(Stanza):
 			return delayNode.hasAttr("stamp")
 		return False
 		
-	def buildReply(self, text=None):
+	def buildReply(self, typ=None, text=None):
 		""" Builds and returns another message object with specified text.
 			The to, from and thread properties of new message are pre-set as reply to this message. """
-		m = Message(to=self.getFrom(), frm=self.getTo(), typ=self.getType(), body=text)
+		m = Message(to=self.getFrom(), frm=self.getTo(), typ=typ, body=text)
 		return m
 
 class Presence(Stanza):

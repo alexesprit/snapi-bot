@@ -199,7 +199,7 @@ class Dispatcher(plugin.PlugIn):
 					text = tag.getData()
 				else:
 					name = tag.getName()
-		raise StreamError(u"%s: %s" % (name, text))
+		raise protocol.StreamError(u"%s: %s" % (name, text))
 
 	def dispatch(self, stanza):
 		""" Main procedure that performs XMPP stanza recognition and calling 
