@@ -505,14 +505,10 @@ def parseMessage(stanza):
 		errorCode = stanza.getErrorCode()
 		if errorCode == "500":
 			time.sleep(1)
+			gClient.send(stanza.buildReply(protocol.TYPE_PUBLIC, message))
 		elif errorCode == "406":
-			addConference(conference)
-			setConferenceConfigKey(conference, "nick", Config.NICK)
+			addTextToSysLog("Not allowed: %s" % (str(stanza)), FLAG_WARNING)
 			joinConference(conference)
-			time.sleep(0.5)
-		else:
-			return
-		gClient.send(stanza.buildReply(protocol.TYPE_PUBLIC, message))
 		return
 	if not message:
 		return
