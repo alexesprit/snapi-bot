@@ -163,7 +163,7 @@ gMacros = macros.Macros(CONFIG_DIR)
 gConferenceConfig = {}
 gConferences = {}
 
-gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0}
+gInfo = {"msg": 0, "prs": 0, "iq": 0, "cmd": 0, "thr": 0, "err": 0, "last": 0}
 
 gDebug = debug.Debug([debug.DBG_ALWAYS], showFlags=False)
 gDebug.colors[FLAG_ERROR] = debug.colorBrightRed
@@ -580,6 +580,7 @@ def parseMessage(stanza):
 			if not param and isCommandType(command, CMD_PARAM):
 				return
 			gInfo["cmd"] += 1
+			gInfo["last"] = time.time()
 			startThread(gCmdHandlers[command], msgType, barejid, resource, param)
 		else:
 			sendMsg(msgType, barejid, resource, u"Недостаточно прав")
@@ -705,7 +706,7 @@ def parseIQ(stanza):
 		elif stanza.getTags("query", xmlns=protocol.NS_LAST):
 			iq = stanza.buildReply(protocol.TYPE_RESULT)
 			query = iq.getTag("query")
-			query.setAttr("seconds", int(time.time() - gInfo["start"]))
+			query.setAttr("seconds", int(time.time() - gInfo["last"]))
 		elif stanza.getTags("time", xmlns=protocol.NS_ENTITY_TIME):
 			tZone = time.altzone if time.localtime()[8] else time.timezone
 			sign = (tZone < 0) and "+" or "-"
@@ -831,7 +832,6 @@ def start():
 			for conference in conferences:
 				addConference(conference)
 				joinConference(conference)
-				saveConferenceConfig(conference)
 			printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
 		startKeepAliveSending()

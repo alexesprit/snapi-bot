@@ -29,6 +29,7 @@ import simplexml
 
 DBG_DISPATCHER = "dispatcher"
 DEFAULT_TIMEOUT = 25
+RESPONSE_TIMEOUT = 600
 
 class Dispatcher(plugin.PlugIn):
 	""" Ancestor of PlugIn class. Handles XMPP stream, i.e. aware of stream headers.
@@ -297,7 +298,7 @@ class Dispatcher(plugin.PlugIn):
 			if isinstance(self._expected[item], tuple):
 				t1 = self._expected[item][2]
 				t2 = time.time()
-				if t2 - t1 > 600:
+				if (t2 - t1) > RESPONSE_TIMEOUT:
 					idToRemove.append(item)
 		for item in idToRemove:
 			del self._expected[item]

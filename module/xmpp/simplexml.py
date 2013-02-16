@@ -318,6 +318,7 @@ class NodeBuilder:
 		self._document_attrs = None
 		self._document_nsp = None
 		self._mini_dom = None
+		self.data_buffer = []
 		self._ptr = None
 		if data:
 			self._parser.Parse(data,1)
@@ -363,6 +364,8 @@ class NodeBuilder:
 	def endtag(self, tag):
 		""" XML Parser callback. Used internally.
 		"""
+		self._ptr.setData("".join(self.data_buffer))
+		self.data_buffer = []
 		if self.__depth == self._dispatch_depth:
 			self.dispatch(self._mini_dom)
 		elif self.__depth > self._dispatch_depth:
@@ -372,8 +375,7 @@ class NodeBuilder:
 	def handle_cdata(self, data):
 		""" XML Parser callback. Used internally.
 		"""
-		if self._ptr:
-			self._ptr.setData(data)
+		self.data_buffer.append(data)
 
 	def getDom(self):
 		""" Returns just built Node.
