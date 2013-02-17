@@ -16,8 +16,8 @@
 
 def sendInvite(msgType, conference, nick, param):
 	args = param.split(None, 1)
-	user = args[0]
-	truejid = getTrueJID(conference, user)
+	userNick = args[0]
+	truejid = getTrueJID(conference, userNick)
 	if not truejid:
 		if netutil.isJID(userNick):
 			truejid = userNick
