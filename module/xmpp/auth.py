@@ -102,7 +102,6 @@ class SASL(plugin.PlugIn):
 	def _parseAuthStanza(self, stanza):
 		""" Perform next SASL auth step. Used internally.
 		"""
-		print stanza.getXMLNS()
 		if stanza.getXMLNS() != protocol.NS_SASL:
 			return
 		if stanza.getName() == "failure":

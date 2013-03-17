@@ -49,11 +49,12 @@ class Client:
 		self._owner = self
 		self.connectType = None
 
-		if not debugFlags:
-			debugFlags = ["socket"]	
 		self._initDebugger(debugFlags)
 	
 	def _initDebugger(self, debugFlags):
+		if not debugFlags:
+			debugFlags = []
+	
 		self._debug = debug.Debug(debugFlags, showFlags=False)
 		self.printf = self._debug.show
 		self.debugFlags = self._debug.debugFlags

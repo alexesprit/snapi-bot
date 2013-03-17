@@ -19,7 +19,8 @@ def searchInYandex(msgType, conference, nick, param):
 	qparam = {"text": param.encode("utf-8")}
 	data = netutil.getURLResponseData(url, qparam, encoding='utf-8')
 	if data:
-		elements = re.findall(r'<a class="b-serp-item__title.+?href="(.+?)".+?>(.+?)</a>.+?<div class="b-serp-item__text">(.+?)</div>', data, re.DOTALL)
+		#elements = re.findall(r'<a class="b-serp-item__title.+?href="(.+?)".+?>(.+?)</a>.+?<div class="b-serp-item__text">(.+?)</div>', data, re.DOTALL)
+		elements = re.findall(r'<a class="b-serp-item__title.+?href="(.+?)".+?>(.+?)</h2>(.+?)</div>', data, re.DOTALL)
 		if elements:
 			if protocol.TYPE_PUBLIC == msgType:
 				elements = elements[:1]
