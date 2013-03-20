@@ -48,7 +48,7 @@ osinfo = platform.uname()
 osname = u"%s %s" % (osinfo[0], osinfo[2])
 
 revision = os.popen("svnversion -n").read()
-if not revision:
+if not revision or "Unversioned" in revision:
 	revision = "0"
 version = u"%s.%s.%s" % (MAJOR, MINOR, revision)
 
