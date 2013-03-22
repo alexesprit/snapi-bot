@@ -85,33 +85,31 @@ def unquote(url):
 
 def getResponseData(response, encoding=None):
 	if response:
+		url = response.geturl()
 		data = response.read()
 		info = response.info()
 		contentenc = info.getheader('Content-Encoding')
 		if contentenc == 'gzip':
-			obj = zlib.decompressobj(16 + zlib.MAX_WBITS)
-			data = obj.decompress(data)
-		
+			data = zlib.decompress(16 + zlib.MAX_WBITS)		
 		if encoding != 'raw':
 			if encoding:
 				try:
 					data = unicode(data, encoding)
 					return data
 				except UnicodeDecodeError:
-					print '%s: failed to decode response data; encoding: %s (defined by user)' % (response.geturl(), encoding)
+					print 'netutil: failed to decode %s [%s, user]' % (url, encoding)
 			else:
-				'%s: encoding is not defined' % (response.geturl())
-
+				print 'netutil: unknown encoding for %s [user]' % (url)
 			encoding = chardet.detect(data)['encoding']
 			if encoding:
 				try:
 					data = unicode(data, encoding)
-					print "%s: enconding is %s" % (response.geturl(), encoding)
+					print "netutil: enconding for %s [%s]" % (url, encoding)
 					return data
 				except UnicodeDecodeError:
-					print '%s: failed to decode response data; encoding: %s (detected with chardet)' % (response.geturl(), encoding)
+					print 'netutil: failed to decode %s [%s, chardet]' % (url, encoding)
 			else:
-				print '%s: unknown encoding' % (response.geturl())
+				print 'netutil: unknown encoding for %s [chardet]' % (url)
 		return data
 	return None
 
@@ -130,7 +128,7 @@ def getURLResponse(url, param=None, data=None):
 	try:
 		return urllib2.urlopen(request)
 	except IOError, e:
-		print u"Unable to open %s (%s)" % (url, e)
+		print 'netutil: failed to open %s [%s]' % (url, e)
 	return None
 
 #USERJID_RE = re.compile(r"\w+@\w+\.\w+", re.UNICODE)
