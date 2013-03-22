@@ -19,64 +19,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-AFISHA_CITIES = {
-	u"москва": "msk",
-	u"петербург": "spb", 
-	u"волгоград": "volgograd",
-	u"воронеж": "voronezh", 
-	u"екатеринбург": "ekaterinburg",
-	u"иркутск": "irkutsk",
-	u"казань": "kazan",
-	u"калининград": "kaliningrad",
-	u"краснодар": "krasnodar",
-	u"липецк": "lipetsk",
-	u"мурманск": "murmansk",
-	u"новгород": "nnovgorod",
-	u"новосибирск": "novosibirsk",
-	u"омск": "omsk",
-	u"пермь": "perm",
-	u"петрозаводск": "petrozavidsk",
-	u"ростов-на-дону": "rostov-na-donu",
-	u"самара": "samara",
-	u"сочи": "sochi",
-	u"ставрополь": "stavropol",
-	u"тула": "tula",
-	u"уфа": "ufa",
-	u"челябинск": "chelyabinsk",
-	u"ярославль": "yaroslavl",
-	u"киев": "kiev",
-	u"харьков": "harkov",
-	u"донецк": "donetsk"
-}
-
-TIME_OFFSET = {
-	"msk": 4,
-	"spb": 4,
-	"volgograd": 4,
-	"voronezh": 4,
-	"ekaterinburg": 6,
-	"irkutsk": 4,
-	"kazan": 4,
-	"kaliningrad": 3,
-	"krasnodar": 4,
-	"lipetsk": 4,
-	"murmansk": 4,
-	"nnovgorod": 4,
-	"novosibirsk": 7,
-	"perm": 6,
-	"petrozavodsk": 4,
-	"rostov-na-donu": 4,
-	"samara": 4, 
-	"sochi": 4,
-	"stavropol": 4,
-	"tula": 4,
-	"ufa": 6,
-	"chelyabinsk": 6,
-	"yaroslavl": 4,
-	"kiev": 2,
-	"harkov": 2,
-	"donetsk": 2
-}
+AFISHA_CITIES_PATH = 'afisha-cities.txt'
+TIME_OFFSETS_PATH = 'afisha-tzones.txt'
 
 gAfishaCache = {}
 
@@ -143,7 +87,8 @@ def getFullSchedule(city):
 	return schedule
 
 def getCityTime(city):
-	now = time.gmtime(time.time() + (TIME_OFFSET[city]) * 3600)
+	offsets = eval(io.read(getFilePath(RESOURCE_DIR, TIME_OFFSETS_PATH)))
+	now = time.gmtime(time.time() + (offsets[city]) * 3600)
 	return now
 
 def getCinemas(city):
@@ -159,7 +104,8 @@ def getFilms(city):
 	return films
 	
 def getCities():
-	return sorted(AFISHA_CITIES.keys())
+	cities = eval(io.read(getFilePath(RESOURCE_DIR, AFISHA_CITIES_PATH)))
+	return sorted(cities.keys())
 
 def getSchedule(city, now, cinema, film):
 	ls = []
@@ -182,12 +128,13 @@ def showAfisha(msgType, conference, nick, param):
 	arglen = len(args)
 
 	city = args[0].lower()
-	if city not in AFISHA_CITIES:
+	cities = eval(io.read(getFilePath(RESOURCE_DIR, AFISHA_CITIES_PATH)))
+	if city not in cities:
 		citieslist = u", ".join(city.capitalize() for city in getCities())
 		sendMsg(msgType, conference, nick, 
 			u"Укажите, пожалуйста, один из следующих городов: %s" % (citieslist))
 		return
-	cityCode = AFISHA_CITIES[city]
+	cityCode = cities[city]
 	city = city.capitalize()
 
 	if arglen > 1:
