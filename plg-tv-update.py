@@ -19,7 +19,7 @@ def getTVData():
 		return elements
 	return None
 	
-out = open(TV_PROGRAM_FILE, 'w')
+out = open(TV_PROGRAM_FILE, 'wb')
 out.write('[\n')
 for data in getTVData():
 	chURL = data[0].encode('utf-8')
