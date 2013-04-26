@@ -24,6 +24,7 @@ TV_CATEGORIES = {
 	u"спорт": "old/tv/-/%Y-%m-%d/Спорт/",
 	u"детям": "old/tv/-/%Y-%m-%d/Детям/",
 	u"досуг": "old/tv/-/%Y-%m-%d/Досуг/",
+	u"досуг": "old/tv/-/%Y-%m-%d/Познавательное/",
 }
 
 def getTVChannels():
