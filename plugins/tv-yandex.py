@@ -107,9 +107,10 @@ def getChannelProgramFromData(data):
 		return "\n".join(program)
 	return None
 	
-def getTVProgramByUserCategory(category, when=FLAG_ALL):
+def getTVProgramByUserCategory(category, when, day):
 	flag = category[0]
 	query = {
+		'day': day,
 		'when': when,
 		'flag': flag if flag else '',
 		'channel': ",".join(category[1])
@@ -117,16 +118,18 @@ def getTVProgramByUserCategory(category, when=FLAG_ALL):
 	data = netutil.getURLResponseData(YANDEX_TV_URL, query, encoding='utf-8')
 	return getCategoryProgramFromData(data)
 
-def getTVProgramByCategory(number, when=FLAG_ALL):
+def getTVProgramByCategory(number, when, day):
 	query = {
+		'day': day,
 		'when': 2,
 		'flag': number,
 	}
 	data = netutil.getURLResponseData(YANDEX_TV_URL, query, encoding='utf-8')
 	return getCategoryProgramFromData(data)
 	
-def getTVProgramByChannel(number, when=FLAG_ALL):
+def getTVProgramByChannel(number, when, day):
 	query = {
+		'day': day,
 		'when': when,
 		'channel': number,
 	}
@@ -136,14 +139,22 @@ def getTVProgramByChannel(number, when=FLAG_ALL):
 def parseParameters(param):
 	param = param.lower()
 	args = param.rsplit(' ', 1)
+	# current day since 1 Jan 1970
+	curday = int(time.mktime(time.localtime()) / 86400)
 	if len(args) == 2:
 		arg1, arg2 = args
-		printf(arg1)
-		printf(arg2)
-		when = TV_FLAGS.get(arg2, FLAG_ALL)	
-		printf(when)
-		return arg1, when
-	return param, FLAG_ALL
+		when = TV_FLAGS.get(arg2, -1)
+		if when == -1:
+			when = FLAG_ALL
+			days = {
+				u'завтра': curday + 1,
+				u'послезавтра': curday + 2,
+				u'вчера': curday - 1,
+				u'позавчера': curday - 2,
+			}
+			day = days.get(arg2, curday)
+		return arg1, when, day
+	return param, FLAG_ALL, curday
 	
 def showTVCategory(msgType, conference, nick, param):
 	param = param.lower()
@@ -213,7 +224,7 @@ def delTVCategory(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Вы не добавляли ни одной категории.")
 
 def showTVProgram(msgType, conference, nick, param):
-	param, when = parseParameters(param)
+	param, when, day = parseParameters(param)
 	if u"каналы" == param:
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли.")
@@ -237,7 +248,7 @@ def showTVProgram(msgType, conference, nick, param):
 		else:
 			info = getChannelInfoByName(param)
 		if info:
-			program = getTVProgramByChannel(info[0], when)
+			program = getTVProgramByChannel(info[0], when, day)
 			if program:
 				if protocol.TYPE_PUBLIC == msgType:
 					sendMsg(msgType, conference, nick, u"В привате.")
@@ -249,11 +260,11 @@ def showTVProgram(msgType, conference, nick, param):
 			program = None
 			category = getUserCategory(userjid, param)
 			if category:
-				program = getTVProgramByUserCategory(category, when)
+				program = getTVProgramByUserCategory(category, when, day)
 			else:
 				info = getCategoryInfoByName(param)
 				if info:
-					program = getTVProgramByCategory(info[0], when)
+					program = getTVProgramByCategory(info[0], when, day)
 				else:
 					sendMsg(msgType, conference, nick, u"Не знаю такого канала/категории.")
 					return
