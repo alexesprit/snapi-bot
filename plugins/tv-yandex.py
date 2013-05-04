@@ -133,28 +133,32 @@ def getTVProgramByChannel(number, when, day):
 		'when': when,
 		'channel': number,
 	}
+	printf(query)
 	data = netutil.getURLResponseData(YANDEX_TV_URL, query, encoding='utf-8')
 	return getChannelProgramFromData(data)
 	
 def parseParameters(param):
 	param = param.lower()
+	channel = param
 	args = param.rsplit(' ', 1)
-	# current day since 1 Jan 1970
-	curday = int(time.mktime(time.localtime()) / 86400)
+	when = FLAG_ALL
+	day = ''
 	if len(args) == 2:
 		arg1, arg2 = args
-		when = TV_FLAGS.get(arg2, -1)
-		if when == -1:
-			when = FLAG_ALL
+		channel = arg1
+		if arg2 in TV_FLAGS:
+			when = TV_FLAGS[arg2]
+		else:
+			# current day since 1 Jan 1970
+			day = int(time.mktime(time.localtime()) / 86400)
 			days = {
 				u'завтра': curday + 1,
 				u'послезавтра': curday + 2,
 				u'вчера': curday - 1,
 				u'позавчера': curday - 2,
 			}
-			day = days.get(arg2, curday)
-		return arg1, when, day
-	return param, FLAG_ALL, curday
+			day = days.get(arg2, None)
+	return channel, when, day
 	
 def showTVCategory(msgType, conference, nick, param):
 	param = param.lower()
@@ -225,6 +229,7 @@ def delTVCategory(msgType, conference, nick, param):
 
 def showTVProgram(msgType, conference, nick, param):
 	param, when, day = parseParameters(param)
+	printf(parseParameters(param))
 	if u"каналы" == param:
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли.")
@@ -277,9 +282,9 @@ def showTVProgram(msgType, conference, nick, param):
 
 registerEventHandler(loadTVData, EVT_CONNECTED)
 registerCommand(showTVProgram, u"тв", 10, 
-				u'Показывает телепрограму для определённого канала/категории. Параметр "каналы" - список каналов, параметр "категории" - список категорий. Для управления собственными категориями используйте команды "тв+", "тв-", "тв*".',
-				u"<канал|категория>", 
-				(u"первый", u"каналы", u"категории"), 
+				u'Показывает телепрограму для определённого канала/категории. Параметр "каналы" - список каналов, параметр "категории" - список категорий. Для получения программы на определённый день/время суток укажите в конце этот день (позавчера, вчера, завтра, послезавтра), либо время суток (утром, днем, вечером, сейчас). Для управления собственными категориями используйте команды "тв+", "тв-", "тв*".',
+				u"<канал|категория> [день|время суток]", 
+				(u'каналы', u'категории', u'первый', u'первый утром', u'первый завтра'), 
 				CMD_ANY | CMD_PARAM)
 registerCommand(addTVCategory, u"тв+", 10, 
 				u'Добавляет пользовательскую категорию. Категории хранятся отдельно для каждого пользователя. В качестве параметра принимается список, разделённый переводом строки; первый элемент списка - имя категории, остальные элементы - имена каналов, которые можно узнать, отправив боту "тв каналы".',
