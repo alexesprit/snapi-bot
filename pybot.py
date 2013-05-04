@@ -754,15 +754,16 @@ def loadPlugins():
 	invalidPlugins = 0
 	plugins = os.listdir(PLUGIN_DIR)
 	for plugin in plugins:
-		try:
-			path = os.path.join(PLUGIN_DIR, plugin)
-			if os.path.isfile(path):
-				execfile(path, globals())
-				validPlugins += 1
-		except (SyntaxError, NameError):
-			printf("Exception in loadPlugins function", FLAG_ERROR)
-			addTextToSysLog(traceback.format_exc(), LOG_ERRORS)
-			invalidPlugins += 1
+		if plugin.endswith('.py'):
+			try:
+				path = os.path.join(PLUGIN_DIR, plugin)
+				if os.path.isfile(path):
+					execfile(path, globals())
+					validPlugins += 1
+			except (SyntaxError, NameError):
+				printf("Exception in loadPlugins function", FLAG_ERROR)
+				addTextToSysLog(traceback.format_exc(), LOG_ERRORS)
+				invalidPlugins += 1
 	if not invalidPlugins:
 		printf("Loaded %d plugins" % (validPlugins), FLAG_SUCCESS)
 	else:
