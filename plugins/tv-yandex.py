@@ -152,10 +152,10 @@ def parseParameters(param):
 			# current day since 1 Jan 1970
 			day = int(time.mktime(time.localtime()) / 86400)
 			days = {
-				u'завтра': curday + 1,
-				u'послезавтра': curday + 2,
-				u'вчера': curday - 1,
-				u'позавчера': curday - 2,
+				u'завтра': day + 1,
+				u'послезавтра': day + 2,
+				u'вчера': day - 1,
+				u'позавчера': day - 2,
 			}
 			day = days.get(arg2, None)
 	return channel, when, day
