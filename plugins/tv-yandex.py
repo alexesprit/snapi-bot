@@ -133,20 +133,19 @@ def getTVProgramByChannel(number, when, day):
 		'when': when,
 		'channel': number,
 	}
-	printf(query)
 	data = netutil.getURLResponseData(YANDEX_TV_URL, query, encoding='utf-8')
 	return getChannelProgramFromData(data)
 	
 def parseParameters(param):
 	param = param.lower()
 	channel = param
-	args = param.rsplit(' ', 1)
 	when = FLAG_ALL
 	day = ''
+	args = param.rsplit(' ', 1)
 	if len(args) == 2:
 		arg1, arg2 = args
-		channel = arg1
 		if arg2 in TV_FLAGS:
+			channel = arg1
 			when = TV_FLAGS[arg2]
 		else:
 			# current day since 1 Jan 1970
@@ -157,7 +156,9 @@ def parseParameters(param):
 				u'вчера': day - 1,
 				u'позавчера': day - 2,
 			}
-			day = days.get(arg2, None)
+			if arg2 in days:
+				channel = arg1
+				day = days[arg2]
 	return channel, when, day
 	
 def showTVCategory(msgType, conference, nick, param):
@@ -229,7 +230,6 @@ def delTVCategory(msgType, conference, nick, param):
 
 def showTVProgram(msgType, conference, nick, param):
 	param, when, day = parseParameters(param)
-	printf(parseParameters(param))
 	if u"каналы" == param:
 		if protocol.TYPE_PUBLIC == msgType:
 			sendMsg(msgType, conference, nick, u"Ушли.")
