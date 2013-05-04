@@ -33,6 +33,7 @@
 "zvenigorod": 4,
 "zelenograd": 4,
 "ivanovo": 4,
+"ivanteevka": 4, 
 "izhevsk": 4,
 "irkutsk": 9,
 "iskitim": 7,
