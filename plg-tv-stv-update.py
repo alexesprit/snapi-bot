@@ -6,7 +6,7 @@ from module import io
 from module import netutil
 
 S_TV_URL = 'http://s-tv.ru/old/tv/1tv/'
-TV_PROGRAM_FILE = 'tvchannels.txt'
+TV_PROGRAM_FILE = 'tv-stv.txt'
 
 def getTVData():
 	data = netutil.getURLResponseData(S_TV_URL, encoding='utf-8')

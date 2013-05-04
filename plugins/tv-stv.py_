@@ -15,7 +15,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-TVCODES_FILE = "tvchannels.txt"
+TVCODES_FILE = "tv-stv.txt"
 
 TV_CATEGORIES = {
 	u"новости": "old/tv/-/%Y-%m-%d/Инфо/",
