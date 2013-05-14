@@ -119,7 +119,7 @@ def showCinemaQuote(msgType, conference, nick, param):
 def showFact(msgType, conference, nick, param):
 	pageNum = random.randrange(1, 29)
 	url = "http://skio.ru/facts/fact%d.php" % (pageNum)
-	data = netutil.getURLResponseData(url)
+	data = netutil.getURLResponseData(url, encoding='windows-1251')
 	if data:
 		elements = re.findall("<li>(.+?)<br><br></li>", data)
 		if elements:

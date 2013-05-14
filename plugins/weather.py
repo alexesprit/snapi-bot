@@ -62,7 +62,7 @@ def showWeather(msgType, conference, nick, param):
 	if rawdata:
 		city, code = rawdata
 		url = "http://informer.gismeteo.ru/xml/%s.xml" % (code.strip())
-		data = netutil.getURLResponseData(url)
+		data = netutil.getURLResponseData(url, 'ascii')
 		if data:
 			node = simplexml.XML2Node(data)
 			node = node.getTag("REPORT").getTag("TOWN")
