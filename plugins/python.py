@@ -45,6 +45,7 @@ def pythonShell(msgType, conference, nick, param):
 		sendMsg(msgType, conference, nick, u"Выполнено!")
 
 def pythonCalc(msgType, conference, nick, param):
+	param = param.replace(',', '.').replace(' ', '')
 	if not re.sub("([0-9]+|[\+\-\/\*\^\.\(\)\|\&\^~])", "", param).strip():
 		if not param.count("**"):
 			try:
