@@ -335,7 +335,7 @@ class NodeBuilder:
 		"""
 		self.__depth += 1
 		if self.__depth == self._dispatch_depth:
-			if not self._mini_dom :
+			if not self._mini_dom:
 				self._mini_dom = Node(name=name, attrs=attrs, nsp=self._document_nsp, node_built=True)
 			else:
 				Node(self._mini_dom, name=name, attrs=attrs, nsp=self._document_nsp, node_built=True)
@@ -343,6 +343,9 @@ class NodeBuilder:
 		elif self.__depth > self._dispatch_depth:
 			self._ptr.children.append(Node(name=name, parent=self._ptr, attrs=attrs, node_built=True))
 			self._ptr = self._ptr.children[-1]
+		if self._ptr:
+			self._ptr.setData("".join(self.data_buffer))
+			self.data_buffer = []
 		if self.__depth == 1:
 			self._document_attrs = {}
 			self._document_nsp = {}
