@@ -206,7 +206,7 @@ def execute(function, args):
 	try:
 		function(*args)
 	except Exception:
-		printf("Exception in %s function" % (function.__name__), FLAG_ERROR)
+		printf(u"Exception in %s function [args: %s]" % (function.__name__, str(args)), FLAG_ERROR)
 		addTextToSysLog(traceback.format_exc(), LOG_ERRORS)
 
 def printf(text, flag=FLAG_INFO):
@@ -458,7 +458,7 @@ def sendMsg(msgType, conference, nick, text, force=False):
 				sendMsg(msgType, conference, nick, u"Смотри в привате (ограничение в %d символов)" % (msgLimit), True)
 				msgType = protocol.TYPE_PRIVATE
 	if protocol.TYPE_PUBLIC == msgType:
-		text = u"%s: %s" % (nick, text)
+		text = u"%s, %s" % (nick, text)
 		jid = conference
 	else:
 		jid = u"%s/%s" % (conference, nick)
@@ -639,25 +639,27 @@ def parsePresence(stanza):
 				callEventHandlers(EVT_USERLEAVE, MODE_ASYNC, conference, nick, truejid, reason, code)
 		elif protocol.TYPE_ERROR == prsType:
 			errorCode = stanza.getErrorCode()
-			if errorCode == "409":
+			if errorCode:
+				try:
+					printf(stanza)
+				except:
+					printf("Failed to print stanza with code %s" % (errorCode))
+			if errorCode in "409":
 				newNick = getBotNick(conference) + "."
 				setConferenceConfigKey(conference, "nick", newNick)
 				saveConferenceConfig(conference)
 				joinConference(conference)
+			elif errorCode in ("503", "332"):
+				leaveConference(conference)
+				startTimer(REJOIN_DELAY, joinConference, conference)
+				printf("Got 503 error code in %s" % (conference))
+			elif errorCode in ("401", "403", "405"):
+				leaveConference(conference, u"Got %s error code" % errorCode)
+				printf(u"Got error in %s (%s)" % (conference, errorCode), FLAG_WARNING)
 			elif errorCode == "404":
 				delConference(conference)
 				saveConferences()
 				printf(u"%s is deleted (%s)" % (conference, errorCode), FLAG_WARNING)
-			elif errorCode == "503":
-				leaveConference(conference)
-
-				startTimer(REJOIN_DELAY, joinConference, conference)
-
-				printf("Got 503 error code in %s" % (conference))
-			elif errorCode in ("401", "403", "405"):
-				leaveConference(conference, u"Got %s error code" % errorCode)
-
-				printf(u"Got error in %s (%s)" % (conference, errorCode), FLAG_WARNING)
 		callEventHandlers(EVT_PRS | H_CONFERENCE, MODE_ASYNC, stanza, conference, nick, truejid)
 	else:
 		if protocol.PRS_SUBSCRIBE == prsType:
@@ -734,6 +736,13 @@ def parseIQ(stanza):
 			error = iq.addChild("error", {"type": "cancel"})
 			error.addChild("feature-not-implemented", xmlns=protocol.NS_STANZAS)
 		gClient.send(iq)
+	elif protocol.TYPE_ERROR == stanza.getType():
+		errorCode = stanza.getErrorCode()
+		if errorCode:
+			try:
+				printf(stanza)
+			except:
+				printf("Failed to print stanza with code %s" % (errorCode))
 	if isConference:
 		callEventHandlers(EVT_IQ | H_CONFERENCE, MODE_ASYNC, stanza, barejid, resource, truejid)
 	else:
