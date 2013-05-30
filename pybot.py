@@ -622,6 +622,7 @@ def parsePresence(stanza):
 				printf(stanza)
 			if isNickOnline(conference, nick):
 				code = stanza.getStatusCode()
+				reason = stanza.getReason() or stanza.getStatus()
 				if "303" == code:
 					newNick = stanza.getNick()
 					if not isNickInConference(conference, newNick):
@@ -629,7 +630,6 @@ def parsePresence(stanza):
 					for key in gConferences[conference][nick]:
 						oldval = getNickKey(conference, nick, key)
 						setNickKey(conference, newNick, key, oldval)
-				reason = stanza.getStatus()
 				setNickKey(conference, nick, NICK_HERE, False)
 				if not getNickByJID(conference, truejid):
 					setTempAccess(conference, truejid)

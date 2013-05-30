@@ -370,7 +370,15 @@ class Presence(Stanza):
 		for xtag in self.getTags("x", {}, NS_MUC_USER):
 			for child in xtag.getTags(tag):
 				return child.getAttr(attr)
-	
+		return None
+				
+	def _getMUCItemData(self, tag):
+		for xtag in self.getTags("x", {}, NS_MUC_USER):
+			for child in xtag.getTags("item"):
+				for cchild in child.getTags(tag):
+					return cchild.getData()
+		return None
+
 	def getRole(self):
 		"""Returns the presence role.
 		"""
@@ -395,6 +403,9 @@ class Presence(Stanza):
 		"""Returns the status code of the presence.
 		"""
 		return self._getMUCItemAttr("status", "code")
+		
+	def getReason(self):
+		return self._getMUCItemData("reason")
 
 class Iq(Stanza): 
 	""" XMPP Iq object - get/set dialog mechanism.
