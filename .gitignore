@@ -1,0 +1,6 @@
+config/*.txt
+config/*.db
+config/*.dat
+syslogs/*
+*.pyc
+config.py
