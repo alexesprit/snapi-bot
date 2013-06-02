@@ -8,6 +8,13 @@ from module import netutil
 YANDEX_TV_URL = 'http://m.tv.yandex.ru/5'
 TV_PROGRAM_FILE = 'tv-yandex.txt'
 
+REPLACES = {
+	u'СТС Золотой век': u'СТС',
+}
+EXCEPTIONS = (
+	u'Спорт',
+)
+
 data = netutil.getURLResponseData(YANDEX_TV_URL, encoding='utf-8')
 if data:
 	channels = []
@@ -17,7 +24,9 @@ if data:
 		# 0-7 are categories numbers
 		if number > 7:
 			channel = entry[1].strip()
-			channels.append((number, channel))
+			if channel not in EXCEPTIONS:
+				channel = REPLACES.get(channel, channel)
+				channels.append((number, channel))
 	out = open(TV_PROGRAM_FILE, 'wb')
 	out.write('(\n')
 	for ch in channels:
