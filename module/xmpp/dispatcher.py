@@ -326,3 +326,4 @@ class Dispatcher(plugin.PlugIn):
 			before stream closure.
 		"""
 		self._owner_send("</stream:stream>")
+		self._owner.Connection.disconnect()
