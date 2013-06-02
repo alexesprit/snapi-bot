@@ -45,17 +45,16 @@ def leaveConf(msgType, conference, nick, param):
 			sendMsg(msgType, conference, nick, u"Ошибка! Необходимо указать конференцию")
 			
 def updateWorkingCopy(msgType, conference, nick, param):
-	response = os.popen("svn up").read()
+	response = os.popen("git pull").read()
 	if response:
-		currentRev = Version.revision
-		newRev = os.popen("svnversion -n").read()
-		if currentRev != newRev:
-			sendMsg(msgType, conference, nick, u"Обновлено до редакции %s" % (newRev))
+		if not "up-to-date" in response:
+			newSHA = os.popen("git rev-parse --short HEAD").read().strip()
+			sendMsg(msgType, conference, nick, u"Обновлено [sha1: %s]" % (newSHA))
 			stop(ACTION_RESTART, u"Выключаюсь: обновление")
 		else:
 			sendMsg(msgType, conference, nick, u"Ваша копия не требует обновления")
 	else:
-		sendMsg(msgType, conference, nick, u"Не удалось обновиться, возможно не установлена SubVersion")
+		sendMsg(msgType, conference, nick, u"Не удалось обновиться, возможно не установлен git.")
 
 def botRestart(msgType, conference, nick, param):
 	myNick = getNickFromJID(conference, nick)
