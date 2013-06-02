@@ -326,5 +326,4 @@ class Dispatcher(plugin.PlugIn):
 			before stream closure.
 		"""
 		self._owner_send("</stream:stream>")
-		while self.process(1):
-			pass
+		self._owner.Connection.disconnect()

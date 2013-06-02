@@ -102,7 +102,7 @@ class TCPSocket(plugin.PlugIn):
 		""" Disconnect from the remote server and unregister self.disconnected method from
 			the owner's dispatcher.
 		"""
-		self._sock.close()
+		self.disconnect()
 		if hasattr(self._owner, "Connection"):
 			del self._owner.Connection
 
