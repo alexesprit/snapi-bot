@@ -125,7 +125,6 @@ STATUS_STRINGS = (
 KEEPALIVE_TIMEOUT = 300
 REJOIN_DELAY = 120
 RECONNECT_DELAY = 15
-RESTART_DELAY = 5
 
 H_CONFERENCE = 0x0001
 H_ROSTER = 0x0002
@@ -790,7 +789,6 @@ def stop(action, message=None):
 
 	if ACTION_RESTART == action:
 		printf("Restarting...")
-		time.sleep(RESTART_DELAY)
 		os.execl(sys.executable, sys.executable, sys.argv[0])
 	elif ACTION_SHUTDOWN == action:
 		printf("Terminating...", FLAG_SUCCESS)
