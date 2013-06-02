@@ -1,6 +1,5 @@
-config/*.txt
+config.py
+*.pyc
+*.txt
 config/*.db
 config/*.dat
-syslogs/*
-*.pyc
-config.py
