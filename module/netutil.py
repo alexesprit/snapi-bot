@@ -128,7 +128,7 @@ def getURLResponse(url, param=None, data=None):
 	try:
 		return urllib2.urlopen(request)
 	except IOError, e:
-		print 'netutil: failed to open %s [%s]' % (url, e)
+		print 'netutil: failed to open %s [%r]' % (url, e)
 	return None
 
 #USERJID_RE = re.compile(r"\w+@\w+\.\w+", re.UNICODE)
