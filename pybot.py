@@ -735,13 +735,6 @@ def parseIQ(stanza):
 			error = iq.addChild("error", {"type": "cancel"})
 			error.addChild("feature-not-implemented", xmlns=protocol.NS_STANZAS)
 		gClient.send(iq)
-	elif protocol.TYPE_ERROR == stanza.getType():
-		errorCode = stanza.getErrorCode()
-		if errorCode:
-			try:
-				printf(stanza)
-			except:
-				printf("Failed to print stanza with code %s" % (errorCode))
 	if isConference:
 		callEventHandlers(EVT_IQ | H_CONFERENCE, MODE_ASYNC, stanza, barejid, resource, truejid)
 	else:
