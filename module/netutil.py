@@ -20,6 +20,7 @@ import zlib
 
 from module import chardet
 
+REQUEST_TIMEOUT = 15
 HTML_ESC_MAP = (
 	("&gt;", u">"), 
 	("&lt;", u"<"),
@@ -29,7 +30,6 @@ HTML_ESC_MAP = (
 	("&mdash;", u"—"),
 	("&middot;", u"·")
 )
-
 XML_ESC_MAP = (
 	("&gt;", ">"), 
 	("&lt;", "<"),
@@ -126,7 +126,7 @@ def getURLResponse(url, param=None, data=None):
 	request.add_header("User-Agent", "Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11")
 	request.add_header("Accept", "text/*")
 	try:
-		return urllib2.urlopen(request)
+		return urllib2.urlopen(request, timeout=REQUEST_TIMEOUT)
 	except IOError, e:
 		print 'netutil: failed to open %s [%r]' % (url, e)
 	return None
