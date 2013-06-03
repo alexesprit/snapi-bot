@@ -18,12 +18,24 @@ def showWhoIs(msgType, conference, nick, param):
 	qparam = {"url": param.encode("utf-8")}
 	data = netutil.getURLResponseData(url, qparam, encoding='windows-1251')
 	if data:
-		elements = re.search("<blockquote>(.+?)</font></blockquote>", data, re.DOTALL)
-		if elements:
-			text = elements.group(1)
-			text = text.replace("<br />", "")
-			text = netutil.removeTags(text)
-			sendMsg(msgType, conference, nick, text)
+		serverInfo = re.search(r'<noindex><a target=_blank(.+?)<span id="srvrinfo">', data, re.DOTALL)
+		if serverInfo:
+			def getFields(rawdata):
+				buf = []
+				records = re.findall(r'(.+?)\:(.+?)\n', rawdata)
+				for record in records:
+					fieldName = record[0]
+					fieldValue = record[1].strip()
+					if fieldValue:
+						buf.append("%s: %s\n" % (fieldName, fieldValue))
+				return buf
+			whoisRecord = re.search("<br />Domain.+?</blockquote>", data, re.DOTALL)
+			buf = []
+			buf.extend(getFields(netutil.removeTags(serverInfo.group(1))))
+			buf.append('\n')
+			buf.extend(getFields(netutil.removeTags(whoisRecord.group(0))))
+		
+			sendMsg(msgType, conference, nick, "".join(buf))
 		else:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
 	else:
