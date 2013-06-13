@@ -83,6 +83,32 @@ def showServerUptime(msgType, conference, nick, param):
 	iq = protocol.Iq(protocol.TYPE_GET, protocol.NS_LAST)
 	iq.setTo(server)
 	gClient.sendAndCallForResponse(iq, showServerUptime_, (msgType, conference, nick, server))
+	
+def showWhoIs(msgType, conference, nick, param):
+	url = "http://1whois.ru/index.php"
+	qparam = {"url": param.encode("idna")}
+	data = netutil.getURLResponseData(url, qparam, encoding='windows-1251')
+	if data:
+		whoisRecord = re.search("<blockquote>(.+?)</blockquote>", data, re.DOTALL)
+		recordData = whoisRecord.group(1)
+		if u'Нет данных' in recordData:
+			sendMsg(msgType, conference, nick, u"Не найдено!")
+		else:
+			records = re.findall(r'(.+?)\:([\w\s\-\.]+|\w+)\n', netutil.removeTags(whoisRecord.group(1)))
+			buf = []
+			for record in records:
+				fieldName = record[0].strip()
+				# text below is unused
+				if fieldName == 'NOTICE':
+					break
+				fieldValue = record[1].strip()
+				if fieldName and fieldValue:
+					# fix for domain list output (e.g. github.com query)
+					fieldValue = fieldValue.replace('\n      ', '')
+					buf.append("%s: %s\n" % (fieldName, fieldValue))
+			sendMsg(msgType, conference, nick, "".join(buf))
+	else:
+		sendMsg(msgType, conference, nick, u"Ошибка!")
 
 def showServerUptime_(stanza, msgType, conference, nick, server):
 	if protocol.TYPE_RESULT == stanza.getType():
@@ -112,3 +138,8 @@ registerCommand(showServerUptime, u"аптайм", 10,
 				u"Показывает аптайм jabber-сервера",
 				u"[сервер]",
 				(None, u"server.tld"))
+registerCommand(showWhoIs, u"хтоэто", 10, 
+				u"Показывает информацию о домене", 
+				u"<домен>", 
+				(u"server.tld", ), 
+				CMD_ANY | CMD_PARAM)
