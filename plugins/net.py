@@ -38,7 +38,7 @@ def showDNSResponse(msgType, conference, nick, param):
 def showGeoIPInfo(msgType, conference, nick, param):
 	host = param or Config.HOST or Config.SERVER
 	url = "http://www.and-rey.ru/geoip/ie.php"
-	qparam = {"host": host.encode("utf-8")}
+	qparam = {"host": host.encode("idna")}
 	data = netutil.getURLResponseData(url, qparam, encoding='windows-1251')
 	if data:
 		elements = re.findall("<td class=red>(.+?)</td><td class=blue>(.+?)</td>", data)
