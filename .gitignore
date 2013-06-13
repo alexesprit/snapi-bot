@@ -1,5 +1,6 @@
-config.py
+config/*
+*.py
 *.pyc
 *.txt
-config/*.db
-config/*.dat
+!plugins/*
+!resource/*
