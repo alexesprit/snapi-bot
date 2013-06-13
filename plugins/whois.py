@@ -15,29 +15,27 @@
 
 def showWhoIs(msgType, conference, nick, param):
 	url = "http://1whois.ru/index.php"
-	qparam = {"url": param.encode("utf-8")}
+	qparam = {"url": param.encode("idna")}
 	data = netutil.getURLResponseData(url, qparam, encoding='windows-1251')
 	if data:
-		serverInfo = re.search(r'<noindex><a target=_blank(.+?)<span id="srvrinfo">', data, re.DOTALL)
-		if serverInfo:
-			def getFields(rawdata):
-				buf = []
-				records = re.findall(r'(.+?)\:(.+?)\n', rawdata)
-				for record in records:
-					fieldName = record[0]
-					fieldValue = record[1].strip()
-					if fieldValue:
-						buf.append("%s: %s\n" % (fieldName, fieldValue))
-				return buf
-			whoisRecord = re.search("<br />Domain.+?</blockquote>", data, re.DOTALL)
-			buf = []
-			buf.extend(getFields(netutil.removeTags(serverInfo.group(1))))
-			buf.append('\n')
-			buf.extend(getFields(netutil.removeTags(whoisRecord.group(0))))
-		
-			sendMsg(msgType, conference, nick, "".join(buf))
-		else:
+		whoisRecord = re.search("<blockquote>(.+?)</blockquote>", data, re.DOTALL)
+		recordData = whoisRecord.group(1)
+		if u'Нет данных' in recordData:
 			sendMsg(msgType, conference, nick, u"Не найдено!")
+		else:
+			records = re.findall(r'(.+?)\:([\w\s\-\.]+|\w+)\n', netutil.removeTags(whoisRecord.group(1)))
+			buf = []
+			for record in records:
+				fieldName = record[0].strip()
+				# text below is unused
+				if fieldName == 'NOTICE':
+					break
+				fieldValue = record[1].strip()
+				if fieldName and fieldValue:
+					# fix for domain list output (e.g. github.com query)
+					fieldValue = fieldValue.replace('\n      ', '')
+					buf.append("%s: %s\n" % (fieldName, fieldValue))
+			sendMsg(msgType, conference, nick, "".join(buf))
 	else:
 		sendMsg(msgType, conference, nick, u"Ошибка!")
 
