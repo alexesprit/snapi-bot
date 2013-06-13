@@ -18,18 +18,23 @@
 import socket
 
 def getDNSResponse(query):
+	query = query.encode('idna')
+	isHostName = True	
 	try:
-		if not re.sub(r"\d+\.\d+\.\d+\.\d+", "", query):
-			hostname = socket.gethostbyaddr(query)[0]
-			return hostname
+		socket.inet_aton(query)
+		isHostName = False
+	except socket.error:
+		pass
+	try:
+		if isHostName:
+			return socket.gethostbyname(query)
 		else:
-			ipaddrlist = socket.gethostbyaddr(query)[2]
-			return u", ".join(ipaddrlist)
+			return socket.gethostbyaddr(query)[0]
 	except (socket.error):
 		return None
 
 def showDNSResponse(msgType, conference, nick, param):
-	response = getDNSResponse(param.encode("utf-8"))
+	response = getDNSResponse(param)
 	if response:
 		sendMsg(msgType, conference, nick, response)
 	else:
