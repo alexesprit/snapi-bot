@@ -16,12 +16,12 @@ def getTVData():
 	return None
 	
 out = open(TV_PROGRAM_FILE, 'wb')
-out.write('[\n')
+out.write('(\n')
 for data in getTVData():
 	chURL = data[0].encode('utf-8')
 	if chURL[-1] == '/':
 		chURL = chURL[:-1]
 	chName = data[1].encode('utf-8').strip()
-	out.write('[u"%s", "%s"],\n' % (chName, chURL))
-out.write(']\n')
+	out.write('(u"%s", "%s"),\n' % (chName, chURL))
+out.write(')\n')
 out.close()
