@@ -92,9 +92,6 @@ def updateAfishaCities():
 		if tzone == '???':
 			hastZone = False
 			tzone = "0"
-		if ' ' in city:
-			citiesOut.write('#')
-			tzonesOut.write('#')
 		citiesOut.write('u"%s": "%s", ' % (city.lower().encode('utf-8'), code.encode('utf-8')))
 		tzonesOut.write('"%s": %s, ' % (code.encode('utf-8'), tzone))
 		if not hastZone:
