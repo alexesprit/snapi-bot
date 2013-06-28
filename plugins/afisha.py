@@ -130,11 +130,10 @@ def showAfishaCinemas(msgType, conference, nick, param):
 	city = param.lower()
 	cities = getCities()
 	if not city in cities:
-		#citieslist = u", ".join(city.title() for city in sorted(cities.keys()))
-		#sendMsg(msgType, conference, nick, u"Укажите, пожалуйста, один из следующих городов: %s" % (citieslist))
+		sendMsg(msgType, conference, nick, u'Неизвестный город! Отправьте "афиша города", чтобы получить список городов.')
 		return
 	cityCode = cities[city]
-	cinemalist = "\n".join([u"%d) %s" % (i + 1, cinema) for i, cinema in enumerate(getCinemas(cityCode))])
+	cinemalist = "\n".join(u"%d) %s" % (i + 1, cinema) for i, cinema in enumerate(getCinemas(cityCode)))
 	if protocol.TYPE_PUBLIC == msgType:
 		sendMsg(msgType, conference, nick, u"В привате")
 	sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"В городе %s есть следующие кинотеатры:\n%s" % (city, cinemalist))
@@ -143,23 +142,25 @@ def showAfishaMovies(msgType, conference, nick, param):
 	city = param.lower()
 	cities = getCities()
 	if not city in cities:
-		#citieslist = u", ".join(city.title() for city in sorted(cities.keys()))
-		#sendMsg(msgType, conference, nick, u"Укажите, пожалуйста, один из следующих городов: %s" % (citieslist))
+		sendMsg(msgType, conference, nick, u'Неизвестный город! Отправьте "афиша города", чтобы получить список городов.')
 		return
 	cityCode = cities[city]
-	filmslist = "\n".join([u"%d) %s" % (i + 1, film) for i, film in enumerate(getFilms(cityCode))])
+	filmslist = "\n".join(u"%d) %s" % (i + 1, film) for i, film in enumerate(getFilms(cityCode)))
 	if protocol.TYPE_PUBLIC == msgType:
 		sendMsg(msgType, conference, nick, u"В привате")
 	sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"В городе %s показывают следующие фильмы:\n%s" % (city, filmslist))
 		
 def showAfisha(msgType, conference, nick, param):
 	param = param.lower()
+	cities = getCities()
+	if u'города' == param:
+		citieslist = "\n".join(u"%d) %s" % (i + 1, city.title()) for i, city in enumerate(sorted(cities.keys())))
+		sendMsg(msgType, conference, nick, u"Укажите, пожалуйста, один из следующих городов: %s" % (citieslist))
+		return
 	
 	city = None
 	cinema = None
-	now = None
-	
-	cities = getCities()
+	now = None	
 	
 	if re.search('[0-9]+\:[0-9]+', param):
 		args = re.split('([0-9]+\:[0-9]+)', param)
@@ -178,8 +179,7 @@ def showAfisha(msgType, conference, nick, param):
 				cinema = param[param.find(c.lower()) + len(c.lower()) + 1:]
 				break
 	if not city:
-		citieslist = u", ".join(city.title() for city in sorted(cities.keys()))
-		sendMsg(msgType, conference, nick, u"Укажите, пожалуйста, один из следующих городов: %s" % (citieslist))
+		sendMsg(msgType, conference, nick, u'Неизвестный город! Отправьте "афиша города", чтобы получить список городов.')
 		return
 
 	cityCode = cities[city]
@@ -229,9 +229,9 @@ def showAfisha(msgType, conference, nick, param):
 			u"Укажите кинотеатр, расписание которого Вы хотите посмотреть:\n%s\nили один из фильмов:\n%s" % (cinemalist, filmslist))
 	
 registerCommand(showAfisha, u"афиша", 10, 
-				u'Показывает расписание кинотеатров.',
+				u'Показывает расписание кинотеатров. Список городов можно посмотреть, указав "города" в качестве параметра.',
 				u"<город> [время] [фильм|кинотеатр]", 
-				(u"Уфа", u"Уфа 19:00", u"Уфа Семья", u"Уфа 08:00 Терминатор 4"), 
+				(u"города", u"Уфа", u"Уфа 19:00", u"Уфа Семья", u"Уфа 08:00 Терминатор 4"), 
 				CMD_ANY | CMD_PARAM)
 registerCommand(showAfishaMovies, u"фильмы", 10, 
 				u'Показывает список фильмов, которые показывают в кинотеатрах указанного города.',
