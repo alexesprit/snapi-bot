@@ -126,6 +126,32 @@ def getAfishaTime(string):
 	except ValueError:
 		return None
 
+def showAfishaCinemas(msgType, conference, nick, param):
+	city = param.lower()
+	cities = getCities()
+	if not city in cities:
+		#citieslist = u", ".join(city.title() for city in sorted(cities.keys()))
+		#sendMsg(msgType, conference, nick, u"Укажите, пожалуйста, один из следующих городов: %s" % (citieslist))
+		return
+	cityCode = cities[city]
+	cinemalist = "\n".join([u"%d) %s" % (i + 1, cinema) for i, cinema in enumerate(getCinemas(cityCode))])
+	if protocol.TYPE_PUBLIC == msgType:
+		sendMsg(msgType, conference, nick, u"В привате")
+	sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"В городе %s есть следующие кинотеатры:\n%s" % (city, cinemalist))
+
+def showAfishaMovies(msgType, conference, nick, param):
+	city = param.lower()
+	cities = getCities()
+	if not city in cities:
+		#citieslist = u", ".join(city.title() for city in sorted(cities.keys()))
+		#sendMsg(msgType, conference, nick, u"Укажите, пожалуйста, один из следующих городов: %s" % (citieslist))
+		return
+	cityCode = cities[city]
+	filmslist = "\n".join([u"%d) %s" % (i + 1, film) for i, film in enumerate(getFilms(cityCode))])
+	if protocol.TYPE_PUBLIC == msgType:
+		sendMsg(msgType, conference, nick, u"В привате")
+	sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"В городе %s показывают следующие фильмы:\n%s" % (city, filmslist))
+		
 def showAfisha(msgType, conference, nick, param):
 	param = param.lower()
 	
@@ -141,7 +167,7 @@ def showAfisha(msgType, conference, nick, param):
 		if not now:
 			sendMsg(msgType, conference, nick, u'Дата указана неверно!')
 			return
-		city = args[0].strip().title()
+		city = args[0].strip().title().lower()
 		cinema = args[2].strip().title()
 	else:
 		
@@ -196,16 +222,6 @@ def showAfisha(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, 
 				u"После %s фильм %s не найден" % (timestr, cinema))
-	elif cinema.lower() == u'кинотеатры':
-		cinemalist = "\n".join([u"%d) %s" % (i + 1, film) for i, film in enumerate(getCinemas(cityCode))])
-		if protocol.TYPE_PUBLIC == msgType:
-			sendMsg(msgType, conference, nick, u"В привате")
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"В городе %s есть следующие кинотеатры:\n%s" % (city, cinemalist))
-	elif cinema.lower() == u'фильмы':
-		filmslist = "\n".join([u"%d) %s" % (i + 1, film) for i, film in enumerate(getFilms(cityCode))])
-		if protocol.TYPE_PUBLIC == msgType:
-			sendMsg(msgType, conference, nick, u"В привате")
-		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"В городе %s показывают следующие фильмы:\n%s" % (city, filmslist))
 	else:
 		cinemalist = u", ".join(getCinemas(cityCode))
 		filmslist = u", ".join(getFilms(cityCode))
@@ -213,7 +229,17 @@ def showAfisha(msgType, conference, nick, param):
 			u"Укажите кинотеатр, расписание которого Вы хотите посмотреть:\n%s\nили один из фильмов:\n%s" % (cinemalist, filmslist))
 	
 registerCommand(showAfisha, u"афиша", 10, 
-				u'Показывает расписание кинотеатров. Для просмотра списков фильмов или кинотеатров можно указать слова "фильмы" и "кинотеатры".',
-				u"<город> [время] [фильм|кинотеатр|фильмы|кинотеатры]", 
+				u'Показывает расписание кинотеатров.',
+				u"<город> [время] [фильм|кинотеатр]", 
 				(u"Уфа", u"Уфа 19:00", u"Уфа Семья", u"Уфа 08:00 Терминатор 4"), 
+				CMD_ANY | CMD_PARAM)
+registerCommand(showAfishaMovies, u"фильмы", 10, 
+				u'Показывает список фильмов, которые показывают в кинотеатрах указанного города.',
+				u"<город>", 
+				(u"Уфа", ), 
+				CMD_ANY | CMD_PARAM)
+registerCommand(showAfishaCinemas, u"кинотеатры", 10, 
+				u'Показывает список кинотеатров указанного города.',
+				u"<город>", 
+				(u"Уфа", ), 
 				CMD_ANY | CMD_PARAM)
