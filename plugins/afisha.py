@@ -105,7 +105,7 @@ def getFilms(city):
 	
 def getCities():
 	cities = eval(io.read(getFilePath(RESOURCE_DIR, AFISHA_CITIES_PATH)))
-	return sorted(cities.keys())
+	return cities
 
 def getSchedule(city, now, cinema, film):
 	ls = []
@@ -118,37 +118,49 @@ def getSchedule(city, now, cinema, film):
 				if n > 9:
 					break
 	return ls
+	
+
+def getAfishaTime(string):
+	try:
+		return time.strptime(string, "%H:%M")
+	except ValueError:
+		return None
 
 def showAfisha(msgType, conference, nick, param):
-	hasDate = re.search(u"\d:\d", param)
-	if hasDate:
-		args = param.split(None, 2)
+	param = param.lower()
+	
+	city = None
+	cinema = None
+	now = None
+	
+	cities = getCities()
+	
+	if re.search('[0-9]+\:[0-9]+', param):
+		args = re.split('([0-9]+\:[0-9]+)', param)
+		now = getAfishaTime(args[1])
+		if not now:
+			sendMsg(msgType, conference, nick, u'Дата указана неверно!')
+			return
+		city = args[0].strip().title()
+		cinema = args[2].strip().title()
 	else:
-		args = param.split(None, 1)
-	arglen = len(args)
-
-	city = args[0].lower()
-	cities = eval(io.read(getFilePath(RESOURCE_DIR, AFISHA_CITIES_PATH)))
-	if city not in cities:
-		citieslist = u", ".join(city.capitalize() for city in getCities())
-		sendMsg(msgType, conference, nick, 
-			u"Укажите, пожалуйста, один из следующих городов: %s" % (citieslist))
+		
+		for c in cities:
+			c = c.lower()
+			if c in param:
+				city = c
+				cinema = param[param.find(c.lower()) + len(c.lower()) + 1:]
+				break
+	if not city:
+		citieslist = u", ".join(city.title() for city in sorted(cities.keys()))
+		sendMsg(msgType, conference, nick, u"Укажите, пожалуйста, один из следующих городов: %s" % (citieslist))
 		return
-	cityCode = cities[city]
-	city = city.capitalize()
 
-	if arglen > 1:
-		if hasDate:
-			try:
-				now = time.strptime(args[1], "%H:%M")
-			except ValueError:
-				now = getCityTime(cityCode)
-		else:
-			now = getCityTime(cityCode)
-		cinema = args[arglen - 1].capitalize()
-	else:
+	cityCode = cities[city]
+	city = city.title()
+	cinema = cinema.title()
+	if not now:
 		now = getCityTime(cityCode)
-		cinema = None
 	timestr = time.strftime(u"%H:%M", now)
 
 	if not cinema:
@@ -184,6 +196,16 @@ def showAfisha(msgType, conference, nick, param):
 		else:
 			sendMsg(msgType, conference, nick, 
 				u"После %s фильм %s не найден" % (timestr, cinema))
+	elif cinema.lower() == u'кинотеатры':
+		cinemalist = "\n".join([u"%d) %s" % (i + 1, film) for i, film in enumerate(getCinemas(cityCode))])
+		if protocol.TYPE_PUBLIC == msgType:
+			sendMsg(msgType, conference, nick, u"В привате")
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"В городе %s есть следующие кинотеатры:\n%s" % (city, cinemalist))
+	elif cinema.lower() == u'фильмы':
+		filmslist = "\n".join([u"%d) %s" % (i + 1, film) for i, film in enumerate(getFilms(cityCode))])
+		if protocol.TYPE_PUBLIC == msgType:
+			sendMsg(msgType, conference, nick, u"В привате")
+		sendMsg(protocol.TYPE_PRIVATE, conference, nick, u"В городе %s показывают следующие фильмы:\n%s" % (city, filmslist))
 	else:
 		cinemalist = u", ".join(getCinemas(cityCode))
 		filmslist = u", ".join(getFilms(cityCode))
@@ -191,7 +213,7 @@ def showAfisha(msgType, conference, nick, param):
 			u"Укажите кинотеатр, расписание которого Вы хотите посмотреть:\n%s\nили один из фильмов:\n%s" % (cinemalist, filmslist))
 	
 registerCommand(showAfisha, u"афиша", 10, 
-				u"Показывает расписание кинотеатров",
-				u"<город> [время] [фильм|кинотеатр]", 
+				u'Показывает расписание кинотеатров. Для просмотра списков фильмов или кинотеатров можно указать слова "фильмы" и "кинотеатры".',
+				u"<город> [время] [фильм|кинотеатр|фильмы|кинотеатры]", 
 				(u"Уфа", u"Уфа 19:00", u"Уфа Семья", u"Уфа 08:00 Терминатор 4"), 
 				CMD_ANY | CMD_PARAM)
