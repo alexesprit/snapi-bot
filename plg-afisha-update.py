@@ -5,17 +5,41 @@ import re
 from module import io
 from module import netutil
 
-TZONES_CACHE_FILE = 'afisha-cache.txt'
 AFISHA_CITIES_PATH = 'afisha-cities.txt'
 TIME_OFFSETS_PATH = 'afisha-tzones.txt'
 
 AFISHA_RU_URL = "http://www.afisha.ru/"
 
-def getCityTimeZone(city):
+gWorldTimeZonesRuData = {}
+gKursrubRuData = {}
+
+def getTimeZoneFromKursrubRu(city):
+	global gKursrubRuData
+	if not gKursrubRuData:
+		data = netutil.getURLResponseData('http://kursrub.ru/cities-list.txt', encoding='utf-8')
+		for item in data.splitlines():
+			args = item.split(',')
+			cityname = args[0]
+			cityzone = args[10][1:] # args[10] = '+4', need 4
+			gKursrubRuData[cityname] = cityzone
+	return gKursrubRuData.get(city)
+
+def getTimeZoneFromWorldTimeZonesRu(city):
+	global gWorldTimeZonesRuData
+	if not gWorldTimeZonesRuData:
+		data = netutil.getURLResponseData('http://world-time-zones.ru/goroda.htm', encoding='windows-1251')
+		items = re.findall(u'Часовой пояс г. (.+?)</td>.+?\(UTC\+(\d+)', data, re.DOTALL)
+		for item in items:
+			cityname = item[0]
+			cityzone = item[1]
+			gWorldTimeZonesRuData[cityname] = cityzone
+	return gWorldTimeZonesRuData.get(city)
+
+def getTimeZoneFromWikipedia(city):
 	def parseTZone(url):
 		data = netutil.getURLResponseData(url, encoding='utf-8')
 		if data:
-			gmt = re.search(r'<a href="/wiki/.+?" title="UTC\+\d+">UTC\+(\d+)</a>', data)
+			gmt = re.search(r'<a href="/wiki/UTC.+?" title=".+?" class="mw-redirect">UTC\+(\d+)</a>', data)
 			if gmt:
 				tzone = gmt.group(1)
 				return tzone
@@ -30,25 +54,30 @@ def getCityTimeZone(city):
 	tzone = parseTZone(url)
 	if tzone:
 		return tzone
+	return None
+
+def getCityTimeZone(city):
+	getters = (
+		getTimeZoneFromWorldTimeZonesRu,
+		getTimeZoneFromKursrubRu,
+		getTimeZoneFromWikipedia, 		
+	)
+	for getter in getters:
+		tzone = getter(city)
+		if tzone:
+			return tzone
 	return "???"
 
 def getCitiesData():
-	tzoneCache = io.load(TZONES_CACHE_FILE, {})
 	afishaData = []
 	data = netutil.getURLResponseData(AFISHA_RU_URL, encoding='utf-8')
 	items = re.findall(r'<a href="http://www.afisha.ru/(.+?)/changecity/">(.+?)</a>', data)
 	for item in items:
 		city = item[1]
 		code = item[0]	
-		if city.lower() in tzoneCache:
-			tzone = tzoneCache[city.lower()]
-		else:
-			tzone = getCityTimeZone(city)
-			if tzone != "???":
-				tzoneCache[city.lower()] = tzone
+		tzone = getCityTimeZone(city)
 		afishaData.append((city, code, tzone))
 		print "%s [%s] UTC+%s" % (city, code, tzone)
-	io.dump(TZONES_CACHE_FILE, tzoneCache)
 	return afishaData
 
 def updateAfishaCities():
