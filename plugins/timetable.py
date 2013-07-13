@@ -22,57 +22,58 @@ def getTrainTable(cityFrom, cityTo, dateForward):
 	}
 	data = netutil.getURLResponseData(url, qparam, encoding='utf-8')
 	if data:
+		transports = re.findall(u'<div class="b-timetable__tripname">(.+?)</div>', data)
+		descriptions = re.findall(u'<div class="b-timetable__description">(.+?)</div>', data)
+		platforms = re.findall(u'<div class="b-timetable__holder-name">(.+?)</div>', data)
+		times = re.findall(u'<span class="b-timetable__time.+?">(.+?)</span>', data)
+		places = re.findall(u'<td class="b-timetable__cell b-timetable__cell_type_tariff">(.+?)</td>', data)
+		
 		table = []
-		
-		rawhtml = re.search("</thead>(.+?)<div class=\"b-yadirect\">", data, re.DOTALL).group(1)
-
-		transports = re.findall(u"<div class=\"b-timetable__tripname\">(.+?)</div>", rawhtml, re.DOTALL)
-		descs = re.findall(u"<div class=\"b-timetable__description\">(.+?)</div>", rawhtml, re.DOTALL)
-		platforms = re.findall(u"<div class=\"b-timetable__platform\">(.+?)</div>", rawhtml, re.DOTALL)
-		times = re.findall(u"<div class=\"b-timetable__time\">(.+?)</div>", rawhtml, re.DOTALL)
-		places = re.findall(u"<td class=.+?column_type_price\">(.+?)</td>", rawhtml, re.DOTALL)
-		
 		count = len(transports)
-
 		for i in xrange(count):
-			if "gone" in places[i]:
+			if 'gone' in places[i]:
 				continue
-				
-			transport = netutil.removeTags(transports[i]).strip()
-			desc = netutil.removeTags(descs[i]).strip()
-			source = netutil.removeTags(platforms[2 * i + 0]).strip()
-			target = netutil.removeTags(platforms[2 * i + 1]).strip()
-			departure = netutil.removeTags(times[2 * i]).strip()
-			arrival = netutil.removeTags(times[2 * i + 1]).strip()
+			transport = netutil.removeTags(transports[i])#.strip()
+			description = netutil.removeTags(descriptions[i])#.strip()
+			departurePlace = netutil.removeTags(platforms[2 * i + 0])#.strip()
+			arrivalPlace = netutil.removeTags(platforms[2 * i + 1])#.strip()
+			departureTime = netutil.removeTags(times[2 * i])#.strip()
+			arrivalTime = netutil.removeTags(times[2 * i + 1])#.strip()
 			
-			table.append([transport, desc, source, departure, target, arrival])
+			table.append([transport, description, departurePlace, departureTime, arrivalPlace, arrivalTime])
 		return table
 	else:
 		return None
 
 def showTrainTable(msgType, conference, nick, param):
-	param = param.split(None, 1)
-	if len(param) == 2:
-		cities = param[1]
-		if cities.count(">"):
-			cityFrom, cityTo = cities.split(">")
-			date = param[0]
-			tableList = getTrainTable(cityFrom, cityTo, date)
-			message = []
-			msgText = u"%d) %s\n%s\nОтправление: %s; %s\nПрибытие: %s; %s\n"
-			if tableList:
-				for i, table in enumerate(tableList):
-					message.append(msgText % (i + 1, table[0], table[1], table[2], table[3], table[4], table[5]))
-				if protocol.TYPE_PUBLIC == msgType:
-					sendMsg(msgType, conference, nick, u"ушло")
-				sendMsg(protocol.TYPE_PRIVATE, conference, nick, "\n".join(message))
-			else:
-				sendMsg(msgType, conference, nick, u"Не найдено!")
+	DATE_RE_PATTERN = '[0-9]+\.[0-9]+'
+
+	if re.search(DATE_RE_PATTERN, param):
+		args = re.split(DATE_RE_PATTERN, param)
+		date = args[0]
+		cities = args[1]
+	else:
+		date = time.strftime('%d.%m', time.localtime())
+		cities = param
+
+	if cities.count(">"):
+		cityFrom, cityTo = cities.split(">")
+		tableList = getTrainTable(cityFrom, cityTo, date)
+		message = [u'Расписание на %s:' % date]
+		msgText = u"%d) %s\n%s\nОтправление: %s; %s\nПрибытие: %s; %s\n"
+		if tableList:
+			for i, table in enumerate(tableList):
+				message.append(msgText % (i + 1, table[0], table[1], table[2], table[3], table[4], table[5]))
+			if protocol.TYPE_PUBLIC == msgType:
+				sendMsg(msgType, conference, nick, u"ушло")
+			sendMsg(protocol.TYPE_PRIVATE, conference, nick, "\n".join(message))
 		else:
-			sendMsg(msgType, conference, nick, u"Читай помощь по команде")
+			sendMsg(msgType, conference, nick, u"Не найдено!")
+	else:
+		sendMsg(msgType, conference, nick, u"Читай помощь по команде")
 
 registerCommand(showTrainTable, u"расписание", 10, 
 				u"Показывает расписание поездов",
-				u"<дата> <место_отправления > место прибытия>", 
-				(u"12.09 Котлас > Ярославль", ), 
+				u"[дата] <место_отправления > место прибытия>", 
+				(u"Котлас > Ярославль", u"12.09 Котлас > Ярославль"), 
 				CMD_ANY | CMD_PARAM)
