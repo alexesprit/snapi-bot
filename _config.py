@@ -1,12 +1,9 @@
 # coding: utf-8
 
-# Учётная запись и пароль
+# Учётная запись
 JID = "username@server.tld"
 PASSWORD = "secret"
-
-# Ресурс и приоритет
 RESOURCE = "Snapi-Snup"
-PRIORITY = 0
 
 # Стандарный ник для конференций
 NICK = u"Snapi-Snup"
