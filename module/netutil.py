@@ -90,7 +90,7 @@ def getResponseData(response, encoding=None):
 		info = response.info()
 		contentenc = info.getheader('Content-Encoding')
 		if contentenc == 'gzip':
-			data = zlib.decompress(16 + zlib.MAX_WBITS)		
+			data = zlib.decompress(data, 16 + zlib.MAX_WBITS)		
 		if encoding != 'raw':
 			if encoding:
 				try:
