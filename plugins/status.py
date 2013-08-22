@@ -39,8 +39,7 @@ def saveUserStatus(stanza, conference, nick, truejid):
 			show = stanza.getShow() or u"online"
 			status = stanza.getStatus()
 			setNickKey(conference, nick, NICK_SHOW, show)
-			if status:
-				setNickKey(conference, nick, NICK_STATUS, status)
+			setNickKey(conference, nick, NICK_STATUS, status)
 
 registerEventHandler(saveUserStatus, EVT_PRS | H_CONFERENCE)
 
