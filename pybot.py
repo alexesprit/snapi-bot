@@ -122,8 +122,8 @@ STATUS_STRINGS = (
 	protocol.PRS_CHAT
 )
 
-KEEPALIVE_TIMEOUT = 300
-REJOIN_DELAY = 120
+KEEPALIVE_TIMEOUT = 120
+REJOIN_DELAY = 60
 RECONNECT_DELAY = 15
 
 H_CONFERENCE = 0x0001
@@ -464,15 +464,19 @@ def sendMsg(msgType, conference, nick, text, force=False):
 	sendTo(msgType, jid, text)
 
 def startKeepAliveSending():
-	#for conference in gConferences.keys():
-	#	iq = protocol.Iq(protocol.TYPE_GET)
-	#	iq.addChild("ping", xmlns=protocol.NS_PING)
-	#	iq.setTo(u"%s/%s" % (conference, getBotNick(conference)))
-	#	gClient.send(iq)
-	#	time.sleep(0.5)
-	iq = protocol.Iq(protocol.TYPE_GET)
-	iq.addChild("ping", xmlns=protocol.NS_PING)
-	gClient.send(iq)
+	def conference_ping_answer(stanza, conference):
+		if protocol.TYPE_RESULT == stanza.getType():
+			userNicks = (x.getAttr('name') for x in stanza.getQueryChildren())
+			if getBotNick(conference) not in userNicks:
+				joinConference(conference)
+				printf('rejoined to %s' % conference)
+
+	for conference in gConferences:
+		iq = protocol.Iq(protocol.TYPE_GET)
+		query = iq.addChild("query", xmlns=protocol.NS_DISCO_ITEMS)
+		iq.setTo(conference)
+		gClient.sendAndCallForResponse(iq, conference_ping_answer, (conference, ))
+		time.sleep(1)
 	startTimer(KEEPALIVE_TIMEOUT, startKeepAliveSending)
 
 def parseMessage(stanza):
@@ -833,9 +837,10 @@ def start():
 			for conference in conferences:
 				addConference(conference)
 				joinConference(conference)
+				printf("joined in %s" % conference)
 			printf("Entered in %d rooms" % (len(conferences)), FLAG_SUCCESS)
 
-		startKeepAliveSending()
+		startTimer(KEEPALIVE_TIMEOUT, startKeepAliveSending)
 
 		callEventHandlers(EVT_READY, MODE_ASYNC)
 		clearEventHandlers(EVT_READY)
