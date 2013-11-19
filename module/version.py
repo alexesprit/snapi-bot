@@ -42,7 +42,7 @@ identname = "snapi"
 identtype = "pc"
 
 appname = "Snapi-Snup"
-caps = "http://snapi-bot.googlecode.com/caps"
+caps = "https://github.com/alexesprit/snapi-bot"
 
 osinfo = platform.uname()
 osname = u"%s %s" % (osinfo[0], osinfo[2])
