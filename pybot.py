@@ -436,7 +436,7 @@ def setOfflineStatus(to=None, status=None):
 def sendTo(msgType, jid, text):
 	message = protocol.Message(jid, typ=msgType)
 	text = text.strip()
-	if text:
+	if text is not None:
 		message.setBody(text)
 	gClient.send(message)
 	callEventHandlers(EVT_SELFMSG, MODE_ASYNC, msgType, jid, text)
