@@ -799,20 +799,21 @@ def start():
 
 		printf("Loading plugins...")
 		loadPlugins()
-
-		printf("Connecting...")
-		if gClient.connect(Config.SECURE, Config.USE_RESOLVER):
-			printf("Connection established (%s)" % gClient.getConnectType(), FLAG_SUCCESS)
-		else:
-			printf("Unable to connect", FLAG_ERROR)
-			if Config.RESTART_IF_ERROR:
-				printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
-				time.sleep(RECONNECT_DELAY)
-				stop(ACTION_RESTART)
+		
+		
+		while True: 
+			printf("Connecting...")
+			if gClient.connect(Config.SECURE, Config.USE_RESOLVER):
+				printf("Connection established (%s)" % gClient.getConnectType(), FLAG_SUCCESS)
+				break
 			else:
-				stop(ACTION_SHUTDOWN)
-				return
-
+				printf("Unable to connect", FLAG_ERROR)
+				if not Config.RESTART_IF_ERROR:
+					stop(ACTION_SHUTDOWN)
+					return 0
+			printf("Sleeping for %d seconds..." % RECONNECT_DELAY)
+			time.sleep(RECONNECT_DELAY)
+					
 		printf("Authenticating...")
 		if gClient.auth(Config.USERNAME, Config.PASSWORD, Config.RESOURCE):
 			printf("Done", FLAG_SUCCESS)
