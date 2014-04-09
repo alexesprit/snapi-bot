@@ -15,7 +15,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-from module import simplejson
+import json
 
 TRANSL_LANGS_FILE = "transllangs.txt"
 
@@ -33,7 +33,7 @@ def getTranslatedText(text, source, target, detailed):
 	}
 	response = netutil.getURLResponse(url, qparam)
 	if response:
-		rawdata = simplejson.load(response)
+		rawdata = json.load(response)
 		try:
 			detailed &= ("dict" in rawdata)
 			if detailed:

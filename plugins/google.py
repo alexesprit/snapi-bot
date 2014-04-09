@@ -14,7 +14,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-from module import simplejson
+import json
 
 def getGoogleSearchQuery(text, lang=None):
 	param = {
@@ -43,7 +43,7 @@ def searchInGoogleRU(msgType, conference, nick, text):
 def searchInGoogle(msgType, conference, nick, url, qparam):
 	response = netutil.getURLResponse(url, qparam)
 	if response:
-		response = simplejson.load(response)
+		response = json.load(response)
 		rawdata = response["responseData"]["results"]
 		if rawdata:
 			if msgType == protocol.TYPE_PUBLIC:
