@@ -52,16 +52,20 @@ class TCPSocket(plugin.PlugIn):
 		""" SRV resolver. Takes server=(host, port) as argument.
 			Returns new (host, port) pair
 		"""
-		from module import dns
-		host, port = server
-		query = "_xmpp-client._tcp.%s" % host
-
 		try:
-			dns.DiscoverNameServers()
-			response = dns.DnsRequest().req(query, qtype="SRV")
-			if response.answers:
-				host = response.answers[0]["data"][3]
-		except dns.DNSError:
+			import dns.resolver
+
+			host, port = server
+			query = "_xmpp-client._tcp.%s" % host
+			try:
+				answers = dns.resolver.query(query, 'SRV')
+				if answers:
+					_host = str(answers[0].target)
+					_port = int(answers[0].port)
+					return _host, _port
+			except dns.resolver.NXDOMAIN:
+				pass
+		except ImportError:
 			pass
 		return host, port
 
