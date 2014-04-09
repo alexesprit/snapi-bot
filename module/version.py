@@ -18,6 +18,7 @@ import base64
 import hashlib
 import os
 import platform
+import sys
 
 from module.xmpp import protocol
 
@@ -25,16 +26,16 @@ MAJOR = "0"
 MINOR = "1"
 
 BOT_FEATURES = (
-	protocol.NS_ACTIVITY,
-	protocol.NS_DISCO_INFO,
-	protocol.NS_DISCO_ITEMS,
-	protocol.NS_MOOD,
-	protocol.NS_MUC,
-	protocol.NS_VERSION,
-	protocol.NS_PING,
-	protocol.NS_RECEIPTS,
-	protocol.NS_ENTITY_TIME,
-	protocol.NS_VCARD
+    protocol.NS_ACTIVITY,
+    protocol.NS_DISCO_INFO,
+    protocol.NS_DISCO_ITEMS,
+    protocol.NS_MOOD,
+    protocol.NS_MUC,
+    protocol.NS_VERSION,
+    protocol.NS_PING,
+    protocol.NS_RECEIPTS,
+    protocol.NS_ENTITY_TIME,
+    protocol.NS_VCARD
 )
 
 identcat = "bot"
@@ -47,9 +48,12 @@ caps = "https://github.com/alexesprit/snapi-bot"
 osinfo = platform.uname()
 osname = u"%s %s" % (osinfo[0], osinfo[2])
 
-sha = os.popen("git rev-parse --short HEAD").read().strip()
-if not sha or "Not a git" in sha:
-	sha = "unknown"
+workdir = os.path.dirname(sys.argv[0])
+if not workdir:
+    workdir = os.getcwd()
+sha = os.popen('git -C "%s" rev-parse --short HEAD' % workdir).read().strip()
+if not sha or 'Not a git' in sha:
+    sha = '?'
 version = u"%s.%s-%s" % (MAJOR, MINOR, sha)
 
 features = "<".join(BOT_FEATURES)
@@ -59,6 +63,6 @@ verhash = base64.b64encode(hashlib.sha1(string).digest())
 del features
 del string
 del osinfo
+del workdir
 del MAJOR
 del MINOR
-
