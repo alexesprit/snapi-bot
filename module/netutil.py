@@ -18,7 +18,7 @@ import urllib
 import urllib2
 import zlib
 
-from module import chardet
+import chardet
 
 REQUEST_TIMEOUT = 15
 HTML_ESC_MAP = (
