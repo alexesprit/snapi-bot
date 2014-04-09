@@ -51,7 +51,8 @@ osname = u"%s %s" % (osinfo[0], osinfo[2])
 workdir = os.path.dirname(sys.argv[0])
 if not workdir:
     workdir = os.getcwd()
-sha = os.popen('git -C "%s" rev-parse --short HEAD' % workdir).read().strip()
+gitdir = os.path.join(workdir, '.git')
+sha = os.popen('git --git-dir="%s" rev-parse --short HEAD' % gitdir).read().strip()
 if not sha or 'Not a git' in sha:
     sha = '?'
 version = u"%s.%s-%s" % (MAJOR, MINOR, sha)
@@ -64,5 +65,6 @@ del features
 del string
 del osinfo
 del workdir
+del gitdir
 del MAJOR
 del MINOR
