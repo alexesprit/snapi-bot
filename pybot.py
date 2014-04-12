@@ -55,8 +55,6 @@ CONF_FILE = "conferences.txt"
 LOG_ERRORS_FILE = "%Y.%m.%d_errors.txt"
 LOG_CRASHES_FILE = "%Y.%m.%d_crashes.txt"
 
-JOKES_FILE = "jokes.txt"
-
 FLAG_INFO = "info"
 FLAG_ERROR = "error"
 FLAG_WARNING = "warning"
@@ -446,16 +444,10 @@ def sendToConference(conference, text):
 
 def sendMsg(msgType, conference, nick, text, force=False):
     if protocol.TYPE_PUBLIC == msgType and not force:
-        fools = getConferenceConfigKey(conference, "jokes")
-        if fools and not random.randrange(0, 30):
-            jokesPath = getFilePath(RESOURCE_DIR, JOKES_FILE)
-            jokes = eval(io.read(jokesPath))
-            text = random.choice(jokes)
-        else:
-            msgLimit = getConferenceConfigKey(conference, "msg")
-            if msgLimit and len(text) > msgLimit:
-                sendMsg(msgType, conference, nick, u"Смотри в привате (ограничение в %d символов)" % (msgLimit), True)
-                msgType = protocol.TYPE_PRIVATE
+        msgLimit = getConferenceConfigKey(conference, "msg")
+        if msgLimit and len(text) > msgLimit:
+            sendMsg(msgType, conference, nick, u"Смотри в привате (ограничение в %d символов)" % (msgLimit), True)
+            msgType = protocol.TYPE_PRIVATE
     if protocol.TYPE_PUBLIC == msgType:
         text = u"%s, %s" % (nick, text)
         jid = conference
