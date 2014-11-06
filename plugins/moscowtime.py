@@ -8,35 +8,43 @@
 import socket
 import struct
 
+import pytz
+
+from pytz import timezone
+from datetime import datetime
+
 WEEKDAYS = (u"понедельник", u"вторник", u"среда", u"четверг", u"пятница", u"суббота", u"воскресенье")
+NTP_SERVER = "pool.ntp.org"
+NTP_PACKET = "\x1b" + 47 * "\0"
 
-def getMoscowTime():
+def getUtcTime():
 	try:
-		server = ("pool.ntp.org", 123)
-		reqdata = "\x1b" + 47 * "\0"
-
+		server = (NTP_SERVER, 123)
 		client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		client.sendto(reqdata, server)
+		client.sendto(NTP_PACKET, server)
 		data = client.recvfrom(1024)[0]
 		if data:
 			seconds = struct.unpack('!12I', data)[10]
 			if seconds:
-				return time.gmtime(seconds - 2208988800L + 4 * 3600)
+				return seconds - 2208988800L
 	except socket.error:
 		pass
-	return None
+	return 0
 
 def showMoscowTime(msgType, conference, nick, param):
-	fromntp = True
-	currtime = getMoscowTime()
-	if not currtime:
-		fromntp = False
-		currtime = time.localtime()
-	timestr = time.strftime("%H:%M:%S, %d.%m.%Y", currtime)
-	if fromntp:
-		message = u"Московское время: %s, %s" % (timestr, WEEKDAYS[currtime[6]])
+	current_time = getUtcTime()
+	if current_time:
+		from_ntp = True
 	else:
-		message = u"Локальное время: %s, %s" % (timestr, WEEKDAYS[currtime[6]])
+		from_ntp = False
+		current_time = time.time()
+
+	moscow_tz = timezone('Europe/Moscow')
+	utc_dt = pytz.utc.localize(datetime.utcfromtimestamp(current_time))
+	moscow_dt = utc_dt.astimezone(moscow_tz)
+	time_str = moscow_dt.strftime('%Y-%m-%d %H:%M:%S %Z%z')
+
+	message = u"Московское время: %s".format(time_str)
 	sendMsg(msgType, conference, nick, message)
 
 registerCommand(showMoscowTime, u"время", 10,
