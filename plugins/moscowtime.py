@@ -44,7 +44,7 @@ def showMoscowTime(msgType, conference, nick, param):
 	moscow_dt = utc_dt.astimezone(moscow_tz)
 	time_str = moscow_dt.strftime('%Y-%m-%d %H:%M:%S %Z%z')
 
-	message = u"Московское время: %s".format(time_str)
+	message = u"Московское время: {0}".format(time_str)
 	sendMsg(msgType, conference, nick, message)
 
 registerCommand(showMoscowTime, u"время", 10,
