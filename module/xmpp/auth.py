@@ -90,8 +90,8 @@ class SASL(plugin.PlugIn):
 			node = protocol.Node("auth", attrs={"xmlns": protocol.NS_SASL, "mechanism": "DIGEST-MD5"})
 		elif "PLAIN" in mecs:
 			data = "%s@%s\x00%s\x00%s" % (self.username, self._owner.server, self.username, self.password)
-			iq = protocol.Node("auth", attrs={"xmlns": protocol.NS_SASL, "mechanism": "PLAIN"})
-			iq.setData(base64.encodestring(data).replace("\r", "").replace("\n", ""))
+			node = protocol.Node("auth", attrs={"xmlns": protocol.NS_SASL, "mechanism": "PLAIN"})
+			node.setData(base64.encodestring(data).replace("\r", "").replace("\n", ""))
 		else:
 			self.state = AUTH_FAILURE
 			self.printf("I can only use DIGEST-MD5 and PLAIN mecanisms.", "error")
